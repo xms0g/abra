@@ -72,13 +72,28 @@ FrameBuffer& FrameBuffer::withTextureMultisampled(const int multisampledCount) {
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTexture16F() {
+FrameBuffer& FrameBuffer::withTextureFP(const bool alpha, const uint32_t format) {
+	const uint32_t fmt = alpha ? GL_RGBA : GL_RGB;
+	int internalFormat = 0;
+	if (format == 16) {
+		if (alpha) {
+			internalFormat = GL_RGBA16F;
+		} else {
+			internalFormat = GL_RGB16F;
+		}
+	} else if (format == 32) {
+		if (alpha) {
+			internalFormat = GL_RGBA32F;
+		} else {
+			internalFormat = GL_RGB32F;
+		}
+	}
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextureIDs.push_back(textureID);
 
 	glBindTexture(GL_TEXTURE_2D, textureID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, mWidth, mHeight, 0, GL_RGBA, GL_FLOAT, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, mWidth, mHeight, 0, fmt, GL_FLOAT, nullptr);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -88,13 +103,27 @@ FrameBuffer& FrameBuffer::withTexture16F() {
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTexture16FMultisampled(const int multisampledCount) {
+FrameBuffer& FrameBuffer::withTextureFPMultisampled(const bool alpha, const uint32_t format, const int multisampledCount) {
+	int internalFormat = 0;
+	if (format == 16) {
+		if (alpha) {
+			internalFormat = GL_RGBA16F;
+		} else {
+			internalFormat = GL_RGB16F;
+		}
+	} else if (format == 32) {
+		if (alpha) {
+			internalFormat = GL_RGBA32F;
+		} else {
+			internalFormat = GL_RGB32F;
+		}
+	}
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextureIDs.push_back(textureID);
 
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureID);
-	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, multisampledCount, GL_RGBA16F, mWidth, mHeight, GL_TRUE);
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, multisampledCount, internalFormat, mWidth, mHeight, GL_TRUE);
 
 	setAttachment(textureID, GL_TEXTURE_2D_MULTISAMPLE);
 
@@ -176,19 +205,35 @@ FrameBuffer& FrameBuffer::withTextureCubemapArrayDepth(const int layerCount) {
 }
 
 FrameBuffer& FrameBuffer::withRenderBufferDepth(const uint32_t depthFormat) {
+	uint32_t format = 0;
+	if (depthFormat == 16) {
+		format = GL_DEPTH_COMPONENT16;
+	} else if (depthFormat == 24) {
+		format = GL_DEPTH_COMPONENT24;
+	} else if (depthFormat == 32) {
+		format = GL_DEPTH_COMPONENT32F;
+	}
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 
-	glRenderbufferStorage(GL_RENDERBUFFER, depthFormat, mWidth, mHeight);
+	glRenderbufferStorage(GL_RENDERBUFFER, format, mWidth, mHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	return *this;
 }
 
 FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(const int multisampledCount, const uint32_t depthFormat) {
+	uint32_t format = 0;
+	if (depthFormat == 16) {
+		format = GL_DEPTH_COMPONENT16;
+	} else if (depthFormat == 24) {
+		format = GL_DEPTH_COMPONENT24;
+	} else if (depthFormat == 32) {
+		format = GL_DEPTH_COMPONENT32F;
+	}
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisampledCount, depthFormat, mWidth, mHeight);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisampledCount, format, mWidth, mHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	return *this;

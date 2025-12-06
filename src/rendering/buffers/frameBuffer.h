@@ -27,9 +27,9 @@ public:
 
 	FrameBuffer& withTextureMultisampled(int multisampledCount);
 
-	FrameBuffer& withTexture16F();
+	FrameBuffer& withTextureFP(bool alpha, uint32_t format);
 
-	FrameBuffer& withTexture16FMultisampled(int multisampledCount);
+	FrameBuffer& withTextureFPMultisampled(bool alpha, uint32_t format, int multisampledCount);
 
 	FrameBuffer& withTextureDepth();
 
