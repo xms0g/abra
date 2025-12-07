@@ -66,6 +66,14 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
 	}
 }
 
+void Mesh::bind() const {
+	glBindVertexArray(mVAO);
+}
+
+void Mesh::unbind() const {
+	glBindVertexArray(0);
+}
+
 void Mesh::enableInstanceAttributes(const uint32_t instanceVBO, const size_t offset) const {
 	glBindVertexArray(mVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);

@@ -30,7 +30,7 @@ void BlendInstancedPass::execute(const RenderContext& ctx) {
 			RenderCommon::bindTextures(material->textures, *shader);
 
 			for (const auto& mesh: *meshes) {
-				glBindVertexArray(mesh.VAO());
+				mesh.bind();
 				glDrawElementsInstanced(GL_TRIANGLES, static_cast<int32_t>(mesh.indices().size()),
 										GL_UNSIGNED_INT, nullptr, static_cast<int32_t>(count));
 			}

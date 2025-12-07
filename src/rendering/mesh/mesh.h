@@ -39,11 +39,13 @@ public:
 
 	[[nodiscard]] const glm::vec3& max() const { return mMax; }
 
-	[[nodiscard]] uint32_t VAO() const { return mVAO; }
-
 	[[nodiscard]] bool isVisible() const { return mIsVisible; }
 
 	void setVisible(const bool visible) { mIsVisible = visible; }
+
+	void bind() const;
+
+	void unbind() const;
 
 	void enableInstanceAttributes(uint32_t instanceVBO, size_t offset) const;
 private:

@@ -36,7 +36,7 @@ void RenderCommon::drawMeshes(const std::vector<Mesh>& meshes) {
 	for (const auto& mesh: meshes) {
 		if (!mesh.isVisible()) continue;
 
-		glBindVertexArray(mesh.VAO());
+		mesh.bind();
 		if (!mesh.indices().empty()) {
 			glDrawElements(GL_TRIANGLES, static_cast<int32_t>(mesh.indices().size()), GL_UNSIGNED_INT, nullptr);
 		} else {
