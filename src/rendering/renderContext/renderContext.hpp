@@ -22,6 +22,7 @@ struct RenderContext {
 
 	struct {
 		const UniformBuffer* ubo;
+		uint32_t maxDirLights, maxPointLights, maxSpotLights;
 		const std::vector<DirectionalLightComponent*>* dirLights;
 		const std::vector<PointLightComponent*>* pointLights;
 		const std::vector<SpotLightComponent*>* spotLights;
@@ -59,4 +60,6 @@ struct RenderContext {
 		const std::array<uint32_t, 3>* textures;
 		const UniformBuffer* ubo;
 	} shadowMap;
+
+	RenderContext() = default;
 };

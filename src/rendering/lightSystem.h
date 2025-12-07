@@ -1,6 +1,7 @@
 #pragma once
 #include "../ECS/system.hpp"
 
+struct RenderContext;
 class UniformBuffer;
 struct PointLightComponent;
 struct DirectionalLightComponent;
@@ -8,7 +9,7 @@ struct SpotLightComponent;
 
 class LightSystem final : public System {
 public:
-	LightSystem();
+	LightSystem(const RenderContext& ctx);
 
 	[[nodiscard]] const UniformBuffer& getLightUBO() const { return *mLightUBO; }
 
@@ -16,10 +17,10 @@ public:
 	[[nodiscard]] const std::vector<DirectionalLightComponent*>& getDirLights() const { return dirLights; }
 	[[nodiscard]] const std::vector<SpotLightComponent*>& getSpotLights() const { return spotLights; }
 
-	void update();
+	void update(const RenderContext& ctx);
 
 private:
-	void updateLightUBO() const;
+	void updateLightUBO(const RenderContext& ctx) const;
 
 	std::unique_ptr<UniformBuffer> mLightUBO;
 	std::vector<DirectionalLightComponent*> dirLights;

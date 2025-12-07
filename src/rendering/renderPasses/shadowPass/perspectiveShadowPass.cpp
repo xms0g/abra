@@ -33,8 +33,8 @@ void PerspectiveShadowPass::render(const RenderContext& ctx, const glm::vec4& di
 	const glm::mat4 lightProjection = glm::perspective(
 		fovy,
 		static_cast<float>(ctx.shadowMap.width) / static_cast<float>(ctx.shadowMap.height),
-		SHADOW_PERSPECTIVE_NEAR,
-		SHADOW_PERSPECTIVE_FAR);
+		ctx.shadowMap.perspective.nearPlane,
+		ctx.shadowMap.perspective.farPlane);
 
 	const auto dir = glm::vec3(direction);
 	const auto pos = glm::vec3(position);
@@ -59,5 +59,5 @@ void PerspectiveShadowPass::render(const RenderContext& ctx, const glm::vec4& di
 	}
 	mDepthMap->unbind();
 	glCullFace(GL_BACK);
-	glViewport(0, 0, static_cast<int32_t>(SCR_WIDTH), static_cast<int32_t>(SCR_HEIGHT));
+	glViewport(0, 0, static_cast<int32_t>(ctx.screen.width), static_cast<int32_t>(ctx.screen.height));
 }

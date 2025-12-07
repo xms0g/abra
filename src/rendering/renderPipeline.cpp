@@ -53,7 +53,12 @@ RenderPipeline::RenderPipeline(Registry* registry) {
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
 
-	registry->addSystem<LightSystem>();
+	mRenderCtx = std::make_unique<RenderContext>();
+	mRenderCtx->light.maxDirLights = MAX_DIRECTIONAL_LIGHTS;
+	mRenderCtx->light.maxPointLights = MAX_POINT_LIGHTS;
+	mRenderCtx->light.maxSpotLights = MAX_SPOT_LIGHTS;
+
+	registry->addSystem<LightSystem>(*mRenderCtx);
 	mLightSystem = &registry->getSystem<LightSystem>();
 }
 
@@ -141,7 +146,9 @@ void RenderPipeline::configure(const Camera& camera) {
 #endif
 	mRenderPasses.push_back(mPostProcessPass);
 
-	mRenderCtx = std::make_unique<RenderContext>(&mRenderQueue, mSceneBuffer.get(), mIntermediateBuffer.get());
+	mRenderCtx->renderQueue = &mRenderQueue;
+	mRenderCtx->sceneBuffer = mSceneBuffer.get();
+	mRenderCtx->intermediateBuffer = mIntermediateBuffer.get();
 	mRenderCtx->light.ubo = &mLightSystem->getLightUBO();
 	mRenderCtx->light.dirLights = &mLightSystem->getDirLights();
 	mRenderCtx->light.pointLights = &mLightSystem->getPointLights();
@@ -207,7 +214,7 @@ void RenderPipeline::render() {
 	refreshCameraData();
 	sortEntities();
 
-	mLightSystem->update();
+	mLightSystem->update(*mRenderCtx);
 
 	for (const auto& pass: mRenderPasses) {
 		pass->execute(*mRenderCtx);

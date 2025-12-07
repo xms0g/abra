@@ -3,7 +3,6 @@
 #include "../../shader.h"
 #include "../../renderCommon.h"
 #include "../../buffers/frameBuffer.h"
-#include "../../../config/config.hpp"
 
 FXAA::FXAA(const std::string& name, const bool enabled) : IPostEffect(name, enabled) {
 	shader = std::make_unique<Shader>("models/quad.vert", "post-processing/fxaa.frag");
@@ -17,7 +16,7 @@ uint32_t FXAA::render(const uint32_t sceneTexture, const uint32_t VAO,
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	shader->activate();
-	shader->setVec2("resolution", glm::vec2(SCR_WIDTH, SCR_HEIGHT));
+	shader->setVec2("resolution", glm::vec2(renderTargets[toggle]->width(), renderTargets[toggle]->height()));
 	RenderCommon::drawQuad(sceneTexture, VAO);
 
 	const uint32_t texture = renderTargets[toggle]->texture();
