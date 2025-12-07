@@ -160,6 +160,7 @@ void RenderPipeline::configure(const Camera& camera) {
 	mRenderCtx->shadowMap.textureSlot = SHADOWMAP_TEXTURE_SLOT;
 	mRenderCtx->shadowMap.width = SHADOWMAP_WIDTH;
 	mRenderCtx->shadowMap.height = SHADOWMAP_HEIGHT;
+	mRenderCtx->shadowMap.directional.maxLights = MAX_DIRECTIONAL_LIGHTS;
 	mRenderCtx->shadowMap.directional.nearPlane = SHADOW_DIRECTIONAL_NEAR;
 	mRenderCtx->shadowMap.directional.farPlane = SHADOW_DIRECTIONAL_FAR;
 	mRenderCtx->shadowMap.directional.left = SHADOW_DIRECTIONAL_LEFT;

@@ -40,20 +40,21 @@ struct RenderContext {
 	} screen;
 
 	struct {
-		uint32_t textureSlot;
-		uint32_t width, height;
+		int textureSlot;
+		int width, height;
 
 		struct  {
+			int maxLights;
 			float nearPlane, farPlane, left, right, bottom, top;
 		} directional;
 
 		struct {
-			uint32_t maxLights;
+			int maxLights;
 			float nearPlane, farPlane, fovy;
 		} omnidirectional;
 
 		struct {
-			uint32_t maxLights;
+			int maxLights;
 			float nearPlane, farPlane;
 		} perspective;
 

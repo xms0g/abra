@@ -19,15 +19,15 @@ constexpr float ZNEAR{0.1f};
 constexpr float ZFAR{100.0f};
 
 // Light Settings
-constexpr uint32_t MAX_DIRECTIONAL_LIGHTS{1};
-constexpr uint32_t MAX_POINT_LIGHTS{4};
-constexpr uint32_t MAX_SPOT_LIGHTS{4};
+constexpr int MAX_DIRECTIONAL_LIGHTS{1};
+constexpr int MAX_POINT_LIGHTS{4};
+constexpr int MAX_SPOT_LIGHTS{4};
 
 // Render Settings
 constexpr uint32_t MULTISAMPLED_COUNT{4};
-constexpr uint32_t SHADOWMAP_WIDTH{1024};
-constexpr uint32_t SHADOWMAP_HEIGHT{1024};
-constexpr uint32_t SHADOWMAP_TEXTURE_SLOT{4};
+constexpr int SHADOWMAP_WIDTH{1024};
+constexpr int SHADOWMAP_HEIGHT{1024};
+constexpr int SHADOWMAP_TEXTURE_SLOT{4};
 constexpr float SHADOW_DIRECTIONAL_NEAR{1.0f};
 constexpr float SHADOW_DIRECTIONAL_FAR{7.5f};
 constexpr float SHADOW_DIRECTIONAL_LEFT{-10.0f};

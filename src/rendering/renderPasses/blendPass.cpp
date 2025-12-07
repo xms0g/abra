@@ -12,6 +12,14 @@
 BlendPass::~BlendPass() = default;
 
 void BlendPass::configure(const RenderContext& ctx) {
+	for (const auto& [entity, matBatches]: ctx.renderQueue->blendGroups) {
+		for (const auto& [material, shader, meshes]: matBatches) {
+			shader->activate();
+			shader->setInt("shadowMap", ctx.shadowMap.textureSlot);
+			shader->setInt("shadowCubemap", ctx.shadowMap.textureSlot + 1);
+			shader->setInt("persShadowMap", ctx.shadowMap.textureSlot + 2);
+		}
+	}
 }
 
 void BlendPass::execute(const RenderContext& ctx) {
@@ -25,9 +33,6 @@ void BlendPass::execute(const RenderContext& ctx) {
 
 		for (const auto& [material, shader, meshes]: matBatches) {
 			shader->activate();
-			shader->setInt("shadowMap", ctx.shadowMap.textureSlot);
-			shader->setInt("shadowCubemap", ctx.shadowMap.textureSlot + 1);
-			shader->setInt("persShadowMap", ctx.shadowMap.textureSlot + 2);
 
 			RenderCommon::setupTransform(*entity, *shader);
 			RenderCommon::setupMaterial(*entity, *shader);

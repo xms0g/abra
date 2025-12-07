@@ -18,6 +18,8 @@ SkyboxPass::~SkyboxPass() = default;
 void SkyboxPass::configure(const RenderContext& ctx) {
 	const auto& skybox = ctx.renderQueue->skyboxEntity;
 	const auto& shader = skybox->getComponent<ShaderComponent>().shader;
+	shader->activate();
+	shader->setInt("skybox", 0);
 
 	ctx.camera.ubo->configure(shader->ID(), 0, "CameraBlock");
 }
@@ -30,7 +32,6 @@ void SkyboxPass::execute(const RenderContext& ctx) {
 
 	ctx.sceneBuffer->bind();
 	shader->activate();
-	shader->setInt("skybox", 0);
 	shader->setMat4("skyView", ctx.camera.skyView);
 
 	glActiveTexture(GL_TEXTURE0); // active proper texture unit before binding

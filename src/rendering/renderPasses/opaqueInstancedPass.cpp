@@ -15,6 +15,15 @@ OpaqueInstancedPass::~OpaqueInstancedPass() = default;
 void OpaqueInstancedPass::configure(const RenderContext& ctx) {
 	prepareInstanceBuffer(ctx);
 	prepareInstanceData(ctx);
+
+	for (const auto& [entity, transforms, matBatches]: ctx.renderQueue->opaqueInstancedGroups) {
+		for (const auto& [material, shader, meshes]: matBatches) {
+			shader->activate();
+			shader->setInt("shadowMap", ctx.shadowMap.textureSlot);
+			shader->setInt("shadowCubemap", ctx.shadowMap.textureSlot + 1);
+			shader->setInt("persShadowMap", ctx.shadowMap.textureSlot + 2);
+		}
+	}
 }
 
 void OpaqueInstancedPass::execute(const RenderContext& ctx) {
@@ -26,9 +35,6 @@ void OpaqueInstancedPass::execute(const RenderContext& ctx) {
 
 		for (const auto& [material, shader, meshes]: matBatches) {
 			shader->activate();
-			shader->setInt("shadowMap", ctx.shadowMap.textureSlot);
-			shader->setInt("shadowCubemap", ctx.shadowMap.textureSlot + 1);
-			shader->setInt("persShadowMap", ctx.shadowMap.textureSlot + 2);
 
 			RenderCommon::setupMaterial(*entity, *shader);
 			RenderCommon::bindTextures(material->textures, *shader);

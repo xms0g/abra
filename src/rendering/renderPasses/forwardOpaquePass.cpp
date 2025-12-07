@@ -11,6 +11,14 @@
 ForwardOpaquePass::~ForwardOpaquePass() = default;
 
 void ForwardOpaquePass::configure(const RenderContext& ctx) {
+	for (const auto& [entity, matBatches]: ctx.renderQueue->forwardOpaqueGroups) {
+		for (const auto& [material, shader, meshes]: matBatches) {
+			shader->activate();
+			shader->setInt("shadowMap", ctx.shadowMap.textureSlot);
+			shader->setInt("shadowCubemap", ctx.shadowMap.textureSlot + 1);
+			shader->setInt("persShadowMap", ctx.shadowMap.textureSlot + 2);
+		}
+	}
 }
 
 void ForwardOpaquePass::execute(const RenderContext& ctx) {
@@ -23,9 +31,6 @@ void ForwardOpaquePass::execute(const RenderContext& ctx) {
 
 		for (const auto& [material, shader, meshes]: matBatches) {
 			shader->activate();
-			shader->setInt("shadowMap", ctx.shadowMap.textureSlot);
-			shader->setInt("shadowCubemap", ctx.shadowMap.textureSlot + 1);
-			shader->setInt("persShadowMap", ctx.shadowMap.textureSlot + 2);
 
 			RenderCommon::setupTransform(*entity, *shader);
 			RenderCommon::setupMaterial(*entity, *shader);
