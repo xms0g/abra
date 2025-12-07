@@ -49,7 +49,7 @@ private:
 	// Render queue
 	RenderQueue mRenderQueue;
 	// Render context
-	std::unique_ptr<RenderContext> mContext;
+	std::unique_ptr<RenderContext> mRenderCtx;
 	// Render passes
 	std::shared_ptr<ShadowPass> mShadowPass;
 	std::shared_ptr<PostProcessPass> mPostProcessPass;

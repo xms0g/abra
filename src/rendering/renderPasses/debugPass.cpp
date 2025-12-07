@@ -11,7 +11,7 @@
 
 DebugPass::~DebugPass() = default;
 
-void DebugPass::configure(const RenderContext& context) {
+void DebugPass::configure(const RenderContext& ctx) {
 	mDebugShaders = {
 		nullptr, // for None
 		std::make_shared<Shader>("debug/normal.vert", "debug/normal.frag", "debug/normal.geom"),
@@ -20,13 +20,13 @@ void DebugPass::configure(const RenderContext& context) {
 
 	for (const auto& shader: mDebugShaders) {
 		if (!shader) continue;
-		context.camera.ubo->configure(shader->ID(), 0, "CameraBlock");
+		ctx.camera.ubo->configure(shader->ID(), 0, "CameraBlock");
 	}
 }
 
-void DebugPass::execute(const RenderContext& context) {
-	context.sceneBuffer->bind();
-	for (const auto& [entity, matBatches]: context.renderQueue->debugGroups) {
+void DebugPass::execute(const RenderContext& ctx) {
+	ctx.sceneBuffer->bind();
+	for (const auto& [entity, matBatches]: ctx.renderQueue->debugGroups) {
 		const auto& db = entity->getComponent<DebugComponent>();
 		if (db.mode == None)
 			continue;
@@ -39,5 +39,5 @@ void DebugPass::execute(const RenderContext& context) {
 			RenderCommon::drawMeshes(*meshes);
 		}
 	}
-	context.sceneBuffer->unbind();
+	ctx.sceneBuffer->unbind();
 }

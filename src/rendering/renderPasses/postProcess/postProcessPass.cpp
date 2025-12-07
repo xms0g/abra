@@ -16,12 +16,12 @@
 
 PostProcessPass::~PostProcessPass() = default;
 
-void PostProcessPass::configure(const RenderContext& context) {
+void PostProcessPass::configure(const RenderContext& ctx) {
 	mQuad = std::make_unique<Models::Quad>();
 
 	mEffects = {
 		std::make_shared<Blur>("Blur", false),
-		std::make_shared<Bloom>("Bloom", context.screen.width, context.screen.height, false),
+		std::make_shared<Bloom>("Bloom", ctx.screen.width, ctx.screen.height, false),
 		std::make_shared<ToneMapping>("Tone Mapping", false, 1.1f),
 		std::make_shared<Grayscale>("Grayscale", false),
 		std::make_shared<Sepia>("Sepia", false),
@@ -32,7 +32,7 @@ void PostProcessPass::configure(const RenderContext& context) {
 	};
 
 	for (auto& target: renderTargets) {
-		target = std::make_unique<FrameBuffer>(context.screen.width, context.screen.height);
+		target = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
 #ifdef HDR
 		target->withTextureFP(true, 16)
 #else
@@ -42,8 +42,8 @@ void PostProcessPass::configure(const RenderContext& context) {
 	}
 }
 
-void PostProcessPass::execute(const RenderContext& context) {
-	uint32_t inputTex = context.sceneBuffer->texture();
+void PostProcessPass::execute(const RenderContext& ctx) {
+	uint32_t inputTex = ctx.sceneBuffer->texture();
 	int toggle = 0;
 
 	for (const auto& effect: mEffects) {

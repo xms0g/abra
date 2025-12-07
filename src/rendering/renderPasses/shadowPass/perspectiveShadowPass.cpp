@@ -9,9 +9,9 @@
 #include "../../buffers/frameBuffer.h"
 #include "../../renderCommon.h"
 
-PerspectiveShadowPass::PerspectiveShadowPass(const RenderContext& context) {
-	mDepthMap = std::make_unique<FrameBuffer>(context.shadowMap.width, context.shadowMap.height);
-	mDepthMap->withTextureArrayDepth(context.shadowMap.perspective.maxLights)
+PerspectiveShadowPass::PerspectiveShadowPass(const RenderContext& ctx) {
+	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadowMap.width, ctx.shadowMap.height);
+	mDepthMap->withTextureArrayDepth(ctx.shadowMap.perspective.maxLights)
 			.checkStatus();
 	mDepthMap->unbind();
 
@@ -28,11 +28,11 @@ glm::mat4 PerspectiveShadowPass::getLightSpaceMatrix(const int layer) const {
 	return mLightSpaceMatrix[layer];
 }
 
-void PerspectiveShadowPass::render(const RenderContext& context, const glm::vec4& direction,
+void PerspectiveShadowPass::render(const RenderContext& ctx, const glm::vec4& direction,
                                    const glm::vec4& position, const float fovy, const int layer) {
 	const glm::mat4 lightProjection = glm::perspective(
 		fovy,
-		static_cast<float>(context.shadowMap.width) / static_cast<float>(context.shadowMap.height),
+		static_cast<float>(ctx.shadowMap.width) / static_cast<float>(ctx.shadowMap.height),
 		SHADOW_PERSPECTIVE_NEAR,
 		SHADOW_PERSPECTIVE_FAR);
 
@@ -50,8 +50,8 @@ void PerspectiveShadowPass::render(const RenderContext& context, const glm::vec4
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
-	glViewport(0, 0, context.shadowMap.width, context.shadowMap.height);
-	for (const auto& [entity, matBatches]: context.renderQueue->shadowCasterGroups) {
+	glViewport(0, 0, ctx.shadowMap.width, ctx.shadowMap.height);
+	for (const auto& [entity, matBatches]: ctx.renderQueue->shadowCasterGroups) {
 		for (const auto& [material, shader, meshes]: matBatches) {
 			RenderCommon::setupTransform(*entity, *mDepthShader);
 			RenderCommon::drawMeshes(*meshes);

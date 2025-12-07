@@ -13,9 +13,9 @@ public:
 
 	const Shader& getShader() const { return *mShader; }
 
-	void configure(const RenderContext& context) override;
+	void configure(const RenderContext& ctx) override;
 
-	void execute(const RenderContext& context) override;
+	void execute(const RenderContext& ctx) override;
 
 private:
 	std::unique_ptr<FrameBuffer> mGBuffer;

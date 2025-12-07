@@ -12,23 +12,23 @@
 
 OpaqueInstancedPass::~OpaqueInstancedPass() = default;
 
-void OpaqueInstancedPass::configure(const RenderContext& context) {
-	prepareInstanceBuffer(context);
-	prepareInstanceData(context);
+void OpaqueInstancedPass::configure(const RenderContext& ctx) {
+	prepareInstanceBuffer(ctx);
+	prepareInstanceData(ctx);
 }
 
-void OpaqueInstancedPass::execute(const RenderContext& context) {
-	RenderCommon::bindShadowMaps(*context.shadowMap.textures);
+void OpaqueInstancedPass::execute(const RenderContext& ctx) {
+	RenderCommon::bindShadowMaps(*ctx.shadowMap.textures);
 
-	context.sceneBuffer->bind();
-	for (const auto& [entity, transforms, matBatches]: context.renderQueue->opaqueInstancedGroups) {
+	ctx.sceneBuffer->bind();
+	for (const auto& [entity, transforms, matBatches]: ctx.renderQueue->opaqueInstancedGroups) {
 		const size_t count = transforms->size() / 9;
 
 		for (const auto& [material, shader, meshes]: matBatches) {
 			shader->activate();
-			shader->setInt("shadowMap", context.shadowMap.textureSlot);
-			shader->setInt("shadowCubemap", context.shadowMap.textureSlot + 1);
-			shader->setInt("persShadowMap", context.shadowMap.textureSlot + 2);
+			shader->setInt("shadowMap", ctx.shadowMap.textureSlot);
+			shader->setInt("shadowCubemap", ctx.shadowMap.textureSlot + 1);
+			shader->setInt("persShadowMap", ctx.shadowMap.textureSlot + 2);
 
 			RenderCommon::setupMaterial(*entity, *shader);
 			RenderCommon::bindTextures(material->textures, *shader);
@@ -42,14 +42,14 @@ void OpaqueInstancedPass::execute(const RenderContext& context) {
 			RenderCommon::unbindTextures(material->textures);
 		}
 	}
-	context.sceneBuffer->unbind();
+	ctx.sceneBuffer->unbind();
 }
 
-void OpaqueInstancedPass::prepareInstanceBuffer(const RenderContext& context) {
+void OpaqueInstancedPass::prepareInstanceBuffer(const RenderContext& ctx) {
 	glGenBuffers(1, &vbo.buffer);
 
 	size_t requiredGPUBufferSize = 0;
-	for (const auto& [entity, transforms, materials]: context.renderQueue->opaqueInstancedGroups) {
+	for (const auto& [entity, transforms, materials]: ctx.renderQueue->opaqueInstancedGroups) {
 		for (const auto& material: materials) {
 			for (const auto& mesh: *material.meshes) {
 				mesh.enableInstanceAttributes(vbo.buffer, vbo.offset);
@@ -68,8 +68,8 @@ void OpaqueInstancedPass::prepareInstanceBuffer(const RenderContext& context) {
 	vbo.offset = 0;
 }
 
-void OpaqueInstancedPass::prepareInstanceData(const RenderContext& context) const {
-	for (const auto& [entity, transforms, materials]: context.renderQueue->opaqueInstancedGroups) {
+void OpaqueInstancedPass::prepareInstanceData(const RenderContext& ctx) const {
+	for (const auto& [entity, transforms, materials]: ctx.renderQueue->opaqueInstancedGroups) {
 		std::vector<InstanceData> gpuData;
 		gpuData.reserve(transforms->size() / 9);
 

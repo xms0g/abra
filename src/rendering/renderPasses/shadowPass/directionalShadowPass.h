@@ -9,7 +9,7 @@ class FrameBuffer;
 
 class DirectionalShadowPass {
 public:
-	explicit DirectionalShadowPass(const RenderContext& context);
+	explicit DirectionalShadowPass(const RenderContext& ctx);
 
 	~DirectionalShadowPass();
 
@@ -17,7 +17,7 @@ public:
 
 	[[nodiscard]] glm::mat4 getLightSpaceMatrix() const;
 
-	void render(const RenderContext& context, const glm::vec4& direction);
+	void render(const RenderContext& ctx, const glm::vec4& direction);
 
 private:
 	glm::mat4 mLightSpaceMatrix{};

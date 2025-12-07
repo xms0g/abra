@@ -17,9 +17,9 @@ class PostProcessPass final : public IRenderPass {
 public:
 	~PostProcessPass() override;
 
-	void configure(const RenderContext& context) override;
+	void configure(const RenderContext& ctx) override;
 
-	void execute(const RenderContext& context) override;
+	void execute(const RenderContext& ctx) override;
 
 	std::vector<std::shared_ptr<IPostEffect> >& effects() { return mEffects; }
 

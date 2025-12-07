@@ -11,29 +11,29 @@
 
 FrustumCullingPass::~FrustumCullingPass() = default;
 
-void FrustumCullingPass::configure(const RenderContext& context) {
+void FrustumCullingPass::configure(const RenderContext& ctx) {
 }
 
-void FrustumCullingPass::execute(const RenderContext& context) {
+void FrustumCullingPass::execute(const RenderContext& ctx) {
 	auto cullItems = [&](const std::vector<RenderGroup>& groups) {
 		for (const auto& [entity, matBatch]: groups) {
 			auto& bvc = entity->getComponent<BoundingVolumeComponent>();
 			const auto& tc = entity->getComponent<TransformComponent>();
 			const auto& aabb = bvc.bv;
 
-			bvc.isVisible = aabb->isOnFrustum(*context.camera.frustum, tc.position, tc.rotation, tc.scale);
+			bvc.isVisible = aabb->isOnFrustum(*ctx.camera.frustum, tc.position, tc.rotation, tc.scale);
 			if (!bvc.isVisible) return;
 
 			for (auto& [material, shader, meshes]: matBatch) {
 				for (auto& mesh: *meshes) {
-					mesh.setVisible(aabb->isMeshInFrustum(*context.camera.frustum, mesh.min(), mesh.max(),
+					mesh.setVisible(aabb->isMeshInFrustum(*ctx.camera.frustum, mesh.min(), mesh.max(),
 														  tc.position, tc.rotation, tc.scale));
 				}
 			}
 		}
 	};
 
-	cullItems(context.renderQueue->forwardOpaqueGroups);
-	cullItems(context.renderQueue->deferredGroups);
-	cullItems(context.renderQueue->blendGroups);
+	cullItems(ctx.renderQueue->forwardOpaqueGroups);
+	cullItems(ctx.renderQueue->deferredGroups);
+	cullItems(ctx.renderQueue->blendGroups);
 }

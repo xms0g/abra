@@ -11,23 +11,23 @@
 
 BlendPass::~BlendPass() = default;
 
-void BlendPass::configure(const RenderContext& context) {
+void BlendPass::configure(const RenderContext& ctx) {
 }
 
-void BlendPass::execute(const RenderContext& context) {
+void BlendPass::execute(const RenderContext& ctx) {
 	glDepthMask(GL_FALSE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	context.sceneBuffer->bind();
-	for (const auto& [entity, matBatches]: context.renderQueue->blendGroups) {
+	ctx.sceneBuffer->bind();
+	for (const auto& [entity, matBatches]: ctx.renderQueue->blendGroups) {
 		if (!entity->getComponent<BoundingVolumeComponent>().isVisible)
 			continue;
 
 		for (const auto& [material, shader, meshes]: matBatches) {
 			shader->activate();
-			shader->setInt("shadowMap", context.shadowMap.textureSlot);
-			shader->setInt("shadowCubemap", context.shadowMap.textureSlot + 1);
-			shader->setInt("persShadowMap", context.shadowMap.textureSlot + 2);
+			shader->setInt("shadowMap", ctx.shadowMap.textureSlot);
+			shader->setInt("shadowCubemap", ctx.shadowMap.textureSlot + 1);
+			shader->setInt("persShadowMap", ctx.shadowMap.textureSlot + 2);
 
 			RenderCommon::setupTransform(*entity, *shader);
 			RenderCommon::setupMaterial(*entity, *shader);
@@ -37,7 +37,7 @@ void BlendPass::execute(const RenderContext& context) {
 			RenderCommon::unbindTextures(material->textures);
 		}
 	}
-	context.sceneBuffer->unbind();
+	ctx.sceneBuffer->unbind();
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
 }

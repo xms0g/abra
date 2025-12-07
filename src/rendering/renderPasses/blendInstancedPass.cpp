@@ -12,17 +12,17 @@
 
 BlendInstancedPass::~BlendInstancedPass() = default;
 
-void BlendInstancedPass::configure(const RenderContext& context) {
-	prepareInstanceBuffer(context);
-	prepareInstanceData(context);
+void BlendInstancedPass::configure(const RenderContext& ctx) {
+	prepareInstanceBuffer(ctx);
+	prepareInstanceData(ctx);
 }
 
-void BlendInstancedPass::execute(const RenderContext& context) {
+void BlendInstancedPass::execute(const RenderContext& ctx) {
 	glDepthMask(GL_FALSE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	context.sceneBuffer->bind();
-	for (const auto& [entity, transforms, matBatches]: context.renderQueue->blendInstancedGroups) {
+	ctx.sceneBuffer->bind();
+	for (const auto& [entity, transforms, matBatches]: ctx.renderQueue->blendInstancedGroups) {
 		const size_t count = transforms->size() / 9;
 
 		for (const auto& [material, shader, meshes]: matBatches) {
@@ -38,16 +38,16 @@ void BlendInstancedPass::execute(const RenderContext& context) {
 			RenderCommon::unbindTextures(material->textures);
 		}
 	}
-	context.sceneBuffer->unbind();
+	ctx.sceneBuffer->unbind();
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
 }
 
-void BlendInstancedPass::prepareInstanceBuffer(const RenderContext& context) {
+void BlendInstancedPass::prepareInstanceBuffer(const RenderContext& ctx) {
 	glGenBuffers(1, &vbo.buffer);
 
 	size_t requiredGPUBufferSize = 0;
-	for (const auto& [entity, transforms, materials]: context.renderQueue->blendInstancedGroups) {
+	for (const auto& [entity, transforms, materials]: ctx.renderQueue->blendInstancedGroups) {
 		for (const auto& material: materials) {
 			for (const auto& mesh: *material.meshes) {
 				mesh.enableInstanceAttributes(vbo.buffer, vbo.offset);
@@ -66,8 +66,8 @@ void BlendInstancedPass::prepareInstanceBuffer(const RenderContext& context) {
 	vbo.offset = 0;
 }
 
-void BlendInstancedPass::prepareInstanceData(const RenderContext& context) const {
-	for (const auto& [entity, transforms, materials]: context.renderQueue->blendInstancedGroups) {
+void BlendInstancedPass::prepareInstanceData(const RenderContext& ctx) const {
+	for (const auto& [entity, transforms, materials]: ctx.renderQueue->blendInstancedGroups) {
 		std::vector<InstanceData> gpuData;
 		gpuData.reserve(transforms->size() / 9);
 

@@ -9,7 +9,7 @@ class FrameBuffer;
 
 class OmnidirectionalShadowPass {
 public:
-	explicit OmnidirectionalShadowPass(const RenderContext& context);
+	explicit OmnidirectionalShadowPass(const RenderContext& ctx);
 
 	~OmnidirectionalShadowPass();
 
@@ -17,7 +17,7 @@ public:
 
 	[[nodiscard]] FrameBuffer& getDepthMap() const;
 
-	void render(const RenderContext& context, const glm::vec4& position, int layer) const;
+	void render(const RenderContext& ctx, const glm::vec4& position, int layer) const;
 
 private:
 	std::unique_ptr<FrameBuffer> mDepthMap;

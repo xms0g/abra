@@ -15,23 +15,23 @@
 
 SkyboxPass::~SkyboxPass() = default;
 
-void SkyboxPass::configure(const RenderContext& context) {
-	const auto& skybox = context.renderQueue->skyboxEntity;
+void SkyboxPass::configure(const RenderContext& ctx) {
+	const auto& skybox = ctx.renderQueue->skyboxEntity;
 	const auto& shader = skybox->getComponent<ShaderComponent>().shader;
 
-	context.camera.ubo->configure(shader->ID(), 0, "CameraBlock");
+	ctx.camera.ubo->configure(shader->ID(), 0, "CameraBlock");
 }
 
-void SkyboxPass::execute(const RenderContext& context) {
-	const auto& skybox = context.renderQueue->skyboxEntity;
+void SkyboxPass::execute(const RenderContext& ctx) {
+	const auto& skybox = ctx.renderQueue->skyboxEntity;
 	const auto& shader = skybox->getComponent<ShaderComponent>().shader;
 	const uint32_t VAO = skybox->getComponent<MeshComponent>().meshes->at(0).front().VAO();
 	const uint32_t texID = skybox->getComponent<MaterialComponent>().materials->at(0).textures.front().id;
 
-	context.sceneBuffer->bind();
+	ctx.sceneBuffer->bind();
 	shader->activate();
 	shader->setInt("skybox", 0);
-	shader->setMat4("skyView", context.camera.skyView);
+	shader->setMat4("skyView", ctx.camera.skyView);
 
 	glActiveTexture(GL_TEXTURE0); // active proper texture unit before binding
 	// and finally bind the texture
@@ -44,5 +44,5 @@ void SkyboxPass::execute(const RenderContext& context) {
 	glBindVertexArray(0);
 	glDepthFunc(GL_LESS);
 	glDepthMask(GL_TRUE);
-	context.sceneBuffer->unbind();
+	ctx.sceneBuffer->unbind();
 }

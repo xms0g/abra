@@ -5,7 +5,7 @@ class ResolvePass final : public IRenderPass {
 public:
 	~ResolvePass() override;
 
-	void configure(const RenderContext& context) override;
+	void configure(const RenderContext& ctx) override;
 
-	void execute(const RenderContext& context) override;
+	void execute(const RenderContext& ctx) override;
 };

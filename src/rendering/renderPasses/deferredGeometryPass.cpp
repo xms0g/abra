@@ -12,8 +12,8 @@
 
 DeferredGeometryPass::~DeferredGeometryPass() = default;
 
-void DeferredGeometryPass::configure(const RenderContext& context) {
-	mGBuffer = std::make_unique<FrameBuffer>(context.screen.width, context.screen.height);
+void DeferredGeometryPass::configure(const RenderContext& ctx) {
+	mGBuffer = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
 	mGBuffer->withTextureFP(true, 16)
 			.withTextureFP(true, 16)
 #ifdef HDR
@@ -26,14 +26,14 @@ void DeferredGeometryPass::configure(const RenderContext& context) {
 			.checkStatus();
 
 	mShader = std::make_unique<Shader>("deferred/gbuffer.vert", "deferred/gbuffer.frag");
-	context.camera.ubo->configure(mShader->ID(), 0, "CameraBlock");
+	ctx.camera.ubo->configure(mShader->ID(), 0, "CameraBlock");
 }
 
-void DeferredGeometryPass::execute(const RenderContext& context) {
+void DeferredGeometryPass::execute(const RenderContext& ctx) {
 	mGBuffer->bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	mShader->activate();
-	for (const auto& [entity, matBatches]: context.renderQueue->deferredGroups) {
+	for (const auto& [entity, matBatches]: ctx.renderQueue->deferredGroups) {
 		if (!entity->getComponent<BoundingVolumeComponent>().isVisible)
 			continue;
 

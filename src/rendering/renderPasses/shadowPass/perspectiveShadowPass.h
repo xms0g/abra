@@ -9,7 +9,7 @@ class FrameBuffer;
 
 class PerspectiveShadowPass {
 public:
-	explicit PerspectiveShadowPass(const RenderContext& context);
+	explicit PerspectiveShadowPass(const RenderContext& ctx);
 
 	~PerspectiveShadowPass();
 
@@ -17,7 +17,7 @@ public:
 
 	[[nodiscard]] glm::mat4 getLightSpaceMatrix(int layer) const;
 
-	void render(const RenderContext& context, const glm::vec4& direction,
+	void render(const RenderContext& ctx, const glm::vec4& direction,
 	            const glm::vec4& position, float fovy, int layer);
 
 private:

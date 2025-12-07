@@ -141,37 +141,37 @@ void RenderPipeline::configure(const Camera& camera) {
 #endif
 	mRenderPasses.push_back(mPostProcessPass);
 
-	mContext = std::make_unique<RenderContext>(&mRenderQueue, mSceneBuffer.get(), mIntermediateBuffer.get());
-	mContext->light.ubo = &mLightSystem->getLightUBO();
-	mContext->light.dirLights = &mLightSystem->getDirLights();
-	mContext->light.pointLights = &mLightSystem->getPointLights();
-	mContext->light.spotLights = &mLightSystem->getSpotLights();
-	mContext->camera.self = &camera;
-	mContext->camera.ubo = mCameraUBO.get();
-	mContext->screen.width = SCR_WIDTH;
-	mContext->screen.height = SCR_HEIGHT;
-	mContext->shadowMap.textureSlot = SHADOWMAP_TEXTURE_SLOT;
-	mContext->shadowMap.width = SHADOWMAP_WIDTH;
-	mContext->shadowMap.height = SHADOWMAP_HEIGHT;
-	mContext->shadowMap.directional.nearPlane = SHADOW_DIRECTIONAL_NEAR;
-	mContext->shadowMap.directional.farPlane = SHADOW_DIRECTIONAL_FAR;
-	mContext->shadowMap.directional.left = SHADOW_DIRECTIONAL_LEFT;
-	mContext->shadowMap.directional.right = SHADOW_DIRECTIONAL_RIGHT;
-	mContext->shadowMap.directional.bottom = SHADOW_DIRECTIONAL_BOTTOM;
-	mContext->shadowMap.directional.top = SHADOW_DIRECTIONAL_TOP;
-	mContext->shadowMap.omnidirectional.maxLights = MAX_POINT_LIGHTS;
-	mContext->shadowMap.omnidirectional.nearPlane = SHADOW_OMNIDIRECTIONAL_NEAR;
-	mContext->shadowMap.omnidirectional.farPlane = SHADOW_OMNIDIRECTIONAL_FAR;
-	mContext->shadowMap.omnidirectional.fovy = SHADOW_OMNIDIRECTIONAL_FOVY;
-	mContext->shadowMap.perspective.maxLights = MAX_SPOT_LIGHTS;
-	mContext->shadowMap.perspective.nearPlane = SHADOW_PERSPECTIVE_NEAR;
-	mContext->shadowMap.perspective.farPlane = SHADOW_PERSPECTIVE_FAR;
-	mContext->shadowMap.ubo = mShadowPass->getShadowUBO();
-	mContext->shadowMap.textures = &mShadowPass->getShadowMaps();
+	mRenderCtx = std::make_unique<RenderContext>(&mRenderQueue, mSceneBuffer.get(), mIntermediateBuffer.get());
+	mRenderCtx->light.ubo = &mLightSystem->getLightUBO();
+	mRenderCtx->light.dirLights = &mLightSystem->getDirLights();
+	mRenderCtx->light.pointLights = &mLightSystem->getPointLights();
+	mRenderCtx->light.spotLights = &mLightSystem->getSpotLights();
+	mRenderCtx->camera.self = &camera;
+	mRenderCtx->camera.ubo = mCameraUBO.get();
+	mRenderCtx->screen.width = SCR_WIDTH;
+	mRenderCtx->screen.height = SCR_HEIGHT;
+	mRenderCtx->shadowMap.textureSlot = SHADOWMAP_TEXTURE_SLOT;
+	mRenderCtx->shadowMap.width = SHADOWMAP_WIDTH;
+	mRenderCtx->shadowMap.height = SHADOWMAP_HEIGHT;
+	mRenderCtx->shadowMap.directional.nearPlane = SHADOW_DIRECTIONAL_NEAR;
+	mRenderCtx->shadowMap.directional.farPlane = SHADOW_DIRECTIONAL_FAR;
+	mRenderCtx->shadowMap.directional.left = SHADOW_DIRECTIONAL_LEFT;
+	mRenderCtx->shadowMap.directional.right = SHADOW_DIRECTIONAL_RIGHT;
+	mRenderCtx->shadowMap.directional.bottom = SHADOW_DIRECTIONAL_BOTTOM;
+	mRenderCtx->shadowMap.directional.top = SHADOW_DIRECTIONAL_TOP;
+	mRenderCtx->shadowMap.omnidirectional.maxLights = MAX_POINT_LIGHTS;
+	mRenderCtx->shadowMap.omnidirectional.nearPlane = SHADOW_OMNIDIRECTIONAL_NEAR;
+	mRenderCtx->shadowMap.omnidirectional.farPlane = SHADOW_OMNIDIRECTIONAL_FAR;
+	mRenderCtx->shadowMap.omnidirectional.fovy = SHADOW_OMNIDIRECTIONAL_FOVY;
+	mRenderCtx->shadowMap.perspective.maxLights = MAX_SPOT_LIGHTS;
+	mRenderCtx->shadowMap.perspective.nearPlane = SHADOW_PERSPECTIVE_NEAR;
+	mRenderCtx->shadowMap.perspective.farPlane = SHADOW_PERSPECTIVE_FAR;
+	mRenderCtx->shadowMap.ubo = mShadowPass->getShadowUBO();
+	mRenderCtx->shadowMap.textures = &mShadowPass->getShadowMaps();
 
 	// Configure render passes
 	for (const auto& pass: mRenderPasses) {
-		pass->configure(*mContext);
+		pass->configure(*mRenderCtx);
 	}
 
 	if (!mRenderQueue.deferredGroups.empty()) {
@@ -182,19 +182,19 @@ void RenderPipeline::configure(const Camera& camera) {
 	for (const auto& entity: getSystemEntities()) {
 		const auto& shader = entity.getComponent<ShaderComponent>().shader;
 
-		mContext->camera.ubo->configure(shader->ID(), 0, "CameraBlock");
-		mContext->light.ubo->configure(shader->ID(), 1, "LightBlock");
-		mContext->shadowMap.ubo->configure(shader->ID(), 2, "ShadowBlock");
+		mRenderCtx->camera.ubo->configure(shader->ID(), 0, "CameraBlock");
+		mRenderCtx->light.ubo->configure(shader->ID(), 1, "LightBlock");
+		mRenderCtx->shadowMap.ubo->configure(shader->ID(), 2, "ShadowBlock");
 	}
 
 	const glm::mat4 projectionMat = glm::perspective(
-		glm::radians(mContext->camera.self->zoom()),
-		static_cast<float>(mContext->screen.width) / static_cast<float>(mContext->screen.height),
+		glm::radians(mRenderCtx->camera.self->zoom()),
+		static_cast<float>(mRenderCtx->screen.width) / static_cast<float>(mRenderCtx->screen.height),
 		ZNEAR, ZFAR);
 
-	mContext->camera.ubo->bind();
-	mContext->camera.ubo->setData(glm::value_ptr(projectionMat), sizeof(glm::mat4), sizeof(glm::mat4));
-	mContext->camera.ubo->unbind();
+	mRenderCtx->camera.ubo->bind();
+	mRenderCtx->camera.ubo->setData(glm::value_ptr(projectionMat), sizeof(glm::mat4), sizeof(glm::mat4));
+	mRenderCtx->camera.ubo->unbind();
 }
 
 void RenderPipeline::batchEntities() {
@@ -210,25 +210,25 @@ void RenderPipeline::render() {
 	mLightSystem->update();
 
 	for (const auto& pass: mRenderPasses) {
-		pass->execute(*mContext);
+		pass->execute(*mRenderCtx);
 	}
 
-	mContext->sceneBuffer = mSceneBuffer.get();
+	mRenderCtx->sceneBuffer = mSceneBuffer.get();
 	glViewport(0, 0, static_cast<int32_t>(SCR_WIDTH), static_cast<int32_t>(SCR_HEIGHT));
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void RenderPipeline::refreshCameraData() const {
-	const auto skyView = glm::mat4(glm::mat3(mContext->camera.self->viewMatrix()));
-	mContext->camera.skyView = skyView;
-	mContext->camera.frustum = &mContext->camera.self->frustum();
+	const auto skyView = glm::mat4(glm::mat3(mRenderCtx->camera.self->viewMatrix()));
+	mRenderCtx->camera.skyView = skyView;
+	mRenderCtx->camera.frustum = &mRenderCtx->camera.self->frustum();
 
-	auto view = mContext->camera.self->viewMatrix();
-	auto viewPos = glm::vec4(mContext->camera.self->position(), 1.0);
-	mContext->camera.ubo->bind();
-	mContext->camera.ubo->setData(glm::value_ptr(view), sizeof(glm::mat4), 0);
-	mContext->camera.ubo->setData(glm::value_ptr(viewPos), sizeof(glm::vec4), 2 * sizeof(glm::mat4));
-	mContext->camera.ubo->unbind();
+	auto view = mRenderCtx->camera.self->viewMatrix();
+	auto viewPos = glm::vec4(mRenderCtx->camera.self->position(), 1.0);
+	mRenderCtx->camera.ubo->bind();
+	mRenderCtx->camera.ubo->setData(glm::value_ptr(view), sizeof(glm::mat4), 0);
+	mRenderCtx->camera.ubo->setData(glm::value_ptr(viewPos), sizeof(glm::vec4), 2 * sizeof(glm::mat4));
+	mRenderCtx->camera.ubo->unbind();
 }
 
 void RenderPipeline::batchEntity(const Entity& entity) {
@@ -283,7 +283,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 }
 
 void RenderPipeline::sortEntities() {
-	const glm::vec3& camPos = mContext->camera.self->position();
+	const glm::vec3& camPos = mRenderCtx->camera.self->position();
 
 	auto sortBatches = [&](auto& batch, bool transparent) {
 		std::sort(

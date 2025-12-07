@@ -8,9 +8,9 @@
 #include "../../buffers/frameBuffer.h"
 #include "../../renderCommon.h"
 
-OmnidirectionalShadowPass::OmnidirectionalShadowPass(const RenderContext& context) {
-	mDepthMap = std::make_unique<FrameBuffer>(context.shadowMap.width, context.shadowMap.height);
-	mDepthMap->withTextureCubemapArrayDepth(context.shadowMap.omnidirectional.maxLights)
+OmnidirectionalShadowPass::OmnidirectionalShadowPass(const RenderContext& ctx) {
+	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadowMap.width, ctx.shadowMap.height);
+	mDepthMap->withTextureCubemapArrayDepth(ctx.shadowMap.omnidirectional.maxLights)
 			.checkStatus();
 	mDepthMap->unbind();
 
@@ -29,13 +29,13 @@ FrameBuffer& OmnidirectionalShadowPass::getDepthMap() const {
 	return *mDepthMap;
 }
 
-void OmnidirectionalShadowPass::render(const RenderContext& context, const glm::vec4& position,
+void OmnidirectionalShadowPass::render(const RenderContext& ctx, const glm::vec4& position,
                                        const int layer) const {
 	const glm::mat4 shadowProj = glm::perspective(
-		glm::radians(context.shadowMap.omnidirectional.fovy),
-		static_cast<float>(context.shadowMap.width) / static_cast<float>(context.shadowMap.height),
-		context.shadowMap.omnidirectional.nearPlane,
-		context.shadowMap.omnidirectional.farPlane);
+		glm::radians(ctx.shadowMap.omnidirectional.fovy),
+		static_cast<float>(ctx.shadowMap.width) / static_cast<float>(ctx.shadowMap.height),
+		ctx.shadowMap.omnidirectional.nearPlane,
+		ctx.shadowMap.omnidirectional.farPlane);
 
 	const auto pos = glm::vec3(position);
 	std::vector<glm::mat4> shadowTransforms;
@@ -50,11 +50,11 @@ void OmnidirectionalShadowPass::render(const RenderContext& context, const glm::
 	for (unsigned int i = 0; i < 6; ++i)
 		mDepthShader->setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
 
-	mDepthShader->setFloat("omniFarPlane", context.shadowMap.omnidirectional.farPlane);
+	mDepthShader->setFloat("omniFarPlane", ctx.shadowMap.omnidirectional.farPlane);
 	mDepthShader->setVec3("lightPos", position);
 	mDepthShader->setInt("cubeIndex", layer);
 
-	for (const auto& [entity, matBatches]: context.renderQueue->shadowCasterGroups) {
+	for (const auto& [entity, matBatches]: ctx.renderQueue->shadowCasterGroups) {
 		for (const auto& [material, shader, meshes]: matBatches) {
 			RenderCommon::setupTransform(*entity, *mDepthShader);
 			RenderCommon::drawMeshes(*meshes);
