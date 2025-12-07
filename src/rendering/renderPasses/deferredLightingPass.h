@@ -10,8 +10,6 @@ class DeferredLightingPass final : public IRenderPass {
 public:
 	~DeferredLightingPass() override;
 
-	const Shader& getShader() const { return *mShader; }
-
 	void configureInput(const FrameBuffer* gBuffer);
 
 	void configure(const RenderContext& ctx) override;
