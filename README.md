@@ -41,6 +41,8 @@ It’s designed for clarity, experimentation, and real-time graphics research �
   - Screen Quad – for post-processing, deferred pipeline, and blitting
 ## Screenshots
 ![Screenshot](assets/screenshot.png)
+![Screenshot1](assets/screenshot1.png)
+![Screenshot2](assets/screenshot2.png)
 ## Roadmap
 - [ ] SSAO
 - [ ] PBR materials
