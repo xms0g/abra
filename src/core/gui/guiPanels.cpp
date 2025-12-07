@@ -104,9 +104,9 @@ void GuiPanels::renderPointLight(const Entity& entity) {
 void GuiPanels::renderPostProcessPanel(const std::vector<std::shared_ptr<IPostEffect>>& effects) {
 	if (ImGui::Begin("Post-Processing")) {
 		for (auto& effect: effects) {
-			ImGui::Checkbox(effect->name.c_str(), &effect->enabled);
+			ImGui::Checkbox(effect->name().c_str(), &effect->enabled());
 
-			if (effect->name == "Tone Mapping") {
+			if (effect->name() == "Tone Mapping") {
 				Ui::sliderFloat("Exposure", &std::dynamic_pointer_cast<ToneMapping>(effect)->exposure, 100.0f);
 			}
 		}

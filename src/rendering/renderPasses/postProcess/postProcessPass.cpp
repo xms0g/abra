@@ -47,7 +47,7 @@ void PostProcessPass::execute(const RenderContext& ctx) {
 	int toggle = 0;
 
 	for (const auto& effect: mEffects) {
-		if (!effect->enabled) continue;
+		if (!effect->enabled()) continue;
 
 		inputTex = effect->render(inputTex, mQuad->VAO(), toggle, renderTargets);
 	}
