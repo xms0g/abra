@@ -54,6 +54,9 @@ RenderPipeline::RenderPipeline(Registry* registry) {
 	glFrontFace(GL_CCW);
 
 	mRenderCtx = std::make_unique<RenderContext>();
+	mRenderCtx->screen.width = SCR_WIDTH;
+	mRenderCtx->screen.height = SCR_HEIGHT;
+	mRenderCtx->renderQueue = &mRenderQueue;
 	mRenderCtx->light.maxDirLights = MAX_DIRECTIONAL_LIGHTS;
 	mRenderCtx->light.maxPointLights = MAX_POINT_LIGHTS;
 	mRenderCtx->light.maxSpotLights = MAX_SPOT_LIGHTS;
@@ -146,7 +149,6 @@ void RenderPipeline::configure(const Camera& camera) {
 #endif
 	mRenderPasses.push_back(mPostProcessPass);
 
-	mRenderCtx->renderQueue = &mRenderQueue;
 	mRenderCtx->sceneBuffer = mSceneBuffer.get();
 	mRenderCtx->intermediateBuffer = mIntermediateBuffer.get();
 	mRenderCtx->light.ubo = &mLightSystem->getLightUBO();
@@ -155,8 +157,6 @@ void RenderPipeline::configure(const Camera& camera) {
 	mRenderCtx->light.spotLights = &mLightSystem->getSpotLights();
 	mRenderCtx->camera.self = &camera;
 	mRenderCtx->camera.ubo = mCameraUBO.get();
-	mRenderCtx->screen.width = SCR_WIDTH;
-	mRenderCtx->screen.height = SCR_HEIGHT;
 	mRenderCtx->shadowMap.textureSlot = SHADOWMAP_TEXTURE_SLOT;
 	mRenderCtx->shadowMap.width = SHADOWMAP_WIDTH;
 	mRenderCtx->shadowMap.height = SHADOWMAP_HEIGHT;
