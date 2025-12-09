@@ -40,7 +40,6 @@ private:
 	// Systems
 	LightSystem* mLightSystem{};
 
-
 	// Frame Buffers
 	std::unique_ptr<FrameBuffer> mSceneBuffer;
 	std::unique_ptr<FrameBuffer> mIntermediateBuffer;
