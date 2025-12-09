@@ -71,6 +71,7 @@ Models::Plane::Plane(const char* diffuseTexture,
 	if (diffuseTexture) {
 		textures.emplace_back(
 			texture::load(fs::path(ASSET_DIR + diffuseTexture).c_str()),
+			DIFFUSE,
 			"texture_diffuse",
 			diffuseTexture
 		);
@@ -79,6 +80,7 @@ Models::Plane::Plane(const char* diffuseTexture,
 	if (specularTexture) {
 		textures.emplace_back(
 			texture::load(fs::path(ASSET_DIR + specularTexture).c_str()),
+			SPECULAR,
 			"texture_specular",
 			specularTexture);
 	}
@@ -86,6 +88,7 @@ Models::Plane::Plane(const char* diffuseTexture,
 	if (normalTexture) {
 		textures.emplace_back(
 			texture::load(fs::path(ASSET_DIR + normalTexture).c_str()),
+			NORMAL,
 			"texture_normal",
 			normalTexture);
 	}
@@ -93,6 +96,7 @@ Models::Plane::Plane(const char* diffuseTexture,
 	if (heightTexture) {
 		textures.emplace_back(
 			texture::load(fs::path(ASSET_DIR + heightTexture).c_str()),
+			HEIGHT,
 			"texture_height",
 			heightTexture);
 	}

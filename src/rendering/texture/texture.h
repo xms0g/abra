@@ -2,9 +2,17 @@
 #include <vector>
 #include <string>
 
+enum TextureType {
+	DIFFUSE = 1,
+	SPECULAR = 2,
+	HEIGHT = 5,
+	NORMAL = 6
+};
+
 struct Texture {
     uint32_t id;
-    std::string type;
+	uint32_t type;
+    std::string name;
     std::string path;
 };
 
