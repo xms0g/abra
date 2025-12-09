@@ -2,6 +2,7 @@
 #include <ostream>
 #include "core/engine.h"
 #include "core/camera.h"
+#include "core/input.h"
 #include "rendering/shader.h"
 #include "resourceManager/resourceManager.h"
 #include "ECS/registry.h"
@@ -68,41 +69,41 @@ int main() {
 			// Instance 0
 			-10.8f, 1.3f, -1.2f,      95.0f,  12.0f, 270.0f,    1,1,1,
 			// Instance 1
-			-10.4f, 1.2f,  2.7f,     130.0f, 340.0f,  22.0f,    1,1,1,
+			-12.4f, 2.2f,  2.7f,     130.0f, 340.0f,  22.0f,    1,1,1,
 			// Instance 2
-			-10.5f, 1.1f,  0.5f,     250.0f,  80.0f, 190.0f,    1,1,1,
+			-13.5f, 3.1f,  0.5f,     250.0f,  80.0f, 190.0f,    1,1,1,
 			// Instance 3
-			-10.3f, 1.9f, -2.6f,     310.0f,  10.0f,  45.0f,    1,1,1,
+			-11.3f, 4.9f, -2.6f,     310.0f,  10.0f,  45.0f,    1,1,1,
 			// Instance 4
-			-10.2f, 1.0f,  1.8f,     180.0f, 300.0f,  15.0f,    1,1,1,
+			-10.2f, 5.0f,  1.8f,     180.0f, 300.0f,  15.0f,    1,1,1,
 			// Instance 5
-			-10.1f, 1.4f, -0.8f,      60.0f,  45.0f, 310.0f,    1,1,1,
+			-10.1f, 6.4f, -0.8f,      60.0f,  45.0f, 310.0f,    1,1,1,
 			// Instance 6
-			-10.9f, 1.5f, -3.1f,     350.0f, 120.0f,  70.0f,    1,1,1,
+			-15.9f, 7.5f, -3.1f,     350.0f, 120.0f,  70.0f,    1,1,1,
 			// Instance 7
-			-10.7f, 1.2f,  0.0f,     210.0f,  33.0f,  10.0f,    1,1,1,
+			-12.7f, 1.2f,  0.0f,     210.0f,  33.0f,  10.0f,    1,1,1,
 			// Instance 8
-			-10.9f, 1.7f,  2.4f,     145.0f, 200.0f, 310.0f,    1,1,1,
+			-10.9f, 4.7f,  2.4f,     145.0f, 200.0f, 310.0f,    1,1,1,
 			// Instance 9
-			-10.9f, 1.1f, -1.7f,      25.0f,  88.0f, 132.0f,    1,1,1,
+			-13.9f, 5.1f, -1.7f,      25.0f,  88.0f, 132.0f,    1,1,1,
 			// Instance 10
 			-10.4f, 1.3f,  0.9f,     300.0f, 260.0f,  50.0f,    1,1,1,
 			// Instance 11
-			-10.2f, 1.5f, -0.5f,     110.0f, 170.0f, 256.0f,    1,1,1,
+			-11.2f, 5.5f, -0.5f,     110.0f, 170.0f, 256.0f,    1,1,1,
 			// Instance 12
 			-10.1f, 1.0f, -3.0f,     270.0f,  30.0f, 200.0f,    1,1,1,
 			// Instance 13
-			-10.4f, 1.6f,  1.3f,      34.0f, 300.0f,  99.0f,    1,1,1,
+			-10.4f, 5.6f,  1.3f,      34.0f, 300.0f,  99.0f,    1,1,1,
 			// Instance 14
-			-10.8f, 1.3f,  0.4f,     190.0f, 210.0f, 140.0f,    1,1,1,
+			-13.8f, 5.3f,  0.4f,     190.0f, 210.0f, 140.0f,    1,1,1,
 			// Instance 15
-			-10.0f, 1.2f, -2.1f,     360.0f,  44.0f,  18.0f,    1,1,1,
+			-10.0f, 5.2f, -2.1f,     360.0f,  44.0f,  18.0f,    1,1,1,
 			// Instance 16
-			-10.7f, 1.0f,  3.0f,      77.0f, 180.0f, 350.0f,    1,1,1,
+			-10.7f, 5.0f,  3.0f,      77.0f, 180.0f, 350.0f,    1,1,1,
 			// Instance 17
-			-10.9f, 1.4f, -0.2f,     150.0f, 330.0f,  65.0f,    1,1,1,
+			-11.9f, 6.4f, -0.2f,     150.0f, 330.0f,  65.0f,    1,1,1,
 			// Instance 18
-			-10.0f, 1.8f,  1.6f,      12.0f,  99.0f, 280.0f,    1,1,1,
+			-10.0f, 1.2f,  1.6f,      12.0f,  99.0f, 280.0f,    1,1,1,
 			// Instance 19
 			-10.6f, 1.1f, -1.0f,     205.0f,  70.0f,  30.0f,    1,1,1,
 		};
@@ -114,7 +115,7 @@ int main() {
 		suzanne.addComponent<TransformComponent>(
 			glm::vec3(3.2f, 1.1f, 0.0f),
 			glm::vec3(1.0f, 45.0f, 23.0f),
-			glm::vec3(1.0f));
+			glm::vec3(0.5f));
 
 		ResourceManager::instance().loadModel(suzanne.id(), "Suzanne/glTF/Suzanne.gltf");
 
@@ -244,13 +245,13 @@ int main() {
 			glm::vec4(0.01f, 0.01f, 0.01f, 0.0f),
 			glm::vec4(0.4f, 0.4f, 0.4f, 0.0f),
 			glm::vec4(0.5f, 0.5f, 0.5f, 0.0f));
-
+		//
 		// auto pointLight = registry.createEntity("Point Light");
 		// pointLight.addComponent<TransformComponent>(
 		// 	glm::vec3(-3.2f, 5.0f, -2.4f),
 		// 	glm::vec3(0.0f, 0.0f, 0.0f),
 		// 	glm::vec3(0.2f));
-		//
+		// //
 		// pointLight.addComponent<PointLightComponent>(
 		// 	glm::vec4(0.0f),
 		// 	glm::vec4(0.03f, 0.03f, 0.03f, 0.0f), // ambient
@@ -275,7 +276,7 @@ int main() {
 		// 	glm::vec3(3.2f, 5.0f, -2.4f),
 		// 	glm::vec3(0.0f, 0.0f, 0.0f),
 		// 	glm::vec3(0.2f));
-		//
+		// //
 		// pointLight1.addComponent<PointLightComponent>(
 		// 	glm::vec4(0.0f),
 		// 	glm::vec4(0.01f, 0.01f, 0.01f, 0.0f), // ambient
