@@ -146,11 +146,11 @@ void RenderPipeline::configure(const Camera& camera) {
 	mRenderPasses.push_back(std::make_shared<SkyboxPass>());
 #ifdef MSAA
 	mRenderPasses.push_back(std::make_shared<ResolvePass>());
+	mRenderCtx->intermediateBuffer = mIntermediateBuffer.get();
 #endif
 	mRenderPasses.push_back(mPostProcessPass);
 
 	mRenderCtx->sceneBuffer = mSceneBuffer.get();
-	mRenderCtx->intermediateBuffer = mIntermediateBuffer.get();
 	mRenderCtx->light.ubo = &mLightSystem->getLightUBO();
 	mRenderCtx->light.dirLights = &mLightSystem->getDirLights();
 	mRenderCtx->light.pointLights = &mLightSystem->getPointLights();

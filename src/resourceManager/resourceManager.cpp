@@ -151,7 +151,7 @@ void ResourceManager::loadMaterialTextures(const aiMaterial* mat,
 			continue;
 
 		if (mMaterials.contains(materialID)) {
-			mMaterials[materialID].textures.emplace_back(texture::load(path.c_str()), typeName, str.C_Str());
+			mMaterials[materialID].textures.emplace_back(texture::load(path.c_str()), type, typeName, str.C_Str());
 		} else {
 			uint32_t mode = 0;
 
@@ -160,7 +160,7 @@ void ResourceManager::loadMaterialTextures(const aiMaterial* mat,
 			}
 
 			std::vector<Texture> textures;
-			textures.emplace_back(texture::load(path.c_str()), typeName, str.C_Str());
+			textures.emplace_back(texture::load(path.c_str()), type, typeName, str.C_Str());
 			mMaterials[materialID] = {mode, textures};
 		}
 

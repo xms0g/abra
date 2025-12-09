@@ -62,18 +62,16 @@ void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shad
 	for (int i = 0; i < textures.size(); i++) {
 		glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
 
-		std::string name = textures[i].type;
-
-		if (name == "texture_normal") {
+		if (textures[i].type == NORMAL) {
 			hasNormalMap = true;
 		}
 
-		if (name == "texture_height") {
+		if (textures[i].type == HEIGHT) {
 			hasHeightMap = true;
 		}
 
 		// now set the sampler to the correct texture unit
-		shader.setInt(std::string("material.").append(name), i);
+		shader.setInt(std::string("material.").append(textures[i].name), i);
 		// and finally bind the texture
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}
