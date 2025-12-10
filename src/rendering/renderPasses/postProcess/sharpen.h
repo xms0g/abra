@@ -14,6 +14,7 @@ public:
 
 private:
 	std::unique_ptr<Shader> shader;
+
 	static constexpr float kernel[9] = {
 		-1, -1, -1,
 		-1, 9, -1,

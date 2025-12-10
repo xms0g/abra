@@ -23,7 +23,7 @@ void PostProcessPass::configure(const RenderContext& ctx) {
 	mEffects = {
 		std::make_shared<Blur>("Blur", false),
 		std::make_shared<Bloom>("Bloom", ctx.screen.width, ctx.screen.height, false),
-		std::make_shared<ToneMapping>("Tone Mapping", false, 1.1f),
+		std::make_shared<ToneMapping>("Tone Mapping", false),
 		std::make_shared<Grayscale>("Grayscale", false),
 		std::make_shared<Sepia>("Sepia", false),
 		std::make_shared<EdgeDetection>("Edge Detection", false),
