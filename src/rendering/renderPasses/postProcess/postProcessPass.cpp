@@ -3,6 +3,7 @@
 #include "sepia.h"
 #include "bloom.h"
 #include "blur.h"
+#include "ca.h"
 #include "gamma.h"
 #include "sharpen.h"
 #include "toneMapping.h"
@@ -27,6 +28,7 @@ void PostProcessPass::configure(const RenderContext& ctx) {
 		std::make_shared<Sepia>("Sepia", false),
 		std::make_shared<EdgeDetection>("Edge Detection", false),
 		std::make_shared<Sharpen>("Sharpen", false),
+		std::make_shared<CA>("Chromatic Aberration", false),
 		std::make_shared<Gamma>("Gamma Correction", true),
 		std::make_shared<FXAA>("FXAA", false),
 	};

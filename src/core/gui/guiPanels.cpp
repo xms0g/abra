@@ -8,6 +8,7 @@
 #include "../../ECS/components/directionalLight.hpp"
 #include "../../ECS/components/pointLight.hpp"
 #include "../../ECS/components/spotLight.hpp"
+#include "../../rendering/renderPasses/postProcess/ca.h"
 #include "../../rendering/renderPasses/postProcess/toneMapping.h"
 
 void GuiPanels::renderGraphicsInfoPanel(const uint32_t fps) {
@@ -108,6 +109,8 @@ void GuiPanels::renderPostProcessPanel(const std::vector<std::shared_ptr<IPostEf
 
 			if (effect->name() == "Tone Mapping") {
 				Ui::sliderFloat("Exposure", &std::dynamic_pointer_cast<ToneMapping>(effect)->exposure, 100.0f);
+			} else if (effect->name() == "Chromatic Aberration") {
+				Ui::sliderFloat("Intensity", &std::dynamic_pointer_cast<CA>(effect)->intensity(), 100.0f, 0.01f, 0.1f);
 			}
 		}
 	}
