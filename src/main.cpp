@@ -238,38 +238,39 @@ int main() {
 			std::make_shared<math::AABB>(
 				math::generateAABB(*ResourceManager::instance().getMeshes(sponza.id()))));
 
+		//
+		// auto dirLight = registry.createEntity("Directional Light");
+		// dirLight.addComponent<DirectionalLightComponent>(
+		// 	glm::vec4(-0.2f, -1.0f, -0.3f, 0.0f),
+		// 	glm::vec4(0.01f, 0.01f, 0.01f, 0.0f),
+		// 	glm::vec4(0.4f, 0.4f, 0.4f, 0.0f),
+		// 	glm::vec4(0.5f, 0.5f, 0.5f, 0.0f));
+		//
+		auto pointLight = registry.createEntity("Point Light");
+		pointLight.addComponent<TransformComponent>(
+			glm::vec3(-3.2f, 5.0f, -2.4f),
+			glm::vec3(0.0f, 0.0f, 0.0f),
+			glm::vec3(0.2f));
+		//
+		pointLight.addComponent<PointLightComponent>(
+			glm::vec4(0.0f),
+			glm::vec4(0.03f, 0.03f, 0.03f, 0.0f), // ambient
+			glm::vec4(2.3f, 2.2f, 2.5f, 0.0f), // diffuse
+			glm::vec4(1.3f, 1.2f, 1.5f, 0.0f), // specular
+			glm::vec3(1.0f, 0.14f, 0.07f), // attenuation
+			true
+		);
 
-		auto dirLight = registry.createEntity("Directional Light");
-		dirLight.addComponent<DirectionalLightComponent>(
-			glm::vec4(-0.2f, -1.0f, -0.3f, 0.0f),
-			glm::vec4(0.01f, 0.01f, 0.01f, 0.0f),
-			glm::vec4(0.4f, 0.4f, 0.4f, 0.0f),
-			glm::vec4(0.5f, 0.5f, 0.5f, 0.0f));
-		//
-		// auto pointLight = registry.createEntity("Point Light");
-		// pointLight.addComponent<TransformComponent>(
-		// 	glm::vec3(-3.2f, 5.0f, -2.4f),
-		// 	glm::vec3(0.0f, 0.0f, 0.0f),
-		// 	glm::vec3(0.2f));
-		// //
-		// pointLight.addComponent<PointLightComponent>(
-		// 	glm::vec4(0.0f),
-		// 	glm::vec4(0.03f, 0.03f, 0.03f, 0.0f), // ambient
-		// 	glm::vec4(2.3f, 2.2f, 2.5f, 0.0f), // diffuse
-		// 	glm::vec4(1.3f, 1.2f, 1.5f, 0.0f), // specular
-		// 	glm::vec3(1.0f, 0.14f, 0.07f), // attenuation
-		// 	true
-		// );
-		//
-		// pointLight.addComponent<MeshComponent>(cubeModel.getMeshes());
-		// pointLight.addComponent<MaterialComponent>(glm::vec4(4.0f), 32.0f, 1.0f, Forward);
-		//
-		// pointLight.addComponent<ShaderComponent>(
-		// 	std::make_shared<Shader>("models/light.vert", "models/light.frag"));
-		//
-		// pointLight.addComponent<BoundingVolumeComponent>(
-		// 	std::make_shared<math::AABB>(
-		// 		math::generateAABB(*cubeModel.getMeshes())));
+		Models::Cube cubeModel{glm::vec3(2.3f, 2.2f, 2.5f)};
+		pointLight.addComponent<MeshComponent>(cubeModel.getMeshes());
+		pointLight.addComponent<MaterialComponent>(cubeModel.getMaterial(), 32.0f, 1.0f, Forward);
+
+		pointLight.addComponent<ShaderComponent>(
+			std::make_shared<Shader>("models/light.vert", "models/light.frag"));
+
+		pointLight.addComponent<BoundingVolumeComponent>(
+			std::make_shared<math::AABB>(
+				math::generateAABB(*cubeModel.getMeshes())));
 
 		// auto pointLight1 = registry.createEntity("Point Light1");
 		// pointLight1.addComponent<TransformComponent>(

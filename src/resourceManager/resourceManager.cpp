@@ -161,7 +161,7 @@ void ResourceManager::loadMaterialTextures(const aiMaterial* mat,
 
 			std::vector<Texture> textures;
 			textures.emplace_back(texture::load(path.c_str()), type, typeName, str.C_Str());
-			mMaterials[materialID] = {mode, textures};
+			mMaterials[materialID] = {mode, glm::vec3(), textures};
 		}
 
 		// store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate mTextures.

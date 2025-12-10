@@ -33,7 +33,7 @@ void ForwardOpaquePass::execute(const RenderContext& ctx) {
 			shader->activate();
 
 			RenderCommon::setupTransform(*entity, *shader);
-			RenderCommon::setupMaterial(*entity, *shader);
+			RenderCommon::setupMaterial(*entity, *material, *shader);
 
 			RenderCommon::bindTextures(material->textures, *shader);
 			RenderCommon::drawMeshes(*meshes);

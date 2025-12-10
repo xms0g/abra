@@ -21,14 +21,14 @@ void RenderCommon::setupTransform(const Entity& entity, const Shader& shader) {
 	shader.setMat3("normalMatrix", normal);
 }
 
-void RenderCommon::setupMaterial(const Entity& entity, const Shader& shader) {
+void RenderCommon::setupMaterial(const Entity& entity, const Material& material, const Shader& shader) {
 	const auto& mtc = entity.getComponent<MaterialComponent>();
 
 	shader.setFloat("material.shininess", mtc.shininess);
 	shader.setFloat("material.heightScale", mtc.heightScale);
 
-	if (!mtc.materials) {
-		shader.setVec3("material.color", mtc.color);
+	if (material.textures.empty()) {
+		shader.setVec3("material.color", material.color);
 	}
 }
 

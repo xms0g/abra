@@ -5,46 +5,47 @@
 #include "../../config/config.hpp"
 #include "../../io/filesystem.hpp"
 
-Models::Cube::Cube(const char* diffuseTexture,
+Models::Cube::Cube(glm::vec3 color,
+                   const char* diffuseTexture,
                    const char* specularTexture,
                    const char* normalTexture,
                    const char* heightTexture) {
 	constexpr float v[] = {
 		// Back face (-Z)
 		-0.5f, -0.5f, -0.5f, 0, 0, -1, 0, 0,
-		 0.5f, -0.5f, -0.5f, 0, 0, -1, 1, 0,
-		 0.5f,  0.5f, -0.5f, 0, 0, -1, 1, 1,
-		-0.5f,  0.5f, -0.5f, 0, 0, -1, 0, 1,
+		0.5f, -0.5f, -0.5f, 0, 0, -1, 1, 0,
+		0.5f, 0.5f, -0.5f, 0, 0, -1, 1, 1,
+		-0.5f, 0.5f, -0.5f, 0, 0, -1, 0, 1,
 
 		// Front face (+Z)
 		-0.5f, -0.5f, 0.5f, 0, 0, 1, 0, 0,
-		 0.5f, -0.5f, 0.5f, 0, 0, 1, 1, 0,
-	 	 0.5f,  0.5f, 0.5f, 0, 0, 1, 1, 1,
-		-0.5f,  0.5f, 0.5f, 0, 0, 1, 0, 1,
+		0.5f, -0.5f, 0.5f, 0, 0, 1, 1, 0,
+		0.5f, 0.5f, 0.5f, 0, 0, 1, 1, 1,
+		-0.5f, 0.5f, 0.5f, 0, 0, 1, 0, 1,
 
 		// Left face (-X)
 		-0.5f, -0.5f, -0.5f, -1, 0, 0, 0, 0,
-		-0.5f,  0.5f, -0.5f, -1, 0, 0, 1, 0,
-		-0.5f,  0.5f,  0.5f, -1, 0, 0, 1, 1,
-		-0.5f, -0.5f,  0.5f, -1, 0, 0, 0, 1,
+		-0.5f, 0.5f, -0.5f, -1, 0, 0, 1, 0,
+		-0.5f, 0.5f, 0.5f, -1, 0, 0, 1, 1,
+		-0.5f, -0.5f, 0.5f, -1, 0, 0, 0, 1,
 
 		// Right face (+X)
 		0.5f, -0.5f, -0.5f, 1, 0, 0, 0, 0,
-		0.5f,  0.5f, -0.5f, 1, 0, 0, 1, 0,
-		0.5f,  0.5f,  0.5f, 1, 0, 0, 1, 1,
-		0.5f, -0.5f,  0.5f, 1, 0, 0, 0, 1,
+		0.5f, 0.5f, -0.5f, 1, 0, 0, 1, 0,
+		0.5f, 0.5f, 0.5f, 1, 0, 0, 1, 1,
+		0.5f, -0.5f, 0.5f, 1, 0, 0, 0, 1,
 
 		// Bottom face (-Y)
 		-0.5f, -0.5f, -0.5f, 0, -1, 0, 0, 0,
-		 0.5f, -0.5f, -0.5f, 0, -1, 0, 1, 0,
-		 0.5f, -0.5f,  0.5f, 0, -1, 0, 1, 1,
-		-0.5f, -0.5f,  0.5f, 0, -1, 0, 0, 1,
+		0.5f, -0.5f, -0.5f, 0, -1, 0, 1, 0,
+		0.5f, -0.5f, 0.5f, 0, -1, 0, 1, 1,
+		-0.5f, -0.5f, 0.5f, 0, -1, 0, 0, 1,
 
 		// Top face (+Y)
 		-0.5f, 0.5f, -0.5f, 0, 1, 0, 0, 0,
-		 0.5f, 0.5f, -0.5f, 0, 1, 0, 1, 0,
-		 0.5f, 0.5f,  0.5f, 0, 1, 0, 1, 1,
-		-0.5f, 0.5f,  0.5f, 0, 1, 0, 0, 1
+		0.5f, 0.5f, -0.5f, 0, 1, 0, 1, 0,
+		0.5f, 0.5f, 0.5f, 0, 1, 0, 1, 1,
+		-0.5f, 0.5f, 0.5f, 0, 1, 0, 0, 1
 	};
 
 	std::vector<uint32_t> indices = {
@@ -148,7 +149,8 @@ Models::Cube::Cube(const char* diffuseTexture,
 			heightTexture);
 	}
 
-	material[0] = {Opaque | CastShadow, textures};
+
+	material[0] = {Opaque | CastShadow, color, textures};
 }
 
 Models::Cube::~Cube() = default;

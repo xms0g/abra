@@ -247,10 +247,9 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 
 	const auto& matc = entity.getComponent<MaterialComponent>();
 	const auto& shader = *entity.getComponent<ShaderComponent>().shader;
-	const auto& materials = entity.getComponent<MaterialComponent>().materials;
 
 	for (auto& [matID, meshes]: *entity.getComponent<MeshComponent>().meshes) {
-		const auto& material = materials->at(matID);
+		const auto& material = matc.materials->at(matID);
 		std::vector<MaterialBatch> matBatch;
 		matBatch.emplace_back(&material, &shader, &meshes);
 

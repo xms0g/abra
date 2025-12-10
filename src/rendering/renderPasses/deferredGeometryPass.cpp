@@ -39,7 +39,7 @@ void DeferredGeometryPass::execute(const RenderContext& ctx) {
 
 		for (const auto& [material, shader, meshes]: matBatches) {
 			RenderCommon::setupTransform(*entity, *mShader);
-			RenderCommon::setupMaterial(*entity, *mShader);
+			RenderCommon::setupMaterial(*entity, *material, *mShader);
 
 			RenderCommon::bindTextures(material->textures, *mShader);
 			RenderCommon::drawMeshes(*meshes);

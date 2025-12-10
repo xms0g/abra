@@ -5,7 +5,8 @@
 #include "../../config/config.hpp"
 #include "../../io/filesystem.hpp"
 
-Models::Plane::Plane(const char* diffuseTexture,
+Models::Plane::Plane(glm::vec3 color,
+                     const char* diffuseTexture,
                      const char* specularTexture,
                      const char* normalTexture,
                      const char* heightTexture) {
@@ -101,7 +102,7 @@ Models::Plane::Plane(const char* diffuseTexture,
 			heightTexture);
 	}
 
-	material[0] = {Opaque | CastShadow, textures};
+	material[0] = {Opaque | CastShadow, color, textures};
 }
 
 Models::Plane::~Plane() = default;

@@ -3,6 +3,7 @@
 #include <vector>
 #include <array>
 
+struct Material;
 struct Texture;
 class Mesh;
 class Shader;
@@ -11,7 +12,7 @@ class Entity;
 namespace RenderCommon {
 void setupTransform(const Entity& entity, const Shader& shader);
 
-void setupMaterial(const Entity& entity, const Shader& shader);
+void setupMaterial(const Entity& entity, const Material& material, const Shader& shader);
 
 void drawMeshes(const std::vector<Mesh>& meshes);
 

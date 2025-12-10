@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <vector>
+#include "glm/glm.hpp"
 
 enum MaterialFlags: uint32_t {
 	Opaque = 1 << 0,
@@ -15,6 +16,7 @@ class Mesh;
 
 struct Material {
 	uint32_t flag;
+	glm::vec3 color;
 	std::vector<Texture> textures;
 };
 
