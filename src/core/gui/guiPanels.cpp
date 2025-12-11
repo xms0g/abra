@@ -58,16 +58,14 @@ void GuiPanels::renderDebugViewsPanel(const Entity& entity) {
 
 void GuiPanels::renderLightPanel(const Entity& entity) {
 	ImGui::PushID(static_cast<int>(entity.id()));
-	if (ImGui::TreeNodeEx("Light", ImGuiTreeNodeFlags_DefaultOpen)) {
-		if (entity.hasComponent<DirectionalLightComponent>()) {
-			renderDirLight(entity);
-		}else if (entity.hasComponent<SpotLightComponent>()) {
-			renderSpotLight(entity);
-		} else if (entity.hasComponent<PointLightComponent>()) {
-			renderPointLight(entity);
-		}
-		ImGui::TreePop();
+	if (entity.hasComponent<DirectionalLightComponent>()) {
+		renderDirLight(entity);
+	} else if (entity.hasComponent<SpotLightComponent>()) {
+		renderSpotLight(entity);
+	} else if (entity.hasComponent<PointLightComponent>()) {
+		renderPointLight(entity);
 	}
+
 	ImGui::PopID();
 }
 
@@ -102,7 +100,7 @@ void GuiPanels::renderPointLight(const Entity& entity) {
 	ImGui::Checkbox("Cast Shadow", &plc.castShadow);
 }
 
-void GuiPanels::renderPostProcessPanel(const std::vector<std::shared_ptr<IPostEffect>>& effects) {
+void GuiPanels::renderPostProcessPanel(const std::vector<std::shared_ptr<IPostEffect> >& effects) {
 	if (ImGui::Begin("Post-Processing")) {
 		for (auto& effect: effects) {
 			ImGui::Checkbox(effect->name().c_str(), &effect->enabled());
