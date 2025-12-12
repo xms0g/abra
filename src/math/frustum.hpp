@@ -9,6 +9,7 @@ struct Plane {
 	Plane() = default;
 
 	Plane(const glm::vec3& p1, const glm::vec3& norm) : normal(norm) {
+		normal = glm::normalize(normal);
 		distance = glm::dot(p1, normal);
 	}
 
