@@ -9,7 +9,7 @@ struct SpotLightComponent;
 
 class LightSystem final : public System {
 public:
-	LightSystem(const RenderContext& ctx);
+	explicit LightSystem(const RenderContext& ctx);
 
 	[[nodiscard]] const UniformBuffer& getLightUBO() const { return *mLightUBO; }
 
