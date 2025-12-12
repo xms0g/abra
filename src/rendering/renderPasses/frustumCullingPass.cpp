@@ -22,7 +22,7 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 			const auto& aabb = bvc.bv;
 
 			bvc.isVisible = aabb->isOnFrustum(*ctx.camera.frustum, tc.position, tc.rotation, tc.scale);
-			if (!bvc.isVisible) return;
+			if (!bvc.isVisible) continue;
 
 			for (auto& [material, shader, meshes]: matBatch) {
 				for (auto& mesh: *meshes) {
