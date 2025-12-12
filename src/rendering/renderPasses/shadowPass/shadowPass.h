@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <memory>
-#include "glm/glm.hpp"
 #include "directionalShadowPass.h"
 #include "omnidirectionalShadowPass.h"
 #include "perspectiveShadowPass.h"
