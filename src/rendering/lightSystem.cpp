@@ -54,14 +54,13 @@ void LightSystem::updateLightUBO(const RenderContext& ctx) const {
 	uint32_t offset = 0;
 
 	auto uploadDataToGPU = [&]<typename T>(T& lights, const uint32_t maxLightCount, uint32_t& off) {
-		using Light = std::remove_pointer_t<typename T::value_type>;
+		using lightType = std::remove_pointer_t<typename T::value_type>;
 		const size_t lightCount = std::min(lights.size(), static_cast<size_t>(maxLightCount));
 
 		for (size_t i = 0; i < lightCount; i++) {
-			mLightUBO->setData(lights[i], sizeof(Light),
-							   off + i * sizeof(Light));
+			mLightUBO->setData(lights[i], sizeof(lightType), off + i * sizeof(lightType));
 		}
-		off += maxLightCount * sizeof(Light);
+		off += maxLightCount * sizeof(lightType);
 		return lightCount;
 	};
 
