@@ -52,29 +52,22 @@ void LightSystem::update(const RenderContext& ctx) {
 void LightSystem::updateLightUBO(const RenderContext& ctx) const {
 	mLightUBO->bind();
 	uint32_t offset = 0;
-	// Directional lights
-	const size_t dirCount = std::min(dirLights.size(), static_cast<size_t>(ctx.light.maxDirLights));
-	for (size_t i = 0; i < dirCount; i++) {
-		mLightUBO->setData(dirLights[i], sizeof(DirectionalLightComponent),
-		                   offset + i * sizeof(DirectionalLightComponent));
-	}
-	offset += ctx.light.maxDirLights * sizeof(DirectionalLightComponent);
 
-	// Point lights
-	const size_t pointCount = std::min(pointLights.size(), static_cast<size_t>(ctx.light.maxPointLights));
-	for (size_t i = 0; i < pointCount; i++) {
-		mLightUBO->setData(pointLights[i], sizeof(PointLightComponent), offset + i * sizeof(PointLightComponent));
-	}
+	auto uploadDataToGPU = [&]<typename T>(T& lights, const uint32_t maxLightCount, uint32_t& off) {
+		using Light = std::remove_pointer_t<typename T::value_type>;
+		const size_t lightCount = std::min(lights.size(), static_cast<size_t>(maxLightCount));
 
-	offset += ctx.light.maxPointLights * sizeof(PointLightComponent);
+		for (size_t i = 0; i < lightCount; i++) {
+			mLightUBO->setData(lights[i], sizeof(Light),
+							   off + i * sizeof(Light));
+		}
+		off += maxLightCount * sizeof(Light);
+		return lightCount;
+	};
 
-	// Spot Lights
-	const size_t spotCount = std::min(spotLights.size(), static_cast<size_t>(ctx.light.maxSpotLights));
-	for (size_t i = 0; i < spotCount; i++) {
-		mLightUBO->setData(spotLights[i], sizeof(SpotLightComponent), offset + i * sizeof(SpotLightComponent));
-	}
-
-	offset += ctx.light.maxSpotLights * sizeof(SpotLightComponent);
+	const size_t dirCount = uploadDataToGPU(dirLights, ctx.light.maxDirLights, offset);
+	const size_t pointCount = uploadDataToGPU(pointLights, ctx.light.maxPointLights, offset);
+	const size_t spotCount = uploadDataToGPU(spotLights, ctx.light.maxSpotLights, offset);
 
 	auto lightCount = glm::ivec4(dirCount, pointCount, spotCount, 0);
 	mLightUBO->setData(glm::value_ptr(lightCount), sizeof(glm::ivec4), offset);
