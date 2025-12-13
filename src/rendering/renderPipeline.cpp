@@ -227,8 +227,7 @@ void RenderPipeline::render() {
 }
 
 void RenderPipeline::refreshCameraData() const {
-	const auto skyView = glm::mat4(glm::mat3(mRenderCtx->camera.self->viewMatrix()));
-	mRenderCtx->camera.skyView = skyView;
+	mRenderCtx->camera.skyView = glm::mat4(glm::mat3(mRenderCtx->camera.self->viewMatrix()));
 	mRenderCtx->camera.frustum = &mRenderCtx->camera.self->frustum();
 
 	auto view = mRenderCtx->camera.self->viewMatrix();
