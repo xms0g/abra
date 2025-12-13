@@ -12,7 +12,7 @@
 ForwardOpaquePass::~ForwardOpaquePass() = default;
 
 void ForwardOpaquePass::configure(const RenderContext& ctx) {
-	for (const auto& [entity, matBatches]: ctx.renderQueue->blendGroups) {
+	for (const auto& [entity, matBatches]: ctx.renderQueue->forwardOpaqueGroups) {
 		for (const auto& [material, shader, meshes]: matBatches) {
 			shader->activate();
 			shader->setInt("shadowMap", ctx.shadowMap.textureSlot);
