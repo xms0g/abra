@@ -32,16 +32,12 @@ void RenderCommon::setupMaterial(const Entity& entity, const Material& material,
 	}
 }
 
-void RenderCommon::drawMeshes(const std::vector<Mesh>& meshes) {
-	for (const auto& mesh: meshes) {
-		if (!mesh.isVisible()) continue;
-
-		mesh.bind();
-		if (!mesh.indices().empty()) {
-			glDrawElements(GL_TRIANGLES, static_cast<int32_t>(mesh.indices().size()), GL_UNSIGNED_INT, nullptr);
-		} else {
-			glDrawArrays(GL_TRIANGLES, 0, static_cast<int32_t>(mesh.vertices().size()));
-		}
+void RenderCommon::drawMeshes(const Mesh& mesh) {
+	mesh.bind();
+	if (!mesh.indices().empty()) {
+		glDrawElements(GL_TRIANGLES, static_cast<int32_t>(mesh.indices().size()), GL_UNSIGNED_INT, nullptr);
+	} else {
+		glDrawArrays(GL_TRIANGLES, 0, static_cast<int32_t>(mesh.vertices().size()));
 	}
 }
 

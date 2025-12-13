@@ -2,7 +2,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "../../shader.h"
-#include "../../renderContext/renderGroup.hpp"
+#include "../../renderContext/renderCommand.hpp"
 #include "../../renderContext/renderQueue.hpp"
 #include "../../renderContext/renderContext.hpp"
 #include "../../buffers/frameBuffer.h"
@@ -15,7 +15,7 @@ OmnidirectionalShadowPass::OmnidirectionalShadowPass(const RenderContext& ctx) {
 	mDepthMap->unbind();
 
 	mDepthShader = std::make_unique<Shader>("depth/depthCubemap.vert",
-											"depth/depthCubemap.frag",
+	                                        "depth/depthCubemap.frag",
 	                                        "depth/depthCubemap.geom");
 }
 
@@ -54,10 +54,8 @@ void OmnidirectionalShadowPass::render(const RenderContext& ctx, const glm::vec4
 	mDepthShader->setVec3("lightPos", position);
 	mDepthShader->setInt("cubeIndex", layer);
 
-	for (const auto& [entity, matBatches]: ctx.renderQueue->shadowCasterGroups) {
-		for (const auto& [material, shader, meshes]: matBatches) {
-			RenderCommon::setupTransform(*entity, *mDepthShader);
-			RenderCommon::drawMeshes(*meshes);
-		}
+	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->shadowCommands) {
+		RenderCommon::setupTransform(*entity, *mDepthShader);
+		RenderCommon::drawMeshes(*mesh);
 	}
 }

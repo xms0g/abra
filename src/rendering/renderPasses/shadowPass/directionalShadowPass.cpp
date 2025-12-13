@@ -3,7 +3,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "../../shader.h"
 #include "../../renderContext/renderContext.hpp"
-#include "../../renderContext/renderGroup.hpp"
+#include "../../renderContext/renderCommand.hpp"
 #include "../../renderContext/renderQueue.hpp"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderCommon.h"
@@ -48,11 +48,10 @@ void DirectionalShadowPass::render(const RenderContext& ctx, const glm::vec4& di
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
 	glViewport(0, 0, ctx.shadowMap.width, ctx.shadowMap.height);
-	for (const auto& [entity, matBatches]: ctx.renderQueue->shadowCasterGroups) {
-		for (const auto& [material, shader, meshes]: matBatches) {
-			RenderCommon::setupTransform(*entity, *mDepthShader);
-			RenderCommon::drawMeshes(*meshes);
-		}
+
+	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->shadowCommands) {
+		RenderCommon::setupTransform(*entity, *mDepthShader);
+		RenderCommon::drawMeshes(*mesh);
 	}
 	mDepthMap->unbind();
 	glCullFace(GL_BACK);

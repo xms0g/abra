@@ -5,7 +5,7 @@
 #include "../buffers/frameBuffer.h"
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderQueue.hpp"
-#include "../renderContext/renderGroup.hpp"
+#include "../renderContext/renderCommand.hpp"
 #include "../../ECS/components/debug.hpp"
 #include "../../ECS/entity.hpp"
 
@@ -26,7 +26,8 @@ void DebugPass::configure(const RenderContext& ctx) {
 
 void DebugPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
-	for (const auto& [entity, matBatches]: ctx.renderQueue->debugGroups) {
+	const Entity* lastEntity = nullptr;
+	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->dbgCommands) {
 		const auto& db = entity->getComponent<DebugComponent>();
 		if (db.mode == None)
 			continue;
@@ -34,10 +35,12 @@ void DebugPass::execute(const RenderContext& ctx) {
 		const auto& dbgShader = mDebugShaders.at(db.mode);
 		dbgShader->activate();
 
-		for (const auto& [material, shader, meshes]: matBatches) {
-			RenderCommon::setupTransform(*entity, *dbgShader);
-			RenderCommon::drawMeshes(*meshes);
+		if (lastEntity != entity) {
+			lastEntity = entity;
+			RenderCommon::setupTransform(*lastEntity, *dbgShader);
 		}
+
+		RenderCommon::drawMeshes(*mesh);
 	}
 	ctx.sceneBuffer->unbind();
 }

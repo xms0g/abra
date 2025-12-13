@@ -16,16 +16,16 @@ struct PointLightComponent;
 struct SpotLightComponent;
 
 struct RenderContext {
-	const RenderQueue* renderQueue;
+	RenderQueue* renderQueue;
 	mutable const FrameBuffer* sceneBuffer;
 	const FrameBuffer* intermediateBuffer;
 
 	struct {
 		const UniformBuffer* ubo;
-		uint32_t maxDirLights, maxPointLights, maxSpotLights;
 		const std::vector<DirectionalLightComponent*>* dirLights;
 		const std::vector<PointLightComponent*>* pointLights;
 		const std::vector<SpotLightComponent*>* spotLights;
+		uint32_t maxDirLights, maxPointLights, maxSpotLights;
 	} light;
 
 	struct {
@@ -40,6 +40,9 @@ struct RenderContext {
 	} screen;
 
 	struct {
+		const std::array<uint32_t, 3>* textures;
+		const UniformBuffer* ubo;
+
 		int textureSlot;
 		int width, height;
 
@@ -57,9 +60,6 @@ struct RenderContext {
 			int maxLights;
 			float nearPlane, farPlane;
 		} perspective;
-
-		const std::array<uint32_t, 3>* textures;
-		const UniformBuffer* ubo;
 	} shadowMap;
 
 	RenderContext() = default;

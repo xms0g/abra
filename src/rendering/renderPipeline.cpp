@@ -10,6 +10,7 @@
 #include "renderContext/renderContext.hpp"
 #include "renderContext/renderFlags.hpp"
 #include "renderContext/renderGroup.hpp"
+#include "renderContext/renderCommand.hpp"
 #include "renderContext/instanceGroup.hpp"
 #include "renderPasses/IRenderPass.hpp"
 #include "renderPasses/deferredGeometryPass.h"
@@ -254,7 +255,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 
 		if (matc.flag & Instanced) {
 			const auto& ic = entity.getComponent<InstanceComponent>();
-			InstanceGroup instance{&entity, ic.transforms, matBatch};
+			InstanceGroup instance{&entity, ic.transforms, std::move(matBatch)};
 
 			if (material.flag & Blend) {
 				mRenderQueue.blendInstancedGroups.push_back(instance);
@@ -264,14 +265,14 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			continue;
 		}
 
-		RenderGroup group{&entity, matBatch};
+		RenderGroup group{&entity, std::move(matBatch)};
 
 		if (entity.hasComponent<DebugComponent>()) {
 			mRenderQueue.debugGroups.push_back(group);
 		}
 
 		if (material.flag & CastShadow) {
-			mRenderQueue.shadowCasterGroups.push_back(group);
+			mRenderQueue.shadowGroups.push_back(group);
 		}
 
 		if (material.flag & Opaque) {

@@ -2,16 +2,17 @@
 #include "../shader.h"
 #include "../renderCommon.h"
 #include "../buffers/frameBuffer.h"
+#include "../material/material.hpp"
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderQueue.hpp"
+#include "../renderContext/renderCommand.hpp"
 #include "../renderContext/renderGroup.hpp"
-#include "../../ECS/components/bv.hpp"
 #include "../../ECS/entity.hpp"
 
 ForwardOpaquePass::~ForwardOpaquePass() = default;
 
 void ForwardOpaquePass::configure(const RenderContext& ctx) {
-	for (const auto& [entity, matBatches]: ctx.renderQueue->forwardOpaqueGroups) {
+	for (const auto& [entity, matBatches]: ctx.renderQueue->blendGroups) {
 		for (const auto& [material, shader, meshes]: matBatches) {
 			shader->activate();
 			shader->setInt("shadowMap", ctx.shadowMap.textureSlot);
@@ -25,21 +26,27 @@ void ForwardOpaquePass::execute(const RenderContext& ctx) {
 	RenderCommon::bindShadowMaps(*ctx.shadowMap.textures);
 	ctx.sceneBuffer->bind();
 
-	for (const auto& [entity, matBatches]: ctx.renderQueue->forwardOpaqueGroups) {
-		if (!entity->getComponent<BoundingVolumeComponent>().isVisible)
-			continue;
-
-		for (const auto& [material, shader, meshes]: matBatches) {
-			shader->activate();
-
-			RenderCommon::setupTransform(*entity, *shader);
-			RenderCommon::setupMaterial(*entity, *material, *shader);
-
-			RenderCommon::bindTextures(material->textures, *shader);
-			RenderCommon::drawMeshes(*meshes);
-			RenderCommon::unbindTextures(material->textures);
+	const Material* lastMaterial = nullptr;
+	const Shader* lastShader = nullptr;
+	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->forwardCommands) {
+		if (lastShader != shader) {
+			lastShader = shader;
+			lastShader->activate();
+			lastMaterial = nullptr;
 		}
+
+		RenderCommon::setupTransform(*entity, *lastShader);
+
+		if (lastMaterial != material) {
+			lastMaterial = material;
+			RenderCommon::setupMaterial(*entity, *lastMaterial, *lastShader);
+			RenderCommon::bindTextures(lastMaterial->textures, *lastShader);
+		}
+
+		RenderCommon::drawMeshes(*mesh);
 	}
+	if (lastMaterial)
+		RenderCommon::unbindTextures(lastMaterial->textures);
 	ctx.sceneBuffer->unbind();
 }
 

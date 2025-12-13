@@ -4,9 +4,10 @@
 #include "../renderCommon.h"
 #include "../buffers/frameBuffer.h"
 #include "../buffers/uniformBuffer.h"
+#include "../material/material.hpp"
 #include "../renderContext/renderQueue.hpp"
 #include "../renderContext/renderContext.hpp"
-#include "../renderContext/renderGroup.hpp"
+#include "../renderContext/renderCommand.hpp"
 #include "../../ECS/components/bv.hpp"
 #include "../../ECS/entity.hpp"
 
@@ -32,19 +33,23 @@ void DeferredGeometryPass::configure(const RenderContext& ctx) {
 void DeferredGeometryPass::execute(const RenderContext& ctx) {
 	mGBuffer->bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	mShader->activate();
-	for (const auto& [entity, matBatches]: ctx.renderQueue->deferredGroups) {
-		if (!entity->getComponent<BoundingVolumeComponent>().isVisible)
-			continue;
 
-		for (const auto& [material, shader, meshes]: matBatches) {
-			RenderCommon::setupTransform(*entity, *mShader);
-			RenderCommon::setupMaterial(*entity, *material, *mShader);
+	const Material* lastMaterial = nullptr;
+	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->deferredCommands) {
+		RenderCommon::setupTransform(*entity, *mShader);
 
-			RenderCommon::bindTextures(material->textures, *mShader);
-			RenderCommon::drawMeshes(*meshes);
-			RenderCommon::unbindTextures(material->textures);
+		if (lastMaterial != material) {
+			lastMaterial = material;
+			RenderCommon::setupMaterial(*entity, *lastMaterial, *mShader);
+			RenderCommon::bindTextures(lastMaterial->textures, *mShader);
 		}
+
+		RenderCommon::drawMeshes(*mesh);
 	}
+
+	if (lastMaterial)
+		RenderCommon::unbindTextures(lastMaterial->textures);
 	mGBuffer->unbind();
 }
