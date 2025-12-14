@@ -1,3 +1,7 @@
+const int ALPHA_OPAQUE = 1 << 0;
+const int ALPHA_BLEND = 1 << 1;
+const int ALPHA_CUTOUT  = 1 << 2;
+
 struct Material {
     sampler2D texture_diffuse;
     sampler2D texture_specular;
@@ -6,6 +10,8 @@ struct Material {
     vec3 color;
     float shininess;
     float heightScale;
+    int mode;
+    float alphaCutout;
     bool hasNormalMap;
     bool hasHeightMap;
 };

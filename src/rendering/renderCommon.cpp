@@ -27,6 +27,9 @@ void RenderCommon::setupMaterial(const Entity& entity, const Material& material,
 	shader.setFloat("material.shininess", mtc.shininess);
 	shader.setFloat("material.heightScale", mtc.heightScale);
 
+	shader.setInt("material.mode", material.flag);
+	shader.setFloat("material.alphaCutout", material.alphaCutout);
+
 	if (material.textures.empty()) {
 		shader.setVec3("material.color", material.color);
 	}

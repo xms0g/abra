@@ -1,5 +1,6 @@
 #include "resourceManager.h"
 #include <iostream>
+#include <assimp/GltfMaterial.h>
 #include "image/stb_image.h"
 #include "../rendering/texture/texture.h"
 #include "../rendering/mesh/mesh.h"
@@ -154,14 +155,22 @@ void ResourceManager::loadMaterialTextures(const aiMaterial* mat,
 			mMaterials[materialID].textures.emplace_back(texture::load(path.c_str()), type, typeName, str.C_Str());
 		} else {
 			uint32_t mode = 0;
-
-			if (type == aiTextureType_DIFFUSE) {
-				mode = texture::detectAlphaMode(path.c_str());
+			float alphaCutoff = 0.0f;
+			// Only GLTF supports
+			if (aiString alphaMode; mat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode) == AI_SUCCESS) {
+				if (std::strcmp(alphaMode.C_Str(), "OPAQUE") == 0) {
+					mode = Opaque | CastShadow;
+				} else if (std::strcmp(alphaMode.C_Str(), "MASK") == 0) {
+					mode = Cutout | CastShadow;
+					mat->Get(AI_MATKEY_GLTF_ALPHACUTOFF, alphaCutoff);
+				} else if (std::strcmp(alphaMode.C_Str(), "BLEND") == 0) {
+					mode = Blend;
+				}
 			}
 
 			std::vector<Texture> textures;
 			textures.emplace_back(texture::load(path.c_str()), type, typeName, str.C_Str());
-			mMaterials[materialID] = {mode, glm::vec3(), textures};
+			mMaterials[materialID] = {mode, glm::vec3(), alphaCutoff, std::move(textures)};
 		}
 
 		// store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate mTextures.

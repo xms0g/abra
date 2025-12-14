@@ -150,7 +150,7 @@ Models::Cube::Cube(glm::vec3 color,
 	}
 
 
-	material[0] = {Opaque | CastShadow, color, textures};
+	material[0] = {Opaque | CastShadow, color, 0.0f, textures};
 }
 
 Models::Cube::~Cube() = default;

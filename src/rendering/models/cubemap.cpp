@@ -68,7 +68,7 @@ Models::Cubemap::Cubemap(const char* const f[]) {
 
 	std::vector<Texture> textures;
 	textures.emplace_back(texture::loadCubemap(faces), DIFFUSE, "skybox","skybox.jpg");
-	material[0] = {0, glm::vec3(), textures};
+	material[0] = {0, glm::vec3(), 0.0f, textures};
 }
 
 Models::Cubemap::~Cubemap() = default;

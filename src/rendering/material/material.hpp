@@ -17,6 +17,7 @@ class Mesh;
 struct Material {
 	uint32_t flag;
 	glm::vec3 color;
+	float alphaCutout;
 	std::vector<Texture> textures;
 };
 
