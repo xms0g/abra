@@ -51,7 +51,7 @@ void DirectionalShadowPass::render(const RenderContext& ctx, const glm::vec4& di
 
 	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->shadowCommands) {
 		RenderCommon::setupTransform(*entity, *mDepthShader);
-		RenderCommon::drawMeshes(*mesh);
+		RenderCommon::drawMesh(*mesh);
 	}
 	mDepthMap->unbind();
 	glCullFace(GL_BACK);

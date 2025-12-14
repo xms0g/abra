@@ -42,7 +42,7 @@ void ForwardOpaquePass::execute(const RenderContext& ctx) {
 			RenderCommon::bindTextures(lastMaterial->textures, *lastShader);
 		}
 
-		RenderCommon::drawMeshes(*mesh);
+		RenderCommon::drawMesh(*mesh);
 	}
 	if (lastMaterial)
 		RenderCommon::unbindTextures(lastMaterial->textures);

@@ -46,7 +46,7 @@ void DeferredGeometryPass::execute(const RenderContext& ctx) {
 			RenderCommon::bindTextures(lastMaterial->textures, *mShader);
 		}
 
-		RenderCommon::drawMeshes(*mesh);
+		RenderCommon::drawMesh(*mesh);
 	}
 
 	if (lastMaterial)

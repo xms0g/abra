@@ -47,7 +47,7 @@ void BlendPass::execute(const RenderContext& ctx) {
 			lastMaterial = material;
 		}
 
-		RenderCommon::drawMeshes(*mesh);
+		RenderCommon::drawMesh(*mesh);
 	}
 	if (lastMaterial)
 		RenderCommon::unbindTextures(lastMaterial->textures);

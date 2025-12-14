@@ -33,7 +33,7 @@ void RenderCommon::setupMaterial(const Entity& entity, const Material& material,
 	}
 }
 
-void RenderCommon::drawMeshes(const Mesh& mesh) {
+void RenderCommon::drawMesh(const Mesh& mesh) {
 	mesh.bind();
 	if (!mesh.indices().empty()) {
 		glDrawElements(GL_TRIANGLES, static_cast<int32_t>(mesh.indices().size()), GL_UNSIGNED_INT, nullptr);

@@ -14,7 +14,7 @@ void setupTransform(const Entity& entity, const Shader& shader);
 
 void setupMaterial(const Entity& entity, const Material& material, const Shader& shader);
 
-void drawMeshes(const Mesh& mesh);
+void drawMesh(const Mesh& mesh);
 
 void drawQuad(uint32_t sceneTexture, uint32_t VAO);
 
