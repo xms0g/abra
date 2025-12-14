@@ -66,6 +66,8 @@ void Camera::processMouseMovement(float xoffset, float yoffset) {
 		mPitch = 89.0f;
 	if (mPitch < -89.0f)
 		mPitch = -89.0f;
+
+	update();
 }
 
 void Camera::processMouseScroll(float yoffset) {

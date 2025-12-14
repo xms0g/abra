@@ -5,8 +5,8 @@
 
 void Input::process(Camera& camera, SDL_Window* window, const float dt, bool& isRunning) {
     SDL_Event event;
-
     SDL_PollEvent(&event);
+
 #ifdef DEBUG
     ImGui_ImplSDL2_ProcessEvent(&event);
 #endif
@@ -23,50 +23,44 @@ void Input::process(Camera& camera, SDL_Window* window, const float dt, bool& is
 }
 
 void Input::processKeyboard(Camera& camera, const float dt, bool& isRunning) {
-    auto* keystate = SDL_GetKeyboardState(nullptr);
+    auto* keyState = SDL_GetKeyboardState(nullptr);
 
-    if (keystate[SDL_SCANCODE_ESCAPE]) {
+    if (keyState[SDL_SCANCODE_ESCAPE]) {
         isRunning = false;
-    } else if (keystate[SDL_SCANCODE_W]) {
+    } else if (keyState[SDL_SCANCODE_W]) {
         camera.processKeyboard(FORWARD, dt);
-    } else if (keystate[SDL_SCANCODE_S]) {
+    } else if (keyState[SDL_SCANCODE_S]) {
         camera.processKeyboard(BACKWARD, dt);
-    } else if (keystate[SDL_SCANCODE_A]) {
+    } else if (keyState[SDL_SCANCODE_A]) {
         camera.processKeyboard(LEFT, dt);
-    } else if (keystate[SDL_SCANCODE_D]) {
+    } else if (keyState[SDL_SCANCODE_D]) {
         camera.processKeyboard(RIGHT, dt);
     }
 }
 
 void Input::processMouse(Camera& camera) {
-    int x, y;
+    int dx, dy;
+	static bool freeLook{false};
 
-    const int buttons = SDL_GetMouseState(&x, &y);
-    const bool isClickedLeft = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
-    const bool isClickedRight = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
+    if (const uint32_t buttons = SDL_GetRelativeMouseState(&dx, &dy); buttons & SDL_BUTTON(SDL_BUTTON_RIGHT)) {
+		freeLook = !freeLook;
+	}
 
 #ifdef DEBUG
     ImGuiIO& io = ImGui::GetIO();
-    io.MousePos = ImVec2(x, y);
-    io.MouseDown[0] = isClickedLeft;
-    io.MouseDown[1] = isClickedRight;
+	if (!freeLook) {
+		// Only feed ImGui when camera is NOT controlling mouse
+		int x, y;
+		SDL_GetMouseState(&x, &y);
+		io.MousePos = ImVec2(static_cast<float>(x), static_cast<float>(y));
+		io.MouseDown[1] = false;
+	}
 #endif
 
-    auto xpos = static_cast<float>(x);
-    auto ypos = static_cast<float>(y);
-
-    if (mFirstMouse) {
-        mLastX = xpos;
-        mLastY = ypos;
-        mFirstMouse = false;
-    }
-
-    float xoffset = xpos - mLastX;
-    float yoffset = mLastY - ypos; // reversed since y-coordinates go from bottom to top
-
-    mLastX = xpos;
-    mLastY = ypos;
-
-    if (isClickedRight)
-        camera.processMouseMovement(xoffset, yoffset);
+	if (freeLook) {
+		SDL_SetRelativeMouseMode(SDL_TRUE);
+		camera.processMouseMovement(static_cast<float>(dx), static_cast<float>(-dy));
+	} else {
+		SDL_SetRelativeMouseMode(SDL_FALSE);
+	}
 }

@@ -43,6 +43,11 @@ Itâ€™s designed for clarity, experimentation, and real-time graphics research â€
 ![Screenshot](assets/screenshot.png)
 ![Screenshot1](assets/screenshot1.png)
 ![Screenshot2](assets/screenshot2.png)
+## Controls
+| Key  | Action                   |
+|------|--------------------------|
+| WASD | Move                     |
+| RMB  | enable/disable Free Look |
 ## Roadmap
 - [ ] SSAO
 - [ ] PBR materials
