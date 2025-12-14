@@ -34,14 +34,12 @@
 #include "../ECS/components/transform.hpp"
 #include "../ECS/components/material.hpp"
 #include "../ECS/components/mesh.hpp"
-#include "../ECS/components/shader.hpp"
 #include "../ECS/components/instance.hpp"
 #include "../ECS/components/skybox.hpp"
 
 RenderPipeline::RenderPipeline(Registry* registry) {
-	RequireComponent<MeshComponent>();
-	RequireComponent<ShaderComponent>();
-	RequireComponent<TransformComponent>();
+	RequireComponent<MeshComponent>(true);
+	RequireComponent<TransformComponent>(true);
 	// glad: load all OpenGL function pointers
 	// ---------------------------------------
 	if (!gladLoadGLLoader(SDL_GL_GetProcAddress)) {
@@ -64,6 +62,13 @@ RenderPipeline::RenderPipeline(Registry* registry) {
 
 	registry->addSystem<LightSystem>(*mRenderCtx);
 	mLightSystem = &registry->getSystem<LightSystem>();
+
+	opaque = std::make_unique<Shader>("object.vert", "opaque.frag");
+	cutout = std::make_unique<Shader>("object.vert", "cutout.frag");
+	blend = std::make_unique<Shader>("object.vert", "blend.frag");
+	instancedOpaque = std::make_unique<Shader>("instanced.vert", "opaque.frag");
+	instancedCutout = std::make_unique<Shader>("instanced.vert", "cutout.frag");
+	instancedBlend = std::make_unique<Shader>("instanced.vert", "blend.frag");
 }
 
 RenderPipeline::~RenderPipeline() = default;
@@ -152,12 +157,14 @@ void RenderPipeline::configure(const Camera& camera) {
 	mRenderPasses.push_back(mPostProcessPass);
 
 	mRenderCtx->sceneBuffer = mSceneBuffer.get();
+	mRenderCtx->camera.self = &camera;
+	mRenderCtx->camera.ubo = mCameraUBO.get();
 	mRenderCtx->light.ubo = &mLightSystem->getLightUBO();
 	mRenderCtx->light.dirLights = &mLightSystem->getDirLights();
 	mRenderCtx->light.pointLights = &mLightSystem->getPointLights();
 	mRenderCtx->light.spotLights = &mLightSystem->getSpotLights();
-	mRenderCtx->camera.self = &camera;
-	mRenderCtx->camera.ubo = mCameraUBO.get();
+	mRenderCtx->shadowMap.ubo = mShadowPass->getShadowUBO();
+	mRenderCtx->shadowMap.textures = &mShadowPass->getShadowMaps();
 	mRenderCtx->shadowMap.textureSlot = SHADOWMAP_TEXTURE_SLOT;
 	mRenderCtx->shadowMap.width = SHADOWMAP_WIDTH;
 	mRenderCtx->shadowMap.height = SHADOWMAP_HEIGHT;
@@ -175,8 +182,16 @@ void RenderPipeline::configure(const Camera& camera) {
 	mRenderCtx->shadowMap.perspective.maxLights = MAX_SPOT_LIGHTS;
 	mRenderCtx->shadowMap.perspective.nearPlane = SHADOW_PERSPECTIVE_NEAR;
 	mRenderCtx->shadowMap.perspective.farPlane = SHADOW_PERSPECTIVE_FAR;
-	mRenderCtx->shadowMap.ubo = mShadowPass->getShadowUBO();
-	mRenderCtx->shadowMap.textures = &mShadowPass->getShadowMaps();
+
+	// Set camera projection matrix
+	const glm::mat4 projectionMat = glm::perspective(
+		glm::radians(mRenderCtx->camera.self->zoom()),
+		static_cast<float>(mRenderCtx->screen.width) / static_cast<float>(mRenderCtx->screen.height),
+		ZNEAR, ZFAR);
+
+	mRenderCtx->camera.ubo->bind();
+	mRenderCtx->camera.ubo->setData(glm::value_ptr(projectionMat), sizeof(glm::mat4), sizeof(glm::mat4));
+	mRenderCtx->camera.ubo->unbind();
 
 	// Configure render passes
 	for (const auto& pass: mRenderPasses) {
@@ -187,23 +202,30 @@ void RenderPipeline::configure(const Camera& camera) {
 		mDeferredLightingPass->configureInput(mDeferredGeometryPass->getGBuffer());
 	}
 
-	// Configure entities
-	for (const auto& entity: getSystemEntities()) {
-		const auto& shader = entity.getComponent<ShaderComponent>().shader;
+	// Configure shaders
+	auto configureShader = [&]<typename T>(T& groups) {
+		const Shader* lastShader = nullptr;
 
-		mRenderCtx->camera.ubo->configure(shader->ID(), 0, "CameraBlock");
-		mRenderCtx->light.ubo->configure(shader->ID(), 1, "LightBlock");
-		mRenderCtx->shadowMap.ubo->configure(shader->ID(), 2, "ShadowBlock");
-	}
+		for (const auto& group : groups) {
+			if (lastShader == group.mbatch.shader) {
+				continue;
+			}
 
-	const glm::mat4 projectionMat = glm::perspective(
-		glm::radians(mRenderCtx->camera.self->zoom()),
-		static_cast<float>(mRenderCtx->screen.width) / static_cast<float>(mRenderCtx->screen.height),
-		ZNEAR, ZFAR);
+			lastShader = group.mbatch.shader;
+			mRenderCtx->camera.ubo->configure(lastShader->ID(), 0, "CameraBlock");
+			mRenderCtx->light.ubo->configure(lastShader->ID(), 1, "LightBlock");
+			mRenderCtx->shadowMap.ubo->configure(lastShader->ID(), 2, "ShadowBlock");
+		}
+	};
 
-	mRenderCtx->camera.ubo->bind();
-	mRenderCtx->camera.ubo->setData(glm::value_ptr(projectionMat), sizeof(glm::mat4), sizeof(glm::mat4));
-	mRenderCtx->camera.ubo->unbind();
+	configureShader(mRenderQueue.deferredGroups);
+	configureShader(mRenderQueue.forwardOpaqueGroups);
+	configureShader(mRenderQueue.blendGroups);
+	configureShader(mRenderQueue.shadowGroups);
+	configureShader(mRenderQueue.debugGroups);
+	configureShader(mRenderQueue.opaqueInstancedGroups);
+	configureShader(mRenderQueue.cutoutInstancedGroups);
+	configureShader(mRenderQueue.blendInstancedGroups);
 }
 
 void RenderPipeline::batchEntities() {
@@ -246,22 +268,40 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 	}
 
 	const auto& matc = entity.getComponent<MaterialComponent>();
-	const auto& shader = *entity.getComponent<ShaderComponent>().shader;
 
 	for (auto& [matID, meshes]: *entity.getComponent<MeshComponent>().meshes) {
 		const auto& material = matc.materials->at(matID);
-		const MaterialBatch matBatch{&material, &shader, &meshes};
+		MaterialBatch matBatch{&material, nullptr, &meshes};
 
 		if (matc.flag & Instanced) {
+			if (material.flag & Opaque) {
+				matBatch.shader = instancedOpaque.get();
+			} else if (material.flag & Cutout) {
+				matBatch.shader = instancedCutout.get();
+			} else if (material.flag & Blend) {
+				matBatch.shader = instancedBlend.get();
+			}
+
 			const auto& ic = entity.getComponent<InstanceComponent>();
 			InstanceGroup instance{&entity, ic.transforms, matBatch};
 
-			if (material.flag & Blend) {
-				mRenderQueue.blendInstancedGroups.push_back(instance);
-			} else {
+			if (material.flag & Opaque) {
 				mRenderQueue.opaqueInstancedGroups.push_back(instance);
+			} else if (material.flag & Cutout) {
+				mRenderQueue.cutoutInstancedGroups.push_back(instance);
+			} else if (material.flag & Blend) {
+				mRenderQueue.blendInstancedGroups.push_back(instance);
 			}
+
 			continue;
+		}
+
+		if (material.flag & Opaque) {
+			matBatch.shader = opaque.get();
+		} else if (material.flag & Cutout) {
+			matBatch.shader = cutout.get();
+		} else if (material.flag & Blend) {
+			matBatch.shader = blend.get();
 		}
 
 		RenderGroup group{&entity, matBatch};

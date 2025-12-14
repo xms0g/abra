@@ -12,6 +12,7 @@
 #include "../../ECS/components/mesh.hpp"
 #include "../../ECS/components/shader.hpp"
 #include "../../ECS/entity.hpp"
+#include "../../ECS/registry.h"
 
 SkyboxPass::~SkyboxPass() = default;
 

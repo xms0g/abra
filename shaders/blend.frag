@@ -1,10 +1,5 @@
 #version 410 core
-in VS_OUT
-{
-    vec2 TexCoord;
-} fs_in;
-
-#include "common/material.glsl"
+#include "common/object.glsl"
 
 out vec4 fragColor;
 

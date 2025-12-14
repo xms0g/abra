@@ -5,6 +5,7 @@
 #include "../ECS/system.hpp"
 
 struct RenderContext;
+class Shader;
 class ShadowPass;
 class DeferredLightingPass;
 class DeferredGeometryPass;
@@ -39,7 +40,13 @@ private:
 	void sortEntities();
 	// Systems
 	LightSystem* mLightSystem{};
-
+	//Shaders
+	std::unique_ptr<Shader> opaque;
+	std::unique_ptr<Shader> cutout;
+	std::unique_ptr<Shader> blend;
+	std::unique_ptr<Shader> instancedOpaque;
+	std::unique_ptr<Shader> instancedCutout;
+	std::unique_ptr<Shader> instancedBlend;
 	// Frame Buffers
 	std::unique_ptr<FrameBuffer> mSceneBuffer;
 	std::unique_ptr<FrameBuffer> mIntermediateBuffer;

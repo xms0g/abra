@@ -20,7 +20,7 @@ public:
 
     void update();
 
-	const math::Frustum& frustum() const { return mFrustum; }
+	[[nodiscard]] const math::Frustum& frustum() const { return mFrustum; }
 
     [[nodiscard]] glm::mat4 viewMatrix() const { return glm::lookAt(mPosition, mPosition + mFront, mUp); }
 

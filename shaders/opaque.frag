@@ -1,31 +1,9 @@
 #version 410 core
-in VS_OUT
-{
-    vec2 TexCoord;
-    mat3 TBN;
-    vec3 FragPos;
-    vec4 FragPosLightSpace;
-    vec3 ViewDir;
-    vec3 TangentViewDir;
-} fs_in;
-
-#include "ub/camera.glsl"
-#include "ub/shadow.glsl"
-#include "common/material.glsl"
-#include "common/blinnPhong.glsl"
-#include "common/normalMap.glsl"
-#include "common/parallaxMap.glsl"
+#include "common/object.glsl"
 
 out vec4 fragColor;
 
 void main() {
-    if ((material.mode & ALPHA_CUTOUT) != 0) {
-        float alpha = texture(material.texture_diffuse, fs_in.TexCoord).a;
-        if (alpha < material.alphaCutout) {
-            discard;
-        }
-    }
-
     vec2 texCoord = parallaxMapping(fs_in.TexCoord, fs_in.TangentViewDir, material.heightScale, material.hasHeightMap);
     vec3 normal = normalMapping(fs_in.TBN, texCoord, material.hasNormalMap);
     vec3 diffuse = texture(material.texture_diffuse, texCoord).rgb;
