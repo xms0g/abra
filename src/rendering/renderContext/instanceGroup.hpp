@@ -4,7 +4,7 @@
 class Entity;
 
 struct InstanceGroup {
-	const Entity* entity;
-	const std::vector<float>* transforms; // ptr to P,R,S data
-	std::vector<MaterialBatch> mbatch;
+	const Entity* entity{};
+	const std::vector<float>* transforms{}; // ptr to P,R,S data
+	MaterialBatch mbatch;
 };

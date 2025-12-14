@@ -31,13 +31,11 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 			if (!aabb->isOnFrustum(*ctx.camera.frustum, tc.position, tc.rotation, tc.scale))
 				continue;
 
-			for (auto& [material, shader, meshes]: matBatch) {
-				for (auto& mesh: *meshes) {
-					const bool isVisible = aabb->isMeshInFrustum(*ctx.camera.frustum, mesh.min(), mesh.max(),
-														  tc.position, tc.rotation, tc.scale);
-					if (isVisible) {
-						outQueue.push_back({entity, material, shader, &mesh});
-					}
+			for (auto& [material, shader, meshes] = matBatch; const auto& mesh: *meshes) {
+				const bool isVisible = aabb->isMeshInFrustum(*ctx.camera.frustum, mesh.min(), mesh.max(),
+				                                             tc.position, tc.rotation, tc.scale);
+				if (isVisible) {
+					outQueue.push_back({entity, material, shader, &mesh});
 				}
 			}
 		}

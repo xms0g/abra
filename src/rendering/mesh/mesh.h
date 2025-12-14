@@ -39,10 +39,6 @@ public:
 
 	[[nodiscard]] const glm::vec3& max() const { return mMax; }
 
-	[[nodiscard]] bool isVisible() const { return mIsVisible; }
-
-	void setVisible(const bool visible) { mIsVisible = visible; }
-
 	void bind() const;
 
 	void unbind() const;
@@ -55,5 +51,4 @@ private:
 	uint32_t mVAO{}, mVBO{}, mEBO{};
 	// Bounding Volume
 	glm::vec3 mMin{}, mMax{};
-	bool mIsVisible{true};
 };

@@ -250,12 +250,11 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 
 	for (auto& [matID, meshes]: *entity.getComponent<MeshComponent>().meshes) {
 		const auto& material = matc.materials->at(matID);
-		std::vector<MaterialBatch> matBatch;
-		matBatch.emplace_back(&material, &shader, &meshes);
+		const MaterialBatch matBatch{&material, &shader, &meshes};
 
 		if (matc.flag & Instanced) {
 			const auto& ic = entity.getComponent<InstanceComponent>();
-			InstanceGroup instance{&entity, ic.transforms, std::move(matBatch)};
+			InstanceGroup instance{&entity, ic.transforms, matBatch};
 
 			if (material.flag & Blend) {
 				mRenderQueue.blendInstancedGroups.push_back(instance);
@@ -265,7 +264,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			continue;
 		}
 
-		RenderGroup group{&entity, std::move(matBatch)};
+		RenderGroup group{&entity, matBatch};
 
 		if (entity.hasComponent<DebugComponent>()) {
 			mRenderQueue.debugGroups.push_back(group);

@@ -16,13 +16,12 @@ void OpaqueInstancedPass::configure(const RenderContext& ctx) {
 	prepareInstanceBuffer(ctx);
 	prepareInstanceData(ctx);
 
-	for (const auto& [entity, transforms, matBatches]: ctx.renderQueue->opaqueInstancedGroups) {
-		for (const auto& [material, shader, meshes]: matBatches) {
-			shader->activate();
-			shader->setInt("shadowMap", ctx.shadowMap.textureSlot);
-			shader->setInt("shadowCubemap", ctx.shadowMap.textureSlot + 1);
-			shader->setInt("persShadowMap", ctx.shadowMap.textureSlot + 2);
-		}
+	for (const auto& [entity, transforms, matBatch]: ctx.renderQueue->opaqueInstancedGroups) {
+		const auto& [material, shader, meshes] = matBatch;
+		shader->activate();
+		shader->setInt("shadowMap", ctx.shadowMap.textureSlot);
+		shader->setInt("shadowCubemap", ctx.shadowMap.textureSlot + 1);
+		shader->setInt("persShadowMap", ctx.shadowMap.textureSlot + 2);
 	}
 }
 
@@ -30,20 +29,18 @@ void OpaqueInstancedPass::execute(const RenderContext& ctx) {
 	RenderCommon::bindShadowMaps(*ctx.shadowMap.textures);
 
 	ctx.sceneBuffer->bind();
-	for (const auto& [entity, transforms, matBatches]: ctx.renderQueue->opaqueInstancedGroups) {
+	for (const auto& [entity, transforms, matBatch]: ctx.renderQueue->opaqueInstancedGroups) {
 		const size_t count = transforms->size() / 9;
 
-		for (const auto& [material, shader, meshes]: matBatches) {
+		for (const auto& [material, shader, meshes] = matBatch; const auto& mesh: *meshes) {
 			shader->activate();
 
 			RenderCommon::setupMaterial(*entity, *material, *shader);
 			RenderCommon::bindTextures(material->textures, *shader);
 
-			for (const auto& mesh: *meshes) {
-				mesh.bind();
-				glDrawElementsInstanced(GL_TRIANGLES, static_cast<int32_t>(mesh.indices().size()),
-										GL_UNSIGNED_INT, nullptr, static_cast<int32_t>(count));
-			}
+			mesh.bind();
+			glDrawElementsInstanced(GL_TRIANGLES, static_cast<int32_t>(mesh.indices().size()),
+			                        GL_UNSIGNED_INT, nullptr, static_cast<int32_t>(count));
 
 			RenderCommon::unbindTextures(material->textures);
 		}
@@ -55,11 +52,9 @@ void OpaqueInstancedPass::prepareInstanceBuffer(const RenderContext& ctx) {
 	glGenBuffers(1, &vbo.buffer);
 
 	size_t requiredGPUBufferSize = 0;
-	for (const auto& [entity, transforms, materials]: ctx.renderQueue->opaqueInstancedGroups) {
-		for (const auto& material: materials) {
-			for (const auto& mesh: *material.meshes) {
-				mesh.enableInstanceAttributes(vbo.buffer, vbo.offset);
-			}
+	for (const auto& [entity, transforms, matBatch]: ctx.renderQueue->opaqueInstancedGroups) {
+		for (const auto& mesh: *matBatch.meshes) {
+			mesh.enableInstanceAttributes(vbo.buffer, vbo.offset);
 		}
 
 		const size_t count = transforms->size() / 9;
@@ -92,7 +87,7 @@ void OpaqueInstancedPass::prepareInstanceData(const RenderContext& ctx) const {
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo.buffer);
 		glBufferSubData(GL_ARRAY_BUFFER, vbo.offset, static_cast<long>(gpuData.size() * sizeof(InstanceData)),
-						gpuData.data());
+		                gpuData.data());
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 }

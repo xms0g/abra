@@ -4,6 +4,6 @@
 class Entity;
 
 struct RenderGroup {
-	const Entity* entity;
-	std::vector<MaterialBatch> mbatch;
+	const Entity* entity{};
+	MaterialBatch mbatch;
 };
