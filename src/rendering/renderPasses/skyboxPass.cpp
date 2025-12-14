@@ -7,33 +7,27 @@
 #include "../mesh/mesh.h"
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderQueue.hpp"
+#include "../renderContext/renderGroup.hpp"
 #include "../texture/texture.h"
-#include "../../ECS/components/material.hpp"
-#include "../../ECS/components/mesh.hpp"
-#include "../../ECS/components/shader.hpp"
-#include "../../ECS/entity.hpp"
-#include "../../ECS/registry.h"
 
 SkyboxPass::~SkyboxPass() = default;
 
 void SkyboxPass::configure(const RenderContext& ctx) {
-	const auto& skybox = ctx.renderQueue->skyboxEntity;
-	const auto& shader = skybox->getComponent<ShaderComponent>().shader;
-	shader->activate();
-	shader->setInt("skybox", 0);
+	const auto& [entity, mbatch] = ctx.renderQueue->skybox.front();
+	mbatch.shader->activate();
+	mbatch.shader->setInt("skybox", 0);
 
-	ctx.camera.ubo->configure(shader->ID(), 0, "CameraBlock");
+	ctx.camera.ubo->configure(mbatch.shader->ID(), 0, "CameraBlock");
 }
 
 void SkyboxPass::execute(const RenderContext& ctx) {
-	const auto& skybox = ctx.renderQueue->skyboxEntity;
-	const auto& shader = skybox->getComponent<ShaderComponent>().shader;
-	const Mesh& mesh = skybox->getComponent<MeshComponent>().meshes->at(0).front();
-	const uint32_t texID = skybox->getComponent<MaterialComponent>().materials->at(0).textures.front().id;
+	const auto& [entity, mbatch] = ctx.renderQueue->skybox.front();
+	const Mesh& mesh = mbatch.meshes->front();
+	const uint32_t texID = mbatch.material->textures.front().id;
 
 	ctx.sceneBuffer->bind();
-	shader->activate();
-	shader->setMat4("skyView", ctx.camera.skyView);
+	mbatch.shader->activate();
+	mbatch.shader->setMat4("skyView", ctx.camera.skyView);
 
 	glActiveTexture(GL_TEXTURE0); // active proper texture unit before binding
 	// and finally bind the texture

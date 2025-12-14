@@ -69,6 +69,7 @@ RenderPipeline::RenderPipeline(Registry* registry) {
 	instancedOpaque = std::make_unique<Shader>("instanced.vert", "opaque.frag");
 	instancedCutout = std::make_unique<Shader>("instanced.vert", "cutout.frag");
 	instancedBlend = std::make_unique<Shader>("instanced.vert", "blend.frag");
+	skybox = std::make_unique<Shader>("skybox.vert", "skybox.frag");
 }
 
 RenderPipeline::~RenderPipeline() = default;
@@ -262,12 +263,17 @@ void RenderPipeline::refreshCameraData() const {
 }
 
 void RenderPipeline::batchEntity(const Entity& entity) {
+	const auto& matc = entity.getComponent<MaterialComponent>();
+
 	if (entity.hasComponent<SkyboxComponent>()) {
-		mRenderQueue.skyboxEntity = &entity;
+		const auto& material = matc.materials->at(0);
+		auto& meshes = entity.getComponent<MeshComponent>().meshes->at(0);
+		const MaterialBatch matBatch{&material, skybox.get(), &meshes};
+		const RenderGroup group{&entity, matBatch};
+		mRenderQueue.skybox.push_back(group);
 		return;
 	}
 
-	const auto& matc = entity.getComponent<MaterialComponent>();
 
 	for (auto& [matID, meshes]: *entity.getComponent<MeshComponent>().meshes) {
 		const auto& material = matc.materials->at(matID);

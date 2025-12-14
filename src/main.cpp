@@ -12,7 +12,6 @@
 #include "ECS/components/material.hpp"
 #include "ECS/components/mesh.hpp"
 #include "ECS/components/pointLight.hpp"
-#include "ECS/components/shader.hpp"
 #include "ECS/components/skybox.hpp"
 #include "ECS/components/spotLight.hpp"
 #include "ECS/components/transform.hpp"
@@ -58,9 +57,6 @@ int main() {
 		skybox.addComponent<SkyboxComponent>();
 		skybox.addComponent<MaterialComponent>(skyboxModel.getMaterial());
 		skybox.addComponent<MeshComponent>(skyboxModel.getMeshes());
-		skybox.addComponent<ShaderComponent>(
-			std::make_shared<Shader>("skybox.vert", "skybox.frag"));
-
 		//
 		std::vector<float> transforms = {
 			// Instance 0

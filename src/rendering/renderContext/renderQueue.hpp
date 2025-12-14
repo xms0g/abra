@@ -17,11 +17,11 @@ struct RenderQueue {
 	std::vector<RenderGroup> deferredGroups;
 	std::vector<RenderGroup> blendGroups;
 	std::vector<RenderGroup> shadowGroups;
+	std::vector<RenderGroup> skybox;
 	// Render commands
 	std::vector<RenderCommand> deferredCommands;
 	std::vector<RenderCommand> forwardCommands;
 	std::vector<RenderCommand> blendCommands;
 	std::vector<RenderCommand> dbgCommands;
 	std::vector<RenderCommand> shadowCommands;
-	const Entity* skyboxEntity{};
 };

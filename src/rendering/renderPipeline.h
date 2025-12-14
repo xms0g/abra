@@ -47,6 +47,7 @@ private:
 	std::unique_ptr<Shader> instancedOpaque;
 	std::unique_ptr<Shader> instancedCutout;
 	std::unique_ptr<Shader> instancedBlend;
+	std::unique_ptr<Shader> skybox;
 	// Frame Buffers
 	std::unique_ptr<FrameBuffer> mSceneBuffer;
 	std::unique_ptr<FrameBuffer> mIntermediateBuffer;
