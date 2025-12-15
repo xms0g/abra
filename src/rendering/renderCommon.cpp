@@ -11,7 +11,6 @@
 #include "../ECS/components/mesh.hpp"
 #include "../ECS/components/transform.hpp"
 
-
 void RenderCommon::setupTransform(const EntityData& entity, const Shader& shader) {
 	const glm::mat4 model = math::computeModelMatrix(entity.transform->position, entity.transform->rotation, entity.transform->scale);
 	const glm::mat3 normal = math::computeNormalMatrix(model);
