@@ -1,8 +1,8 @@
 #pragma once
 #include <unordered_map>
 #include <vector>
-#include <array>
 
+struct RenderContext;
 struct EntityData;
 struct Material;
 struct Texture;
@@ -23,5 +23,5 @@ void bindTextures(const std::vector<Texture>& textures, const Shader& shader);
 
 void unbindTextures(const std::vector<Texture>& textures);
 
-void bindShadowMaps(const std::array<uint32_t, 3>& shadowMaps);
+void bindShadowMaps(const RenderContext& ctx);
 }

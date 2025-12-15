@@ -26,7 +26,7 @@ void OpaqueInstancedPass::configure(const RenderContext& ctx) {
 }
 
 void OpaqueInstancedPass::execute(const RenderContext& ctx) {
-	RenderCommon::bindShadowMaps(*ctx.shadowMap.textures);
+	RenderCommon::bindShadowMaps(ctx);
 
 	ctx.sceneBuffer->bind();
 	for (const auto& [entity, transforms, matBatch]: ctx.renderQueue->opaqueInstancedGroups) {

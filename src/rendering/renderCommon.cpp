@@ -4,11 +4,11 @@
 #include "material/material.hpp"
 #include "texture/texture.h"
 #include "mesh/mesh.h"
+#include "renderContext/renderContext.hpp"
 #include "renderContext/entityData.hpp"
 #include "../math/matrix.hpp"
 #include "../ECS/components/material.hpp"
 #include "../ECS/components/mesh.hpp"
-#include "../config/config.hpp"
 #include "../ECS/components/transform.hpp"
 
 
@@ -86,13 +86,13 @@ void RenderCommon::unbindTextures(const std::vector<Texture>& textures) {
 	}
 }
 
-void RenderCommon::bindShadowMaps(const std::array<uint32_t, 3>& shadowMaps) {
-	glActiveTexture(GL_TEXTURE0 + SHADOWMAP_TEXTURE_SLOT);
-	glBindTexture(GL_TEXTURE_2D, shadowMaps[0]);
+void RenderCommon::bindShadowMaps(const RenderContext& ctx) {
+	glActiveTexture(GL_TEXTURE0 + ctx.shadowMap.textureSlot);
+	glBindTexture(GL_TEXTURE_2D, ctx.shadowMap.textures->at(0));
 
-	glActiveTexture(GL_TEXTURE0 + SHADOWMAP_TEXTURE_SLOT + 1);
-	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, shadowMaps[1]);
+	glActiveTexture(GL_TEXTURE0 + ctx.shadowMap.textureSlot + 1);
+	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, ctx.shadowMap.textures->at(1));
 
-	glActiveTexture(GL_TEXTURE0 + SHADOWMAP_TEXTURE_SLOT + 2);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, shadowMaps[2]);
+	glActiveTexture(GL_TEXTURE0 + ctx.shadowMap.textureSlot + 2);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, ctx.shadowMap.textures->at(2));
 }

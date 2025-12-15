@@ -44,7 +44,7 @@ void DeferredLightingPass::execute(const RenderContext& ctx) {
 		glBindTexture(GL_TEXTURE_2D, mGBuffer->textures()[i]);
 	}
 
-	RenderCommon::bindShadowMaps(*ctx.shadowMap.textures);
+	RenderCommon::bindShadowMaps(ctx);
 
 	glDisable(GL_DEPTH_TEST);
 	glBindVertexArray(mQuad->VAO());
