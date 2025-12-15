@@ -4,7 +4,7 @@
 #include "image/stb_image.h"
 #include "../material/material.hpp"
 
-uint32_t texture::load(const char* path) {
+uint32_t texture::load(const char* path, const uint32_t flag) {
     uint32_t textureID;
 
 	int width, height, channel;
@@ -30,8 +30,8 @@ uint32_t texture::load(const char* path) {
 	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, format == GL_RGBA ? GL_CLAMP_TO_EDGE: GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, format == GL_RGBA ? GL_CLAMP_TO_EDGE: GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, flag & Blend ? GL_CLAMP_TO_EDGE: GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, flag & Blend ? GL_CLAMP_TO_EDGE: GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 

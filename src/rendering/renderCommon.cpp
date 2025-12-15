@@ -31,6 +31,12 @@ void RenderCommon::setupMaterial(const Entity& entity, const Material& material,
 	if (material.textures.empty()) {
 		shader.setVec3("material.color", material.color);
 	}
+
+	if (material.flag & TwoSided) {
+		glDisable(GL_CULL_FACE);
+	} else {
+		glEnable(GL_CULL_FACE);
+	}
 }
 
 void RenderCommon::drawMesh(const Mesh& mesh) {

@@ -152,25 +152,30 @@ void ResourceManager::loadMaterialTextures(const aiMaterial* mat,
 			continue;
 
 		if (mMaterials.contains(materialID)) {
-			mMaterials[materialID].textures.emplace_back(texture::load(path.c_str()), type, typeName, str.C_Str());
+			const uint32_t flag = mMaterials[materialID].flag;
+			mMaterials[materialID].textures.emplace_back(texture::load(path.c_str(), flag), type, typeName, str.C_Str());
 		} else {
-			uint32_t mode = 0;
+			uint32_t flag{0};
 			float alphaCutoff = 0.0f;
+
+			if (int twoSided{0}; mat->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
+				flag |= twoSided != 0 ? TwoSided : 0;
+			}
 			// Only GLTF supports
 			if (aiString alphaMode; mat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode) == AI_SUCCESS) {
 				if (std::strcmp(alphaMode.C_Str(), "OPAQUE") == 0) {
-					mode = Opaque | CastShadow;
+					flag |= Opaque | CastShadow;
 				} else if (std::strcmp(alphaMode.C_Str(), "MASK") == 0) {
-					mode = Cutout | CastShadow;
+					flag |= Cutout | CastShadow;
 					mat->Get(AI_MATKEY_GLTF_ALPHACUTOFF, alphaCutoff);
 				} else if (std::strcmp(alphaMode.C_Str(), "BLEND") == 0) {
-					mode = Blend;
+					flag |= Blend;
 				}
 			}
 
 			std::vector<Texture> textures;
-			textures.emplace_back(texture::load(path.c_str()), type, typeName, str.C_Str());
-			mMaterials[materialID] = {mode, glm::vec3(), alphaCutoff, std::move(textures)};
+			textures.emplace_back(texture::load(path.c_str(), flag), type, typeName, str.C_Str());
+			mMaterials[materialID] = {flag, glm::vec3(), alphaCutoff, std::move(textures)};
 		}
 
 		// store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate mTextures.

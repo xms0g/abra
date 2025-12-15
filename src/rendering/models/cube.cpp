@@ -118,7 +118,7 @@ Models::Cube::Cube(glm::vec3 color,
 
 	if (diffuseTexture) {
 		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + diffuseTexture).c_str()),
+			texture::load(fs::path(ASSET_DIR + diffuseTexture).c_str(), 1),
 			DIFFUSE,
 			"texture_diffuse",
 			diffuseTexture
@@ -127,7 +127,7 @@ Models::Cube::Cube(glm::vec3 color,
 
 	if (specularTexture) {
 		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + specularTexture).c_str()),
+			texture::load(fs::path(ASSET_DIR + specularTexture).c_str(), 1),
 			SPECULAR,
 			"texture_specular",
 			specularTexture);
@@ -135,7 +135,7 @@ Models::Cube::Cube(glm::vec3 color,
 
 	if (normalTexture) {
 		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + normalTexture).c_str()),
+			texture::load(fs::path(ASSET_DIR + normalTexture).c_str(), 1),
 			NORMAL,
 			"texture_normal",
 			normalTexture);
@@ -143,7 +143,7 @@ Models::Cube::Cube(glm::vec3 color,
 
 	if (heightTexture) {
 		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + heightTexture).c_str()),
+			texture::load(fs::path(ASSET_DIR + heightTexture).c_str(), 1),
 			HEIGHT,
 			"texture_height",
 			heightTexture);
