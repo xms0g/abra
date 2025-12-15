@@ -6,9 +6,8 @@
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderQueue.hpp"
 #include "../renderContext/renderCommand.hpp"
-#include "../../ECS/components/debug.hpp"
-#include "../../ECS/entity.hpp"
 #include "../renderContext/entityData.hpp"
+#include "../../ECS/components/debug.hpp"
 
 DebugPass::~DebugPass() = default;
 

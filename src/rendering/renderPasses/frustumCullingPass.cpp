@@ -5,8 +5,6 @@
 #include "../renderContext/renderCommand.hpp"
 #include "../mesh/mesh.h"
 #include "../../ECS/registry.h"
-#include "../../ECS/components/bv.hpp"
-#include "../../ECS/entity.hpp"
 #include "../../ECS/components/transform.hpp"
 #include "../../math/boundingVolume.h"
 
