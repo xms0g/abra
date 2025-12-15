@@ -1,9 +1,8 @@
 #pragma once
+#include "entityData.hpp"
 #include "../material/material.hpp"
 
-class Entity;
-
 struct RenderGroup {
-	const Entity* entity{};
+	EntityData eData;
 	MaterialBatch mbatch;
 };

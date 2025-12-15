@@ -30,6 +30,7 @@
 #include "../config/config.hpp"
 #include "../ECS/registry.h"
 #include "../core/camera.h"
+#include "../ECS/components/bv.hpp"
 #include "../ECS/components/debug.hpp"
 #include "../ECS/components/transform.hpp"
 #include "../ECS/components/material.hpp"
@@ -38,8 +39,8 @@
 #include "../ECS/components/skybox.hpp"
 
 RenderPipeline::RenderPipeline(Registry* registry) {
-	RequireComponent<MeshComponent>(true);
-	RequireComponent<TransformComponent>(true);
+	RequireComponent<MeshComponent>();
+	RequireComponent<TransformComponent>();
 	// glad: load all OpenGL function pointers
 	// ---------------------------------------
 	if (!gladLoadGLLoader(SDL_GL_GetProcAddress)) {
@@ -207,7 +208,7 @@ void RenderPipeline::configure(const Camera& camera) {
 	auto configureShader = [&]<typename T>(T& groups) {
 		const Shader* lastShader = nullptr;
 
-		for (const auto& group : groups) {
+		for (const auto& group: groups) {
 			if (lastShader == group.mbatch.shader) {
 				continue;
 			}
@@ -264,20 +265,26 @@ void RenderPipeline::refreshCameraData() const {
 
 void RenderPipeline::batchEntity(const Entity& entity) {
 	const auto& matc = entity.getComponent<MaterialComponent>();
+	const EntityData eData{
+		&entity.getComponent<DebugComponent>(),
+		&entity.getComponent<TransformComponent>(),
+		&entity.getComponent<MaterialComponent>(),
+		entity.getComponent<BoundingVolumeComponent>().bv.get()
+	};
 
 	if (entity.hasComponent<SkyboxComponent>()) {
 		const auto& material = matc.materials->at(0);
 		auto& meshes = entity.getComponent<MeshComponent>().meshes->at(0);
 		const MaterialBatch matBatch{&material, skybox.get(), &meshes};
-		const RenderGroup group{&entity, matBatch};
+		const RenderGroup group{eData, matBatch};
 		mRenderQueue.skybox.push_back(group);
 		return;
 	}
 
-
 	for (auto& [matID, meshes]: *entity.getComponent<MeshComponent>().meshes) {
 		const auto& material = matc.materials->at(matID);
 		MaterialBatch matBatch{&material, nullptr, &meshes};
+
 
 		if (matc.flag & Instanced) {
 			if (material.flag & Opaque) {
@@ -289,7 +296,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			}
 
 			const auto& ic = entity.getComponent<InstanceComponent>();
-			InstanceGroup instance{&entity, ic.transforms, matBatch};
+			InstanceGroup instance{eData, ic.transforms, matBatch};
 
 			if (material.flag & Opaque) {
 				mRenderQueue.opaqueInstancedGroups.push_back(instance);
@@ -310,7 +317,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			matBatch.shader = blend.get();
 		}
 
-		RenderGroup group{&entity, matBatch};
+		RenderGroup group{eData, matBatch};
 
 		if (entity.hasComponent<DebugComponent>()) {
 			mRenderQueue.debugGroups.push_back(group);
@@ -342,8 +349,8 @@ void RenderPipeline::sortEntities() {
 			batch.begin(),
 			batch.end(),
 			[&camPos, &transparent](const RenderGroup& a, const RenderGroup& b) {
-				const float da = glm::length2(camPos - a.entity->getComponent<TransformComponent>().position);
-				const float db = glm::length2(camPos - b.entity->getComponent<TransformComponent>().position);
+				const float da = glm::length2(camPos - a.eData.transform->position);
+				const float db = glm::length2(camPos - b.eData.transform->position);
 
 				if (transparent)
 					return da > db;

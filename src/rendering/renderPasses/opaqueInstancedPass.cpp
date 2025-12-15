@@ -35,7 +35,7 @@ void OpaqueInstancedPass::execute(const RenderContext& ctx) {
 		for (const auto& [material, shader, meshes] = matBatch; const auto& mesh: *meshes) {
 			shader->activate();
 
-			RenderCommon::setupMaterial(*entity, *material, *shader);
+			RenderCommon::setupMaterial(entity, *material, *shader);
 			RenderCommon::bindTextures(material->textures, *shader);
 
 			mesh.bind();

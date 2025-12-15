@@ -1,10 +1,10 @@
 #pragma once
+#include <vector>
+#include "entityData.hpp"
 #include "../material/material.hpp"
 
-class Entity;
-
 struct InstanceGroup {
-	const Entity* entity{};
+	EntityData eData;
 	const std::vector<float>* transforms{}; // ptr to P,R,S data
 	MaterialBatch mbatch;
 };

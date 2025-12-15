@@ -26,7 +26,7 @@ void BlendInstancedPass::execute(const RenderContext& ctx) {
 		const size_t count = transforms->size() / 9;
 
 		for (const auto& [material, shader, meshes] = matBatch; const auto& mesh: *meshes) {
-			RenderCommon::setupMaterial(*entity, *material, *shader);
+			RenderCommon::setupMaterial(entity, *material, *shader);
 			RenderCommon::bindTextures(material->textures, *shader);
 
 			mesh.bind();

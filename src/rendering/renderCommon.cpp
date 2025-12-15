@@ -4,28 +4,25 @@
 #include "material/material.hpp"
 #include "texture/texture.h"
 #include "mesh/mesh.h"
+#include "renderContext/entityData.hpp"
 #include "../math/matrix.hpp"
-#include "../ECS/entity.hpp"
-#include "../ECS/components/transform.hpp"
 #include "../ECS/components/material.hpp"
 #include "../ECS/components/mesh.hpp"
 #include "../config/config.hpp"
+#include "../ECS/components/transform.hpp"
 
-void RenderCommon::setupTransform(const Entity& entity, const Shader& shader) {
-	const auto& tc = entity.getComponent<TransformComponent>();
 
-	const glm::mat4 model = math::computeModelMatrix(tc.position, tc.rotation, tc.scale);
+void RenderCommon::setupTransform(const EntityData& entity, const Shader& shader) {
+	const glm::mat4 model = math::computeModelMatrix(entity.transform->position, entity.transform->rotation, entity.transform->scale);
 	const glm::mat3 normal = math::computeNormalMatrix(model);
 
 	shader.setMat4("model", model);
 	shader.setMat3("normalMatrix", normal);
 }
 
-void RenderCommon::setupMaterial(const Entity& entity, const Material& material, const Shader& shader) {
-	const auto& mtc = entity.getComponent<MaterialComponent>();
-
-	shader.setFloat("material.shininess", mtc.shininess);
-	shader.setFloat("material.heightScale", mtc.heightScale);
+void RenderCommon::setupMaterial(const EntityData& entity, const Material& material, const Shader& shader) {
+	shader.setFloat("material.shininess", entity.material->shininess);
+	shader.setFloat("material.heightScale", entity.material->heightScale);
 	shader.setFloat("material.alphaCutout", material.alphaCutout);
 
 	if (material.textures.empty()) {

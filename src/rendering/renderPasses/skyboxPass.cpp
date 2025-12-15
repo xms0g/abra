@@ -23,7 +23,7 @@ void SkyboxPass::configure(const RenderContext& ctx) {
 void SkyboxPass::execute(const RenderContext& ctx) {
 	const auto& [entity, mbatch] = ctx.renderQueue->skybox.front();
 	const Mesh& mesh = mbatch.meshes->front();
-	const uint32_t texID = mbatch.material->textures.front().id;
+	const Texture& tex = mbatch.material->textures.front();
 
 	ctx.sceneBuffer->bind();
 	mbatch.shader->activate();
@@ -31,7 +31,7 @@ void SkyboxPass::execute(const RenderContext& ctx) {
 
 	glActiveTexture(GL_TEXTURE0); // active proper texture unit before binding
 	// and finally bind the texture
-	glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, tex.id);
 	// Draw
 	glDepthMask(GL_FALSE);
 	glDepthFunc(GL_LEQUAL);

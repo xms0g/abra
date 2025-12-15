@@ -1,4 +1,6 @@
 #pragma once
+#include <cstdint>
+
 enum DebugMode: uint32_t {
 	None,
 	Normals,

@@ -8,6 +8,7 @@
 #include "../renderContext/renderCommand.hpp"
 #include "../../ECS/components/debug.hpp"
 #include "../../ECS/entity.hpp"
+#include "../renderContext/entityData.hpp"
 
 DebugPass::~DebugPass() = default;
 
@@ -26,20 +27,15 @@ void DebugPass::configure(const RenderContext& ctx) {
 
 void DebugPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
-	const Entity* lastEntity = nullptr;
+
 	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->dbgCommands) {
-		const auto& db = entity->getComponent<DebugComponent>();
-		if (db.mode == None)
+		if (entity->debug->mode == None)
 			continue;
 
-		const auto& dbgShader = mDebugShaders.at(db.mode);
+		const auto& dbgShader = mDebugShaders.at(entity->debug->mode);
 		dbgShader->activate();
 
-		if (lastEntity != entity) {
-			lastEntity = entity;
-			RenderCommon::setupTransform(*lastEntity, *dbgShader);
-		}
-
+		RenderCommon::setupTransform(*entity, *dbgShader);
 		RenderCommon::drawMesh(*mesh);
 	}
 	ctx.sceneBuffer->unbind();
