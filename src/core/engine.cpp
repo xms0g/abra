@@ -42,7 +42,6 @@ void Engine::run() {
 		mMillisecsPreviousFrame = SDL_GetTicks();
 
 		mInput->process(*mCamera, mWindow->nativeHandle(), mDeltaTime, isRunning);
-		mCamera->update();
 
 		mRenderPipeline->render();
 #ifdef DEBUG

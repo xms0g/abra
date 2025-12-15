@@ -1,7 +1,7 @@
 #include "camera.h"
 #include "glm/gtc/matrix_transform.hpp"
 
-Camera::Camera(const glm::vec3& position, const glm::vec3& up, float yaw, float pitch) : mFront(glm::vec3(
+Camera::Camera(const glm::vec3& position, const glm::vec3& up, const float yaw, const float pitch) : mFront(glm::vec3(
 		0.0f, 0.0f, -1.0f)),
 	mMovementSpeed(SPEED),
 	mMouseSensitivity(SENSITIVITY),
@@ -14,8 +14,8 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& up, float yaw, float 
 	update();
 }
 
-Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw,
-               float pitch) : mFront(glm::vec3(0.0f, 0.0f, -1.0f)),
+Camera::Camera(const float posX, const float posY, const float posZ, const float upX, const float upY, const float upZ, const float yaw,
+               const float pitch) : mFront(glm::vec3(0.0f, 0.0f, -1.0f)),
                               mMovementSpeed(SPEED),
                               mMouseSensitivity(SENSITIVITY),
                               mZoom(ZOOM) {
@@ -66,8 +66,6 @@ void Camera::processMouseMovement(float xoffset, float yoffset) {
 		mPitch = 89.0f;
 	if (mPitch < -89.0f)
 		mPitch = -89.0f;
-
-	update();
 }
 
 void Camera::processMouseScroll(float yoffset) {

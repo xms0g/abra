@@ -285,7 +285,6 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		const auto& material = matc.materials->at(matID);
 		MaterialBatch matBatch{&material, nullptr, &meshes};
 
-
 		if (matc.flag & Instanced) {
 			if (material.flag & Opaque) {
 				matBatch.shader = instancedOpaque.get();

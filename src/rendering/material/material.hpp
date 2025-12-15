@@ -3,7 +3,7 @@
 #include <vector>
 #include "glm/glm.hpp"
 
-enum MaterialFlags: uint32_t {
+enum MaterialFlag: uint32_t {
 	Opaque = 1 << 0,
 	Blend = 1 << 1,
 	Cutout = 1 << 2,

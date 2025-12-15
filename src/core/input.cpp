@@ -19,13 +19,11 @@ void Input::process(Camera& camera, SDL_Window* window, const float dt, bool& is
 
     processKeyboard(camera, dt, isRunning);
     processMouse(camera);
-
+	camera.update();
 }
 
 void Input::processKeyboard(Camera& camera, const float dt, bool& isRunning) {
-    auto* keyState = SDL_GetKeyboardState(nullptr);
-
-    if (keyState[SDL_SCANCODE_ESCAPE]) {
+	if (auto* keyState = SDL_GetKeyboardState(nullptr); keyState[SDL_SCANCODE_ESCAPE]) {
         isRunning = false;
     } else if (keyState[SDL_SCANCODE_W]) {
         camera.processKeyboard(FORWARD, dt);
