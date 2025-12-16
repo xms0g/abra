@@ -56,10 +56,14 @@ void RenderCommon::drawQuad(const uint32_t sceneTexture, const uint32_t VAO) {
 
 
 void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shader& shader) {
-	bool hasNormalMap{false}, hasHeightMap{false};
+	bool hasNormalMap{false}, hasHeightMap{false}, hasSpecularMap{false};
 
 	for (int i = 0; i < textures.size(); i++) {
 		glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
+
+		if (textures[i].type == SPECULAR) {
+			hasSpecularMap = true;
+		}
 
 		if (textures[i].type == NORMAL) {
 			hasNormalMap = true;
@@ -76,6 +80,7 @@ void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shad
 	}
 	shader.setBool("material.hasNormalMap", hasNormalMap);
 	shader.setBool("material.hasHeightMap", hasHeightMap);
+	shader.setBool("material.hasSpecularMap", hasSpecularMap);
 }
 
 void RenderCommon::unbindTextures(const std::vector<Texture>& textures) {
