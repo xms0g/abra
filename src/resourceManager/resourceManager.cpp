@@ -21,6 +21,10 @@ ResourceManager& ResourceManager::instance() {
 	return &mMaterialsByEntity.at(entityID);
 }
 
+std::span<const char* const> ResourceManager::getSkyboxTexture() const {
+	return skyboxFaces;
+}
+
 void ResourceManager::loadModel(const size_t entityID, const char* file) {
 	// read file via ASSIMP
 	Assimp::Importer importer;

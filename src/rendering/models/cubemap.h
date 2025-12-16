@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <vector>
+#include <span>
 
 struct Material;
 class Mesh;
@@ -12,7 +13,7 @@ using MaterialMap = std::unordered_map<uint32_t, Material>;
 namespace Models {
 class Cubemap {
 public:
-	explicit Cubemap(const char* const f[]);
+	explicit Cubemap(std::span<const char* const> faces);
 
 	~Cubemap();
 

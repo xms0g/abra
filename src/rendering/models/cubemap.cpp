@@ -5,7 +5,7 @@
 #include "../../config/config.hpp"
 #include "../../io/filesystem.hpp"
 
-Models::Cubemap::Cubemap(const char* const f[]) {
+Models::Cubemap::Cubemap(std::span<const char* const> faces) {
 	constexpr float v[]= {
 		-1.0f,  1.0f, -1.0f,
 		-1.0f, -1.0f, -1.0f,
@@ -59,15 +59,16 @@ Models::Cubemap::Cubemap(const char* const f[]) {
 	std::vector<uint32_t> indices;
 	meshes[0].emplace_back(vertices, indices);
 
-	std::vector<std::string> faces;
-	faces.reserve(6);
+	std::vector<std::string> facesVec;
+	facesVec.reserve(faces.size());
 
-	for (int i = 0; i < 6; i++) {
-		faces.emplace_back(fs::path(ASSET_DIR + f[i]));
+	for (const auto& face : faces) {
+		facesVec.emplace_back(fs::path(ASSET_DIR + face));
 	}
 
+
 	std::vector<Texture> textures;
-	textures.emplace_back(texture::loadCubemap(faces), DIFFUSE, "skybox","skybox.jpg");
+	textures.emplace_back(texture::loadCubemap(facesVec), DIFFUSE, "skybox","skybox.jpg");
 	material[0] = {0, glm::vec3(), 0.0f, textures};
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <span>
 #include <unordered_set>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -25,6 +26,8 @@ public:
 
 	[[nodiscard]] const MaterialMap* getMaterial(size_t entityID) const;
 
+	[[nodiscard]] std::span<const char* const> getSkyboxTexture() const;
+
 	void loadModel(size_t entityID, const char* file);
 
 private:
@@ -47,4 +50,13 @@ private:
 	std::unordered_map<size_t, MaterialMap> mMaterialsByEntity;
 	std::unordered_map<size_t, MeshMap> mMeshesByEntity;
 	std::unordered_set<std::string> mTexturesLoaded;
+
+	static constexpr const char* skyboxFaces[] = {
+		"skybox/right.jpg",
+		"skybox/left.jpg",
+		"skybox/top.jpg",
+		"skybox/bottom.jpg",
+		"skybox/front.jpg",
+		"skybox/back.jpg"
+	};
 };

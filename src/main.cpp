@@ -32,15 +32,6 @@
 #define STRINGIFY(s) STRINGIFY0(s)
 #define VERSION STRINGIFY(VERSION_MAJOR) "." STRINGIFY(VERSION_MINOR) "." STRINGIFY(VERSION_PATCH)
 
-static constexpr const char* faces[] = {
-	"skybox/right.jpg",
-	"skybox/left.jpg",
-	"skybox/top.jpg",
-	"skybox/bottom.jpg",
-	"skybox/front.jpg",
-	"skybox/back.jpg"
-};
-
 int main() {
 	Registry registry;
 
@@ -48,7 +39,7 @@ int main() {
 		Engine engine;
 		engine.init(&registry);
 
-		Models::Cubemap skyboxModel{faces};
+		Models::Cubemap skyboxModel{ResourceManager::instance().getSkyboxTexture()};
 		auto skybox = registry.createEntity("Skybox");
 		skybox.addComponent<TransformComponent>(
 			glm::vec3(0.0f),
@@ -100,8 +91,6 @@ int main() {
 			// Instance 19
 			-10.6f, 1.1f, -1.0f,     205.0f,  70.0f,  30.0f,    1,1,1,
 		};
-
-
 
 		// Suzanne
 		auto suzanne = registry.createEntity("Suzanne");
@@ -224,12 +213,12 @@ int main() {
 				math::generateAABB(*ResourceManager::instance().getMeshes(sponza.id()))));
 
 		//
-		// auto dirLight = registry.createEntity("Directional Light");
-		// dirLight.addComponent<DirectionalLightComponent>(
-		// 	glm::vec4(-0.2f, -1.0f, -0.3f, 0.0f),
-		// 	glm::vec4(0.01f, 0.01f, 0.01f, 0.0f),
-		// 	glm::vec4(0.4f, 0.4f, 0.4f, 0.0f),
-		// 	glm::vec4(0.5f, 0.5f, 0.5f, 0.0f));
+		auto dirLight = registry.createEntity("Directional Light");
+		dirLight.addComponent<DirectionalLightComponent>(
+			glm::vec4(-0.2f, -1.0f, -0.3f, 0.0f),
+			glm::vec4(0.01f, 0.01f, 0.01f, 0.0f),
+			glm::vec4(0.4f, 0.4f, 0.4f, 0.0f),
+			glm::vec4(0.5f, 0.5f, 0.5f, 0.0f));
 
 		// auto pointLight = registry.createEntity("Point Light");
 		// pointLight.addComponent<TransformComponent>(
