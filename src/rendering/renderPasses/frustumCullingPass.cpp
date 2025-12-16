@@ -14,13 +14,9 @@ void FrustumCullingPass::configure(const RenderContext& ctx) {
 }
 
 void FrustumCullingPass::execute(const RenderContext& ctx) {
-	ctx.renderQueue->deferredCommands.clear();
-	ctx.renderQueue->forwardCommands.clear();
-	ctx.renderQueue->blendCommands.clear();
-	ctx.renderQueue->shadowCommands.clear();
-	ctx.renderQueue->dbgCommands.clear();
-
 	auto cullItems = [&](const std::vector<RenderGroup>& groups, std::vector<RenderCommand>& outQueue) {
+		outQueue.clear();
+
 		for (const auto& [entity, matBatch]: groups) {
 			if (!entity.bv->isOnFrustum(*ctx.camera.frustum,
 			                            entity.transform->position,
