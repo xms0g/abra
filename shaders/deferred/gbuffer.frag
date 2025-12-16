@@ -24,5 +24,5 @@ void main() {
     // and the diffuse per-fragment color
     gAlbedoSpec.rgb = texture(material.texture_diffuse, texCoord).rgb;
     // store specular intensity in gAlbedoSpec's alpha component
-    gAlbedoSpec.a = texture(material.texture_specular, texCoord).r;
+    gAlbedoSpec.a = material.hasSpecularMap ? texture(material.texture_specular, texCoord).r : 0.0;
 }
