@@ -160,12 +160,12 @@ void ResourceManager::loadMaterialTextures(const aiMaterial* mat,
 			mMaterials[materialID].textures.emplace_back(texture::load(path.c_str(), flag), type, typeName, str.C_Str());
 		} else {
 			uint32_t flag{0};
-			float alphaCutoff = 0.0f;
+			float alphaCutoff{0.0f};
 
 			if (int twoSided{0}; mat->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
 				flag |= twoSided != 0 ? TwoSided : 0;
 			}
-			// Only GLTF supports
+			// Only supports GLTF
 			if (aiString alphaMode; mat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode) == AI_SUCCESS) {
 				if (std::strcmp(alphaMode.C_Str(), "OPAQUE") == 0) {
 					flag |= Opaque | CastShadow;
