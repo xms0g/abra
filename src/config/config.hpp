@@ -2,8 +2,8 @@
 #include <string>
 #include <cstdint>
 
-const std::string SHADER_DIR = "shaders/";
-const std::string ASSET_DIR = "assets/";
+constexpr std::string SHADER_DIR = "shaders/";
+constexpr std::string ASSET_DIR = "assets/";
 
 // Window Settings
 inline uint32_t SCR_WIDTH{0};
