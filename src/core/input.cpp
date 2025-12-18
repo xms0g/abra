@@ -39,10 +39,16 @@ void Input::processKeyboard(Camera& camera, const float dt, bool& isRunning) {
 void Input::processMouse(Camera& camera) {
     int dx, dy;
 	static bool freeLook{false};
+	static bool prevRMB{false};
 
-    if (const uint32_t buttons = SDL_GetRelativeMouseState(&dx, &dy); buttons & SDL_BUTTON(SDL_BUTTON_RIGHT)) {
+	const uint32_t buttons = SDL_GetRelativeMouseState(&dx, &dy);
+	const bool rmb = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
+
+	if (rmb && !prevRMB) {
 		freeLook = !freeLook;
+		SDL_SetRelativeMouseMode(freeLook ? SDL_TRUE : SDL_FALSE);
 	}
+	prevRMB = rmb;
 
 #ifdef DEBUG
     ImGuiIO& io = ImGui::GetIO();
@@ -51,14 +57,11 @@ void Input::processMouse(Camera& camera) {
 		int x, y;
 		SDL_GetMouseState(&x, &y);
 		io.MousePos = ImVec2(static_cast<float>(x), static_cast<float>(y));
-		io.MouseDown[1] = false;
+		io.MouseDown[1] = rmb;
 	}
 #endif
 
 	if (freeLook) {
-		SDL_SetRelativeMouseMode(SDL_TRUE);
 		camera.processMouseMovement(static_cast<float>(dx), static_cast<float>(-dy));
-	} else {
-		SDL_SetRelativeMouseMode(SDL_FALSE);
 	}
 }
