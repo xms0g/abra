@@ -23,7 +23,7 @@ void main() {
     vec4 fragPosLightSpace = lightSpaceMatrix * vec4(fragPos, 1.0);
     // Create a mask: 0.0 if no lights, 1.0 if at least one light
     bool hasLights = lightCount.x > 0 || lightCount.y > 0 || lightCount.z > 0;
-    vec3 result = mix(diffuse, calculateLights(normal, fragPos, viewPos.xyz, viewDir, fragPosLightSpace, diffuse, specular, 32.0), float(hasLights));
+    vec3 result = hasLights ? calculateLights(normal, fragPos, viewPos.xyz, viewDir, fragPosLightSpace, diffuse, specular, 32.0) : diffuse;
 
     fragColor = vec4(result, 1.0);
 }
