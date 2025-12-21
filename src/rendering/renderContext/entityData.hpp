@@ -8,7 +8,6 @@ class BoundingVolume;
 
 struct MaterialComponent;
 struct TransformComponent;
-class Entity;
 
 struct EntityData {
 	const DebugComponent* debug{};
