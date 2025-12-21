@@ -27,7 +27,7 @@ public:
 	[[nodiscard]] bool hasComponent() const;
 
 private:
-	size_t mID;
+	size_t mID{};
 	std::string mName;
 
 public:
