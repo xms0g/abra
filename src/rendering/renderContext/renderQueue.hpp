@@ -3,7 +3,7 @@
 
 struct InstanceGroup;
 struct RenderGroup;
-struct RenderCommand;
+struct RenderableObject;
 class Entity;
 
 struct RenderQueue {
@@ -18,10 +18,10 @@ struct RenderQueue {
 	std::vector<RenderGroup> blendGroups;
 	std::vector<RenderGroup> shadowGroups;
 	std::vector<RenderGroup> skybox;
-	// Render commands
-	std::vector<RenderCommand> deferredCommands;
-	std::vector<RenderCommand> forwardCommands;
-	std::vector<RenderCommand> blendCommands;
-	std::vector<RenderCommand> dbgCommands;
-	std::vector<RenderCommand> shadowCommands;
+	// Renderable Objects
+	std::vector<RenderableObject> deferredObjects;
+	std::vector<RenderableObject> forwardObjects;
+	std::vector<RenderableObject> blendObjects;
+	std::vector<RenderableObject> dbgObjects;
+	std::vector<RenderableObject> shadowingObjects;
 };

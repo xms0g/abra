@@ -5,7 +5,7 @@
 #include "../material/material.hpp"
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderQueue.hpp"
-#include "../renderContext/renderCommand.hpp"
+#include "../renderContext/renderableObject.hpp"
 #include "../renderContext/renderGroup.hpp"
 #include "../../ECS/entity.hpp"
 
@@ -27,7 +27,7 @@ void ForwardOpaquePass::execute(const RenderContext& ctx) {
 
 	const Material* lastMaterial = nullptr;
 	const Shader* lastShader = nullptr;
-	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->forwardCommands) {
+	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->forwardObjects) {
 		if (lastShader != shader) {
 			lastShader = shader;
 			lastShader->activate();

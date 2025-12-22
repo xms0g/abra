@@ -10,7 +10,7 @@
 #include "renderContext/renderContext.hpp"
 #include "renderContext/renderFlags.hpp"
 #include "renderContext/renderGroup.hpp"
-#include "renderContext/renderCommand.hpp"
+#include "renderContext/renderableObject.hpp"
 #include "renderContext/instanceGroup.hpp"
 #include "renderPasses/IRenderPass.hpp"
 #include "renderPasses/deferredGeometryPass.h"

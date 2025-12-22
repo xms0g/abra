@@ -5,7 +5,7 @@ class Mesh;
 class Shader;
 struct Material;
 
-struct RenderCommand {
+struct RenderableObject {
 	const EntityData* entity;
 	const Material* material;
 	const Shader* shader;

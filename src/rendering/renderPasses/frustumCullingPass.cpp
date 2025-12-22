@@ -2,7 +2,7 @@
 #include "../renderContext/renderQueue.hpp"
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderGroup.hpp"
-#include "../renderContext/renderCommand.hpp"
+#include "../renderContext/renderableObject.hpp"
 #include "../mesh/mesh.h"
 #include "../../ECS/registry.h"
 #include "../../ECS/components/transform.hpp"
@@ -14,7 +14,7 @@ void FrustumCullingPass::configure(const RenderContext& ctx) {
 }
 
 void FrustumCullingPass::execute(const RenderContext& ctx) {
-	auto cullItems = [&](const std::vector<RenderGroup>& groups, std::vector<RenderCommand>& outQueue) {
+	auto cullItems = [&](const std::vector<RenderGroup>& groups, std::vector<RenderableObject>& outQueue) {
 		outQueue.clear();
 
 		for (const auto& [entity, matBatch]: groups) {
@@ -40,9 +40,9 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 		}
 	};
 
-	cullItems(ctx.renderQueue->forwardOpaqueGroups, ctx.renderQueue->forwardCommands);
-	cullItems(ctx.renderQueue->deferredGroups, ctx.renderQueue->deferredCommands);
-	cullItems(ctx.renderQueue->blendGroups, ctx.renderQueue->blendCommands);
-	cullItems(ctx.renderQueue->shadowGroups, ctx.renderQueue->shadowCommands);
-	cullItems(ctx.renderQueue->debugGroups, ctx.renderQueue->dbgCommands);
+	cullItems(ctx.renderQueue->forwardOpaqueGroups, ctx.renderQueue->forwardObjects);
+	cullItems(ctx.renderQueue->deferredGroups, ctx.renderQueue->deferredObjects);
+	cullItems(ctx.renderQueue->blendGroups, ctx.renderQueue->blendObjects);
+	cullItems(ctx.renderQueue->shadowGroups, ctx.renderQueue->shadowingObjects);
+	cullItems(ctx.renderQueue->debugGroups, ctx.renderQueue->dbgObjects);
 }

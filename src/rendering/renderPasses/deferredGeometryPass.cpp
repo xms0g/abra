@@ -7,7 +7,7 @@
 #include "../material/material.hpp"
 #include "../renderContext/renderQueue.hpp"
 #include "../renderContext/renderContext.hpp"
-#include "../renderContext/renderCommand.hpp"
+#include "../renderContext/renderableObject.hpp"
 #include "../../ECS/components/bv.hpp"
 #include "../../ECS/entity.hpp"
 
@@ -37,7 +37,7 @@ void DeferredGeometryPass::execute(const RenderContext& ctx) {
 	mShader->activate();
 
 	const Material* lastMaterial = nullptr;
-	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->deferredCommands) {
+	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->deferredObjects) {
 		RenderCommon::setupTransform(*entity, *mShader);
 
 		if (lastMaterial != material) {

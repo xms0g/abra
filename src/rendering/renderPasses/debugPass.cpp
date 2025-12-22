@@ -5,7 +5,7 @@
 #include "../buffers/frameBuffer.h"
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderQueue.hpp"
-#include "../renderContext/renderCommand.hpp"
+#include "../renderContext/renderableObject.hpp"
 #include "../renderContext/entityData.hpp"
 #include "../../ECS/components/debug.hpp"
 
@@ -27,7 +27,7 @@ void DebugPass::configure(const RenderContext& ctx) {
 void DebugPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
 
-	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->dbgCommands) {
+	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->dbgObjects) {
 		if (entity->debug->mode == None)
 			continue;
 

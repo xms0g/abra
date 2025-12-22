@@ -2,7 +2,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "../../shader.h"
-#include "../../renderContext/renderCommand.hpp"
+#include "../../renderContext/renderableObject.hpp"
 #include "../../renderContext/renderQueue.hpp"
 #include "../../renderContext/renderContext.hpp"
 #include "../../buffers/frameBuffer.h"
@@ -54,7 +54,7 @@ void OmnidirectionalShadowPass::render(const RenderContext& ctx, const glm::vec4
 	mDepthShader->setVec3("lightPos", position);
 	mDepthShader->setInt("cubeIndex", layer);
 
-	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->shadowCommands) {
+	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->shadowingObjects) {
 		RenderCommon::setupTransform(*entity, *mDepthShader);
 		RenderCommon::drawMesh(*mesh);
 	}
