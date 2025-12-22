@@ -15,6 +15,8 @@ public:
 
 	[[nodiscard]] uint32_t getDepthTexture() const;
 
+	[[nodiscard]] FrameBuffer& getDepthMap() const;
+
 	[[nodiscard]] glm::mat4 getLightSpaceMatrix(int layer) const;
 
 	void render(const RenderContext& ctx, const glm::vec4& direction,

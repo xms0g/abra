@@ -24,6 +24,10 @@ uint32_t PerspectiveShadowPass::getDepthTexture() const {
 	return mDepthMap->texture();
 }
 
+FrameBuffer& PerspectiveShadowPass::getDepthMap() const {
+	return *mDepthMap;
+}
+
 glm::mat4 PerspectiveShadowPass::getLightSpaceMatrix(const int layer) const {
 	return mLightSpaceMatrix[layer];
 }
@@ -45,18 +49,8 @@ void PerspectiveShadowPass::render(const RenderContext& ctx, const glm::vec4& di
 	mDepthShader->setMat4("lightSpaceMatrix", mLightSpaceMatrix[layer]);
 
 	// render scene from light's point of view
-	mDepthMap->bind();
-	mDepthMap->attachLayer(GL_DEPTH_ATTACHMENT, layer);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-	glCullFace(GL_FRONT);
-	glViewport(0, 0, ctx.shadowMap.width, ctx.shadowMap.height);
-
 	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->shadowingObjects) {
 		RenderCommon::setupTransform(*entity, *mDepthShader);
 		RenderCommon::drawMesh(*mesh);
 	}
-	mDepthMap->unbind();
-	glCullFace(GL_BACK);
-	glViewport(0, 0, static_cast<int32_t>(ctx.screen.width), static_cast<int32_t>(ctx.screen.height));
 }

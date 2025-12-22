@@ -64,12 +64,23 @@ void ShadowPass::omnidirectionalShadowPass(const RenderContext& ctx) {
 }
 
 void ShadowPass::perspectiveShadowPass(const RenderContext& ctx) {
+	mPerspectiveShadowPass->getDepthMap().bind();
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	glCullFace(GL_FRONT);
+	glViewport(0, 0, ctx.shadowMap.width, ctx.shadowMap.height);
+
 	const auto& lights = *ctx.light.spotLights;
 	for (int i = 0; i < lights.size(); i++) {
 		const auto& light = lights[i];
 		if (!light->castShadow) continue;
 
+		mPerspectiveShadowPass->getDepthMap().attachLayer(GL_DEPTH_ATTACHMENT, i);
+
 		mPerspectiveShadowPass->render(ctx, light->direction, light->position, light->cutOff.y, i);
 		mShadowData.persLightSpaceMatrix[i] = mPerspectiveShadowPass->getLightSpaceMatrix(i);
 	}
+	glCullFace(GL_BACK);
+	glViewport(0, 0, static_cast<int32_t>(ctx.screen.width), static_cast<int32_t>(ctx.screen.height));
+	mPerspectiveShadowPass->getDepthMap().unbind();
 }
