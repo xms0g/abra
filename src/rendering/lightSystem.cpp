@@ -17,7 +17,7 @@ LightSystem::LightSystem(const RenderContext& ctx) {
 	                                ctx.light.maxPointLights * sizeof(PointLightComponent) +
 	                                ctx.light.maxSpotLights * sizeof(SpotLightComponent) + sizeof(glm::ivec4);
 
-	mLightUBO = std::make_unique<UniformBuffer>(totalLightBufferSize, 1);
+	mLightUBO = std::make_unique<UniformBuffer>(totalLightBufferSize, ctx.light.uboBinding);
 }
 
 void LightSystem::update(const RenderContext& ctx) {

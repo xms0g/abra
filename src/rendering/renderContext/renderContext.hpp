@@ -22,6 +22,7 @@ struct RenderContext {
 
 	struct {
 		const UniformBuffer* ubo;
+		uint32_t uboBinding;
 		const std::vector<DirectionalLightComponent*>* dirLights;
 		const std::vector<PointLightComponent*>* pointLights;
 		const std::vector<SpotLightComponent*>* spotLights;
@@ -30,6 +31,7 @@ struct RenderContext {
 
 	struct {
 		const UniformBuffer* ubo;
+		uint32_t uboBinding;
 		const Camera* self;
 		const math::Frustum* frustum;
 		glm::mat4 skyView;
@@ -42,6 +44,7 @@ struct RenderContext {
 	struct {
 		const std::array<uint32_t, 3>* textures;
 		const UniformBuffer* ubo;
+		uint32_t uboBinding;
 
 		int textureSlot;
 		int width, height;

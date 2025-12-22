@@ -14,7 +14,7 @@ void ShadowPass::configure(const RenderContext& ctx) {
 	mOmnidirShadowPass = std::make_unique<OmnidirectionalShadowPass>(ctx);
 	mPerspectiveShadowPass = std::make_unique<PerspectiveShadowPass>(ctx);
 
-	mShadowUBO = std::make_unique<UniformBuffer>(sizeof(ShadowData), 2);
+	mShadowUBO = std::make_unique<UniformBuffer>(sizeof(ShadowData), ctx.shadowMap.uboBinding);
 
 	mShadowMaps = {
 		mDirShadowPass->getDepthTexture(),

@@ -57,9 +57,11 @@ RenderPipeline::RenderPipeline(Registry* registry) {
 	mRenderCtx->screen.width = SCR_WIDTH;
 	mRenderCtx->screen.height = SCR_HEIGHT;
 	mRenderCtx->renderQueue = &mRenderQueue;
+	mRenderCtx->camera.uboBinding = CAMERA_UBO_BINDING;
 	mRenderCtx->light.maxDirLights = MAX_DIRECTIONAL_LIGHTS;
 	mRenderCtx->light.maxPointLights = MAX_POINT_LIGHTS;
 	mRenderCtx->light.maxSpotLights = MAX_SPOT_LIGHTS;
+	mRenderCtx->light.uboBinding = LIGHT_UBO_BINDING;
 
 	registry->addSystem<LightSystem>(*mRenderCtx);
 	mLightSystem = &registry->getSystem<LightSystem>();
@@ -113,7 +115,7 @@ void RenderPipeline::configure(const Camera& camera) {
 	mSceneBuffer->unbind();
 
 	// Create camera buffer
-	mCameraUBO = std::make_unique<UniformBuffer>(2 * sizeof(glm::mat4) + sizeof(glm::vec4), 0);
+	mCameraUBO = std::make_unique<UniformBuffer>(2 * sizeof(glm::mat4) + sizeof(glm::vec4), mRenderCtx->camera.uboBinding);
 
 	// Create render passes
 	mShadowPass = std::make_shared<ShadowPass>();
@@ -166,6 +168,7 @@ void RenderPipeline::configure(const Camera& camera) {
 	mRenderCtx->light.pointLights = &mLightSystem->getPointLights();
 	mRenderCtx->light.spotLights = &mLightSystem->getSpotLights();
 	mRenderCtx->shadowMap.ubo = mShadowPass->getShadowUBO();
+	mRenderCtx->shadowMap.uboBinding = SHADOW_UBO_BINDING;
 	mRenderCtx->shadowMap.textures = &mShadowPass->getShadowMaps();
 	mRenderCtx->shadowMap.textureSlot = SHADOWMAP_TEXTURE_SLOT;
 	mRenderCtx->shadowMap.width = SHADOWMAP_WIDTH;
@@ -214,9 +217,9 @@ void RenderPipeline::configure(const Camera& camera) {
 			}
 
 			lastShader = group.mbatch.shader;
-			mRenderCtx->camera.ubo->configure(lastShader->ID(), 0, "CameraBlock");
-			mRenderCtx->light.ubo->configure(lastShader->ID(), 1, "LightBlock");
-			mRenderCtx->shadowMap.ubo->configure(lastShader->ID(), 2, "ShadowBlock");
+			mRenderCtx->camera.ubo->configure(lastShader->ID(), mRenderCtx->camera.uboBinding, "CameraBlock");
+			mRenderCtx->light.ubo->configure(lastShader->ID(), mRenderCtx->light.uboBinding, "LightBlock");
+			mRenderCtx->shadowMap.ubo->configure(lastShader->ID(), mRenderCtx->shadowMap.uboBinding, "ShadowBlock");
 		}
 	};
 
