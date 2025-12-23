@@ -1,5 +1,6 @@
 #include "mesh.h"
 #include "glad/glad.h"
+#include "../instanceBufferBuilder.hpp"
 
 Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
 	: mVertices(std::move(vertices)),

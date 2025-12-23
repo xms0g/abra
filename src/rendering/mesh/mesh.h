@@ -21,12 +21,6 @@ struct Vertex {
 	float weights[MAX_BONE_INFLUENCE];
 };
 
-struct InstanceData {
-	glm::mat4 model;
-	glm::mat3 normalMatrix;
-	float padding[3];
-};
-
 class Mesh {
 public:
 	Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices);
