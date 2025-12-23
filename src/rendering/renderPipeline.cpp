@@ -212,11 +212,11 @@ void RenderPipeline::configure(const Camera& camera) {
 		const Shader* lastShader = nullptr;
 
 		for (const auto& group: groups) {
-			if (lastShader == group.mbatch.shader) {
+			if (lastShader == group.matb.shader) {
 				continue;
 			}
 
-			lastShader = group.mbatch.shader;
+			lastShader = group.matb.shader;
 			mRenderCtx->camera.ubo->configure(lastShader->ID(), mRenderCtx->camera.uboBinding, "CameraBlock");
 			mRenderCtx->light.ubo->configure(lastShader->ID(), mRenderCtx->light.uboBinding, "LightBlock");
 			mRenderCtx->shadowMap.ubo->configure(lastShader->ID(), mRenderCtx->shadowMap.uboBinding, "ShadowBlock");
@@ -278,27 +278,27 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 	if (entity.hasComponent<SkyboxComponent>()) {
 		const auto& material = matc.materials->at(0);
 		auto& meshes = entity.getComponent<MeshComponent>().meshes->at(0);
-		const MaterialBatch matBatch{&material, skybox.get(), &meshes};
-		const RenderGroup group{eData, matBatch};
+		const MaterialBatch matb{&material, skybox.get(), &meshes};
+		const RenderGroup group{eData, matb};
 		mRenderQueue.skybox.push_back(group);
 		return;
 	}
 
 	for (auto& [matID, meshes]: *entity.getComponent<MeshComponent>().meshes) {
 		const auto& material = matc.materials->at(matID);
-		MaterialBatch matBatch{&material, nullptr, &meshes};
+		MaterialBatch matb{&material, nullptr, &meshes};
 
 		if (matc.flag & Instanced) {
 			if (material.flag & Opaque) {
-				matBatch.shader = instancedOpaque.get();
+				matb.shader = instancedOpaque.get();
 			} else if (material.flag & Cutout) {
-				matBatch.shader = instancedCutout.get();
+				matb.shader = instancedCutout.get();
 			} else if (material.flag & Blend) {
-				matBatch.shader = instancedBlend.get();
+				matb.shader = instancedBlend.get();
 			}
 
 			const auto& ic = entity.getComponent<InstanceComponent>();
-			InstanceGroup instance{eData, ic.transforms, matBatch};
+			InstanceGroup instance{eData, ic.transforms, matb};
 
 			if (material.flag & Opaque) {
 				mRenderQueue.opaqueInstancedGroups.push_back(instance);
@@ -312,14 +312,14 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		}
 
 		if (material.flag & Opaque) {
-			matBatch.shader = opaque.get();
+			matb.shader = opaque.get();
 		} else if (material.flag & Cutout) {
-			matBatch.shader = cutout.get();
+			matb.shader = cutout.get();
 		} else if (material.flag & Blend) {
-			matBatch.shader = blend.get();
+			matb.shader = blend.get();
 		}
 
-		RenderGroup group{eData, matBatch};
+		RenderGroup group{eData, matb};
 
 		if (entity.hasComponent<DebugComponent>()) {
 			mRenderQueue.debugGroups.push_back(group);

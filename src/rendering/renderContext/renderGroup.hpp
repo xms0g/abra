@@ -4,5 +4,5 @@
 
 struct RenderGroup {
 	EntityData eData;
-	MaterialBatch mbatch;
+	MaterialBatch matb;
 };

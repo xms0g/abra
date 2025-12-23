@@ -22,10 +22,10 @@ void BlendInstancedPass::execute(const RenderContext& ctx) {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	ctx.sceneBuffer->bind();
-	for (const auto& [entity, transforms, matBatch]: ctx.renderQueue->blendInstancedGroups) {
+	for (const auto& [entity, transforms, matb]: ctx.renderQueue->blendInstancedGroups) {
 		const size_t count = transforms->size() / 9;
 
-		for (const auto& [material, shader, meshes] = matBatch; const auto& mesh: *meshes) {
+		for (const auto& [material, shader, meshes] = matb; const auto& mesh: *meshes) {
 			RenderCommon::setupMaterial(entity, *material, *shader);
 			RenderCommon::bindTextures(material->textures, *shader);
 

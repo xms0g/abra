@@ -17,7 +17,7 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 	auto cullItems = [&](const std::vector<RenderGroup>& groups, std::vector<RenderableObject>& outQueue) {
 		outQueue.clear();
 
-		for (const auto& [entity, matBatch]: groups) {
+		for (const auto& [entity, matb]: groups) {
 			if (!entity.bv->isOnFrustum(*ctx.camera.frustum,
 			                            entity.transform->position,
 			                            entity.transform->rotation,
@@ -25,7 +25,7 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 				continue;
 			}
 
-			for (auto& [material, shader, meshes] = matBatch; const auto& mesh: *meshes) {
+			for (auto& [material, shader, meshes] = matb; const auto& mesh: *meshes) {
 				const bool isVisible = entity.bv->isMeshInFrustum(
 					*ctx.camera.frustum,
 					mesh.min(), mesh.max(),

@@ -6,5 +6,5 @@
 struct InstanceGroup {
 	EntityData eData;
 	const std::vector<float>* transforms{}; // ptr to P,R,S data
-	MaterialBatch mbatch;
+	MaterialBatch matb;
 };
