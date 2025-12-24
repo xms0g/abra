@@ -57,11 +57,11 @@ RenderPipeline::RenderPipeline(Registry* registry) {
 	mRenderCtx->screen.width = SCR_WIDTH;
 	mRenderCtx->screen.height = SCR_HEIGHT;
 	mRenderCtx->renderQueue = &mRenderQueue;
-	mRenderCtx->camera.uboBinding = CAMERA_UBO_BINDING;
+	mRenderCtx->camera.ubo.binding = CAMERA_UBO_BINDING;
 	mRenderCtx->light.maxDirLights = MAX_DIRECTIONAL_LIGHTS;
 	mRenderCtx->light.maxPointLights = MAX_POINT_LIGHTS;
 	mRenderCtx->light.maxSpotLights = MAX_SPOT_LIGHTS;
-	mRenderCtx->light.uboBinding = LIGHT_UBO_BINDING;
+	mRenderCtx->light.ubo.binding = LIGHT_UBO_BINDING;
 
 	registry->addSystem<LightSystem>(*mRenderCtx);
 	mLightSystem = &registry->getSystem<LightSystem>();
@@ -116,7 +116,7 @@ void RenderPipeline::configure(const Camera& camera) {
 
 	// Create camera buffer
 	mCameraUBO = std::make_unique<UniformBuffer>(2 * sizeof(glm::mat4) + sizeof(glm::vec4),
-	                                             mRenderCtx->camera.uboBinding);
+	                                             mRenderCtx->camera.ubo.binding);
 
 	// Create render passes
 	mShadowPass = std::make_shared<ShadowPass>();
@@ -163,31 +163,34 @@ void RenderPipeline::configure(const Camera& camera) {
 
 	mRenderCtx->sceneBuffer = mSceneBuffer.get();
 	mRenderCtx->camera.self = &camera;
-	mRenderCtx->camera.ubo = mCameraUBO.get();
-	mRenderCtx->light.ubo = &mLightSystem->getLightUBO();
+	mRenderCtx->camera.ubo.self = mCameraUBO.get();
+	mRenderCtx->camera.ubo.blockName = CAMERA_UBO_BLOCK_NAME;
+	mRenderCtx->light.ubo.self = &mLightSystem->getLightUBO();
+	mRenderCtx->light.ubo.blockName = LIGHT_UBO_BLOCK_NAME;
 	mRenderCtx->light.dirLights = &mLightSystem->getDirLights();
 	mRenderCtx->light.pointLights = &mLightSystem->getPointLights();
 	mRenderCtx->light.spotLights = &mLightSystem->getSpotLights();
-	mRenderCtx->shadowMap.ubo = mShadowPass->getShadowUBO();
-	mRenderCtx->shadowMap.uboBinding = SHADOW_UBO_BINDING;
-	mRenderCtx->shadowMap.textures = &mShadowPass->getShadowMaps();
-	mRenderCtx->shadowMap.textureSlot = SHADOWMAP_TEXTURE_SLOT;
-	mRenderCtx->shadowMap.width = SHADOWMAP_WIDTH;
-	mRenderCtx->shadowMap.height = SHADOWMAP_HEIGHT;
-	mRenderCtx->shadowMap.directional.maxLights = MAX_DIRECTIONAL_LIGHTS;
-	mRenderCtx->shadowMap.directional.nearPlane = SHADOW_DIRECTIONAL_NEAR;
-	mRenderCtx->shadowMap.directional.farPlane = SHADOW_DIRECTIONAL_FAR;
-	mRenderCtx->shadowMap.directional.left = SHADOW_DIRECTIONAL_LEFT;
-	mRenderCtx->shadowMap.directional.right = SHADOW_DIRECTIONAL_RIGHT;
-	mRenderCtx->shadowMap.directional.bottom = SHADOW_DIRECTIONAL_BOTTOM;
-	mRenderCtx->shadowMap.directional.top = SHADOW_DIRECTIONAL_TOP;
-	mRenderCtx->shadowMap.omnidirectional.maxLights = MAX_POINT_LIGHTS;
-	mRenderCtx->shadowMap.omnidirectional.nearPlane = SHADOW_OMNIDIRECTIONAL_NEAR;
-	mRenderCtx->shadowMap.omnidirectional.farPlane = SHADOW_OMNIDIRECTIONAL_FAR;
-	mRenderCtx->shadowMap.omnidirectional.fovy = SHADOW_OMNIDIRECTIONAL_FOVY;
-	mRenderCtx->shadowMap.perspective.maxLights = MAX_SPOT_LIGHTS;
-	mRenderCtx->shadowMap.perspective.nearPlane = SHADOW_PERSPECTIVE_NEAR;
-	mRenderCtx->shadowMap.perspective.farPlane = SHADOW_PERSPECTIVE_FAR;
+	mRenderCtx->shadow.ubo.self = mShadowPass->getShadowUBO();
+	mRenderCtx->shadow.ubo.binding = SHADOW_UBO_BINDING;
+	mRenderCtx->shadow.ubo.blockName = SHADOW_UBO_BLOCK_NAME;
+	mRenderCtx->shadow.textures = &mShadowPass->getShadowMaps();
+	mRenderCtx->shadow.textureSlot = SHADOWMAP_TEXTURE_SLOT;
+	mRenderCtx->shadow.width = SHADOWMAP_WIDTH;
+	mRenderCtx->shadow.height = SHADOWMAP_HEIGHT;
+	mRenderCtx->shadow.directional.maxLights = MAX_DIRECTIONAL_LIGHTS;
+	mRenderCtx->shadow.directional.nearPlane = SHADOW_DIRECTIONAL_NEAR;
+	mRenderCtx->shadow.directional.farPlane = SHADOW_DIRECTIONAL_FAR;
+	mRenderCtx->shadow.directional.left = SHADOW_DIRECTIONAL_LEFT;
+	mRenderCtx->shadow.directional.right = SHADOW_DIRECTIONAL_RIGHT;
+	mRenderCtx->shadow.directional.bottom = SHADOW_DIRECTIONAL_BOTTOM;
+	mRenderCtx->shadow.directional.top = SHADOW_DIRECTIONAL_TOP;
+	mRenderCtx->shadow.omnidirectional.maxLights = MAX_POINT_LIGHTS;
+	mRenderCtx->shadow.omnidirectional.nearPlane = SHADOW_OMNIDIRECTIONAL_NEAR;
+	mRenderCtx->shadow.omnidirectional.farPlane = SHADOW_OMNIDIRECTIONAL_FAR;
+	mRenderCtx->shadow.omnidirectional.fovy = SHADOW_OMNIDIRECTIONAL_FOVY;
+	mRenderCtx->shadow.perspective.maxLights = MAX_SPOT_LIGHTS;
+	mRenderCtx->shadow.perspective.nearPlane = SHADOW_PERSPECTIVE_NEAR;
+	mRenderCtx->shadow.perspective.farPlane = SHADOW_PERSPECTIVE_FAR;
 
 	// Set camera projection matrix
 	const glm::mat4 projectionMat = glm::perspective(
@@ -195,9 +198,9 @@ void RenderPipeline::configure(const Camera& camera) {
 		static_cast<float>(mRenderCtx->screen.width) / static_cast<float>(mRenderCtx->screen.height),
 		ZNEAR, ZFAR);
 
-	mRenderCtx->camera.ubo->bind();
-	mRenderCtx->camera.ubo->setData(glm::value_ptr(projectionMat), sizeof(glm::mat4), sizeof(glm::mat4));
-	mRenderCtx->camera.ubo->unbind();
+	mRenderCtx->camera.ubo.self->bind();
+	mRenderCtx->camera.ubo.self->setData(glm::value_ptr(projectionMat), sizeof(glm::mat4), sizeof(glm::mat4));
+	mRenderCtx->camera.ubo.self->unbind();
 
 	// Configure render passes
 	for (const auto& pass: mRenderPasses) {
@@ -215,9 +218,9 @@ void RenderPipeline::configure(const Camera& camera) {
 	};
 
 	for (const auto& shader: shaders) {
-		mRenderCtx->camera.ubo->configure(shader->ID(), mRenderCtx->camera.uboBinding, "CameraBlock");
-		mRenderCtx->light.ubo->configure(shader->ID(), mRenderCtx->light.uboBinding, "LightBlock");
-		mRenderCtx->shadowMap.ubo->configure(shader->ID(), mRenderCtx->shadowMap.uboBinding, "ShadowBlock");
+		mRenderCtx->camera.ubo.self->configure(shader->ID(), mRenderCtx->camera.ubo.binding, mRenderCtx->camera.ubo.blockName);
+		mRenderCtx->light.ubo.self->configure(shader->ID(), mRenderCtx->light.ubo.binding, mRenderCtx->light.ubo.blockName);
+		mRenderCtx->shadow.ubo.self->configure(shader->ID(), mRenderCtx->shadow.ubo.binding, mRenderCtx->shadow.ubo.blockName);
 	}
 }
 
@@ -248,10 +251,10 @@ void RenderPipeline::refreshCameraData() const {
 
 	auto view = mRenderCtx->camera.self->viewMatrix();
 	auto viewPos = glm::vec4(mRenderCtx->camera.self->position(), 1.0);
-	mRenderCtx->camera.ubo->bind();
-	mRenderCtx->camera.ubo->setData(glm::value_ptr(view), sizeof(glm::mat4), 0);
-	mRenderCtx->camera.ubo->setData(glm::value_ptr(viewPos), sizeof(glm::vec4), 2 * sizeof(glm::mat4));
-	mRenderCtx->camera.ubo->unbind();
+	mRenderCtx->camera.ubo.self->bind();
+	mRenderCtx->camera.ubo.self->setData(glm::value_ptr(view), sizeof(glm::mat4), 0);
+	mRenderCtx->camera.ubo.self->setData(glm::value_ptr(viewPos), sizeof(glm::vec4), 2 * sizeof(glm::mat4));
+	mRenderCtx->camera.ubo.self->unbind();
 }
 
 void RenderPipeline::batchEntity(const Entity& entity) {

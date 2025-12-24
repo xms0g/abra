@@ -9,8 +9,8 @@
 #include "../../renderCommon.h"
 
 OmnidirectionalShadowPass::OmnidirectionalShadowPass(const RenderContext& ctx) {
-	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadowMap.width, ctx.shadowMap.height);
-	mDepthMap->withTextureCubemapArrayDepth(ctx.shadowMap.omnidirectional.maxLights)
+	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadow.width, ctx.shadow.height);
+	mDepthMap->withTextureCubemapArrayDepth(ctx.shadow.omnidirectional.maxLights)
 			.checkStatus();
 	mDepthMap->unbind();
 
@@ -32,10 +32,10 @@ FrameBuffer& OmnidirectionalShadowPass::getDepthMap() const {
 void OmnidirectionalShadowPass::render(const RenderContext& ctx, const glm::vec4& position,
                                        const int layer) const {
 	const glm::mat4 shadowProj = glm::perspective(
-		glm::radians(ctx.shadowMap.omnidirectional.fovy),
-		static_cast<float>(ctx.shadowMap.width) / static_cast<float>(ctx.shadowMap.height),
-		ctx.shadowMap.omnidirectional.nearPlane,
-		ctx.shadowMap.omnidirectional.farPlane);
+		glm::radians(ctx.shadow.omnidirectional.fovy),
+		static_cast<float>(ctx.shadow.width) / static_cast<float>(ctx.shadow.height),
+		ctx.shadow.omnidirectional.nearPlane,
+		ctx.shadow.omnidirectional.farPlane);
 
 	const auto pos = glm::vec3(position);
 	std::vector<glm::mat4> shadowTransforms;
@@ -50,7 +50,7 @@ void OmnidirectionalShadowPass::render(const RenderContext& ctx, const glm::vec4
 	for (unsigned int i = 0; i < 6; ++i)
 		mDepthShader->setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
 
-	mDepthShader->setFloat("omniFarPlane", ctx.shadowMap.omnidirectional.farPlane);
+	mDepthShader->setFloat("omniFarPlane", ctx.shadow.omnidirectional.farPlane);
 	mDepthShader->setVec3("lightPos", position);
 	mDepthShader->setInt("cubeIndex", layer);
 

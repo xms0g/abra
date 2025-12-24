@@ -41,6 +41,9 @@ constexpr float SHADOW_PERSPECTIVE_NEAR{1.0f};
 constexpr float SHADOW_PERSPECTIVE_FAR{25.0f};
 // UBO Settings
 constexpr uint32_t CAMERA_UBO_BINDING{0};
+constexpr auto CAMERA_UBO_BLOCK_NAME = "CameraBlock";
 constexpr uint32_t LIGHT_UBO_BINDING{1};
+constexpr auto LIGHT_UBO_BLOCK_NAME = "LightBlock";
 constexpr uint32_t SHADOW_UBO_BINDING{2};
+constexpr auto SHADOW_UBO_BLOCK_NAME = "ShadowBlock";
 

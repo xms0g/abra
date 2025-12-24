@@ -9,7 +9,7 @@
 #include "../../renderCommon.h"
 
 DirectionalShadowPass::DirectionalShadowPass(const RenderContext& ctx) {
-	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadowMap.width, ctx.shadowMap.height);
+	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadow.width, ctx.shadow.height);
 	mDepthMap->withTextureDepth()
 			.checkStatus();
 	mDepthMap->unbind();
@@ -30,12 +30,12 @@ glm::mat4 DirectionalShadowPass::getLightSpaceMatrix() const {
 void DirectionalShadowPass::render(const RenderContext& ctx, const glm::vec4& direction) {
 	const glm::vec3 lightPos = -glm::vec3(direction) * 5.0f;
 	const glm::mat4 lightProjection = glm::ortho(
-		ctx.shadowMap.directional.left,
-		ctx.shadowMap.directional.right,
-		ctx.shadowMap.directional.bottom,
-		ctx.shadowMap.directional.top,
-		ctx.shadowMap.directional.nearPlane,
-		ctx.shadowMap.directional.farPlane);
+		ctx.shadow.directional.left,
+		ctx.shadow.directional.right,
+		ctx.shadow.directional.bottom,
+		ctx.shadow.directional.top,
+		ctx.shadow.directional.nearPlane,
+		ctx.shadow.directional.farPlane);
 	const glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 	mLightSpaceMatrix = lightProjection * lightView;
 
@@ -47,7 +47,7 @@ void DirectionalShadowPass::render(const RenderContext& ctx, const glm::vec4& di
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
-	glViewport(0, 0, ctx.shadowMap.width, ctx.shadowMap.height);
+	glViewport(0, 0, ctx.shadow.width, ctx.shadow.height);
 
 	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->shadowingObjects) {
 		RenderCommon::setupTransform(*entity, *mDepthShader);

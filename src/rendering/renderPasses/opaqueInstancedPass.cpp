@@ -18,9 +18,9 @@ void OpaqueInstancedPass::configure(const RenderContext& ctx) {
 	for (const auto& [entity, transforms, matb]: ctx.renderQueue->opaqueInstancedGroups) {
 		const auto& [material, shader, meshes] = matb;
 		shader->activate();
-		shader->setInt("shadowMap", ctx.shadowMap.textureSlot);
-		shader->setInt("shadowCubemap", ctx.shadowMap.textureSlot + 1);
-		shader->setInt("persShadowMap", ctx.shadowMap.textureSlot + 2);
+		shader->setInt("shadowMap", ctx.shadow.textureSlot);
+		shader->setInt("shadowCubemap", ctx.shadow.textureSlot + 1);
+		shader->setInt("persShadowMap", ctx.shadow.textureSlot + 2);
 	}
 }
 

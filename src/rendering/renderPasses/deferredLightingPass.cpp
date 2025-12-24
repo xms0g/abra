@@ -19,13 +19,13 @@ void DeferredLightingPass::configure(const RenderContext& ctx) {
 	mShader->setInt("gPosition", 0);
 	mShader->setInt("gNormal", 1);
 	mShader->setInt("gAlbedoSpec", 2);
-	mShader->setInt("shadowMap", ctx.shadowMap.textureSlot);
-	mShader->setInt("shadowCubemap", ctx.shadowMap.textureSlot + 1);
-	mShader->setInt("persShadowMap", ctx.shadowMap.textureSlot + 2);
+	mShader->setInt("shadowMap", ctx.shadow.textureSlot);
+	mShader->setInt("shadowCubemap", ctx.shadow.textureSlot + 1);
+	mShader->setInt("persShadowMap", ctx.shadow.textureSlot + 2);
 
-	ctx.camera.ubo->configure(mShader->ID(), 0, "CameraBlock");
-	ctx.light.ubo->configure(mShader->ID(), 1, "LightBlock");
-	ctx.shadowMap.ubo->configure(mShader->ID(), 2, "ShadowBlock");
+	ctx.camera.ubo.self->configure(mShader->ID(), ctx.camera.ubo.binding, ctx.camera.ubo.blockName);
+	ctx.light.ubo.self->configure(mShader->ID(), ctx.light.ubo.binding, ctx.light.ubo.blockName);
+	ctx.shadow.ubo.self->configure(mShader->ID(), ctx.shadow.ubo.binding, ctx.shadow.ubo.blockName);
 }
 
 void DeferredLightingPass::execute(const RenderContext& ctx) {

@@ -10,8 +10,8 @@
 #include "../../renderCommon.h"
 
 PerspectiveShadowPass::PerspectiveShadowPass(const RenderContext& ctx) {
-	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadowMap.width, ctx.shadowMap.height);
-	mDepthMap->withTextureArrayDepth(ctx.shadowMap.perspective.maxLights)
+	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadow.width, ctx.shadow.height);
+	mDepthMap->withTextureArrayDepth(ctx.shadow.perspective.maxLights)
 			.checkStatus();
 	mDepthMap->unbind();
 
@@ -36,9 +36,9 @@ void PerspectiveShadowPass::render(const RenderContext& ctx, const glm::vec4& di
                                    const glm::vec4& position, const float fovy, const int layer) {
 	const glm::mat4 lightProjection = glm::perspective(
 		fovy,
-		static_cast<float>(ctx.shadowMap.width) / static_cast<float>(ctx.shadowMap.height),
-		ctx.shadowMap.perspective.nearPlane,
-		ctx.shadowMap.perspective.farPlane);
+		static_cast<float>(ctx.shadow.width) / static_cast<float>(ctx.shadow.height),
+		ctx.shadow.perspective.nearPlane,
+		ctx.shadow.perspective.farPlane);
 
 	const auto dir = glm::vec3(direction);
 	const auto pos = glm::vec3(position);

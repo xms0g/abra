@@ -21,8 +21,11 @@ struct RenderContext {
 	const FrameBuffer* intermediateBuffer;
 
 	struct {
-		const UniformBuffer* ubo;
-		uint32_t uboBinding;
+		struct {
+			const UniformBuffer* self;
+			uint32_t binding;
+			const char* blockName;
+		} ubo;
 		const std::vector<DirectionalLightComponent*>* dirLights;
 		const std::vector<PointLightComponent*>* pointLights;
 		const std::vector<SpotLightComponent*>* spotLights;
@@ -30,8 +33,12 @@ struct RenderContext {
 	} light;
 
 	struct {
-		const UniformBuffer* ubo;
-		uint32_t uboBinding;
+		struct {
+			const UniformBuffer* self;
+			uint32_t binding;
+			const char* blockName;
+		} ubo;
+
 		const Camera* self;
 		const math::Frustum* frustum;
 		glm::mat4 skyView;
@@ -43,8 +50,11 @@ struct RenderContext {
 
 	struct {
 		const std::array<uint32_t, 3>* textures;
-		const UniformBuffer* ubo;
-		uint32_t uboBinding;
+		struct {
+			const UniformBuffer* self;
+			uint32_t binding;
+			const char* blockName;
+		} ubo;
 
 		int textureSlot;
 		int width, height;
@@ -63,7 +73,7 @@ struct RenderContext {
 			int maxLights;
 			float nearPlane, farPlane;
 		} perspective;
-	} shadowMap;
+	} shadow;
 
 	RenderContext() = default;
 };

@@ -14,7 +14,7 @@ void ShadowPass::configure(const RenderContext& ctx) {
 	mOmnidirShadowPass = std::make_unique<OmnidirectionalShadowPass>(ctx);
 	mPerspectiveShadowPass = std::make_unique<PerspectiveShadowPass>(ctx);
 
-	mShadowUBO = std::make_unique<UniformBuffer>(sizeof(ShadowData), ctx.shadowMap.uboBinding);
+	mShadowUBO = std::make_unique<UniformBuffer>(sizeof(ShadowData), ctx.shadow.ubo.binding);
 
 	mShadowMaps = {
 		mDirShadowPass->getDepthTexture(),
@@ -48,7 +48,7 @@ void ShadowPass::omnidirectionalShadowPass(const RenderContext& ctx) {
 	mOmnidirShadowPass->getDepthMap().bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
-	glViewport(0, 0, ctx.shadowMap.width, ctx.shadowMap.height);
+	glViewport(0, 0, ctx.shadow.width, ctx.shadow.height);
 
 	const auto& lights = *ctx.light.pointLights;
 	for (int i = 0; i < lights.size(); i++) {
@@ -56,7 +56,7 @@ void ShadowPass::omnidirectionalShadowPass(const RenderContext& ctx) {
 		if (!light->castShadow) continue;
 
 		mOmnidirShadowPass->render(ctx, light->position, i);
-		mShadowData.omniFarPlanes[i] = ctx.shadowMap.omnidirectional.farPlane;
+		mShadowData.omniFarPlanes[i] = ctx.shadow.omnidirectional.farPlane;
 	}
 
 	mOmnidirShadowPass->getDepthMap().unbind();
@@ -68,7 +68,7 @@ void ShadowPass::perspectiveShadowPass(const RenderContext& ctx) {
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
-	glViewport(0, 0, ctx.shadowMap.width, ctx.shadowMap.height);
+	glViewport(0, 0, ctx.shadow.width, ctx.shadow.height);
 
 	const auto& lights = *ctx.light.spotLights;
 	for (int i = 0; i < lights.size(); i++) {

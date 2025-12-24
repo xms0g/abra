@@ -27,7 +27,7 @@ void DeferredGeometryPass::configure(const RenderContext& ctx) {
 			.checkStatus();
 
 	mShader = std::make_unique<Shader>("deferred/gbuffer.vert", "deferred/gbuffer.frag");
-	ctx.camera.ubo->configure(mShader->ID(), 0, "CameraBlock");
+	ctx.camera.ubo.self->configure(mShader->ID(), ctx.camera.ubo.binding, ctx.camera.ubo.blockName);
 }
 
 void DeferredGeometryPass::execute(const RenderContext& ctx) {
