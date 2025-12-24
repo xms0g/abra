@@ -115,7 +115,8 @@ void RenderPipeline::configure(const Camera& camera) {
 	mSceneBuffer->unbind();
 
 	// Create camera buffer
-	mCameraUBO = std::make_unique<UniformBuffer>(2 * sizeof(glm::mat4) + sizeof(glm::vec4), mRenderCtx->camera.uboBinding);
+	mCameraUBO = std::make_unique<UniformBuffer>(2 * sizeof(glm::mat4) + sizeof(glm::vec4),
+	                                             mRenderCtx->camera.uboBinding);
 
 	// Create render passes
 	mShadowPass = std::make_shared<ShadowPass>();
@@ -208,29 +209,16 @@ void RenderPipeline::configure(const Camera& camera) {
 	}
 
 	// Configure shaders
-	auto configureShader = [&]<typename T>(T& groups) {
-		const Shader* lastShader = nullptr;
-
-		for (const auto& group: groups) {
-			if (lastShader == group.matb.shader) {
-				continue;
-			}
-
-			lastShader = group.matb.shader;
-			mRenderCtx->camera.ubo->configure(lastShader->ID(), mRenderCtx->camera.uboBinding, "CameraBlock");
-			mRenderCtx->light.ubo->configure(lastShader->ID(), mRenderCtx->light.uboBinding, "LightBlock");
-			mRenderCtx->shadowMap.ubo->configure(lastShader->ID(), mRenderCtx->shadowMap.uboBinding, "ShadowBlock");
-		}
+	const Shader* shaders[7] = {
+		opaque.get(), cutout.get(), blend.get(), instancedOpaque.get(), instancedCutout.get(), instancedBlend.get(),
+		skybox.get()
 	};
 
-	configureShader(mRenderQueue.deferredGroups);
-	configureShader(mRenderQueue.forwardOpaqueGroups);
-	configureShader(mRenderQueue.blendGroups);
-	configureShader(mRenderQueue.shadowGroups);
-	configureShader(mRenderQueue.debugGroups);
-	configureShader(mRenderQueue.opaqueInstancedGroups);
-	configureShader(mRenderQueue.cutoutInstancedGroups);
-	configureShader(mRenderQueue.blendInstancedGroups);
+	for (const auto& shader: shaders) {
+		mRenderCtx->camera.ubo->configure(shader->ID(), mRenderCtx->camera.uboBinding, "CameraBlock");
+		mRenderCtx->light.ubo->configure(shader->ID(), mRenderCtx->light.uboBinding, "LightBlock");
+		mRenderCtx->shadowMap.ubo->configure(shader->ID(), mRenderCtx->shadowMap.uboBinding, "ShadowBlock");
+	}
 }
 
 void RenderPipeline::batchEntities() {

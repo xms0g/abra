@@ -25,7 +25,7 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 				continue;
 			}
 
-			for (auto& [material, shader, meshes] = matb; const auto& mesh: *meshes) {
+			for (const auto& [material, shader, meshes] = matb; const auto& mesh: *meshes) {
 				const bool isVisible = entity.bv->isMeshInFrustum(
 					*ctx.camera.frustum,
 					mesh.min(), mesh.max(),

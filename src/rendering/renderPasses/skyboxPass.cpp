@@ -1,7 +1,6 @@
 #include "skyboxPass.h"
 #include "glad/glad.h"
 #include "../shader.h"
-#include "../buffers/uniformBuffer.h"
 #include "../buffers/frameBuffer.h"
 #include "../material/material.hpp"
 #include "../mesh/mesh.h"
@@ -16,8 +15,6 @@ void SkyboxPass::configure(const RenderContext& ctx) {
 	const auto& [entity, matb] = ctx.renderQueue->skybox.front();
 	matb.shader->activate();
 	matb.shader->setInt("skybox", 0);
-
-	ctx.camera.ubo->configure(matb.shader->ID(), 0, "CameraBlock");
 }
 
 void SkyboxPass::execute(const RenderContext& ctx) {
