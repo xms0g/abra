@@ -102,7 +102,7 @@ Models::Plane::Plane(glm::vec3 color,
 			heightTexture);
 	}
 
-	material[0] = {Opaque | CastShadow, color, 0.0f, textures};
+	material[0] = {OPAQUE | CASTSHADOW, color, 0.0f, textures};
 }
 
 Models::Plane::~Plane() = default;

@@ -152,12 +152,12 @@ Models::Cube::Cube(glm::vec3 color,
 
 	uint32_t flag{0};
 	if (unlit) {
-		flag |= Unlit;
+		flag |= UNLIT;
 	} else {
-		flag |= CastShadow;
+		flag |= CASTSHADOW;
 	}
 
-	flag |= Opaque;
+	flag |= OPAQUE;
 	material[0] = {flag, color, 0.0f, textures};
 }
 

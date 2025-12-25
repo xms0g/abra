@@ -4,12 +4,12 @@
 #include "glm/glm.hpp"
 
 enum MaterialFlag: uint32_t {
-	Opaque = 1 << 0,
-	Blend = 1 << 1,
-	Cutout = 1 << 2,
-	CastShadow = 1 << 3,
-	TwoSided = 1 << 4,
-	Unlit = 1 << 5
+	OPAQUE = 1 << 0,
+	BLEND = 1 << 1,
+	CUTOUT = 1 << 2,
+	CASTSHADOW = 1 << 3,
+	TWOSIDED = 1 << 4,
+	UNLIT = 1 << 5
 };
 
 struct Texture;

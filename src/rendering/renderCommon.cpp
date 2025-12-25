@@ -28,7 +28,7 @@ void RenderCommon::setupMaterial(const EntityData& entity, const Material& mater
 		shader.setVec3("material.color", material.color);
 	}
 
-	if (material.flag & TwoSided) {
+	if (material.flag & TWOSIDED) {
 		glDisable(GL_CULL_FACE);
 	} else {
 		glEnable(GL_CULL_FACE);

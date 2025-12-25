@@ -280,39 +280,39 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		const auto& material = matc.materials->at(matID);
 		MaterialBatch matb{&material, nullptr, &meshes};
 
-		if (matc.flag & Instanced) {
+		if (matc.flag & INSTANCED_PASS) {
 			// Set shader
-			if (material.flag & Opaque) {
+			if (material.flag & OPAQUE) {
 				matb.shader = instancedOpaque.get();
-			} else if (material.flag & Cutout) {
+			} else if (material.flag & CUTOUT) {
 				matb.shader = instancedCutout.get();
-			} else if (material.flag & Blend) {
+			} else if (material.flag & BLEND) {
 				matb.shader = instancedBlend.get();
 			}
 
 			const auto& ic = entity.getComponent<InstanceComponent>();
 			InstanceGroup instance{eData, ic.transforms, matb};
 
-			if (material.flag & Opaque) {
+			if (material.flag & OPAQUE) {
 				mRenderQueue.opaqueInstancedGroups.push_back(instance);
-			} else if (material.flag & Cutout) {
+			} else if (material.flag & CUTOUT) {
 				mRenderQueue.cutoutInstancedGroups.push_back(instance);
-			} else if (material.flag & Blend) {
+			} else if (material.flag & BLEND) {
 				mRenderQueue.blendInstancedGroups.push_back(instance);
 			}
 
 			continue;
 		}
 		// Set shader
-		if (material.flag & Opaque) {
-			if (material.flag & Unlit) {
+		if (material.flag & OPAQUE) {
+			if (material.flag & UNLIT) {
 				matb.shader = unlit.get();
 			} else {
 				matb.shader = opaque.get();
 			}
-		} else if (material.flag & Cutout) {
+		} else if (material.flag & CUTOUT) {
 			matb.shader = cutout.get();
-		} else if (material.flag & Blend) {
+		} else if (material.flag & BLEND) {
 			matb.shader = blend.get();
 		}
 
@@ -322,19 +322,19 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			mRenderQueue.debugGroups.push_back(group);
 		}
 
-		if (material.flag & CastShadow) {
+		if (material.flag & CASTSHADOW) {
 			mRenderQueue.shadowGroups.push_back(group);
 		}
 
-		if (material.flag & Opaque) {
-			if (matc.flag & Forward) {
+		if (material.flag & OPAQUE) {
+			if (matc.flag & FORWARD_PASS) {
 				mRenderQueue.forwardOpaqueGroups.push_back(group);
 			} else {
 				mRenderQueue.deferredGroups.push_back(group);
 			}
-		} else if (material.flag & Cutout) {
+		} else if (material.flag & CUTOUT) {
 			mRenderQueue.forwardOpaqueGroups.push_back(group);
-		} else if (material.flag & Blend) {
+		} else if (material.flag & BLEND) {
 			mRenderQueue.blendGroups.push_back(group);
 		}
 	}
