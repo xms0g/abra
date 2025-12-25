@@ -6,6 +6,7 @@
 #include "../../io/filesystem.hpp"
 
 Models::Cube::Cube(glm::vec3 color,
+                   bool unlit,
                    const char* diffuseTexture,
                    const char* specularTexture,
                    const char* normalTexture,
@@ -149,8 +150,15 @@ Models::Cube::Cube(glm::vec3 color,
 			heightTexture);
 	}
 
+	uint32_t flag{0};
+	if (unlit) {
+		flag |= Unlit;
+	} else {
+		flag |= CastShadow;
+	}
 
-	material[0] = {Opaque | CastShadow, color, 0.0f, textures};
+	flag |= Opaque;
+	material[0] = {flag, color, 0.0f, textures};
 }
 
 Models::Cube::~Cube() = default;

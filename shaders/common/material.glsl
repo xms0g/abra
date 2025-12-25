@@ -7,6 +7,7 @@ struct Material {
     float shininess;
     float heightScale;
     float alphaCutout;
+    bool hasDiffuseMap;
     bool hasSpecularMap;
     bool hasNormalMap;
     bool hasHeightMap;

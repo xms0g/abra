@@ -69,6 +69,7 @@ RenderPipeline::RenderPipeline(Registry* registry) {
 	opaque = std::make_unique<Shader>("object.vert", "opaque.frag");
 	cutout = std::make_unique<Shader>("object.vert", "cutout.frag");
 	blend = std::make_unique<Shader>("object.vert", "blend.frag");
+	unlit = std::make_unique<Shader>("unlit.vert", "unlit.frag");
 	instancedOpaque = std::make_unique<Shader>("instanced.vert", "opaque.frag");
 	instancedCutout = std::make_unique<Shader>("instanced.vert", "cutout.frag");
 	instancedBlend = std::make_unique<Shader>("instanced.vert", "blend.frag");
@@ -280,6 +281,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		MaterialBatch matb{&material, nullptr, &meshes};
 
 		if (matc.flag & Instanced) {
+			// Set shader
 			if (material.flag & Opaque) {
 				matb.shader = instancedOpaque.get();
 			} else if (material.flag & Cutout) {
@@ -301,9 +303,13 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 
 			continue;
 		}
-
+		// Set shader
 		if (material.flag & Opaque) {
-			matb.shader = opaque.get();
+			if (material.flag & Unlit) {
+				matb.shader = unlit.get();
+			} else {
+				matb.shader = opaque.get();
+			}
 		} else if (material.flag & Cutout) {
 			matb.shader = cutout.get();
 		} else if (material.flag & Blend) {
