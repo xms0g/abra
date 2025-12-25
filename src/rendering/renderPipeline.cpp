@@ -118,7 +118,6 @@ void RenderPipeline::configure(const Camera& camera) {
 	// Create camera buffer
 	mCameraUBO = std::make_unique<UniformBuffer>(2 * sizeof(glm::mat4) + sizeof(glm::vec4),
 	                                             mRenderCtx->camera.ubo.binding);
-
 	// Create render passes
 	mShadowPass = std::make_shared<ShadowPass>();
 	mPostProcessPass = std::make_shared<PostProcessPass>();
@@ -213,15 +212,18 @@ void RenderPipeline::configure(const Camera& camera) {
 	}
 
 	// Configure shaders
-	const Shader* shaders[7] = {
-		opaque.get(), cutout.get(), blend.get(), instancedOpaque.get(), instancedCutout.get(), instancedBlend.get(),
-		skybox.get()
+	const Shader* shaders[8] = {
+		opaque.get(), cutout.get(), blend.get(), unlit.get(), instancedOpaque.get(), instancedCutout.get(),
+		instancedBlend.get(), skybox.get()
 	};
 
 	for (const auto& shader: shaders) {
-		mRenderCtx->camera.ubo.self->configure(shader->ID(), mRenderCtx->camera.ubo.binding, mRenderCtx->camera.ubo.blockName);
-		mRenderCtx->light.ubo.self->configure(shader->ID(), mRenderCtx->light.ubo.binding, mRenderCtx->light.ubo.blockName);
-		mRenderCtx->shadow.ubo.self->configure(shader->ID(), mRenderCtx->shadow.ubo.binding, mRenderCtx->shadow.ubo.blockName);
+		mRenderCtx->camera.ubo.self->configure(shader->ID(), mRenderCtx->camera.ubo.binding,
+		                                       mRenderCtx->camera.ubo.blockName);
+		mRenderCtx->light.ubo.self->configure(shader->ID(), mRenderCtx->light.ubo.binding,
+		                                      mRenderCtx->light.ubo.blockName);
+		mRenderCtx->shadow.ubo.self->configure(shader->ID(), mRenderCtx->shadow.ubo.binding,
+		                                       mRenderCtx->shadow.ubo.blockName);
 	}
 }
 
