@@ -8,10 +8,6 @@
 
 DeferredLightingPass::~DeferredLightingPass() = default;
 
-void DeferredLightingPass::configureInput(const FrameBuffer* gBuffer) {
-	mGBuffer = gBuffer;
-}
-
 void DeferredLightingPass::configure(const RenderContext& ctx) {
 	mQuad = std::make_unique<Models::SingleQuad>();
 	mShader = std::make_unique<Shader>("models/quad.vert", "deferred/lighting.frag");
@@ -30,18 +26,18 @@ void DeferredLightingPass::configure(const RenderContext& ctx) {
 
 void DeferredLightingPass::execute(const RenderContext& ctx) {
 	// Copy depth buffer of gBuffer to scene buffer for the proper depth testing
-	mGBuffer->bindForRead();
+	ctx.gBuffer->bindForRead();
 	ctx.sceneBuffer->bindForDraw();
-	glBlitFramebuffer(0, 0, mGBuffer->width(), mGBuffer->height(),
+	glBlitFramebuffer(0, 0, ctx.gBuffer->width(), ctx.gBuffer->height(),
 					  0, 0, ctx.sceneBuffer->width(), ctx.sceneBuffer->height(),
 					  GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
 	ctx.sceneBuffer->bind();
 	mShader->activate();
 
-	for (int i = 0; i < mGBuffer->textures().size(); i++) {
+	for (int i = 0; i < ctx.gBuffer->textures().size(); i++) {
 		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, mGBuffer->textures()[i]);
+		glBindTexture(GL_TEXTURE_2D, ctx.gBuffer->textures()[i]);
 	}
 
 	RenderCommon::bindShadowMaps(ctx);

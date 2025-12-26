@@ -207,8 +207,8 @@ void RenderPipeline::configure(const Camera& camera) {
 		pass->configure(*mRenderCtx);
 	}
 
-	if (!mRenderQueue.deferredGroups.empty()) {
-		mDeferredLightingPass->configureInput(mDeferredGeometryPass->getGBuffer());
+	if (mDeferredGeometryPass) {
+		mRenderCtx->gBuffer = mDeferredGeometryPass->getGBuffer();
 	}
 
 	// Configure shaders

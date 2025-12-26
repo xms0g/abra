@@ -19,6 +19,7 @@ struct RenderContext {
 	RenderQueue* renderQueue;
 	mutable const FrameBuffer* sceneBuffer;
 	const FrameBuffer* intermediateBuffer;
+	const FrameBuffer* gBuffer;
 
 	struct {
 		struct {
