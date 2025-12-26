@@ -59,7 +59,7 @@ uint32_t Bloom::brightFilterPass(const uint32_t sceneTexture, const uint32_t VAO
 
 uint32_t Bloom::blurPass(const uint32_t sceneTexture, const uint32_t VAO, int& toggle) const {
 	bool horizontal = true;
-	uint32_t outTex{0};
+	uint32_t outTex = sceneTexture;
 
 	for (int i = 0; i < 10; i++) {
 		mRenderTargets[toggle]->bind();
@@ -69,7 +69,7 @@ uint32_t Bloom::blurPass(const uint32_t sceneTexture, const uint32_t VAO, int& t
 		blur->setBool("horizontal", horizontal);
 		horizontal = !horizontal;
 
-		RenderCommon::drawQuad(sceneTexture, VAO);
+		RenderCommon::drawQuad(outTex, VAO);
 
 		outTex = mRenderTargets[toggle]->texture();
 		toggle = !toggle;
