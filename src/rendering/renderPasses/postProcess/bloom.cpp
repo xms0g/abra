@@ -44,7 +44,7 @@ uint32_t Bloom::render(const uint32_t sceneTexture, const uint32_t VAO, int& tog
 	return inputTex;
 }
 
-uint32_t Bloom::brightFilterPass(uint32_t sceneTexture, const uint32_t VAO, int& toggle) const {
+uint32_t Bloom::brightFilterPass(const uint32_t sceneTexture, const uint32_t VAO, int& toggle) const {
 	mRenderTargets[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -52,15 +52,16 @@ uint32_t Bloom::brightFilterPass(uint32_t sceneTexture, const uint32_t VAO, int&
 
 	RenderCommon::drawQuad(sceneTexture, VAO);
 
-	sceneTexture = mRenderTargets[toggle]->texture();
+	const uint32_t outTex = mRenderTargets[toggle]->texture();
 	toggle = !toggle;
-	return sceneTexture;
+	return outTex;
 }
 
-uint32_t Bloom::blurPass(uint32_t sceneTexture, const uint32_t VAO, int& toggle) const {
+uint32_t Bloom::blurPass(const uint32_t sceneTexture, const uint32_t VAO, int& toggle) const {
 	bool horizontal = true;
+	uint32_t outTex{0};
 
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < 10; i++) {
 		mRenderTargets[toggle]->bind();
 		glClear(GL_COLOR_BUFFER_BIT);
 
@@ -70,11 +71,11 @@ uint32_t Bloom::blurPass(uint32_t sceneTexture, const uint32_t VAO, int& toggle)
 
 		RenderCommon::drawQuad(sceneTexture, VAO);
 
-		sceneTexture = mRenderTargets[toggle]->texture();
+		outTex = mRenderTargets[toggle]->texture();
 		toggle = !toggle;
 	}
 
-	return sceneTexture;
+	return outTex;
 }
 
 uint32_t Bloom::combinePass(const uint32_t sceneTexture, const uint32_t bloomBlur,
