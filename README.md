@@ -15,6 +15,8 @@ Itâ€™s designed for clarity, experimentation, and real-time graphics research â€
   - Spot Light + Shadow Mapping
 - **HDR Rendering**
   - Full HDR workflow with tone mapping and manual exposure control.
+- **SSAO**
+  - Only avaliable in the deferred pipeline.
 - **Frustum Culling**
   - Per-entity and per-mesh culling.
 - **Skybox Rendering** 
@@ -50,7 +52,6 @@ Itâ€™s designed for clarity, experimentation, and real-time graphics research â€
 | WASD | Move                     |
 | RMB  | enable/disable Free Look |
 ## Roadmap
-- [ ] SSAO
 - [ ] PBR materials
 - [ ] Cascaded shadow maps
 ## License
