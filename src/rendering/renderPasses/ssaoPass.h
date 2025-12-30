@@ -33,7 +33,7 @@ private:
 	std::unique_ptr<Shader> mSSAOBlurShader;
 
 	std::vector<glm::vec3> mKernel;
-	std::vector<glm::vec3> mNoise;
+	std::vector<float> mNoise;
 	uint32_t mNoiseTexture{0};
 
 };

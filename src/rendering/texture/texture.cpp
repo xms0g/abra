@@ -4,7 +4,7 @@
 #include "image/stb_image.h"
 #include "../material/material.hpp"
 
-uint32_t texture::generate(const uint32_t width, const uint32_t height, const glm::vec3* data) {
+uint32_t texture::generate(const uint32_t width, const uint32_t height, const float* data) {
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);

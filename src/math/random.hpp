@@ -10,6 +10,7 @@ static inline std::default_random_engine generator;
 
 inline std::vector<glm::vec3> generateKernel(const int sampleCount) {
 	std::vector<glm::vec3> kernel;
+
 	for (unsigned int i = 0; i < sampleCount; ++i) {
 		glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0,
 		                 randomFloats(generator) * 2.0 - 1.0,
@@ -23,18 +24,19 @@ inline std::vector<glm::vec3> generateKernel(const int sampleCount) {
 		sample *= scale;
 		kernel.push_back(sample);
 	}
+
 	return kernel;
 }
 
-inline std::vector<glm::vec3> generateNoise(const int sampleCount) {
-	std::vector<glm::vec3> noises;
+inline std::vector<float> generateNoise(const int sampleCount) {
+	std::vector<float> noises;
+
 	for (unsigned int i = 0; i < sampleCount; i++) {
-		glm::vec3 noise(randomFloats(generator) * 2.0 - 1.0,
-		                randomFloats(generator) * 2.0 - 1.0,
-		                0.0f);
-		// rotate around z-axis (in tangent space)
-		noises.push_back(noise);
+		noises.push_back(randomFloats(generator) * 2.0f - 1.0f);
+		noises.push_back(randomFloats(generator) * 2.0f - 1.0f);
+		noises.push_back(0.0f);
 	}
+
 	return noises;
 }
 }

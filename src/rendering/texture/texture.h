@@ -2,8 +2,6 @@
 #include <vector>
 #include <string>
 
-#include "glm/vec3.hpp"
-
 enum TextureType {
 	DIFFUSE = 1,
 	SPECULAR = 2,
@@ -19,7 +17,7 @@ struct Texture {
 };
 
 namespace texture {
-uint32_t generate(uint32_t width, uint32_t height, const glm::vec3* data);
+uint32_t generate(uint32_t width, uint32_t height, const float* data);
 
 uint32_t load(const char* path, uint32_t flag);
 
