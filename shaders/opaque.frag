@@ -10,7 +10,7 @@ void main() {
     float specular = material.hasSpecularMap ? texture(material.texture_specular, texCoord).r : 0.0;
     // Create a mask: 0.0 if no lights, 1.0 if at least one light
     bool hasLights = lightCount.x > 0 || lightCount.y > 0 || lightCount.z > 0;
-    vec3 result = hasLights ? calculateLights(normal, fs_in.FragPos, viewPos.xyz, fs_in.ViewDir, fs_in.FragPosLightSpace, diffuse, specular, material.shininess) : diffuse;
+    vec3 result = hasLights ? calculateLights(normal, fs_in.FragPos, viewPos.xyz, fs_in.ViewDir, fs_in.FragPosLightSpace, diffuse, specular, material.shininess, 1.0) : diffuse;
 
     fragColor = vec4(result, 1.0);
 }

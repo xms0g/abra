@@ -15,6 +15,7 @@ void DeferredLightingPass::configure(const RenderContext& ctx) {
 	mShader->setInt("gPosition", 0);
 	mShader->setInt("gNormal", 1);
 	mShader->setInt("gAlbedoSpec", 2);
+	mShader->setInt("ssao", 3);
 	mShader->setInt("shadowMap", ctx.shadow.textureSlot);
 	mShader->setInt("shadowCubemap", ctx.shadow.textureSlot + 1);
 	mShader->setInt("persShadowMap", ctx.shadow.textureSlot + 2);
@@ -39,6 +40,9 @@ void DeferredLightingPass::execute(const RenderContext& ctx) {
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, ctx.gBuffer->textures()[i]);
 	}
+
+	glActiveTexture(GL_TEXTURE0 + 3);
+	glBindTexture(GL_TEXTURE_2D, ctx.ssao->texture());
 
 	RenderCommon::bindShadowMaps(ctx);
 

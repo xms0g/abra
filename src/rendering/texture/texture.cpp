@@ -4,6 +4,18 @@
 #include "image/stb_image.h"
 #include "../material/material.hpp"
 
+uint32_t texture::generate(const uint32_t width, const uint32_t height, const glm::vec3* data) {
+	uint32_t textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	return textureID;
+}
+
 uint32_t texture::load(const char* path, const uint32_t flag) {
     uint32_t textureID;
 

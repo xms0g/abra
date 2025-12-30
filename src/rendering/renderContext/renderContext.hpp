@@ -20,6 +20,7 @@ struct RenderContext {
 	mutable const FrameBuffer* sceneBuffer;
 	const FrameBuffer* intermediateBuffer;
 	const FrameBuffer* gBuffer;
+	const FrameBuffer* ssao;
 
 	struct {
 		struct {
@@ -77,4 +78,6 @@ struct RenderContext {
 	} shadow;
 
 	RenderContext() = default;
+	RenderContext(const RenderContext&) = delete;
+	RenderContext& operator=(const RenderContext&) = delete;
 };

@@ -4,6 +4,7 @@
 #include "renderContext/renderQueue.hpp"
 #include "../ECS/system.hpp"
 
+class SSAOPass;
 struct RenderContext;
 class Shader;
 class ShadowPass;
@@ -63,5 +64,6 @@ private:
 	std::shared_ptr<PostProcessPass> mPostProcessPass;
 	std::shared_ptr<DeferredGeometryPass> mDeferredGeometryPass;
 	std::shared_ptr<DeferredLightingPass> mDeferredLightingPass;
+	std::shared_ptr<SSAOPass> mSSAOPass;
 	std::vector<std::shared_ptr<IRenderPass>> mRenderPasses;
 };

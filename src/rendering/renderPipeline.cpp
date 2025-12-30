@@ -15,6 +15,7 @@
 #include "renderPasses/IRenderPass.hpp"
 #include "renderPasses/deferredGeometryPass.h"
 #include "renderPasses/deferredLightingPass.h"
+#include "renderPasses/ssaoPass.h"
 #include "renderPasses/debugPass.h"
 #include "renderPasses/forwardOpaquePass.h"
 #include "renderPasses/blendInstancedPass.h"
@@ -129,8 +130,10 @@ void RenderPipeline::configure(const Camera& camera) {
 	if (!mRenderQueue.deferredGroups.empty()) {
 		mDeferredGeometryPass = std::make_shared<DeferredGeometryPass>();
 		mDeferredLightingPass = std::make_shared<DeferredLightingPass>();
+		mSSAOPass = std::make_shared<SSAOPass>();
 
 		mRenderPasses.push_back(mDeferredGeometryPass);
+		mRenderPasses.push_back(mSSAOPass);
 		mRenderPasses.push_back(mDeferredLightingPass);
 	}
 
@@ -209,6 +212,7 @@ void RenderPipeline::configure(const Camera& camera) {
 
 	if (mDeferredGeometryPass) {
 		mRenderCtx->gBuffer = mDeferredGeometryPass->getGBuffer();
+		mRenderCtx->ssao = mSSAOPass->getSSAO();
 	}
 
 	// Configure shaders
