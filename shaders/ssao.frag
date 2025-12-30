@@ -10,12 +10,12 @@ uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D texNoise;
 
+uniform int kernelSize;
+uniform float radius;
+uniform float bias;
+
 uniform vec2 resolution;
 uniform vec3 samples[16];
-
-const int kernelSize = 16;
-const float radius = 1.5;
-const float bias = 0.025;
 
 out vec4 fragColor;
 

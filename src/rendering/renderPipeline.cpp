@@ -168,6 +168,10 @@ void RenderPipeline::configure(const Camera& camera) {
 	mRenderCtx->camera.self = &camera;
 	mRenderCtx->camera.ubo.self = mCameraUBO.get();
 	mRenderCtx->camera.ubo.blockName = CAMERA_UBO_BLOCK_NAME;
+	mRenderCtx->ssao.kernelSize = SSAO_KERNEL_SIZE;
+	mRenderCtx->ssao.noiseTextureSize = SSAO_NOISE_TEXTURE_SIZE;
+	mRenderCtx->ssao.radius = SSAO_RADIUS;
+	mRenderCtx->ssao.bias = SSAO_BIAS;
 	mRenderCtx->light.ubo.self = &mLightSystem->getLightUBO();
 	mRenderCtx->light.ubo.blockName = LIGHT_UBO_BLOCK_NAME;
 	mRenderCtx->light.dirLights = &mLightSystem->getDirLights();
@@ -212,7 +216,7 @@ void RenderPipeline::configure(const Camera& camera) {
 
 	if (mDeferredGeometryPass) {
 		mRenderCtx->gBuffer = mDeferredGeometryPass->getGBuffer();
-		mRenderCtx->ssao = mSSAOPass->getSSAO();
+		mRenderCtx->ssao.buffer = mSSAOPass->getSSAO();
 	}
 
 	// Configure shaders

@@ -42,7 +42,7 @@ void DeferredLightingPass::execute(const RenderContext& ctx) {
 	}
 
 	glActiveTexture(GL_TEXTURE0 + 3);
-	glBindTexture(GL_TEXTURE_2D, ctx.ssao->texture());
+	glBindTexture(GL_TEXTURE_2D, ctx.ssao.buffer->texture());
 
 	RenderCommon::bindShadowMaps(ctx);
 

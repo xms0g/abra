@@ -20,7 +20,14 @@ struct RenderContext {
 	mutable const FrameBuffer* sceneBuffer;
 	const FrameBuffer* intermediateBuffer;
 	const FrameBuffer* gBuffer;
-	const FrameBuffer* ssao;
+
+	struct {
+		const FrameBuffer* buffer;
+		int kernelSize;
+		int noiseTextureSize;
+		float radius;
+		float bias;
+	} ssao;
 
 	struct {
 		struct {

@@ -24,18 +24,21 @@ void SSAOPass::configure(const RenderContext& ctx) {
 	mSSAOShader->setInt("gPosition", 0);
 	mSSAOShader->setInt("gNormal", 1);
 	mSSAOShader->setInt("texNoise", 2);
+	mSSAOShader->setInt("kernelSize", ctx.ssao.kernelSize);
+	mSSAOShader->setFloat("radius", ctx.ssao.radius);
+	mSSAOShader->setFloat("bias", ctx.ssao.bias);
 	mSSAOShader->setVec2("resolution", glm::vec2(ctx.screen.width, ctx.screen.height));
 
 	mSSAOBlurShader = std::make_unique<Shader>("models/quad.vert", "ssaoBlur.frag");
 	mSSAOBlurShader->activate();
 	mSSAOBlurShader->setInt("ssaoTexture", 0);
 
-	mKernel.resize(16);
-	mKernel = math::random::generateKernel(16);
+	mKernel.resize(ctx.ssao.kernelSize);
+	mKernel = math::random::generateKernel(ctx.ssao.kernelSize);
 
-	mNoise.resize(16);
-	mNoise = math::random::generateNoise(16);
-	mNoiseTexture = texture::generate(4, 4, mNoise.data());
+	mNoise.resize(ctx.ssao.noiseTextureSize * ctx.ssao.noiseTextureSize);
+	mNoise = math::random::generateNoise(ctx.ssao.noiseTextureSize * ctx.ssao.noiseTextureSize);
+	mNoiseTexture = texture::generate(ctx.ssao.noiseTextureSize, ctx.ssao.noiseTextureSize, mNoise.data());
 
 	ctx.camera.ubo.self->configure(mSSAOShader->ID(), ctx.camera.ubo.binding, ctx.camera.ubo.blockName);
 }
@@ -50,7 +53,7 @@ void SSAOPass::ssao(const RenderContext& ctx) const {
 	mSSAO->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 	mSSAOShader->activate();
-	for (unsigned int i = 0; i < 64; ++i)
+	for (unsigned int i = 0; i < ctx.ssao.kernelSize; ++i)
 		mSSAOShader->setVec3("samples[" + std::to_string(i) + "]", mKernel[i]);
 
 	glActiveTexture(GL_TEXTURE0);
