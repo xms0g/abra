@@ -17,13 +17,13 @@ class SSAOPass : public IRenderPass {
 public:
 	~SSAOPass() override;
 
+	[[nodiscard]] const FrameBuffer* fbo() const;
+
+	[[nodiscard]] const UniformBuffer* ubo() const;
+
 	void configure(const RenderContext& ctx) override;
 
 	void execute(const RenderContext& ctx) override;
-
-	[[nodiscard]] const FrameBuffer* fbo() const { return mBlurFBO.get(); }
-
-	[[nodiscard]] const UniformBuffer* ubo() const { return mUbo.get(); }
 
 private:
 	void ssao(const RenderContext& ctx) const;

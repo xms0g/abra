@@ -10,6 +10,14 @@
 
 SSAOPass::~SSAOPass() = default;
 
+const FrameBuffer* SSAOPass::fbo() const {
+	return mFBO.get();
+}
+
+const UniformBuffer* SSAOPass::ubo() const {
+	return mUbo.get();
+}
+
 void SSAOPass::configure(const RenderContext& ctx) {
 	mQuad = std::make_unique<Models::SingleQuad>();
 	mFBO = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
