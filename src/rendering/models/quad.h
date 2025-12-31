@@ -29,7 +29,7 @@ public:
 
 	~Quad() override = default;
 
-	[[nodiscard]] const Shader& shader() const { return *mShader; }
+	[[nodiscard]] const Shader& shader() const;
 
 private:
 	std::unique_ptr<Shader> mShader;

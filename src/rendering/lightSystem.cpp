@@ -13,17 +13,33 @@ LightSystem::LightSystem(const RenderContext& ctx) {
 	RequireComponent<PointLightComponent>(true);
 	RequireComponent<SpotLightComponent>(true);
 
-	uint32_t totalLightBufferSize = ctx.light.maxDirLights * sizeof(DirectionalLightComponent) +
+	const uint32_t totalLightBufferSize = ctx.light.maxDirLights * sizeof(DirectionalLightComponent) +
 	                                ctx.light.maxPointLights * sizeof(PointLightComponent) +
 	                                ctx.light.maxSpotLights * sizeof(SpotLightComponent) + sizeof(glm::ivec4);
 
-	mLightUBO = std::make_unique<UniformBuffer>(totalLightBufferSize, ctx.light.ubo.binding);
+	mUBO = std::make_unique<UniformBuffer>(totalLightBufferSize, ctx.light.ubo.binding);
+}
+
+const UniformBuffer& LightSystem::ubo() const {
+	return *mUBO;
+}
+
+const std::vector<PointLightComponent*>& LightSystem::pointLights() const {
+	return mPointLights;
+}
+
+const std::vector<DirectionalLightComponent*>& LightSystem::dirLights() const {
+	return mDirLights;
+}
+
+const std::vector<SpotLightComponent*>& LightSystem::spotLights() const {
+	return mSpotLights;
 }
 
 void LightSystem::update(const RenderContext& ctx) {
-	dirLights.clear();
-	pointLights.clear();
-	spotLights.clear();
+	mDirLights.clear();
+	mPointLights.clear();
+	mSpotLights.clear();
 
 	for (auto& entity: getSystemEntities()) {
 		TransformComponent tc;
@@ -34,15 +50,15 @@ void LightSystem::update(const RenderContext& ctx) {
 
 		if (entity.hasComponent<DirectionalLightComponent>()) {
 			auto& light = entity.getComponent<DirectionalLightComponent>();
-			dirLights.push_back(&light);
+			mDirLights.push_back(&light);
 		} else if (entity.hasComponent<PointLightComponent>()) {
 			auto& light = entity.getComponent<PointLightComponent>();
 			light.position = glm::vec4(tc.position, 1.0f);
-			pointLights.push_back(&light);
+			mPointLights.push_back(&light);
 		} else if (entity.hasComponent<SpotLightComponent>()) {
 			auto& light = entity.getComponent<SpotLightComponent>();
 			light.position = glm::vec4(tc.position, 1.0f);
-			spotLights.push_back(&light);
+			mSpotLights.push_back(&light);
 		}
 	}
 
@@ -50,7 +66,7 @@ void LightSystem::update(const RenderContext& ctx) {
 }
 
 void LightSystem::updateLightUBO(const RenderContext& ctx) const {
-	mLightUBO->bind();
+	mUBO->bind();
 	uint32_t offset = 0;
 
 	auto uploadDataToGPU = [this, &offset]<typename T>(T& lights, const uint32_t maxLightCount) {
@@ -58,17 +74,17 @@ void LightSystem::updateLightUBO(const RenderContext& ctx) const {
 		const size_t lightCount = std::min(lights.size(), static_cast<size_t>(maxLightCount));
 
 		for (size_t i = 0; i < lightCount; i++) {
-			mLightUBO->setData(lights[i], sizeof(lightType), offset + i * sizeof(lightType));
+			mUBO->setData(lights[i], sizeof(lightType), offset + i * sizeof(lightType));
 		}
 		offset += maxLightCount * sizeof(lightType);
 		return lightCount;
 	};
 
-	const size_t dirCount = uploadDataToGPU(dirLights, ctx.light.maxDirLights);
-	const size_t pointCount = uploadDataToGPU(pointLights, ctx.light.maxPointLights);
-	const size_t spotCount = uploadDataToGPU(spotLights, ctx.light.maxSpotLights);
+	const size_t dirCount = uploadDataToGPU(mDirLights, ctx.light.maxDirLights);
+	const size_t pointCount = uploadDataToGPU(mPointLights, ctx.light.maxPointLights);
+	const size_t spotCount = uploadDataToGPU(mSpotLights, ctx.light.maxSpotLights);
 
 	auto lightCount = glm::ivec4(dirCount, pointCount, spotCount, 0);
-	mLightUBO->setData(glm::value_ptr(lightCount), sizeof(glm::ivec4), offset);
-	mLightUBO->unbind();
+	mUBO->setData(glm::value_ptr(lightCount), sizeof(glm::ivec4), offset);
+	mUBO->unbind();
 }

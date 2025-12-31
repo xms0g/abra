@@ -25,13 +25,13 @@ class Mesh {
 public:
 	Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices);
 
-	[[nodiscard]] const std::vector<Vertex>& vertices() const { return mVertices; }
+	[[nodiscard]] const std::vector<Vertex>& vertices() const;
 
-	[[nodiscard]] const std::vector<uint32_t>& indices() const { return mIndices; }
+	[[nodiscard]] const std::vector<uint32_t>& indices() const;
 
-	[[nodiscard]] const glm::vec3& min() const { return mMin; }
+	[[nodiscard]] const glm::vec3& min() const;
 
-	[[nodiscard]] const glm::vec3& max() const { return mMax; }
+	[[nodiscard]] const glm::vec3& max() const;
 
 	void bind() const;
 

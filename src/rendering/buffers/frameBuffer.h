@@ -8,10 +8,13 @@ public:
 
 	~FrameBuffer();
 
-	[[nodiscard]] int width() const { return mWidth; }
-	[[nodiscard]] int height() const { return mHeight; }
-	[[nodiscard]] uint32_t texture() const { return mTextureIDs.front(); }
-	[[nodiscard]] const std::vector<uint32_t>& textures() const { return mTextureIDs; }
+	[[nodiscard]] int width() const;
+
+	[[nodiscard]] int height() const;
+
+	[[nodiscard]] uint32_t texture() const;
+
+	[[nodiscard]] const std::vector<uint32_t>& textures() const;
 
 	void bind() const;
 

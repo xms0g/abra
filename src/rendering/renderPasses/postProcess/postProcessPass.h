@@ -17,11 +17,11 @@ class PostProcessPass final : public IRenderPass {
 public:
 	~PostProcessPass() override;
 
+	std::vector<std::shared_ptr<IPostEffect> >& effects();
+
 	void configure(const RenderContext& ctx) override;
 
 	void execute(const RenderContext& ctx) override;
-
-	std::vector<std::shared_ptr<IPostEffect> >& effects() { return mEffects; }
 
 private:
 	std::unique_ptr<Models::Quad> mQuad;

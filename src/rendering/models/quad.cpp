@@ -1,7 +1,6 @@
 #include "quad.h"
 #include "glad/glad.h"
 #include "../../rendering/shader.h"
-#include "../../config/config.hpp"
 
 IQuad::IQuad() {
 	constexpr float vertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
@@ -36,6 +35,10 @@ Models::Quad::Quad() {
 	mShader = std::make_unique<Shader>( "models/quad.vert", "models/quad.frag");
 	mShader->activate();
 	mShader->setInt("screenTexture", 0);
+}
+
+const Shader& Models::Quad::shader() const {
+	return *mShader;
 }
 
 

@@ -11,19 +11,21 @@ class LightSystem final : public System {
 public:
 	explicit LightSystem(const RenderContext& ctx);
 
-	[[nodiscard]] const UniformBuffer& getLightUBO() const { return *mLightUBO; }
+	[[nodiscard]] const UniformBuffer& ubo() const;
 
-	[[nodiscard]] const std::vector<PointLightComponent*>& getPointLights() const  { return pointLights; }
-	[[nodiscard]] const std::vector<DirectionalLightComponent*>& getDirLights() const { return dirLights; }
-	[[nodiscard]] const std::vector<SpotLightComponent*>& getSpotLights() const { return spotLights; }
+	[[nodiscard]] const std::vector<PointLightComponent*>& pointLights() const;
+
+	[[nodiscard]] const std::vector<DirectionalLightComponent*>& dirLights() const;
+
+	[[nodiscard]] const std::vector<SpotLightComponent*>& spotLights() const;
 
 	void update(const RenderContext& ctx);
 
 private:
 	void updateLightUBO(const RenderContext& ctx) const;
 
-	std::unique_ptr<UniformBuffer> mLightUBO;
-	std::vector<DirectionalLightComponent*> dirLights;
-	std::vector<PointLightComponent*> pointLights;
-	std::vector<SpotLightComponent*> spotLights;
+	std::unique_ptr<UniformBuffer> mUBO;
+	std::vector<DirectionalLightComponent*> mDirLights;
+	std::vector<PointLightComponent*> mPointLights;
+	std::vector<SpotLightComponent*> mSpotLights;
 };

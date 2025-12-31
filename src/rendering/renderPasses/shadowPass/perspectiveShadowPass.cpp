@@ -1,5 +1,4 @@
 #include "perspectiveShadowPass.h"
-#include "glad/glad.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "../../shader.h"
@@ -20,15 +19,15 @@ PerspectiveShadowPass::PerspectiveShadowPass(const RenderContext& ctx) {
 
 PerspectiveShadowPass::~PerspectiveShadowPass() = default;
 
-uint32_t PerspectiveShadowPass::getDepthTexture() const {
+uint32_t PerspectiveShadowPass::depthTexture() const {
 	return mDepthMap->texture();
 }
 
-FrameBuffer& PerspectiveShadowPass::getDepthMap() const {
+FrameBuffer& PerspectiveShadowPass::depthMap() const {
 	return *mDepthMap;
 }
 
-glm::mat4 PerspectiveShadowPass::getLightSpaceMatrix(const int layer) const {
+glm::mat4 PerspectiveShadowPass::lightSpaceMatrix(const int layer) const {
 	return mLightSpaceMatrix[layer];
 }
 

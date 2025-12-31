@@ -19,11 +19,11 @@ DirectionalShadowPass::DirectionalShadowPass(const RenderContext& ctx) {
 
 DirectionalShadowPass::~DirectionalShadowPass() = default;
 
-uint32_t DirectionalShadowPass::getDepthTexture() const {
+uint32_t DirectionalShadowPass::depthTexture() const {
 	return mDepthMap->texture();
 }
 
-glm::mat4 DirectionalShadowPass::getLightSpaceMatrix() const {
+glm::mat4 DirectionalShadowPass::lightSpaceMatrix() const {
 	return mLightSpaceMatrix;
 }
 

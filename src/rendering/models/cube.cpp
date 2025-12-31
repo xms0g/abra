@@ -113,7 +113,7 @@ Models::Cube::Cube(glm::vec3 color,
 			                                                  f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z));
 	}
 
-	meshes[0].emplace_back(vertices, indices);
+	mMeshes[0].emplace_back(vertices, indices);
 
 	std::vector<Texture> textures;
 
@@ -158,11 +158,11 @@ Models::Cube::Cube(glm::vec3 color,
 	}
 
 	flag |= OPAQUE;
-	material[0] = {flag, color, 0.0f, textures};
+	mMaterial[0] = {flag, color, 0.0f, textures};
 }
 
 Models::Cube::~Cube() = default;
 
-[[nodiscard]] MeshMap* Models::Cube::getMeshes() { return &meshes; }
+[[nodiscard]] MeshMap* Models::Cube::meshes() { return &mMeshes; }
 
-[[nodiscard]] const MaterialMap* Models::Cube::getMaterial() const { return &material; }
+[[nodiscard]] const MaterialMap* Models::Cube::material() const { return &mMaterial; }

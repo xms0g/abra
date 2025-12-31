@@ -13,9 +13,9 @@ public:
 
 	~DirectionalShadowPass();
 
-	[[nodiscard]] uint32_t getDepthTexture() const;
+	[[nodiscard]] uint32_t depthTexture() const;
 
-	[[nodiscard]] glm::mat4 getLightSpaceMatrix() const;
+	[[nodiscard]] glm::mat4 lightSpaceMatrix() const;
 
 	void render(const RenderContext& ctx, const glm::vec4& direction);
 

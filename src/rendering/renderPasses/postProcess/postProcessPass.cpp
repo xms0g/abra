@@ -17,6 +17,10 @@
 
 PostProcessPass::~PostProcessPass() = default;
 
+std::vector<std::shared_ptr<IPostEffect>>& PostProcessPass::effects() {
+	return mEffects;
+}
+
 void PostProcessPass::configure(const RenderContext& ctx) {
 	mQuad = std::make_unique<Models::Quad>();
 

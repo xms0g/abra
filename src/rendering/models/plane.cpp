@@ -65,7 +65,7 @@ Models::Plane::Plane(glm::vec3 color,
 			                                                  f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z));
 	}
 
-	meshes[0].emplace_back(vertices, indices);
+	mMeshes[0].emplace_back(vertices, indices);
 
 	std::vector<Texture> textures;
 
@@ -102,11 +102,11 @@ Models::Plane::Plane(glm::vec3 color,
 			heightTexture);
 	}
 
-	material[0] = {OPAQUE | CASTSHADOW, color, 0.0f, textures};
+	mMaterial[0] = {OPAQUE | CASTSHADOW, color, 0.0f, textures};
 }
 
 Models::Plane::~Plane() = default;
 
-[[nodiscard]] MeshMap* Models::Plane::getMeshes() { return &meshes; }
+[[nodiscard]] MeshMap* Models::Plane::meshes() { return &mMeshes; }
 
-[[nodiscard]] const MaterialMap* Models::Plane::getMaterial() const { return &material; }
+[[nodiscard]] const MaterialMap* Models::Plane::material() const { return &mMaterial; }

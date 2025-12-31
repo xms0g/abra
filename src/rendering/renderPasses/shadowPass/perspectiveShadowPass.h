@@ -13,11 +13,11 @@ public:
 
 	~PerspectiveShadowPass();
 
-	[[nodiscard]] uint32_t getDepthTexture() const;
+	[[nodiscard]] uint32_t depthTexture() const;
 
-	[[nodiscard]] FrameBuffer& getDepthMap() const;
+	[[nodiscard]] FrameBuffer& depthMap() const;
 
-	[[nodiscard]] glm::mat4 getLightSpaceMatrix(int layer) const;
+	[[nodiscard]] glm::mat4 lightSpaceMatrix(int layer) const;
 
 	void render(const RenderContext& ctx, const glm::vec4& direction,
 	            const glm::vec4& position, float fovy, int layer);

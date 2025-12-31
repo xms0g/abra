@@ -21,11 +21,11 @@ OmnidirectionalShadowPass::OmnidirectionalShadowPass(const RenderContext& ctx) {
 
 OmnidirectionalShadowPass::~OmnidirectionalShadowPass() = default;
 
-uint32_t OmnidirectionalShadowPass::getDepthTexture() const {
+uint32_t OmnidirectionalShadowPass::depthTexture() const {
 	return mDepthMap->texture();
 }
 
-FrameBuffer& OmnidirectionalShadowPass::getDepthMap() const {
+FrameBuffer& OmnidirectionalShadowPass::depthMap() const {
 	return *mDepthMap;
 }
 

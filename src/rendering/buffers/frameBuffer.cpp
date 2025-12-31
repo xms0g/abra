@@ -20,6 +20,22 @@ FrameBuffer::~FrameBuffer() {
 	glDeleteFramebuffers(1, &mFBO);
 }
 
+int FrameBuffer::width() const {
+	return mWidth;
+}
+
+int FrameBuffer::height() const {
+	return mHeight;
+}
+
+uint32_t FrameBuffer::texture() const {
+	return mTextureIDs.front();
+}
+
+const std::vector<uint32_t>& FrameBuffer::textures() const {
+	return mTextureIDs;
+}
+
 void FrameBuffer::bind() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
 	glViewport(0, 0, mWidth, mHeight);

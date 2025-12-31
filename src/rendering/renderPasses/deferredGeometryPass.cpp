@@ -13,6 +13,10 @@
 
 DeferredGeometryPass::~DeferredGeometryPass() = default;
 
+const FrameBuffer* DeferredGeometryPass::gBuffer() const {
+	return mGBuffer.get();
+}
+
 void DeferredGeometryPass::configure(const RenderContext& ctx) {
 	mGBuffer = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
 	mGBuffer->withTextureFP(true, 16)

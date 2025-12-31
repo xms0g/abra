@@ -175,15 +175,15 @@ void RenderPipeline::configure(const Camera& camera) {
 	mRenderCtx->ssao.noiseTextureSize = SSAO_NOISE_TEXTURE_SIZE;
 	mRenderCtx->ssao.radius = SSAO_RADIUS;
 	mRenderCtx->ssao.bias = SSAO_BIAS;
-	mRenderCtx->light.ubo.self = &mLightSystem->getLightUBO();
+	mRenderCtx->light.ubo.self = &mLightSystem->ubo();
 	mRenderCtx->light.ubo.blockName = LIGHT_UBO_BLOCK_NAME;
-	mRenderCtx->light.dirLights = &mLightSystem->getDirLights();
-	mRenderCtx->light.pointLights = &mLightSystem->getPointLights();
-	mRenderCtx->light.spotLights = &mLightSystem->getSpotLights();
-	mRenderCtx->shadow.ubo.self = mShadowPass->getShadowUBO();
+	mRenderCtx->light.dirLights = &mLightSystem->dirLights();
+	mRenderCtx->light.pointLights = &mLightSystem->pointLights();
+	mRenderCtx->light.spotLights = &mLightSystem->spotLights();
+	mRenderCtx->shadow.ubo.self = mShadowPass->ubo();
 	mRenderCtx->shadow.ubo.binding = SHADOW_UBO_BINDING;
 	mRenderCtx->shadow.ubo.blockName = SHADOW_UBO_BLOCK_NAME;
-	mRenderCtx->shadow.textures = &mShadowPass->getShadowMaps();
+	mRenderCtx->shadow.textures = &mShadowPass->shadowMaps();
 	mRenderCtx->shadow.textureSlot = SHADOWMAP_TEXTURE_SLOT;
 	mRenderCtx->shadow.width = SHADOWMAP_WIDTH;
 	mRenderCtx->shadow.height = SHADOWMAP_HEIGHT;
@@ -218,7 +218,7 @@ void RenderPipeline::configure(const Camera& camera) {
 	}
 
 	if (mDeferredGeometryPass) {
-		mRenderCtx->gBuffer = mDeferredGeometryPass->getGBuffer();
+		mRenderCtx->gBuffer = mDeferredGeometryPass->gBuffer();
 		mRenderCtx->ssao.buffer = mSSAOPass->fbo();
 	}
 

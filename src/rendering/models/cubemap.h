@@ -17,12 +17,12 @@ public:
 
 	~Cubemap();
 
-	[[nodiscard]] MeshMap* getMeshes();
+	[[nodiscard]] MeshMap* meshes();
 
-	[[nodiscard]] const MaterialMap* getMaterial() const;
+	[[nodiscard]] const MaterialMap* material() const;
 
 private:
-	MeshMap meshes;
-	MaterialMap material;
+	MeshMap mMeshes;
+	MaterialMap mMaterial;
 };
 }

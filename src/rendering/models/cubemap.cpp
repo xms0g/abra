@@ -57,7 +57,7 @@ Models::Cubemap::Cubemap(std::span<const char* const> faces) {
 	}
 
 	std::vector<uint32_t> indices;
-	meshes[0].emplace_back(vertices, indices);
+	mMeshes[0].emplace_back(vertices, indices);
 
 	std::vector<std::string> facesVec;
 	facesVec.reserve(faces.size());
@@ -69,12 +69,12 @@ Models::Cubemap::Cubemap(std::span<const char* const> faces) {
 
 	std::vector<Texture> textures;
 	textures.emplace_back(texture::loadCubemap(facesVec), DIFFUSE, "skybox","skybox.jpg");
-	material[0] = {0, glm::vec3(), 0.0f, textures};
+	mMaterial[0] = {0, glm::vec3(), 0.0f, textures};
 }
 
 Models::Cubemap::~Cubemap() = default;
 
-[[nodiscard]] MeshMap* Models::Cubemap::getMeshes() { return &meshes; }
+[[nodiscard]] MeshMap* Models::Cubemap::meshes() { return &mMeshes; }
 
-[[nodiscard]] const MaterialMap* Models::Cubemap::getMaterial() const { return &material; }
+[[nodiscard]] const MaterialMap* Models::Cubemap::material() const { return &mMaterial; }
 

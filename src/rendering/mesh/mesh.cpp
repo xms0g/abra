@@ -67,6 +67,22 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
 	}
 }
 
+const std::vector<Vertex>& Mesh::vertices() const {
+	return mVertices;
+}
+
+const std::vector<uint32_t>& Mesh::indices() const {
+	return mIndices;
+}
+
+const glm::vec3& Mesh::min() const {
+	return mMin;
+}
+
+const glm::vec3& Mesh::max() const {
+	return mMax;
+}
+
 void Mesh::bind() const {
 	glBindVertexArray(mVAO);
 }

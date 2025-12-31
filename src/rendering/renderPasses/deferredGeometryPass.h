@@ -9,11 +9,11 @@ class DeferredGeometryPass final : public IRenderPass {
 public:
 	~DeferredGeometryPass() override;
 
+	[[nodiscard]] const FrameBuffer* gBuffer() const;
+
 	void configure(const RenderContext& ctx) override;
 
 	void execute(const RenderContext& ctx) override;
-
-	[[nodiscard]] const FrameBuffer* getGBuffer() const { return mGBuffer.get(); }
 
 private:
 	std::unique_ptr<FrameBuffer> mGBuffer;
