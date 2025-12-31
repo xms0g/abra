@@ -21,9 +21,9 @@ public:
 
 	void execute(const RenderContext& ctx) override;
 
-	[[nodiscard]] const FrameBuffer* getSSAO() const { return mSSAOBlur.get(); }
+	[[nodiscard]] const FrameBuffer* fbo() const { return mBlurFBO.get(); }
 
-	[[nodiscard]] const UniformBuffer* ubo() const { return mSSAOUbo.get(); }
+	[[nodiscard]] const UniformBuffer* ubo() const { return mUbo.get(); }
 
 private:
 	void ssao(const RenderContext& ctx) const;
@@ -31,11 +31,11 @@ private:
 	void blur() const;
 
 	std::unique_ptr<Models::SingleQuad> mQuad;
-	std::unique_ptr<FrameBuffer> mSSAO;
-	std::unique_ptr<FrameBuffer> mSSAOBlur;
-	std::unique_ptr<Shader> mSSAOShader;
-	std::unique_ptr<Shader> mSSAOBlurShader;
-	std::unique_ptr<UniformBuffer> mSSAOUbo;
+	std::unique_ptr<FrameBuffer> mFBO;
+	std::unique_ptr<FrameBuffer> mBlurFBO;
+	std::unique_ptr<Shader> mShader;
+	std::unique_ptr<Shader> mBlurShader;
+	std::unique_ptr<UniformBuffer> mUbo;
 
 	std::vector<glm::vec4> mKernel;
 	std::vector<float> mNoise;
