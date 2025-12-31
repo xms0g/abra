@@ -40,6 +40,14 @@ void SSAOPass::configure(const RenderContext& ctx) {
 	mNoise = math::random::generateNoise(ctx.ssao.noiseTextureSize * ctx.ssao.noiseTextureSize);
 	mNoiseTexture = texture::generate(ctx.ssao.noiseTextureSize, ctx.ssao.noiseTextureSize, mNoise.data());
 
+	uint32_t uboSize = ctx.ssao.kernelSize * sizeof(glm::vec4);
+
+	mSSAOUbo = std::make_unique<UniformBuffer>(uboSize, ctx.ssao.ubo.binding);
+	mSSAOUbo->bind();
+	mSSAOUbo->setData(mKernel.data(), uboSize, 0);
+	mSSAOUbo->unbind();
+
+	mSSAOUbo->configure(mSSAOShader->ID(), ctx.ssao.ubo.binding, ctx.ssao.ubo.blockName);
 	ctx.camera.ubo.self->configure(mSSAOShader->ID(), ctx.camera.ubo.binding, ctx.camera.ubo.blockName);
 }
 
@@ -52,9 +60,8 @@ void SSAOPass::ssao(const RenderContext& ctx) const {
 	//IMPORTANT: SSAO internally converts G-buffer data to view space. G-buffer remains world-space by design.
 	mSSAO->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
+
 	mSSAOShader->activate();
-	for (unsigned int i = 0; i < ctx.ssao.kernelSize; ++i)
-		mSSAOShader->setVec3("samples[" + std::to_string(i) + "]", mKernel[i]);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, ctx.gBuffer->textures()[0]);

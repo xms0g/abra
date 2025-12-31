@@ -168,6 +168,9 @@ void RenderPipeline::configure(const Camera& camera) {
 	mRenderCtx->camera.self = &camera;
 	mRenderCtx->camera.ubo.self = mCameraUBO.get();
 	mRenderCtx->camera.ubo.blockName = CAMERA_UBO_BLOCK_NAME;
+	mRenderCtx->ssao.ubo.self = mSSAOPass->ubo();
+	mRenderCtx->ssao.ubo.binding = SSAO_UBO_BINDING;
+	mRenderCtx->ssao.ubo.blockName = SSAO_UBO_BLOCK_NAME;
 	mRenderCtx->ssao.kernelSize = SSAO_KERNEL_SIZE;
 	mRenderCtx->ssao.noiseTextureSize = SSAO_NOISE_TEXTURE_SIZE;
 	mRenderCtx->ssao.radius = SSAO_RADIUS;

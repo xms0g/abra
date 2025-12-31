@@ -27,30 +27,35 @@ struct RenderContext {
 		int noiseTextureSize;
 		float radius;
 		float bias;
-	} ssao;
 
-	struct {
 		struct {
 			const UniformBuffer* self;
 			uint32_t binding;
 			const char* blockName;
 		} ubo;
+	} ssao;
+
+	struct {
 		const std::vector<DirectionalLightComponent*>* dirLights;
 		const std::vector<PointLightComponent*>* pointLights;
 		const std::vector<SpotLightComponent*>* spotLights;
 		uint32_t maxDirLights, maxPointLights, maxSpotLights;
-	} light;
-
-	struct {
 		struct {
 			const UniformBuffer* self;
 			uint32_t binding;
 			const char* blockName;
 		} ubo;
+	} light;
 
+	struct {
 		const Camera* self;
 		const math::Frustum* frustum;
 		glm::mat4 skyView;
+		struct {
+			const UniformBuffer* self;
+			uint32_t binding;
+			const char* blockName;
+		} ubo;
 	} camera;
 
 	struct {
@@ -59,14 +64,14 @@ struct RenderContext {
 
 	struct {
 		const std::array<uint32_t, 3>* textures;
+		int textureSlot;
+		int width, height;
+
 		struct {
 			const UniformBuffer* self;
 			uint32_t binding;
 			const char* blockName;
 		} ubo;
-
-		int textureSlot;
-		int width, height;
 
 		struct  {
 			int maxLights;

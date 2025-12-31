@@ -15,7 +15,11 @@ uniform float radius;
 uniform float bias;
 
 uniform vec2 resolution;
-uniform vec3 samples[16];
+
+layout (std140) uniform SSAOBlock
+{
+    vec4 samples[16];
+};
 
 out vec4 fragColor;
 
@@ -36,7 +40,7 @@ void main() {
     float occlusion = 0.0;
     for(int i = 0; i < kernelSize; ++i) {
         // get sample position
-        vec3 samplePos = TBN * samples[i]; // from tangent to view-space
+        vec3 samplePos = TBN * samples[i].xyz; // from tangent to view-space
         samplePos = fragPosView + samplePos * radius;
 
         // project sample position (to sample texture) (to get position on screen/texture)

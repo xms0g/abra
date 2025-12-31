@@ -8,13 +8,14 @@ namespace math::random {
 static inline std::uniform_real_distribution<float> randomFloats(0.0, 1.0);
 static inline std::default_random_engine generator;
 
-inline std::vector<glm::vec3> generateKernel(const int sampleCount) {
-	std::vector<glm::vec3> kernel;
+inline std::vector<glm::vec4> generateKernel(const int sampleCount) {
+	std::vector<glm::vec4> kernel;
 
 	for (unsigned int i = 0; i < sampleCount; ++i) {
-		glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0,
+		glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, // [-1.0, 1.0]
 		                 randomFloats(generator) * 2.0 - 1.0,
-		                 randomFloats(generator));
+		                 randomFloats(generator)); // [0.0, 1.0]
+
 		sample = glm::normalize(sample);
 		sample *= randomFloats(generator);
 
@@ -22,7 +23,7 @@ inline std::vector<glm::vec3> generateKernel(const int sampleCount) {
 		// scale samples s.t. they're more aligned to center of kernel
 		scale = lerp(0.1f, 1.0f, scale * scale);
 		sample *= scale;
-		kernel.push_back(sample);
+		kernel.emplace_back(sample, 1.0);
 	}
 
 	return kernel;
