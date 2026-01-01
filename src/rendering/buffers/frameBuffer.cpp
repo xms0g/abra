@@ -156,8 +156,6 @@ FrameBuffer& FrameBuffer::withTextureDepth(const uint32_t format, const bool onl
 		internalFormat = GL_DEPTH_COMPONENT16;
 	} else if (format == 24) {
 		internalFormat = GL_DEPTH_COMPONENT24;
-	} else if (format == 32) {
-		internalFormat = GL_DEPTH_COMPONENT32F;
 	}
 
 	uint32_t textureID;
@@ -186,8 +184,6 @@ FrameBuffer& FrameBuffer::withTextureDepthArray(const int layerCount, const uint
 		internalFormat = GL_DEPTH_COMPONENT16;
 	} else if (format == 24) {
 		internalFormat = GL_DEPTH_COMPONENT24;
-	} else if (format == 32) {
-		internalFormat = GL_DEPTH_COMPONENT32F;
 	}
 
 	uint32_t textureID;
@@ -216,8 +212,6 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepth(const uint32_t format, const b
 		internalFormat = GL_DEPTH_COMPONENT16;
 	} else if (format == 24) {
 		internalFormat = GL_DEPTH_COMPONENT24;
-	} else if (format == 32) {
-		internalFormat = GL_DEPTH_COMPONENT32F;
 	}
 
 	uint32_t textureID;
@@ -247,9 +241,8 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(const int layerCount, con
 		internalFormat = GL_DEPTH_COMPONENT16;
 	} else if (format == 24) {
 		internalFormat = GL_DEPTH_COMPONENT24;
-	} else if (format == 32) {
-		internalFormat = GL_DEPTH_COMPONENT32F;
 	}
+
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextureIDs.push_back(textureID);
@@ -276,9 +269,8 @@ FrameBuffer& FrameBuffer::withRenderBufferDepth(const uint32_t format) {
 		internalFormat = GL_DEPTH_COMPONENT16;
 	} else if (format == 24) {
 		internalFormat = GL_DEPTH_COMPONENT24;
-	} else if (format == 32) {
-		internalFormat = GL_DEPTH_COMPONENT32F;
 	}
+
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 
@@ -294,9 +286,8 @@ FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(const int multisampl
 		internalFormat = GL_DEPTH_COMPONENT16;
 	} else if (format == 24) {
 		internalFormat = GL_DEPTH_COMPONENT24;
-	} else if (format == 32) {
-		internalFormat = GL_DEPTH_COMPONENT32F;
 	}
+
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 	glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisampledCount, internalFormat, mWidth, mHeight);
