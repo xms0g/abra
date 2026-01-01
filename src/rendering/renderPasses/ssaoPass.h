@@ -13,11 +13,11 @@ namespace Models {
 class SingleQuad;
 }
 
-class SSAOPass : public IRenderPass {
+class SSAOPass final : public IRenderPass {
 public:
 	~SSAOPass() override;
 
-	[[nodiscard]] const FrameBuffer* fbo() const;
+	[[nodiscard]] const FrameBuffer* blurFBO() const;
 
 	[[nodiscard]] const UniformBuffer* ubo() const;
 

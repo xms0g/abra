@@ -10,8 +10,8 @@
 
 SSAOPass::~SSAOPass() = default;
 
-const FrameBuffer* SSAOPass::fbo() const {
-	return mFBO.get();
+const FrameBuffer* SSAOPass::blurFBO() const {
+	return mBlurFBO.get();
 }
 
 const UniformBuffer* SSAOPass::ubo() const {

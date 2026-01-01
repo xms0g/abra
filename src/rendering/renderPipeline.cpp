@@ -219,7 +219,7 @@ void RenderPipeline::configure(const Camera& camera) {
 
 	if (mDeferredGeometryPass) {
 		mRenderCtx->gBuffer = mDeferredGeometryPass->gBuffer();
-		mRenderCtx->ssao.buffer = mSSAOPass->fbo();
+		mRenderCtx->ssao.buffer = mSSAOPass->blurFBO();
 	}
 
 	// Configure shaders
