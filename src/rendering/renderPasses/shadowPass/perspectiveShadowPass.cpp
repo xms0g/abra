@@ -10,7 +10,7 @@
 
 PerspectiveShadowPass::PerspectiveShadowPass(const RenderContext& ctx) {
 	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadow.width, ctx.shadow.height);
-	mDepthMap->withTextureArrayDepth(ctx.shadow.perspective.maxLights, 24, true)
+	mDepthMap->withTextureDepthArray(ctx.shadow.perspective.maxLights, 24, true)
 			.checkStatus();
 	mDepthMap->unbind();
 

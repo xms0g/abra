@@ -10,7 +10,7 @@
 
 OmnidirectionalShadowPass::OmnidirectionalShadowPass(const RenderContext& ctx) {
 	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadow.width, ctx.shadow.height);
-	mDepthMap->withTextureCubemapArrayDepth(ctx.shadow.omnidirectional.maxLights, 16, true)
+	mDepthMap->withTextureCubemapDepthArray(ctx.shadow.omnidirectional.maxLights, 16, true)
 			.checkStatus();
 	mDepthMap->unbind();
 

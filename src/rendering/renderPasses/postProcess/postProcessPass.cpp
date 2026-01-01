@@ -40,7 +40,7 @@ void PostProcessPass::configure(const RenderContext& ctx) {
 	for (auto& target: mRenderTargets) {
 		target = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
 #ifdef HDR
-		target->withTextureFP(true, 16)
+		target->withTextureFP(16, true)
 #else
 		target->withTexture()
 #endif

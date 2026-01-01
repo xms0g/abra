@@ -88,9 +88,10 @@ FrameBuffer& FrameBuffer::withTextureMultisampled(const int multisampledCount) {
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTextureFP(const bool alpha, const uint32_t format) {
+FrameBuffer& FrameBuffer::withTextureFP(const uint32_t format, const bool alpha) {
 	const uint32_t fmt = alpha ? GL_RGBA : GL_RGB;
-	int internalFormat = 0;
+	int internalFormat{0};
+
 	if (format == 16) {
 		if (alpha) {
 			internalFormat = GL_RGBA16F;
@@ -119,8 +120,9 @@ FrameBuffer& FrameBuffer::withTextureFP(const bool alpha, const uint32_t format)
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTextureFPMultisampled(const bool alpha, const uint32_t format, const int multisampledCount) {
-	int internalFormat = 0;
+FrameBuffer& FrameBuffer::withTextureFPMultisampled(const int multisampledCount, const uint32_t format, const bool alpha) {
+	int internalFormat{0};
+
 	if (format == 16) {
 		if (alpha) {
 			internalFormat = GL_RGBA16F;
@@ -147,109 +149,157 @@ FrameBuffer& FrameBuffer::withTextureFPMultisampled(const bool alpha, const uint
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTextureDepth() {
+FrameBuffer& FrameBuffer::withTextureDepth(const uint32_t format, const bool onlyForShadowMap) {
+	uint32_t internalFormat{0};
+
+	if (format == 16) {
+		internalFormat = GL_DEPTH_COMPONENT16;
+	} else if (format == 24) {
+		internalFormat = GL_DEPTH_COMPONENT24;
+	} else if (format == 32) {
+		internalFormat = GL_DEPTH_COMPONENT32F;
+	}
+
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextureIDs.push_back(textureID);
 
 	glBindTexture(GL_TEXTURE_2D, textureID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat,
 	             mWidth, mHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 
 	setDepthTextureParameters(GL_TEXTURE_2D, 2);
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, textureID, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
+	if (onlyForShadowMap) {
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTextureArrayDepth(const int layerCount) {
+FrameBuffer& FrameBuffer::withTextureDepthArray(const int layerCount, const uint32_t format, const bool onlyForShadowMap) {
+	uint32_t internalFormat{0};
+
+	if (format == 16) {
+		internalFormat = GL_DEPTH_COMPONENT16;
+	} else if (format == 24) {
+		internalFormat = GL_DEPTH_COMPONENT24;
+	} else if (format == 32) {
+		internalFormat = GL_DEPTH_COMPONENT32F;
+	}
+
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextureIDs.push_back(textureID);
 
 	glBindTexture(GL_TEXTURE_2D_ARRAY, textureID);
 	glTexImage3D(
-		GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT32F, mWidth, mHeight, layerCount,
+		GL_TEXTURE_2D_ARRAY, 0, internalFormat, mWidth, mHeight, layerCount,
 		0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 
 	setDepthTextureParameters(GL_TEXTURE_2D_ARRAY, 2);
 
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, textureID, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
+	if (onlyForShadowMap) {
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+	}
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTextureCubemapDepth() {
+FrameBuffer& FrameBuffer::withTextureCubemapDepth(const uint32_t format, const bool onlyForShadowMap) {
+	uint32_t internalFormat{0};
+
+	if (format == 16) {
+		internalFormat = GL_DEPTH_COMPONENT16;
+	} else if (format == 24) {
+		internalFormat = GL_DEPTH_COMPONENT24;
+	} else if (format == 32) {
+		internalFormat = GL_DEPTH_COMPONENT32F;
+	}
+
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextureIDs.push_back(textureID);
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 	for (unsigned int i = 0; i < 6; ++i)
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, mWidth, mHeight, 0, GL_DEPTH_COMPONENT,
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, mWidth, mHeight, 0, GL_DEPTH_COMPONENT,
 		             GL_FLOAT, nullptr);
 	setDepthTextureParameters(GL_TEXTURE_CUBE_MAP, 3);
 	// attach depth texture as FBO's depth buffer
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, textureID, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
+
+	if (onlyForShadowMap) {
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTextureCubemapArrayDepth(const int layerCount) {
+FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(const int layerCount, const uint32_t format, const bool onlyForShadowMap) {
+	uint32_t internalFormat{0};
+
+	if (format == 16) {
+		internalFormat = GL_DEPTH_COMPONENT16;
+	} else if (format == 24) {
+		internalFormat = GL_DEPTH_COMPONENT24;
+	} else if (format == 32) {
+		internalFormat = GL_DEPTH_COMPONENT32F;
+	}
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextureIDs.push_back(textureID);
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, textureID);
 	glTexImage3D(
-		GL_TEXTURE_CUBE_MAP_ARRAY, 0, GL_DEPTH_COMPONENT32F, mWidth, mHeight, layerCount * 6,
+		GL_TEXTURE_CUBE_MAP_ARRAY, 0, internalFormat, mWidth, mHeight, layerCount * 6,
 		0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 
 	setDepthTextureParameters(GL_TEXTURE_CUBE_MAP_ARRAY, 3);
 	// attach depth texture as FBO's depth buffer
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, textureID, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
+	if (onlyForShadowMap) {
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withRenderBufferDepth(const uint32_t depthFormat) {
-	uint32_t format = 0;
-	if (depthFormat == 16) {
-		format = GL_DEPTH_COMPONENT16;
-	} else if (depthFormat == 24) {
-		format = GL_DEPTH_COMPONENT24;
-	} else if (depthFormat == 32) {
-		format = GL_DEPTH_COMPONENT32F;
+FrameBuffer& FrameBuffer::withRenderBufferDepth(const uint32_t format) {
+	uint32_t internalFormat{0};
+	if (format == 16) {
+		internalFormat = GL_DEPTH_COMPONENT16;
+	} else if (format == 24) {
+		internalFormat = GL_DEPTH_COMPONENT24;
+	} else if (format == 32) {
+		internalFormat = GL_DEPTH_COMPONENT32F;
 	}
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 
-	glRenderbufferStorage(GL_RENDERBUFFER, format, mWidth, mHeight);
+	glRenderbufferStorage(GL_RENDERBUFFER, internalFormat, mWidth, mHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(const int multisampledCount, const uint32_t depthFormat) {
-	uint32_t format = 0;
-	if (depthFormat == 16) {
-		format = GL_DEPTH_COMPONENT16;
-	} else if (depthFormat == 24) {
-		format = GL_DEPTH_COMPONENT24;
-	} else if (depthFormat == 32) {
-		format = GL_DEPTH_COMPONENT32F;
+FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(const int multisampledCount, const uint32_t format) {
+	uint32_t internalFormat{0};
+	if (format == 16) {
+		internalFormat = GL_DEPTH_COMPONENT16;
+	} else if (format == 24) {
+		internalFormat = GL_DEPTH_COMPONENT24;
+	} else if (format == 32) {
+		internalFormat = GL_DEPTH_COMPONENT32F;
 	}
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisampledCount, format, mWidth, mHeight);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisampledCount, internalFormat, mWidth, mHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	return *this;

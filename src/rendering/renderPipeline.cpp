@@ -88,13 +88,13 @@ void RenderPipeline::configure(const Camera& camera) {
 	glEnable(GL_MULTISAMPLE);
 	mIntermediateBuffer = std::make_unique<FrameBuffer>(mSceneBuffer->width(), mSceneBuffer->height());
 # ifdef HDR
-	mIntermediateBuffer->withTextureFP(true, 16)
+	mIntermediateBuffer->withTextureFP(16, true)
 			.withRenderBufferDepth(24)
 			.checkStatus();
 	mIntermediateBuffer->unbind();
 
 	mSceneBuffer->bind();
-	mSceneBuffer->withTextureFPMultisampled(true, 16, MULTISAMPLED_COUNT)
+	mSceneBuffer->withTextureFPMultisampled(MULTISAMPLED_COUNT, 16, true)
 # else
 	mIntermediateBuffer->withTexture()
 			.withRenderBufferDepth(24)
@@ -107,7 +107,7 @@ void RenderPipeline::configure(const Camera& camera) {
 			.withRenderBufferDepthMultisampled(MULTISAMPLED_COUNT, 24)
 #else
 # ifdef HDR
-	mSceneBuffer->withTextureFP(true, 16)
+	mSceneBuffer->withTextureFP(16, true)
 # else
 			mSceneBuffer->withTexture()
 # endif

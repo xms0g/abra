@@ -30,21 +30,21 @@ public:
 
 	FrameBuffer& withTextureMultisampled(int multisampledCount);
 
-	FrameBuffer& withTextureFP(bool alpha, uint32_t format);
+	FrameBuffer& withTextureFP(uint32_t format, bool alpha);
 
-	FrameBuffer& withTextureFPMultisampled(bool alpha, uint32_t format, int multisampledCount);
+	FrameBuffer& withTextureFPMultisampled(int multisampledCount, uint32_t format, bool alpha);
 
-	FrameBuffer& withTextureDepth();
+	FrameBuffer& withTextureDepth(uint32_t format, bool onlyForShadowMap);
 
-	FrameBuffer& withTextureArrayDepth(int layerCount);
+	FrameBuffer& withTextureDepthArray(int layerCount, uint32_t format, bool onlyForShadowMap);
 
-	FrameBuffer& withTextureCubemapDepth();
+	FrameBuffer& withTextureCubemapDepth(uint32_t format, bool onlyForShadowMap);
 
-	FrameBuffer& withTextureCubemapArrayDepth(int layerCount);
+	FrameBuffer& withTextureCubemapDepthArray(int layerCount, uint32_t format, bool onlyForShadowMap);
 
-	FrameBuffer& withRenderBufferDepth(uint32_t depthFormat);
+	FrameBuffer& withRenderBufferDepth(uint32_t format);
 
-	FrameBuffer& withRenderBufferDepthMultisampled(int multisampledCount, uint32_t depthFormat);
+	FrameBuffer& withRenderBufferDepthMultisampled(int multisampledCount, uint32_t format);
 
 	FrameBuffer& withRenderBufferDepthStencil();
 
