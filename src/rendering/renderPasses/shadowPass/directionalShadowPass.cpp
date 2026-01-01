@@ -28,7 +28,7 @@ glm::mat4 DirectionalShadowPass::lightSpaceMatrix() const {
 }
 
 void DirectionalShadowPass::render(const RenderContext& ctx, const glm::vec4& direction) {
-	const glm::vec3 lightPos = -glm::vec3(direction) * 5.0f;
+	const glm::vec3 lightPos = -glm::vec3(direction) * ctx.shadow.directional.height;
 	const glm::mat4 lightProjection = glm::ortho(
 		ctx.shadow.directional.left,
 		ctx.shadow.directional.right,

@@ -188,6 +188,7 @@ void RenderPipeline::configure(const Camera& camera) {
 	mRenderCtx->shadow.width = SHADOWMAP_WIDTH;
 	mRenderCtx->shadow.height = SHADOWMAP_HEIGHT;
 	mRenderCtx->shadow.directional.maxLights = MAX_DIRECTIONAL_LIGHTS;
+	mRenderCtx->shadow.directional.height = SHADOW_DIRECTIONAL_HEIGHT;
 	mRenderCtx->shadow.directional.nearPlane = SHADOW_DIRECTIONAL_NEAR;
 	mRenderCtx->shadow.directional.farPlane = SHADOW_DIRECTIONAL_FAR;
 	mRenderCtx->shadow.directional.left = SHADOW_DIRECTIONAL_LEFT;

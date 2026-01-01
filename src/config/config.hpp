@@ -35,6 +35,7 @@ constexpr auto LIGHT_UBO_BLOCK_NAME = "LightBlock";
 constexpr int SHADOWMAP_WIDTH{1024};
 constexpr int SHADOWMAP_HEIGHT{1024};
 constexpr int SHADOWMAP_TEXTURE_SLOT{4};
+constexpr float SHADOW_DIRECTIONAL_HEIGHT{5.0};
 constexpr float SHADOW_DIRECTIONAL_NEAR{1.0f};
 constexpr float SHADOW_DIRECTIONAL_FAR{7.5f};
 constexpr float SHADOW_DIRECTIONAL_LEFT{-10.0f};

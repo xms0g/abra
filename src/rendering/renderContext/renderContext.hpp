@@ -75,7 +75,7 @@ struct RenderContext {
 
 		struct  {
 			int maxLights;
-			float nearPlane, farPlane, left, right, bottom, top;
+			float height, nearPlane, farPlane, left, right, bottom, top;
 		} directional;
 
 		struct {
