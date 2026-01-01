@@ -109,15 +109,15 @@ void RenderPipeline::configure(const Camera& camera) {
 # ifdef HDR
 	mSceneBuffer->withTextureFP(true, 16)
 # else
-	mSceneBuffer->withTexture()
+			mSceneBuffer->withTexture()
 # endif
-			.withRenderBufferDepth(24)
+			.withTextureDepth(24, false)
 #endif
 			.checkStatus();
 	mSceneBuffer->unbind();
 
 	// Create camera buffer
-	mCameraUBO = std::make_unique<UniformBuffer>(2 * sizeof(glm::mat4) + sizeof(glm::vec4),
+	mCameraUBO = std::make_unique<UniformBuffer>(3 * sizeof(glm::mat4) + sizeof(glm::vec4),
 	                                             mRenderCtx->camera.ubo.binding);
 	// Create render passes
 	mShadowPass = std::make_shared<ShadowPass>();
@@ -208,8 +208,13 @@ void RenderPipeline::configure(const Camera& camera) {
 		static_cast<float>(mRenderCtx->screen.width) / static_cast<float>(mRenderCtx->screen.height),
 		ZNEAR, ZFAR);
 
+	const glm::mat4 invProjectionMat = glm::inverse(projectionMat);
+
 	mRenderCtx->camera.ubo.self->bind();
-	mRenderCtx->camera.ubo.self->setData(glm::value_ptr(projectionMat), sizeof(glm::mat4), sizeof(glm::mat4));
+	mRenderCtx->camera.ubo.self->setData(glm::value_ptr(projectionMat), sizeof(glm::mat4),
+	                                     sizeof(glm::mat4) + sizeof(glm::vec4));
+	mRenderCtx->camera.ubo.self->setData(glm::value_ptr(invProjectionMat), sizeof(glm::mat4),
+	                                     2 * sizeof(glm::mat4) + sizeof(glm::vec4));
 	mRenderCtx->camera.ubo.self->unbind();
 
 	// Configure render passes
@@ -267,7 +272,7 @@ void RenderPipeline::refreshCameraData() const {
 	auto viewPos = glm::vec4(mRenderCtx->camera.self->position(), 1.0);
 	mRenderCtx->camera.ubo.self->bind();
 	mRenderCtx->camera.ubo.self->setData(glm::value_ptr(view), sizeof(glm::mat4), 0);
-	mRenderCtx->camera.ubo.self->setData(glm::value_ptr(viewPos), sizeof(glm::vec4), 2 * sizeof(glm::mat4));
+	mRenderCtx->camera.ubo.self->setData(glm::value_ptr(viewPos), sizeof(glm::vec4), sizeof(glm::mat4));
 	mRenderCtx->camera.ubo.self->unbind();
 }
 

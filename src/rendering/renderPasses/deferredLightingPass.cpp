@@ -36,7 +36,7 @@ void DeferredLightingPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
 	mShader->activate();
 
-	for (int i = 0; i < ctx.gBuffer->textures().size(); i++) {
+	for (int i = 0; i < ctx.gBuffer->textures().size() - 1; i++) {
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, ctx.gBuffer->textures()[i]);
 	}

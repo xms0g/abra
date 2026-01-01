@@ -1,6 +1,7 @@
 layout (std140) uniform CameraBlock
 {
     mat4 view;
-    mat4 projection;
     vec4 viewPos;
+    mat4 projection;
+    mat4 inverseProjection;
 };

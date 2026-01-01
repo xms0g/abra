@@ -27,7 +27,7 @@ void DeferredGeometryPass::configure(const RenderContext& ctx) {
 			.withTexture()
 #endif
 			.configureAttachments()
-			.withRenderBufferDepth(24)
+			.withTextureDepth(24, false)
 			.checkStatus();
 
 	mShader = std::make_unique<Shader>("deferred/gbuffer.vert", "deferred/gbuffer.frag");

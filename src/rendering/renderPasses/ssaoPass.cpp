@@ -29,7 +29,7 @@ void SSAOPass::configure(const RenderContext& ctx) {
 
 	mShader = std::make_unique<Shader>("models/quad.vert", "ssao.frag");
 	mShader->activate();
-	mShader->setInt("gPosition", 0);
+	mShader->setInt("gDepthMap", 0);
 	mShader->setInt("gNormal", 1);
 	mShader->setInt("texNoise", 2);
 	mShader->setInt("kernelSize", ctx.ssao.kernelSize);
@@ -72,7 +72,7 @@ void SSAOPass::ssao(const RenderContext& ctx) const {
 	mShader->activate();
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, ctx.gBuffer->textures()[0]);
+	glBindTexture(GL_TEXTURE_2D, ctx.gBuffer->textures()[3]);
 
 	glActiveTexture(GL_TEXTURE0 + 1);
 	glBindTexture(GL_TEXTURE_2D, ctx.gBuffer->textures()[1]);
