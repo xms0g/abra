@@ -27,6 +27,26 @@ Camera::Camera(const float posX, const float posY, const float posZ, const float
 	update();
 }
 
+glm::mat4 Camera::viewMatrix() const {
+	return glm::lookAt(mPosition, mPosition + mFront, mUp);
+}
+
+float Camera::zoom() const {
+	return mZoom;
+}
+
+const glm::vec3& Camera::position() const {
+	return mPosition;
+}
+
+const glm::vec3& Camera::front() const {
+	return mFront;
+}
+
+const math::Frustum& Camera::frustum() const {
+	return mFrustum;
+}
+
 void Camera::update() {
 	// calculate the new Front vector
 	glm::vec3 _front;

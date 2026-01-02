@@ -1,8 +1,8 @@
 #pragma once
 #include "glm/glm.hpp"
 #include "glm/ext/matrix_transform.hpp"
-#include "../config/config.hpp"
 #include "../math/frustum.hpp"
+#include "../config/config.hpp"
 
 enum CameraMovement {
     FORWARD,
@@ -18,17 +18,17 @@ public:
 
     Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
 
-    void update();
+	[[nodiscard]] glm::mat4 viewMatrix() const;
 
-	[[nodiscard]] const math::Frustum& frustum() const { return mFrustum; }
+    [[nodiscard]] float zoom() const;
 
-    [[nodiscard]] glm::mat4 viewMatrix() const { return glm::lookAt(mPosition, mPosition + mFront, mUp); }
+    [[nodiscard]] const glm::vec3& position() const;
 
-    [[nodiscard]] float zoom() const { return mZoom; }
+    [[nodiscard]] const glm::vec3& front() const;
 
-    [[nodiscard]] const glm::vec3& position() const { return mPosition; }
+	[[nodiscard]] const math::Frustum& frustum() const;
 
-    [[nodiscard]] const glm::vec3& front() const { return mFront; }
+	void update();
 
     void processKeyboard(CameraMovement direction, float deltaTime);
 

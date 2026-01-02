@@ -166,6 +166,7 @@ void RenderPipeline::configure(const Camera& camera) {
 
 	mRenderCtx->sceneBuffer = mSceneBuffer.get();
 	mRenderCtx->camera.self = &camera;
+	mRenderCtx->camera.frustum = &camera.frustum();
 	mRenderCtx->camera.ubo.self = mCameraUBO.get();
 	mRenderCtx->camera.ubo.blockName = CAMERA_UBO_BLOCK_NAME;
 	mRenderCtx->ssao.ubo.self = mSSAOPass->ubo();
@@ -267,7 +268,6 @@ void RenderPipeline::render() {
 
 void RenderPipeline::refreshCameraData() const {
 	mRenderCtx->camera.skyView = glm::mat4(glm::mat3(mRenderCtx->camera.self->viewMatrix()));
-	mRenderCtx->camera.frustum = &mRenderCtx->camera.self->frustum();
 
 	auto view = mRenderCtx->camera.self->viewMatrix();
 	auto viewPos = glm::vec4(mRenderCtx->camera.self->position(), 1.0);

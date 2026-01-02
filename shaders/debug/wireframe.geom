@@ -25,7 +25,7 @@ void emitEdge(int i0, int i1, vec3 color) {
 
 void main() {
     // color edges uniformly (or choose per-edge)
-    vec3 color = vec3(1.0, 1.0, 0.0); // orange wireframe
+    vec3 color = vec3(0.0, 1.0, 0.0); // orange wireframe
 
     // edges: 0-1, 1-2, 2-0
     emitEdge(0, 1, color);
