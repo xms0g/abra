@@ -50,9 +50,9 @@ constexpr float SHADOW_PERSPECTIVE_FAR{25.0f};
 constexpr uint32_t SHADOW_UBO_BINDING{2};
 constexpr auto SHADOW_UBO_BLOCK_NAME = "ShadowBlock";
 // SSAO
-constexpr int SSAO_KERNEL_SIZE{16};
+constexpr int SSAO_KERNEL_SIZE{32};
 constexpr int SSAO_NOISE_TEXTURE_SIZE{4};
-constexpr float SSAO_RADIUS{1.5f};
+constexpr float SSAO_RADIUS{0.5f};
 constexpr float SSAO_BIAS{0.025f};
 constexpr uint32_t SSAO_UBO_BINDING{3};
 constexpr auto SSAO_UBO_BLOCK_NAME = "SSAOBlock";
