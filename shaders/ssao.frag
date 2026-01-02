@@ -63,6 +63,7 @@ void main() {
 
         // get sample depth
         float sampleDepth = viewPosFromDepth(offset.xy).z;// get depth value of kernel sample
+
         // range check & accumulate
         float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPosView.z - sampleDepth));
         occlusion += (sampleDepth >= samplePos.z + bias ? 1.0 : 0.0) * rangeCheck;
