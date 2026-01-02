@@ -65,7 +65,6 @@ void SSAOPass::execute(const RenderContext& ctx) {
 }
 
 void SSAOPass::ssao(const RenderContext& ctx) const {
-	//IMPORTANT: SSAO internally converts G-buffer data to view space. G-buffer remains world-space by design.
 	mFBO->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
