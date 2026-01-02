@@ -27,6 +27,7 @@ struct RenderContext {
 		int noiseTextureSize;
 		float radius;
 		float bias;
+		float intensity;
 
 		struct {
 			const UniformBuffer* self;

@@ -176,6 +176,7 @@ void RenderPipeline::configure(const Camera& camera) {
 	mRenderCtx->ssao.noiseTextureSize = SSAO_NOISE_TEXTURE_SIZE;
 	mRenderCtx->ssao.radius = SSAO_RADIUS;
 	mRenderCtx->ssao.bias = SSAO_BIAS;
+	mRenderCtx->ssao.intensity = SSAO_INTENSITY;
 	mRenderCtx->light.ubo.self = &mLightSystem->ubo();
 	mRenderCtx->light.ubo.blockName = LIGHT_UBO_BLOCK_NAME;
 	mRenderCtx->light.dirLights = &mLightSystem->dirLights();

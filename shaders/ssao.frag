@@ -13,6 +13,7 @@ uniform sampler2D texNoise;
 uniform int kernelSize;
 uniform float radius;
 uniform float bias;
+uniform float intensity;
 
 uniform vec2 resolution;
 
@@ -62,13 +63,13 @@ void main() {
 
         // get sample depth
         float sampleDepth = viewPosFromDepth(offset.xy).z;// get depth value of kernel sample
-
         // range check & accumulate
         float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPosView.z - sampleDepth));
         occlusion += (sampleDepth >= samplePos.z + bias ? 1.0 : 0.0) * rangeCheck;
     }
 
     occlusion = 1.0 - (occlusion / kernelSize);
+    occlusion = pow(occlusion, intensity);
 
     fragColor = vec4(vec3(occlusion), 1.0);
 }

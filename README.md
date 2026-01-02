@@ -46,6 +46,7 @@ Itâ€™s designed for clarity, experimentation, and real-time graphics research â€
 ![Screenshot2](assets/screenshot2.png)
 ![Screenshot1](assets/screenshot1.png)
 ![Screenshot3](assets/screenshot3.png)
+![Screenshot4](assets/screenshot4.png)
 ## Controls
 | Key  | Action                   |
 |------|--------------------------|

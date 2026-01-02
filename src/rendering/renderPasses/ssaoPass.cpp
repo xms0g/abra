@@ -35,6 +35,7 @@ void SSAOPass::configure(const RenderContext& ctx) {
 	mShader->setInt("kernelSize", ctx.ssao.kernelSize);
 	mShader->setFloat("radius", ctx.ssao.radius);
 	mShader->setFloat("bias", ctx.ssao.bias);
+	mShader->setFloat("intensity", ctx.ssao.intensity);
 	mShader->setVec2("resolution", glm::vec2(ctx.screen.width, ctx.screen.height));
 
 	mBlurShader = std::make_unique<Shader>("models/quad.vert", "ssaoBlur.frag");
