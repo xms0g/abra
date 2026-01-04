@@ -15,7 +15,7 @@ const FrameBuffer* SSAOPass::blurFBO() const {
 }
 
 const UniformBuffer* SSAOPass::ubo() const {
-	return mUbo.get();
+	return mUBO.get();
 }
 
 void SSAOPass::configure(const RenderContext& ctx) {
@@ -51,12 +51,12 @@ void SSAOPass::configure(const RenderContext& ctx) {
 
 	uint32_t uboSize = ctx.ssao.kernelSize * sizeof(glm::vec4);
 
-	mUbo = std::make_unique<UniformBuffer>(uboSize, ctx.ssao.ubo.binding);
-	mUbo->bind();
-	mUbo->setData(mKernel.data(), uboSize, 0);
-	mUbo->unbind();
+	mUBO = std::make_unique<UniformBuffer>(uboSize, ctx.ssao.ubo.binding);
+	mUBO->bind();
+	mUBO->setData(mKernel.data(), uboSize, 0);
+	mUBO->unbind();
 
-	mUbo->configure(mShader->ID(), ctx.ssao.ubo.binding, ctx.ssao.ubo.blockName);
+	mUBO->configure(mShader->ID(), ctx.ssao.ubo.binding, ctx.ssao.ubo.blockName);
 	ctx.camera.ubo.self->configure(mShader->ID(), ctx.camera.ubo.binding, ctx.camera.ubo.blockName);
 }
 

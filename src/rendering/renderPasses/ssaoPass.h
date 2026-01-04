@@ -35,7 +35,7 @@ private:
 	std::unique_ptr<FrameBuffer> mBlurFBO;
 	std::unique_ptr<Shader> mShader;
 	std::unique_ptr<Shader> mBlurShader;
-	std::unique_ptr<UniformBuffer> mUbo;
+	std::unique_ptr<UniformBuffer> mUBO;
 
 	std::vector<glm::vec4> mKernel;
 	std::vector<float> mNoise;
