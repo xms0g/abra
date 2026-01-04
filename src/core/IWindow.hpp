@@ -13,7 +13,7 @@ public:
         return mWindow;
     }
 
-    void clear(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 0.0f) {
+    void clear(const float r = 0.0f, const float g = 0.0f, const float b = 0.0f, const float a = 0.0f) {
         clearImpl(r, g, b, a);
     }
 
