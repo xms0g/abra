@@ -207,7 +207,7 @@ void RenderPipeline::configure(const Camera& camera) {
 
 	// Set camera projection matrix
 	const glm::mat4 projectionMat = glm::perspective(
-		glm::radians(mRenderCtx->camera.self->zoom()),
+		glm::radians(ZOOM),
 		static_cast<float>(mRenderCtx->screen.width) / static_cast<float>(mRenderCtx->screen.height),
 		ZNEAR, ZFAR);
 

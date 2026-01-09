@@ -4,8 +4,7 @@
 Camera::Camera(const glm::vec3& position, const glm::vec3& up, const float yaw, const float pitch) : mFront(glm::vec3(
 		0.0f, 0.0f, -1.0f)),
 	mMovementSpeed(SPEED),
-	mMouseSensitivity(SENSITIVITY),
-	mZoom(ZOOM) {
+	mMouseSensitivity(SENSITIVITY) {
 	mPosition = position;
 	mWorldUp = up;
 	mYaw = yaw;
@@ -17,8 +16,7 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& up, const float yaw, 
 Camera::Camera(const float posX, const float posY, const float posZ, const float upX, const float upY, const float upZ, const float yaw,
                const float pitch) : mFront(glm::vec3(0.0f, 0.0f, -1.0f)),
                               mMovementSpeed(SPEED),
-                              mMouseSensitivity(SENSITIVITY),
-                              mZoom(ZOOM) {
+                              mMouseSensitivity(SENSITIVITY) {
 	mPosition = glm::vec3(posX, posY, posZ);
 	mWorldUp = glm::vec3(upX, upY, upZ);
 	mYaw = yaw;
@@ -29,10 +27,6 @@ Camera::Camera(const float posX, const float posY, const float posZ, const float
 
 glm::mat4 Camera::viewMatrix() const {
 	return glm::lookAt(mPosition, mPosition + mFront, mUp);
-}
-
-float Camera::zoom() const {
-	return mZoom;
 }
 
 const glm::vec3& Camera::position() const {
