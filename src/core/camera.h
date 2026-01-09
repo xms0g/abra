@@ -52,5 +52,7 @@ private:
     // camera options
     float mMovementSpeed;
     float mMouseSensitivity;
-    float mZoom;
+
+	const float halfVSide = ZFAR * tanf(glm::radians(ZOOM) * 0.5f);
+	const float halfHSide = halfVSide * (static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT));
 };

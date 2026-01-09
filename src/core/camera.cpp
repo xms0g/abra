@@ -88,17 +88,7 @@ void Camera::processMouseMovement(float xoffset, float yoffset) {
 		mPitch = -89.0f;
 }
 
-void Camera::processMouseScroll(float yoffset) {
-	mZoom -= yoffset;
-	if (mZoom < 1.0f)
-		mZoom = 1.0f;
-	if (mZoom > 45.0f)
-		mZoom = 45.0f;
-}
-
 void Camera::generateFrustum() {
-	const float halfVSide = ZFAR * tanf(glm::radians(mZoom) * 0.5f);
-	const float halfHSide = halfVSide * (static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT));
 	const glm::vec3 frontMultFar = ZFAR * mFront;
 
 	mFrustum.nearFace = {mPosition + ZNEAR * mFront, mFront};
