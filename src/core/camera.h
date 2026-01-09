@@ -32,8 +32,6 @@ public:
 
     void processMouseMovement(float xoffset, float yoffset);
 
-    void processMouseScroll(float yoffset);
-
 private:
 	void generateFrustum();
 
