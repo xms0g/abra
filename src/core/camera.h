@@ -20,8 +20,6 @@ public:
 
 	[[nodiscard]] glm::mat4 viewMatrix() const;
 
-    [[nodiscard]] float zoom() const;
-
     [[nodiscard]] const glm::vec3& position() const;
 
     [[nodiscard]] const glm::vec3& front() const;
