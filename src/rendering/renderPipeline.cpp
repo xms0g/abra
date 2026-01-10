@@ -109,7 +109,7 @@ void RenderPipeline::configure(const Camera& camera) {
 # ifdef HDR
 	mSceneBuffer->withTextureFP(16, true)
 # else
-			mSceneBuffer->withTexture()
+	mSceneBuffer->withTexture()
 # endif
 			.withTextureDepth(24, false)
 #endif
@@ -336,7 +336,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			matb.shader = blend.get();
 		}
 
-		RenderGroup group{eData, matb};
+		const RenderGroup group{eData, matb};
 
 		if (entity.hasComponent<DebugComponent>()) {
 			mRenderQueue.debugGroups.push_back(group);
@@ -374,7 +374,8 @@ void RenderPipeline::sortEntities() {
 				if (transparent)
 					return da > db;
 				return da < db;
-			});
+			}
+		);
 	};
 
 	// Sort opaque objects front to back
