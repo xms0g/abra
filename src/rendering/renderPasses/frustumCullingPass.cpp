@@ -45,4 +45,5 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 	cullItems(ctx.renderQueue->blendGroups, ctx.renderQueue->blendObjects);
 	cullItems(ctx.renderQueue->shadowGroups, ctx.renderQueue->shadowingObjects);
 	cullItems(ctx.renderQueue->debugGroups, ctx.renderQueue->dbgObjects);
+	cullItems(ctx.renderQueue->pbrGroups, ctx.renderQueue->pbrObjects);
 }

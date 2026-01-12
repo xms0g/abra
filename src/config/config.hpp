@@ -54,7 +54,7 @@ constexpr int SSAO_KERNEL_SIZE{32};
 constexpr int SSAO_NOISE_TEXTURE_SIZE{4};
 constexpr float SSAO_RADIUS{0.5f};
 constexpr float SSAO_BIAS{0.025f};
-constexpr float SSAO_INTENSITY{6.0f};
+constexpr float SSAO_INTENSITY{3.0f};
 constexpr uint32_t SSAO_UBO_BINDING{3};
 constexpr auto SSAO_UBO_BLOCK_NAME = "SSAOBlock";
 

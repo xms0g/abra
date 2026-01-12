@@ -120,7 +120,7 @@ Models::Cube::Cube(glm::vec3 color,
 	if (diffuseTexture) {
 		textures.emplace_back(
 			texture::load(fs::path(ASSET_DIR + diffuseTexture).c_str(), 1),
-			DIFFUSE,
+			ALBEDO,
 			"texture_diffuse",
 			diffuseTexture
 		);

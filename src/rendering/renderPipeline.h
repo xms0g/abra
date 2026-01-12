@@ -46,6 +46,7 @@ private:
 	std::unique_ptr<Shader> cutout;
 	std::unique_ptr<Shader> blend;
 	std::unique_ptr<Shader> unlit;
+	std::unique_ptr<Shader> pbr;
 	std::unique_ptr<Shader> instancedOpaque;
 	std::unique_ptr<Shader> instancedCutout;
 	std::unique_ptr<Shader> instancedBlend;

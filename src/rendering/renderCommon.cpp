@@ -61,7 +61,7 @@ void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shad
 	for (int i = 0; i < textures.size(); i++) {
 		glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
 
-		if (textures[i].type == DIFFUSE) {
+		if (textures[i].type == ALBEDO) {
 			hasDiffuseMap = true;
 		}
 		if (textures[i].type == SPECULAR) {

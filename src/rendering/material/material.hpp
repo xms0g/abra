@@ -9,7 +9,8 @@ enum MaterialFlag: uint32_t {
 	CUTOUT = 1 << 2,
 	CASTSHADOW = 1 << 3,
 	TWOSIDED = 1 << 4,
-	UNLIT = 1 << 5
+	UNLIT = 1 << 5,
+	PBR = 1 << 6
 };
 
 struct Texture;

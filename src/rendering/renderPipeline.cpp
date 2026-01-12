@@ -17,6 +17,7 @@
 #include "renderPasses/deferredLightingPass.h"
 #include "renderPasses/ssaoPass.h"
 #include "renderPasses/debugPass.h"
+#include "renderPasses/pbrPass.h"
 #include "renderPasses/forwardOpaquePass.h"
 #include "renderPasses/blendInstancedPass.h"
 #include "renderPasses/blendPass.h"
@@ -71,6 +72,7 @@ RenderPipeline::RenderPipeline(Registry* registry) {
 	cutout = std::make_unique<Shader>("object.vert", "cutout.frag");
 	blend = std::make_unique<Shader>("object.vert", "blend.frag");
 	unlit = std::make_unique<Shader>("unlit.vert", "unlit.frag");
+	pbr = std::make_unique<Shader>("pbr.vert", "pbr.frag");
 	instancedOpaque = std::make_unique<Shader>("instanced.vert", "opaque.frag");
 	instancedCutout = std::make_unique<Shader>("instanced.vert", "cutout.frag");
 	instancedBlend = std::make_unique<Shader>("instanced.vert", "blend.frag");
@@ -135,6 +137,10 @@ void RenderPipeline::configure(const Camera& camera) {
 		mRenderPasses.push_back(mDeferredGeometryPass);
 		mRenderPasses.push_back(mSSAOPass);
 		mRenderPasses.push_back(mDeferredLightingPass);
+	}
+
+	if (!mRenderQueue.pbrGroups.empty()) {
+		mRenderPasses.push_back(std::make_shared<PBRPass>());
 	}
 
 	if (!mRenderQueue.forwardOpaqueGroups.empty()) {
@@ -231,9 +237,10 @@ void RenderPipeline::configure(const Camera& camera) {
 	}
 
 	// Configure shaders
-	const Shader* shaders[8] = {
-		opaque.get(), cutout.get(), blend.get(), unlit.get(), instancedOpaque.get(), instancedCutout.get(),
-		instancedBlend.get(), skybox.get()
+	const Shader* shaders[9] = {
+		opaque.get(), cutout.get(), blend.get(),
+		unlit.get(), pbr.get(), instancedOpaque.get(),
+		instancedCutout.get(), instancedBlend.get(), skybox.get()
 	};
 
 	for (const auto& shader: shaders) {
@@ -327,6 +334,8 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		if (material.flag & OPAQUE) {
 			if (material.flag & UNLIT) {
 				matb.shader = unlit.get();
+			} else if (material.flag & PBR) {
+				matb.shader = pbr.get();
 			} else {
 				matb.shader = opaque.get();
 			}
@@ -347,10 +356,14 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		}
 
 		if (material.flag & OPAQUE) {
-			if (matc.flag & FORWARD_PASS) {
-				mRenderQueue.forwardOpaqueGroups.push_back(group);
+			if (material.flag & PBR) {
+				mRenderQueue.pbrGroups.push_back(group);
 			} else {
-				mRenderQueue.deferredGroups.push_back(group);
+				if (matc.flag & FORWARD_PASS) {
+					mRenderQueue.forwardOpaqueGroups.push_back(group);
+				} else {
+					mRenderQueue.deferredGroups.push_back(group);
+				}
 			}
 		} else if (material.flag & CUTOUT) {
 			mRenderQueue.forwardOpaqueGroups.push_back(group);

@@ -3,10 +3,14 @@
 #include <string>
 
 enum TextureType {
-	DIFFUSE = 1,
+	ALBEDO = 1,
 	SPECULAR = 2,
+	EMISSION = 4,
 	HEIGHT = 5,
-	NORMAL = 6
+	NORMAL = 6,
+	METALNESS = 15,
+	ROUGHNESS = 16,
+	AO = 17
 };
 
 struct Texture {
