@@ -51,7 +51,7 @@ Itâ€™s designed for clarity, experimentation, and real-time graphics research â€
 | WASD | Move                     |
 | RMB  | enable/disable Free Look |
 ## Roadmap
-- [ ] PBR materials
+- [ ] IBL
 - [ ] Cascaded shadow maps
 ## License
 This project is licensed under the BSD 3-Clause License. See the LICENSE file for details.
