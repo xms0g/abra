@@ -9,7 +9,7 @@ struct MaterialComponent {
 
 	float shininess;
 	float heightScale;
-	uint32_t flag;
+	uint32_t renderFlag;
 
 	MaterialComponent() = default;
 
@@ -17,6 +17,6 @@ struct MaterialComponent {
 	                           const float s = 32.0f,
 	                           const float h = 1.0f,
 	                           const uint32_t f = 1 << 1)
-		: materials(mat), shininess(s), heightScale(h), flag(f) {
+		: materials(mat), shininess(s), heightScale(h), renderFlag(f) {
 	}
 };

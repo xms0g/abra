@@ -302,7 +302,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		const auto& material = matc.materials->at(matID);
 		MaterialBatch matb{&material, nullptr, &meshes};
 
-		if (matc.flag & INSTANCED_PASS) {
+		if (matc.renderFlag & INSTANCED_PASS) {
 			// Set shader
 			if (material.flag & OPAQUE) {
 				matb.shader = instancedOpaque.get();
@@ -351,7 +351,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		}
 
 		if (material.flag & OPAQUE) {
-			if (material.flag & PBR || matc.flag & FORWARD_PASS) {
+			if (material.flag & PBR || matc.renderFlag & FORWARD_PASS) {
 				mRenderQueue.forwardOpaqueGroups.push_back(group);
 			} else {
 				mRenderQueue.deferredGroups.push_back(group);

@@ -230,7 +230,7 @@ int main() {
 			glm::vec3(1.0f));
 
 		sphere.addComponent<MeshComponent>(sphereModel.meshes());
-		sphere.addComponent<MaterialComponent>(sphereModel.material(), 32.0f, 1.0f);
+		sphere.addComponent<MaterialComponent>(sphereModel.material());
 
 		sphere.addComponent<DebugComponent>();
 
