@@ -23,9 +23,6 @@ It’s designed for clarity, experimentation, and real-time graphics research �
 - **Advanced Materials**
   - Normal Mapping
   - Parallax Mapping
-- **Rendering Infrastructure**
-  - Framebuffers
-  - Uniform Buffers
 - **Anti-Aliasing**
   - MSAA (only avaliable in the forward pipeline) 
   - FXAA 
@@ -40,6 +37,7 @@ It’s designed for clarity, experimentation, and real-time graphics research �
   - Cube – perfect for testing transforms, lighting, and shadow maps
   - Cubemap – used for skybox rendering
   - Plane
+  - Sphere
   - Screen Quad – for post-processing, deferred pipeline, and blitting
 ## Screenshots
 ![Screenshot](assets/screenshot.png)

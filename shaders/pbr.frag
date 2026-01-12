@@ -6,7 +6,6 @@ in VS_OUT
     vec3 Normal;
 } fs_in;
 
-
 #include "ub/camera.glsl"
 #include "common/brdf.glsl"
 
