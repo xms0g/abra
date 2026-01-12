@@ -38,7 +38,7 @@ float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
     return ggx1 * ggx2;
 }
 
-vec3 pbr(vec3 pos, vec3 color, vec3 albedo, vec3 N, float metallic, float roughness, float ao, vec3 V, vec3 F0) {
+vec3 brdf(vec3 pos, vec3 color, vec3 albedo, vec3 N, float metallic, float roughness, float ao, vec3 V, vec3 F0) {
     vec3 L = normalize(pos - WorldPos);
     vec3 H = normalize(V + L);
     float distance = length(pos - WorldPos);
@@ -47,10 +47,10 @@ vec3 pbr(vec3 pos, vec3 color, vec3 albedo, vec3 N, float metallic, float roughn
 
     // Cook-Torrance BRDF
     float NDF = distributionGGX(N, H, roughness);
-    float G   = geometrySmith(N, V, L, roughness);
-    vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
+    float G = geometrySmith(N, V, L, roughness);
+    vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
-    vec3 numerator    = NDF * G * F;
+    vec3 numerator = NDF * G * F;
     float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
     vec3 specular = numerator / denominator;
 
@@ -68,7 +68,6 @@ vec3 pbr(vec3 pos, vec3 color, vec3 albedo, vec3 N, float metallic, float roughn
     // scale light by NdotL
     float NdotL = max(dot(N, L), 0.0);
 
-    // add to outgoing radiance Lo
     return (kD * albedo / PI + specular) * radiance * NdotL;
 }
 
@@ -78,13 +77,13 @@ vec3 calculateLights(vec3 albedo, vec3 N, float metallic, float roughness, float
 
     vec3 Lo = vec3(0.0);
     for (int i = 0; i < lightCount.x; i++) {
-        Lo += pbr((-dirLights[i].direction * 5.0).xyz, dirLights[i].diffuse.rgb, albedo, N, metallic, roughness, ao, V, F0);
+        Lo += brdf((-dirLights[i].direction * 5.0).xyz, dirLights[i].diffuse.rgb, albedo, N, metallic, roughness, ao, V, F0);
     }
     for (int i = 0; i < lightCount.y; i++) {
-        Lo += pbr(pointLights[i].position.xyz, pointLights[i].diffuse.rgb, albedo, N, metallic, roughness, ao, V, F0);
+        Lo += brdf(pointLights[i].position.xyz, pointLights[i].diffuse.rgb, albedo, N, metallic, roughness, ao, V, F0);
     }
     for (int i = 0; i < lightCount.z; i++) {
-        Lo += pbr(spotLights[i].position.xyz, spotLights[i].diffuse.rgb, albedo, N, metallic, roughness, ao, V, F0);
+        Lo += brdf(spotLights[i].position.xyz, spotLights[i].diffuse.rgb, albedo, N, metallic, roughness, ao, V, F0);
     }
 
     vec3 ambient = vec3(0.03) * albedo * ao;
