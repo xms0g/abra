@@ -1,9 +1,9 @@
 #include "frustumCullingPass.h"
+#include "../mesh/mesh.h"
 #include "../renderContext/renderQueue.hpp"
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderGroup.hpp"
 #include "../renderContext/renderableObject.hpp"
-#include "../mesh/mesh.h"
 #include "../../ECS/registry.h"
 #include "../../ECS/components/transform.hpp"
 #include "../../math/boundingVolume.h"
@@ -45,5 +45,4 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 	cullItems(ctx.renderQueue->blendGroups, ctx.renderQueue->blendObjects);
 	cullItems(ctx.renderQueue->shadowGroups, ctx.renderQueue->shadowingObjects);
 	cullItems(ctx.renderQueue->debugGroups, ctx.renderQueue->dbgObjects);
-	cullItems(ctx.renderQueue->pbrGroups, ctx.renderQueue->pbrObjects);
 }

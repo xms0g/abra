@@ -17,7 +17,6 @@
 #include "renderPasses/deferredLightingPass.h"
 #include "renderPasses/ssaoPass.h"
 #include "renderPasses/debugPass.h"
-#include "renderPasses/pbrPass.h"
 #include "renderPasses/forwardOpaquePass.h"
 #include "renderPasses/blendInstancedPass.h"
 #include "renderPasses/blendPass.h"
@@ -137,10 +136,6 @@ void RenderPipeline::configure(const Camera& camera) {
 		mRenderPasses.push_back(mDeferredGeometryPass);
 		mRenderPasses.push_back(mSSAOPass);
 		mRenderPasses.push_back(mDeferredLightingPass);
-	}
-
-	if (!mRenderQueue.pbrGroups.empty()) {
-		mRenderPasses.push_back(std::make_shared<PBRPass>());
 	}
 
 	if (!mRenderQueue.forwardOpaqueGroups.empty()) {
@@ -356,14 +351,10 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		}
 
 		if (material.flag & OPAQUE) {
-			if (material.flag & PBR) {
-				mRenderQueue.pbrGroups.push_back(group);
+			if (material.flag & PBR || matc.flag & FORWARD_PASS) {
+				mRenderQueue.forwardOpaqueGroups.push_back(group);
 			} else {
-				if (matc.flag & FORWARD_PASS) {
-					mRenderQueue.forwardOpaqueGroups.push_back(group);
-				} else {
-					mRenderQueue.deferredGroups.push_back(group);
-				}
+				mRenderQueue.deferredGroups.push_back(group);
 			}
 		} else if (material.flag & CUTOUT) {
 			mRenderQueue.forwardOpaqueGroups.push_back(group);
