@@ -22,6 +22,7 @@
 #include "rendering/models/cube.h"
 #include "rendering/models/cubemap.h"
 #include "rendering/models/plane.h"
+#include "rendering/models/sphere.h"
 #include "rendering/renderContext/renderFlags.hpp"
 
 #define VERSION_MAJOR 0
@@ -175,23 +176,23 @@ int main() {
 			std::make_shared<math::AABB>(
 				math::generateAABB(*ResourceManager::instance().getMeshes(helmet.id()))));
 
-		auto angel = registry.createEntity("Angel");
-		angel.addComponent<TransformComponent>(
-			glm::vec3(-5.2f, 0.0f, -1.0f),
-			glm::vec3(-90.0f, 0.0f, 0.0f),
-			glm::vec3(2.0f));
-
-		ResourceManager::instance().loadModel(angel.id(), "cemetery_angel/scene.gltf");
-
-		angel.addComponent<MeshComponent>(ResourceManager::instance().getMeshes(angel.id()));
-		angel.addComponent<MaterialComponent>(
-			ResourceManager::instance().getMaterial(angel.id()));
-
-		angel.addComponent<DebugComponent>();
-
-		angel.addComponent<BoundingVolumeComponent>(
-			std::make_shared<math::AABB>(
-				math::generateAABB(*ResourceManager::instance().getMeshes(angel.id()))));
+		// auto angel = registry.createEntity("Angel");
+		// angel.addComponent<TransformComponent>(
+		// 	glm::vec3(-5.2f, 0.0f, -1.0f),
+		// 	glm::vec3(-90.0f, 0.0f, 0.0f),
+		// 	glm::vec3(2.0f));
+		//
+		// ResourceManager::instance().loadModel(angel.id(), "cemetery_angel/scene.gltf");
+		//
+		// angel.addComponent<MeshComponent>(ResourceManager::instance().getMeshes(angel.id()));
+		// angel.addComponent<MaterialComponent>(
+		// 	ResourceManager::instance().getMaterial(angel.id()));
+		//
+		// angel.addComponent<DebugComponent>();
+		//
+		// angel.addComponent<BoundingVolumeComponent>(
+		// 	std::make_shared<math::AABB>(
+		// 		math::generateAABB(*ResourceManager::instance().getMeshes(angel.id()))));
 
 		// Sponza
 		auto sponza = registry.createEntity("Sponza");
@@ -213,6 +214,31 @@ int main() {
 				math::generateAABB(*ResourceManager::instance().getMeshes(sponza.id()))));
 
 		//
+		Models::Sphere sphereModel{
+			glm::vec3(0.0f, 0.0f, 0.0f),
+			false,
+			"textures/pbr/rusted_iron/albedo.png",
+			"textures/pbr/rusted_iron/normal.png",
+			"textures/pbr/rusted_iron/metallic.png",
+			"textures/pbr/rusted_iron/roughness.png",
+			"textures/pbr/rusted_iron/ao.png"
+		};
+		auto sphere = registry.createEntity("Sphere");
+		sphere.addComponent<TransformComponent>(
+			glm::vec3(0.0f, 3.6f, 0.0f),
+			glm::vec3(0.0),
+			glm::vec3(1.0f));
+
+		sphere.addComponent<MeshComponent>(sphereModel.meshes());
+		sphere.addComponent<MaterialComponent>(sphereModel.material(), 32.0f, 1.0f);
+
+		sphere.addComponent<DebugComponent>();
+
+		sphere.addComponent<BoundingVolumeComponent>(
+			std::make_shared<math::AABB>(
+				math::generateAABB(*sphereModel.meshes())));
+
+
 		auto dirLight = registry.createEntity("Directional Light");
 		dirLight.addComponent<DirectionalLightComponent>(
 			glm::vec4(-0.2f, -1.0f, -0.3f, 0.0f),
