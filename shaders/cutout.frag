@@ -4,14 +4,14 @@
 out vec4 fragColor;
 
 void main() {
-    float alpha = texture(material.texture_diffuse, fs_in.TexCoord).a;
+    float alpha = texture(material.texture_albedo, fs_in.TexCoord).a;
     if (alpha < material.alphaCutout) {
         discard;
     }
 
     vec2 texCoord = parallaxMapping(fs_in.TexCoord, fs_in.TangentViewDir, material.heightScale, material.hasHeightMap);
     vec3 normal = normalMapping(fs_in.TBN, texCoord, material.hasNormalMap);
-    vec3 diffuse = texture(material.texture_diffuse, texCoord).rgb;
+    vec3 diffuse = texture(material.texture_albedo, texCoord).rgb;
     float specular = material.hasSpecularMap ? texture(material.texture_specular, texCoord).r : 0.04;
     // Create a mask: 0.0 if no lights, 1.0 if at least one light
     bool hasLights = lightCount.x > 0 || lightCount.y > 0 || lightCount.z > 0;

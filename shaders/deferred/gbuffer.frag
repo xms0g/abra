@@ -22,7 +22,7 @@ void main() {
     // also store the per-fragment normals into the gbuffer
     gNormal = normalMapping(fs_in.TBN, texCoord, material.hasNormalMap);
     // and the diffuse per-fragment color
-    gAlbedoSpec.rgb = texture(material.texture_diffuse, texCoord).rgb;
+    gAlbedoSpec.rgb = texture(material.texture_albedo, texCoord).rgb;
     // store specular intensity in gAlbedoSpec's alpha component
     gAlbedoSpec.a = material.hasSpecularMap ? texture(material.texture_specular, texCoord).r : 0.0;
 }

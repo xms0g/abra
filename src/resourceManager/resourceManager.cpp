@@ -132,7 +132,7 @@ std::pair<uint32_t, Mesh> ResourceManager::processMesh(aiMesh* mesh, const aiSce
 	// normal: texture_normalN
 
 	// 1. diffuse maps
-	loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", mesh->mMaterialIndex);
+	loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_albedo", mesh->mMaterialIndex);
 	// 2. specular maps
 	loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular", mesh->mMaterialIndex);
 	// 3. normal maps
