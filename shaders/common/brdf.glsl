@@ -38,10 +38,10 @@ float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
     return ggx1 * ggx2;
 }
 
-vec3 brdf(vec3 pos, vec3 color, vec3 albedo, vec3 N, float metallic, float roughness, float ao, vec3 V, vec3 F0) {
-    vec3 L = normalize(pos - WorldPos);
+vec3 brdf(vec3 lightPos, vec3 worldPos, vec3 color, vec3 albedo, vec3 N, float metallic, float roughness, float ao, vec3 V, vec3 F0) {
+    vec3 L = normalize(lightPos - worldPos);
     vec3 H = normalize(V + L);
-    float distance = length(pos - WorldPos);
+    float distance = length(lightPos - worldPos);
     float attenuation = 1.0 / (distance * distance);
     vec3 radiance = color * attenuation;
 
@@ -71,19 +71,19 @@ vec3 brdf(vec3 pos, vec3 color, vec3 albedo, vec3 N, float metallic, float rough
     return (kD * albedo / PI + specular) * radiance * NdotL;
 }
 
-vec3 calculateLights(vec3 albedo, vec3 N, float metallic, float roughness, float ao, vec3 V) {
+vec3 calculateLights(vec3 albedo, vec3 N, float metallic, float roughness, float ao, vec3 V, vec3 worldPos) {
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo, metallic);
 
     vec3 Lo = vec3(0.0);
     for (int i = 0; i < lightCount.x; i++) {
-        Lo += brdf((-dirLights[i].direction * 5.0).xyz, dirLights[i].diffuse.rgb, albedo, N, metallic, roughness, ao, V, F0);
+        Lo += brdf((-dirLights[i].direction * 5.0).xyz, worldPos, dirLights[i].diffuse.rgb, albedo, N, metallic, roughness, ao, V, F0);
     }
     for (int i = 0; i < lightCount.y; i++) {
-        Lo += brdf(pointLights[i].position.xyz, pointLights[i].diffuse.rgb, albedo, N, metallic, roughness, ao, V, F0);
+        Lo += brdf(pointLights[i].position.xyz, worldPos, pointLights[i].diffuse.rgb, albedo, N, metallic, roughness, ao, V, F0);
     }
     for (int i = 0; i < lightCount.z; i++) {
-        Lo += brdf(spotLights[i].position.xyz, spotLights[i].diffuse.rgb, albedo, N, metallic, roughness, ao, V, F0);
+        Lo += brdf(spotLights[i].position.xyz, worldPos, spotLights[i].diffuse.rgb, albedo, N, metallic, roughness, ao, V, F0);
     }
 
     vec3 ambient = vec3(0.03) * albedo * ao;

@@ -9,15 +9,18 @@ layout (location = 2) in vec2 aTexCoord;
 uniform mat4 model;
 uniform mat3 normalMatrix;
 
-out vec2 TexCoord;
-out vec3 WorldPos;
-out vec3 Normal;
+out VS_OUT
+{
+    vec2 TexCoord;
+    vec3 WorldPos;
+    vec3 Normal;
+} vs_out;
 
 void main()
 {
-    TexCoord = aTexCoord;
-    WorldPos = vec3(model * vec4(aPos, 1.0));
-    Normal = normalMatrix * aNormal;
+    vs_out.TexCoord = aTexCoord;
+    vs_out.WorldPos = vec3(model * vec4(aPos, 1.0));
+    vs_out.Normal = normalMatrix * aNormal;
 
-    gl_Position =  projection * view * vec4(WorldPos, 1.0);
+    gl_Position =  projection * view * vec4(vs_out.WorldPos, 1.0);
 }
