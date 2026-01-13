@@ -20,7 +20,7 @@ void main() {
     gPosition = fs_in.FragPos;
     vec2 texCoord = parallaxMapping(fs_in.TexCoord, fs_in.TangentViewDir, material.heightScale, material.hasHeightMap);
     // also store the per-fragment normals into the gbuffer
-    gNormal = normalMapping(fs_in.TBN, texCoord, material.hasNormalMap);
+    gNormal = normal(fs_in.TBN, texCoord, material.hasNormalMap);
     // and the diffuse per-fragment color
     gAlbedoSpec.rgb = texture(material.texture_albedo, texCoord).rgb;
     // store specular intensity in gAlbedoSpec's alpha component
