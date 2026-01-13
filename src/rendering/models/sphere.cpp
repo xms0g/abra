@@ -73,6 +73,37 @@ Models::Sphere::Sphere(glm::vec3 color, bool unlit, const char* albedo, const ch
 		vertices.emplace_back(vertex);
 	}
 
+	for (uint32_t i = 0; i < indices.size(); i += 3) {
+		uint32_t i0 = indices[i];
+		uint32_t i1 = indices[i + 1];
+		uint32_t i2 = indices[i + 2];
+
+		glm::vec3 pos0 = vertices[i0].position;
+		glm::vec3 pos1 = vertices[i1].position;
+		glm::vec3 pos2 = vertices[i2].position;
+
+		glm::vec2 uv0 = vertices[i0].texcoord;
+		glm::vec2 uv1 = vertices[i1].texcoord;
+		glm::vec2 uv2 = vertices[i2].texcoord;
+
+		glm::vec3 edge1 = pos1 - pos0;
+		glm::vec3 edge2 = pos2 - pos0;
+		glm::vec2 deltaUV1 = uv1 - uv0;
+		glm::vec2 deltaUV2 = uv2 - uv0;
+
+		float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+		vertices[i0].tangent = vertices[i1].tangent = vertices[i2].tangent = glm::vec3(
+														  f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x),
+														  f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y),
+														  f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z));
+
+		vertices[i0].bitangent = vertices[i1].bitangent = vertices[i2].bitangent = glm::vec3(
+															  f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x),
+															  f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y),
+															  f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z));
+	}
+
 	mMeshes[0].emplace_back(vertices, indices);
 
 	std::vector<Texture> textures;
