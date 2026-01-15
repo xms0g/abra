@@ -170,7 +170,7 @@ void RenderPipeline::configure(const Camera& camera) {
 	mRenderCtx->camera.frustum = &camera.frustum();
 	mRenderCtx->camera.ubo.self = mCameraUBO.get();
 	mRenderCtx->camera.ubo.blockName = CAMERA_UBO_BLOCK_NAME;
-	mRenderCtx->ssao.ubo.self = mSSAOPass->ubo();
+	mRenderCtx->ssao.ubo.self = mSSAOPass ? mSSAOPass->ubo() : nullptr;
 	mRenderCtx->ssao.ubo.binding = SSAO_UBO_BINDING;
 	mRenderCtx->ssao.ubo.blockName = SSAO_UBO_BLOCK_NAME;
 	mRenderCtx->ssao.kernelSize = SSAO_KERNEL_SIZE;
@@ -329,11 +329,11 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		if (material.flag & OPAQUE) {
 			if (material.flag & UNLIT) {
 				matb.shader = unlit.get();
-			} else if (material.flag & PBR) {
-				matb.shader = pbr.get();
 			} else {
 				matb.shader = opaque.get();
 			}
+		} else if (material.flag & PBR) {
+			matb.shader = pbr.get();
 		} else if (material.flag & CUTOUT) {
 			matb.shader = cutout.get();
 		} else if (material.flag & BLEND) {
@@ -351,12 +351,12 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		}
 
 		if (material.flag & OPAQUE) {
-			if (material.flag & PBR || matc.renderFlag & FORWARD_PASS) {
+			if (matc.renderFlag & FORWARD_PASS) {
 				mRenderQueue.forwardOpaqueGroups.push_back(group);
 			} else {
 				mRenderQueue.deferredGroups.push_back(group);
 			}
-		} else if (material.flag & CUTOUT) {
+		} else if (material.flag & PBR || material.flag & CUTOUT) {
 			mRenderQueue.forwardOpaqueGroups.push_back(group);
 		} else if (material.flag & BLEND) {
 			mRenderQueue.blendGroups.push_back(group);

@@ -155,7 +155,6 @@ Models::Sphere::Sphere(glm::vec3 color, bool unlit, const char* albedo, const ch
 		flag |= CASTSHADOW;
 	}
 
-	flag |= OPAQUE;
 	flag |= PBR;
 	mMaterial[0] = {flag, color, 0.0f, textures};
 }

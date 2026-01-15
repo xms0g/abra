@@ -139,6 +139,11 @@ std::pair<uint32_t, Mesh> ResourceManager::processMesh(aiMesh* mesh, const aiSce
 	loadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal", mesh->mMaterialIndex);
 	// 4. height maps
 	loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_height", mesh->mMaterialIndex);
+	// PBR Materials
+	loadMaterialTextures(material, aiTextureType_METALNESS, "texture_metallic", mesh->mMaterialIndex);
+	loadMaterialTextures(material, aiTextureType_DIFFUSE_ROUGHNESS, "texture_roughness", mesh->mMaterialIndex);
+	loadMaterialTextures(material, aiTextureType_EMISSIVE, "texture_emissive", mesh->mMaterialIndex);
+	loadMaterialTextures(material, aiTextureType_AMBIENT_OCCLUSION, "texture_ao", mesh->mMaterialIndex);
 	// return a mesh object created from the extracted mesh data
 	return std::make_pair(mesh->mMaterialIndex, Mesh{vertices, indices});
 }
@@ -160,12 +165,18 @@ void ResourceManager::loadMaterialTextures(const aiMaterial* mat,
 			mMaterials[materialID].textures.emplace_back(texture::load(path.c_str(), flag), type, typeName, str.C_Str());
 		} else {
 			uint32_t flag{0};
-			float alphaCutoff{0.0f};
 
 			if (int twoSided{0}; mat->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
 				flag |= twoSided != 0 ? TWOSIDED : 0;
 			}
+
+			// if (float value{0.0f}; mat->Get(AI_MATKEY_METALLIC_FACTOR, value) == AI_SUCCESS ||
+			//                        mat->Get(AI_MATKEY_ROUGHNESS_FACTOR, value) == AI_SUCCESS) {
+			// 	flag |= value > 0.0f ? PBR : 0;
+			// }
+
 			// Only supports GLTF
+			float alphaCutoff{0.0f};
 			if (aiString alphaMode; mat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode) == AI_SUCCESS) {
 				if (std::strcmp(alphaMode.C_Str(), "OPAQUE") == 0) {
 					flag |= OPAQUE | CASTSHADOW;

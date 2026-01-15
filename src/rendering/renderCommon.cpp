@@ -56,7 +56,11 @@ void RenderCommon::drawQuad(const uint32_t sceneTexture, const uint32_t VAO) {
 
 
 void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shader& shader) {
-	bool hasNormalMap{false}, hasHeightMap{false}, hasSpecularMap{false}, hasDiffuseMap{false};
+	bool hasNormalMap{false};
+	bool hasHeightMap{false};
+	bool hasSpecularMap{false};
+	bool hasDiffuseMap{false};
+	bool hasEmissiveMap{false};
 
 	for (int i = 0; i < textures.size(); i++) {
 		glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
@@ -76,15 +80,22 @@ void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shad
 			hasHeightMap = true;
 		}
 
+
+		if (textures[i].type == EMISSION) {
+			hasEmissiveMap = true;
+		}
+
 		// now set the sampler to the correct texture unit
 		shader.setInt(std::string("material.").append(textures[i].name), i);
 		// and finally bind the texture
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}
 	shader.setBool("material.hasDiffuseMap", hasDiffuseMap);
+	shader.setBool("material.hasSpecularMap", hasSpecularMap);
 	shader.setBool("material.hasNormalMap", hasNormalMap);
 	shader.setBool("material.hasHeightMap", hasHeightMap);
-	shader.setBool("material.hasSpecularMap", hasSpecularMap);
+	shader.setBool("material.hasEmissiveMap", hasEmissiveMap);
+
 }
 
 void RenderCommon::unbindTextures(const std::vector<Texture>& textures) {
