@@ -40,7 +40,7 @@ float calculateDirectionalShadow(vec4 fragPosLightSpace, vec3 normal, vec3 light
     float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
     // PCF
     float shadow = 0.0;
-    int samples = 3;
+    int samples = 5;
     vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
 
     for (int x = -samples; x <= samples; ++x) {
