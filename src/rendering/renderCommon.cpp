@@ -80,7 +80,6 @@ void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shad
 			hasHeightMap = true;
 		}
 
-
 		if (textures[i].type == EMISSION) {
 			hasEmissiveMap = true;
 		}

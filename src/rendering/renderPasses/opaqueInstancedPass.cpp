@@ -31,7 +31,8 @@ void OpaqueInstancedPass::execute(const RenderContext& ctx) {
 	for (const auto& [entity, transforms, matb]: ctx.renderQueue->opaqueInstancedGroups) {
 		const size_t count = transforms->size() / 9;
 
-		for (const auto& [material, shader, meshes] = matb; const auto& mesh: *meshes) {
+		const auto& [material, shader, meshes] = matb;
+		for (const auto& mesh: *meshes) {
 			shader->activate();
 
 			RenderCommon::setupMaterial(entity, *material, *shader);
