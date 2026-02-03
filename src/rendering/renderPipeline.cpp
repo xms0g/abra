@@ -232,11 +232,10 @@ void RenderPipeline::configure(const Camera& camera) {
 	}
 
 	// Configure shaders
-	const Shader* shaders[9] = {
+	const std::vector<Shader*> shaders = {
 		opaque.get(), cutout.get(), blend.get(),
 		unlit.get(), pbr.get(), instancedOpaque.get(),
-		instancedCutout.get(), instancedBlend.get(), skybox.get()
-	};
+		instancedCutout.get(), instancedBlend.get(), skybox.get()};
 
 	for (const auto& shader: shaders) {
 		mRenderCtx->camera.ubo.self->configure(shader->ID(), mRenderCtx->camera.ubo.binding, mRenderCtx->camera.ubo.blockName);
