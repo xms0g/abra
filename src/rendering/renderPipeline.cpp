@@ -215,10 +215,8 @@ void RenderPipeline::configure(const Camera& camera) {
 	const glm::mat4 invProjectionMat = glm::inverse(projectionMat);
 
 	mRenderCtx->camera.ubo.self->bind();
-	mRenderCtx->camera.ubo.self->setData(glm::value_ptr(projectionMat), sizeof(glm::mat4),
-	                                     sizeof(glm::mat4) + sizeof(glm::vec4));
-	mRenderCtx->camera.ubo.self->setData(glm::value_ptr(invProjectionMat), sizeof(glm::mat4),
-	                                     2 * sizeof(glm::mat4) + sizeof(glm::vec4));
+	mRenderCtx->camera.ubo.self->setData(glm::value_ptr(projectionMat), sizeof(glm::mat4), sizeof(glm::mat4) + sizeof(glm::vec4));
+	mRenderCtx->camera.ubo.self->setData(glm::value_ptr(invProjectionMat), sizeof(glm::mat4), 2 * sizeof(glm::mat4) + sizeof(glm::vec4));
 	mRenderCtx->camera.ubo.self->unbind();
 
 	// Configure render passes
@@ -363,7 +361,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 void RenderPipeline::sortEntities() {
 	const glm::vec3& camPos = mRenderCtx->camera.self->position();
 
-	auto sortBatches = [&](auto& batch, bool transparent) {
+	auto sortBatches = [&](auto& batch, bool transparent) -> void {
 		std::sort(
 			batch.begin(),
 			batch.end(),

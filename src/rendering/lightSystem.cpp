@@ -69,7 +69,7 @@ void LightSystem::updateLightUBO(const RenderContext& ctx) const {
 	mUBO->bind();
 	uint32_t offset = 0;
 
-	auto uploadDataToGPU = [this, &offset]<typename T>(T& lights, const uint32_t maxLightCount) {
+	auto uploadDataToGPU = [this, &offset]<typename T>(T& lights, const uint32_t maxLightCount) -> size_t {
 		using lightType = std::remove_pointer_t<typename T::value_type>;
 		const size_t lightCount = std::min(lights.size(), static_cast<size_t>(maxLightCount));
 

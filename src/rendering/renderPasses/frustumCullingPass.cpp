@@ -14,7 +14,7 @@ void FrustumCullingPass::configure(const RenderContext& ctx) {
 }
 
 void FrustumCullingPass::execute(const RenderContext& ctx) {
-	auto cullItems = [&](const std::vector<RenderGroup>& groups, std::vector<RenderableObject>& outQueue) {
+	auto cullItems = [&](const std::vector<RenderGroup>& groups, std::vector<RenderableObject>& outQueue) -> void {
 		outQueue.clear();
 
 		for (const auto& [entity, matb]: groups) {
