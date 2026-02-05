@@ -65,7 +65,7 @@ void ResourceManager::processNode(const aiNode* node, const aiScene* scene, Mesh
 	}
 }
 
-std::pair<uint32_t, Mesh> ResourceManager::processMesh(aiMesh* mesh, const aiScene* scene, MaterialMap& materials) {
+std::pair<uint32_t, Mesh> ResourceManager::processMesh(aiMesh* mesh, const aiScene* scene, MaterialMap& materials) const {
 	// data to fill
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
@@ -153,7 +153,7 @@ void ResourceManager::loadMaterialTextures(const aiMaterial* mat,
                                            const std::string& typeName,
                                            const uint32_t materialID,
                                            MaterialMap& materials,
-                                           std::unordered_set<std::string>& texturesLoaded) {
+                                           std::unordered_set<std::string>& texturesLoaded) const {
 	for (uint32_t i = 0; i < mat->GetTextureCount(type); i++) {
 		aiString str;
 		mat->GetTexture(type, i, &str);
