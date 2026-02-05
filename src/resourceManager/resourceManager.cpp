@@ -41,32 +41,31 @@ void ResourceManager::loadModel(const size_t entityID, const char* file) {
 	// retrieve the directory path of the filepath
 	mDirectory = path.substr(0, path.find_last_of('/')).append("/");
 
+	MeshMap meshesByMatID;
+	MaterialMap materials;
 	// process ASSIMP's root node recursively
-	processNode(scene->mRootNode, scene);
+	processNode(scene->mRootNode, scene, meshesByMatID, materials);
 
-	mMeshesByEntity.emplace(entityID, mMeshesByMatID);
-	mMaterialsByEntity.emplace(entityID, mMaterials);
-	mMeshesByMatID.clear();
-	mMaterials.clear();
-	mTexturesLoaded.clear();
+	mMeshesByEntity.emplace(entityID, meshesByMatID);
+	mMaterialsByEntity.emplace(entityID, materials);
 }
 
-void ResourceManager::processNode(const aiNode* node, const aiScene* scene) {
+void ResourceManager::processNode(const aiNode* node, const aiScene* scene, MeshMap& meshesByMatID, MaterialMap& materials) {
 	// process each mesh located at the current node
 	for (uint32_t i = 0; i < node->mNumMeshes; i++) {
 		// the node object only contains mIndices to index the actual objects in the scene.
 		// the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
 		aiMesh* aMesh = scene->mMeshes[node->mMeshes[i]];
-		auto [matID, mesh] = processMesh(aMesh, scene);
-		mMeshesByMatID[matID].push_back(mesh);
+		auto [matID, mesh] = processMesh(aMesh, scene, materials);
+		meshesByMatID[matID].push_back(mesh);
 	}
 	// after we've processed all of the mMeshes (if any) we then recursively process each of the children nodes
 	for (uint32_t i = 0; i < node->mNumChildren; i++) {
-		processNode(node->mChildren[i], scene);
+		processNode(node->mChildren[i], scene, meshesByMatID, materials);
 	}
 }
 
-std::pair<uint32_t, Mesh> ResourceManager::processMesh(aiMesh* mesh, const aiScene* scene) {
+std::pair<uint32_t, Mesh> ResourceManager::processMesh(aiMesh* mesh, const aiScene* scene, MaterialMap& materials) {
 	// data to fill
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
@@ -131,19 +130,20 @@ std::pair<uint32_t, Mesh> ResourceManager::processMesh(aiMesh* mesh, const aiSce
 	// specular: texture_specularN
 	// normal: texture_normalN
 
+	std::unordered_set<std::string> texturesLoaded;
 	// 1. diffuse maps
-	loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_albedo", mesh->mMaterialIndex);
+	loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_albedo", mesh->mMaterialIndex, materials, texturesLoaded);
 	// 2. specular maps
-	loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular", mesh->mMaterialIndex);
+	loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular", mesh->mMaterialIndex, materials, texturesLoaded);
 	// 3. normal maps
-	loadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal", mesh->mMaterialIndex);
+	loadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal", mesh->mMaterialIndex, materials, texturesLoaded);
 	// 4. height maps
-	loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_height", mesh->mMaterialIndex);
+	loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_height", mesh->mMaterialIndex, materials, texturesLoaded);
 	// PBR Materials
-	loadMaterialTextures(material, aiTextureType_METALNESS, "texture_metallic", mesh->mMaterialIndex);
-	loadMaterialTextures(material, aiTextureType_DIFFUSE_ROUGHNESS, "texture_roughness", mesh->mMaterialIndex);
-	loadMaterialTextures(material, aiTextureType_EMISSIVE, "texture_emissive", mesh->mMaterialIndex);
-	loadMaterialTextures(material, aiTextureType_AMBIENT_OCCLUSION, "texture_ao", mesh->mMaterialIndex);
+	loadMaterialTextures(material, aiTextureType_METALNESS, "texture_metallic", mesh->mMaterialIndex, materials, texturesLoaded);
+	loadMaterialTextures(material, aiTextureType_DIFFUSE_ROUGHNESS, "texture_roughness", mesh->mMaterialIndex, materials, texturesLoaded);
+	loadMaterialTextures(material, aiTextureType_EMISSIVE, "texture_emissive", mesh->mMaterialIndex, materials, texturesLoaded);
+	loadMaterialTextures(material, aiTextureType_AMBIENT_OCCLUSION, "texture_ao", mesh->mMaterialIndex, materials, texturesLoaded);
 	// return a mesh object created from the extracted mesh data
 	return std::make_pair(mesh->mMaterialIndex, Mesh{vertices, indices});
 }
@@ -151,18 +151,20 @@ std::pair<uint32_t, Mesh> ResourceManager::processMesh(aiMesh* mesh, const aiSce
 void ResourceManager::loadMaterialTextures(const aiMaterial* mat,
                                            const aiTextureType type,
                                            const std::string& typeName,
-                                           const uint32_t materialID) {
+                                           const uint32_t materialID,
+                                           MaterialMap& materials,
+                                           std::unordered_set<std::string>& texturesLoaded) {
 	for (uint32_t i = 0; i < mat->GetTextureCount(type); i++) {
 		aiString str;
 		mat->GetTexture(type, i, &str);
 		std::string path = mDirectory + str.C_Str();
 		// check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
-		if (mTexturesLoaded.contains(path))
+		if (texturesLoaded.contains(path))
 			continue;
 
-		if (mMaterials.contains(materialID)) {
-			const uint32_t flag = mMaterials[materialID].flag;
-			mMaterials[materialID].textures.emplace_back(texture::load(path.c_str(), flag), type, typeName, str.C_Str());
+		if (materials.contains(materialID)) {
+			const uint32_t flag = materials[materialID].flag;
+			materials[materialID].textures.emplace_back(texture::load(path.c_str(), flag), type, typeName, str.C_Str());
 		} else {
 			uint32_t flag{0};
 
@@ -190,10 +192,10 @@ void ResourceManager::loadMaterialTextures(const aiMaterial* mat,
 
 			std::vector<Texture> textures;
 			textures.emplace_back(texture::load(path.c_str(), flag), type, typeName, str.C_Str());
-			mMaterials[materialID] = {flag, glm::vec3(), alphaCutoff, std::move(textures)};
+			materials[materialID] = {flag, glm::vec3(), alphaCutoff, std::move(textures)};
 		}
 
 		// store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate mTextures.
-		mTexturesLoaded.emplace(path);
+		texturesLoaded.emplace(path);
 	}
 }

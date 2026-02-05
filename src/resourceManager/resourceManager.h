@@ -35,21 +35,20 @@ private:
 
 	~ResourceManager() = default;
 
-	void processNode(const aiNode* node, const aiScene* scene);
+	void processNode(const aiNode* node, const aiScene* scene, MeshMap& meshesByMatID, MaterialMap& materials);
 
-	std::pair<uint32_t, Mesh> processMesh(aiMesh* mesh, const aiScene* scene);
+	std::pair<uint32_t, Mesh> processMesh(aiMesh* mesh, const aiScene* scene, MaterialMap& materials);
 
 	void loadMaterialTextures(const aiMaterial* mat,
 	                          aiTextureType type,
 	                          const std::string& typeName,
-	                          uint32_t materialID);
+	                          uint32_t materialID,
+	                          MaterialMap& materials,
+	                          std::unordered_set<std::string>& texturesLoaded);
 
 	std::string mDirectory;
-	MaterialMap mMaterials;
-	MeshMap mMeshesByMatID;
 	std::unordered_map<size_t, MaterialMap> mMaterialsByEntity;
 	std::unordered_map<size_t, MeshMap> mMeshesByEntity;
-	std::unordered_set<std::string> mTexturesLoaded;
 
 	static constexpr const char* skyboxFaces[] = {
 		"skybox/right.jpg",
