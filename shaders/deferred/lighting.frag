@@ -16,8 +16,8 @@ uniform sampler2D ssao;
 out vec4 fragColor;
 
 void main() {
-    vec3 fragPos = texture(gPosition, fs_in.TexCoord).rgb;
-    vec3 normal = texture(gNormal, fs_in.TexCoord).rgb;
+    vec3 fragPos = texture(gPosition, fs_in.TexCoord).xyz;
+    vec3 normal = texture(gNormal, fs_in.TexCoord).xyz;
     vec3 diffuse = texture(gAlbedoSpec, fs_in.TexCoord).rgb;
     float specular = texture(gAlbedoSpec, fs_in.TexCoord).a;
     float ambientOcclusion = texture(ssao, fs_in.TexCoord).r;
