@@ -44,7 +44,7 @@ private:
 	                          const std::string& typeName,
 	                          uint32_t materialID,
 	                          MaterialMap& materials,
-	                          std::unordered_set<std::string>& texturesLoaded);
+	                          std::unordered_set<std::string>& texturesLoaded) const;
 
 	std::string mDirectory;
 	std::unordered_map<size_t, MaterialMap> mMaterialsByEntity;

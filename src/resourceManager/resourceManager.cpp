@@ -153,7 +153,7 @@ void ResourceManager::loadMaterialTextures(const aiMaterial* mat,
                                            const std::string& typeName,
                                            const uint32_t materialID,
                                            MaterialMap& materials,
-                                           std::unordered_set<std::string>& texturesLoaded) {
+                                           std::unordered_set<std::string>& texturesLoaded) const {
 	for (uint32_t i = 0; i < mat->GetTextureCount(type); i++) {
 		aiString str;
 		mat->GetTexture(type, i, &str);
