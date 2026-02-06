@@ -66,6 +66,7 @@ Models::Plane::Plane(glm::vec3 color,
 	}
 
 	mMeshes[0].emplace_back(vertices, indices);
+	mMeshes.at(0).at(0).uploadToGPU();
 
 	std::vector<Texture> textures;
 

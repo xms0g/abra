@@ -105,6 +105,7 @@ Models::Sphere::Sphere(glm::vec3 color, bool unlit, const char* albedo, const ch
 	}
 
 	mMeshes[0].emplace_back(vertices, indices);
+	mMeshes.at(0).at(0).uploadToGPU();
 
 	std::vector<Texture> textures;
 	if (albedo) {

@@ -58,6 +58,7 @@ Models::Cubemap::Cubemap(std::span<const char* const> faces) {
 
 	std::vector<uint32_t> indices;
 	mMeshes[0].emplace_back(vertices, indices);
+	mMeshes.at(0).at(0).uploadToGPU();
 
 	std::vector<std::string> facesVec;
 	facesVec.reserve(faces.size());

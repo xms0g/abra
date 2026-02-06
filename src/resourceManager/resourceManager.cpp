@@ -25,6 +25,40 @@ std::span<const char* const> ResourceManager::getSkyboxTexture() const {
 	return skyboxFaces;
 }
 
+void ResourceManager::asyncLoadModel(size_t entityID, const char* file) {
+	mThreadPool.enqueue([this, entityID, file]() {
+		loadModel(entityID, std::string(file).c_str());
+   });
+}
+
+void ResourceManager::uploadModelsToGPU() {
+	for (auto& [entityID, meshByMaterial]: mMeshesByEntity) {
+		for (auto& [matID, meshes]: meshByMaterial) {
+			for (auto& mesh: meshes) {
+				mesh.uploadToGPU();
+			}
+		}
+	}
+
+	std::unordered_set<std::string> texturesLoaded;
+	for (auto& [entityID, materials]: mMaterialsByEntity) {
+		for (auto& [matID, material]: materials) {
+			for (auto& texture: material.textures) {
+				if (texturesLoaded.contains(texture.path))
+					continue;
+
+				texture.id = texture::load(texture.path.c_str(), material.flag);
+				texturesLoaded.emplace(texture.path);
+			}
+		}
+	}
+
+}
+
+void ResourceManager::waitForAll() const {
+	mThreadPool.wait();
+}
+
 void ResourceManager::loadModel(const size_t entityID, const char* file) {
 	// read file via ASSIMP
 	Assimp::Importer importer;
@@ -43,29 +77,35 @@ void ResourceManager::loadModel(const size_t entityID, const char* file) {
 
 	MeshMap meshesByMatID;
 	MaterialMap materials;
+	std::unordered_set<std::string> texturesLoaded;
 	// process ASSIMP's root node recursively
-	processNode(scene->mRootNode, scene, meshesByMatID, materials);
+	processNode(scene->mRootNode, scene, meshesByMatID, materials, texturesLoaded);
 
-	mMeshesByEntity.emplace(entityID, meshesByMatID);
-	mMaterialsByEntity.emplace(entityID, materials);
+	{
+		std::lock_guard<std::mutex> lock(mResourceMutex);
+		mMeshesByEntity.emplace(entityID, meshesByMatID);
+		mMaterialsByEntity.emplace(entityID, materials);
+	}
+
 }
 
-void ResourceManager::processNode(const aiNode* node, const aiScene* scene, MeshMap& meshesByMatID, MaterialMap& materials) {
+void ResourceManager::processNode(const aiNode* node, const aiScene* scene, MeshMap& meshesByMatID, MaterialMap& materials, std::unordered_set<std::string>& texturesLoaded) {
 	// process each mesh located at the current node
 	for (uint32_t i = 0; i < node->mNumMeshes; i++) {
 		// the node object only contains mIndices to index the actual objects in the scene.
 		// the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
 		aiMesh* aMesh = scene->mMeshes[node->mMeshes[i]];
-		auto [matID, mesh] = processMesh(aMesh, scene, materials);
+		auto [matID, mesh] = processMesh(aMesh, scene, materials, texturesLoaded);
 		meshesByMatID[matID].push_back(mesh);
 	}
 	// after we've processed all of the mMeshes (if any) we then recursively process each of the children nodes
 	for (uint32_t i = 0; i < node->mNumChildren; i++) {
-		processNode(node->mChildren[i], scene, meshesByMatID, materials);
+		processNode(node->mChildren[i], scene, meshesByMatID, materials, texturesLoaded);
 	}
 }
 
-std::pair<uint32_t, Mesh> ResourceManager::processMesh(aiMesh* mesh, const aiScene* scene, MaterialMap& materials) const {
+std::pair<uint32_t, Mesh> ResourceManager::processMesh(aiMesh* mesh, const aiScene* scene, MaterialMap& materials,
+	std::unordered_set<std::string>& texturesLoaded) const {
 	// data to fill
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
@@ -130,7 +170,6 @@ std::pair<uint32_t, Mesh> ResourceManager::processMesh(aiMesh* mesh, const aiSce
 	// specular: texture_specularN
 	// normal: texture_normalN
 
-	std::unordered_set<std::string> texturesLoaded;
 	// 1. diffuse maps
 	loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_albedo", mesh->mMaterialIndex, materials, texturesLoaded);
 	// 2. specular maps
@@ -162,9 +201,11 @@ void ResourceManager::loadMaterialTextures(const aiMaterial* mat,
 		if (texturesLoaded.contains(path))
 			continue;
 
+		// store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate mTextures.
+		texturesLoaded.emplace(path);
+
 		if (materials.contains(materialID)) {
-			const uint32_t flag = materials[materialID].flag;
-			materials[materialID].textures.emplace_back(texture::load(path.c_str(), flag), type, typeName, str.C_Str());
+			materials[materialID].textures.emplace_back(0, type, typeName, std::move(path));
 		} else {
 			uint32_t flag{0};
 
@@ -191,11 +232,8 @@ void ResourceManager::loadMaterialTextures(const aiMaterial* mat,
 			}
 
 			std::vector<Texture> textures;
-			textures.emplace_back(texture::load(path.c_str(), flag), type, typeName, str.C_Str());
+			textures.emplace_back(0, type, typeName, std::move(path));
 			materials[materialID] = {flag, glm::vec3(), alphaCutoff, std::move(textures)};
 		}
-
-		// store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate mTextures.
-		texturesLoaded.emplace(path);
 	}
 }

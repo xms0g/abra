@@ -2,9 +2,62 @@
 #include "glad/glad.h"
 #include "../instanceBufferBuilder.hpp"
 
-Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
-	: mVertices(std::move(vertices)),
-	  mIndices(std::move(indices)) {
+Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices) : mVertices(std::move(vertices)),
+                                                                            mIndices(std::move(indices)) {
+	mMin = glm::vec3(FLT_MAX);
+	mMax = glm::vec3(-FLT_MAX);
+
+	for (auto& vertex: mVertices) {
+		mMin = glm::min(mMin, vertex.position);
+		mMax = glm::max(mMax, vertex.position);
+	}
+}
+
+const std::vector<Vertex>& Mesh::vertices() const {
+	return mVertices;
+}
+
+const std::vector<uint32_t>& Mesh::indices() const {
+	return mIndices;
+}
+
+const glm::vec3& Mesh::min() const {
+	return mMin;
+}
+
+const glm::vec3& Mesh::max() const {
+	return mMax;
+}
+
+void Mesh::bind() const {
+	glBindVertexArray(mVAO);
+}
+
+void Mesh::unbind() const {
+	glBindVertexArray(0);
+}
+
+void Mesh::enableInstanceAttributes(const uint32_t instanceVBO, const size_t offset) const {
+	glBindVertexArray(mVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+	// Model matrix attributes (7–10)
+	for (int i = 0; i < 4; i++) {
+		glEnableVertexAttribArray(7 + i);
+		glVertexAttribPointer(7 + i, 4, GL_FLOAT, GL_FALSE, sizeof(InstanceData),
+		                      reinterpret_cast<void*>(offset + sizeof(glm::vec4) * i));
+		glVertexAttribDivisor(7 + i, 1);
+	}
+
+	// Normal matrix attributes (11–13)
+	for (int i = 0; i < 3; i++) {
+		glEnableVertexAttribArray(11 + i);
+		glVertexAttribPointer(11 + i, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData),
+		                      reinterpret_cast<void*>(offset + sizeof(glm::mat4) + sizeof(glm::vec3) * i));
+		glVertexAttribDivisor(11 + i, 1);
+	}
+}
+
+void Mesh::uploadToGPU() {
 	// now that we have all the required data, set the vertex buffers and its attribute pointers.
 	// create vao
 	glGenVertexArrays(1, &mVAO);
@@ -57,56 +110,4 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
 	                      reinterpret_cast<void*>(offsetof(Vertex, weights)));
 
 	glBindVertexArray(0);
-
-	mMin = glm::vec3(FLT_MAX);
-	mMax = glm::vec3(-FLT_MAX);
-
-	for (auto& vertex: mVertices) {
-		mMin = glm::min(mMin, vertex.position);
-		mMax = glm::max(mMax, vertex.position);
-	}
-}
-
-const std::vector<Vertex>& Mesh::vertices() const {
-	return mVertices;
-}
-
-const std::vector<uint32_t>& Mesh::indices() const {
-	return mIndices;
-}
-
-const glm::vec3& Mesh::min() const {
-	return mMin;
-}
-
-const glm::vec3& Mesh::max() const {
-	return mMax;
-}
-
-void Mesh::bind() const {
-	glBindVertexArray(mVAO);
-}
-
-void Mesh::unbind() const {
-	glBindVertexArray(0);
-}
-
-void Mesh::enableInstanceAttributes(const uint32_t instanceVBO, const size_t offset) const {
-	glBindVertexArray(mVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-	// Model matrix attributes (7–10)
-	for (int i = 0; i < 4; i++) {
-		glEnableVertexAttribArray(7 + i);
-		glVertexAttribPointer(7 + i, 4, GL_FLOAT, GL_FALSE, sizeof(InstanceData),
-		                      reinterpret_cast<void*>(offset + sizeof(glm::vec4) * i));
-		glVertexAttribDivisor(7 + i, 1);
-	}
-
-	// Normal matrix attributes (11–13)
-	for (int i = 0; i < 3; i++) {
-		glEnableVertexAttribArray(11 + i);
-		glVertexAttribPointer(11 + i, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData),
-		                      reinterpret_cast<void*>(offset + sizeof(glm::mat4) + sizeof(glm::vec3) * i));
-		glVertexAttribDivisor(11 + i, 1);
-	}
 }

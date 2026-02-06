@@ -6,6 +6,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include "../job/threadPool.h"
 
 struct Material;
 using MaterialMap = std::unordered_map<uint32_t, Material >;
@@ -28,16 +29,24 @@ public:
 
 	[[nodiscard]] std::span<const char* const> getSkyboxTexture() const;
 
-	void loadModel(size_t entityID, const char* file);
+	void asyncLoadModel(size_t entityID, const char* file);
+
+	void uploadModelsToGPU();
+
+	void waitForAll() const;
 
 private:
 	explicit ResourceManager() = default;
 
 	~ResourceManager() = default;
 
-	void processNode(const aiNode* node, const aiScene* scene, MeshMap& meshesByMatID, MaterialMap& materials);
+	void loadModel(size_t entityID, const char* file);
 
-	std::pair<uint32_t, Mesh> processMesh(aiMesh* mesh, const aiScene* scene, MaterialMap& materials) const;
+	void processNode(const aiNode* node, const aiScene* scene,
+		MeshMap& meshesByMatID, MaterialMap& materials, std::unordered_set<std::string>& texturesLoaded);
+
+	std::pair<uint32_t, Mesh> processMesh(aiMesh* mesh, const aiScene* scene, MaterialMap& materials,
+		std::unordered_set<std::string>& texturesLoaded) const;
 
 	void loadMaterialTextures(const aiMaterial* mat,
 	                          aiTextureType type,
@@ -49,6 +58,8 @@ private:
 	std::string mDirectory;
 	std::unordered_map<size_t, MaterialMap> mMaterialsByEntity;
 	std::unordered_map<size_t, MeshMap> mMeshesByEntity;
+	ThreadPool mThreadPool{};
+	std::mutex mResourceMutex;
 
 	static constexpr const char* skyboxFaces[] = {
 		"skybox/right.jpg",
