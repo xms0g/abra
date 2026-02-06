@@ -43,19 +43,19 @@ private:
 	void loadModel(size_t entityID, const char* file);
 
 	void processNode(const aiNode* node, const aiScene* scene,
-		MeshMap& meshesByMatID, MaterialMap& materials, std::unordered_set<std::string>& texturesLoaded);
+		MeshMap& meshesByMatID, MaterialMap& materials, std::unordered_set<std::string>& texturesLoaded, std::string& baseDir);
 
 	std::pair<uint32_t, Mesh> processMesh(aiMesh* mesh, const aiScene* scene, MaterialMap& materials,
-		std::unordered_set<std::string>& texturesLoaded) const;
+		std::unordered_set<std::string>& texturesLoaded, std::string& baseDir) const;
 
 	void loadMaterialTextures(const aiMaterial* mat,
 	                          aiTextureType type,
 	                          const std::string& typeName,
 	                          uint32_t materialID,
 	                          MaterialMap& materials,
-	                          std::unordered_set<std::string>& texturesLoaded) const;
+	                          std::unordered_set<std::string>& texturesLoaded,
+	                          const std::string& baseDir) const;
 
-	std::string mDirectory;
 	std::unordered_map<size_t, MaterialMap> mMaterialsByEntity;
 	std::unordered_map<size_t, MeshMap> mMeshesByEntity;
 	ThreadPool mThreadPool{};
