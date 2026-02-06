@@ -80,6 +80,7 @@ void ResourceManager::loadModel(const size_t entityID, const char* file) {
 	std::unordered_set<std::string> texturesLoaded;
 	// process ASSIMP's root node recursively
 	processNode(scene->mRootNode, scene, meshesByMatID, materials, texturesLoaded, baseDir);
+	processMeshMaterials(scene, materials, texturesLoaded, baseDir);
 
 	{
 		std::lock_guard<std::mutex> lock(mResourceMutex);
@@ -89,23 +90,25 @@ void ResourceManager::loadModel(const size_t entityID, const char* file) {
 
 }
 
-void ResourceManager::processNode(const aiNode* node, const aiScene* scene, MeshMap& meshesByMatID, MaterialMap& materials, std::unordered_set<std::string>& texturesLoaded, std::string& baseDir) {
+void ResourceManager::processNode(const aiNode* node, const aiScene* scene, MeshMap& meshesByMatID, MaterialMap& materials,
+	std::unordered_set<std::string>& texturesLoaded, std::string& baseDir) {
 	// process each mesh located at the current node
 	for (uint32_t i = 0; i < node->mNumMeshes; i++) {
 		// the node object only contains mIndices to index the actual objects in the scene.
 		// the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
 		aiMesh* aMesh = scene->mMeshes[node->mMeshes[i]];
-		auto [matID, mesh] = processMesh(aMesh, scene, materials, texturesLoaded, baseDir);
-		meshesByMatID[matID].push_back(mesh);
+		const Mesh mesh = processMesh(aMesh);
+
+		meshesByMatID[aMesh->mMaterialIndex].push_back(mesh);
 	}
+
 	// after we've processed all of the mMeshes (if any) we then recursively process each of the children nodes
 	for (uint32_t i = 0; i < node->mNumChildren; i++) {
 		processNode(node->mChildren[i], scene, meshesByMatID, materials, texturesLoaded, baseDir);
 	}
 }
 
-std::pair<uint32_t, Mesh> ResourceManager::processMesh(aiMesh* mesh, const aiScene* scene, MaterialMap& materials,
-	std::unordered_set<std::string>& texturesLoaded, std::string& baseDir) const {
+Mesh ResourceManager::processMesh(aiMesh* mesh) const {
 	// data to fill
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
@@ -161,37 +164,33 @@ std::pair<uint32_t, Mesh> ResourceManager::processMesh(aiMesh* mesh, const aiSce
 		for (uint32_t j = 0; j < face.mNumIndices; j++)
 			indices.push_back(face.mIndices[j]);
 	}
-	// process materials
-	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-	// we assume a convention for sampler names in the shaders. Each diffuse texture should be named
-	// as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER.
-	// Same applies to other texture as the following list summarizes:
-	// diffuse: texture_diffuseN
-	// specular: texture_specularN
-	// normal: texture_normalN
-
-	// 1. diffuse maps
-	loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_albedo", mesh->mMaterialIndex, materials, texturesLoaded, baseDir);
-	// 2. specular maps
-	loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular", mesh->mMaterialIndex, materials, texturesLoaded, baseDir);
-	// 3. normal maps
-	loadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal", mesh->mMaterialIndex, materials, texturesLoaded, baseDir);
-	// 4. height maps
-	loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_height", mesh->mMaterialIndex, materials, texturesLoaded, baseDir);
-	// PBR Materials
-	loadMaterialTextures(material, aiTextureType_METALNESS, "texture_metallic", mesh->mMaterialIndex, materials, texturesLoaded, baseDir);
-	loadMaterialTextures(material, aiTextureType_DIFFUSE_ROUGHNESS, "texture_roughness", mesh->mMaterialIndex, materials, texturesLoaded, baseDir);
-	loadMaterialTextures(material, aiTextureType_EMISSIVE, "texture_emissive", mesh->mMaterialIndex, materials, texturesLoaded, baseDir);
-	loadMaterialTextures(material, aiTextureType_AMBIENT_OCCLUSION, "texture_ao", mesh->mMaterialIndex, materials, texturesLoaded, baseDir);
+	
 	// return a mesh object created from the extracted mesh data
-	return std::make_pair(mesh->mMaterialIndex, Mesh{vertices, indices});
+	return Mesh{vertices, indices};
 }
 
-void ResourceManager::loadMaterialTextures(const aiMaterial* mat,
-                                           const aiTextureType type,
-                                           const std::string& typeName,
-                                           const uint32_t materialID,
-                                           MaterialMap& materials,
+void ResourceManager::processMeshMaterials(const aiScene* scene, MaterialMap& materials, std::unordered_set<std::string>& texturesLoaded, const std::string& baseDir) const {
+	// process materials
+	for (uint32_t i = 0; i < scene->mNumMaterials; i++) {
+		const aiMaterial* material = scene->mMaterials[i];
+		// 1. diffuse maps
+		loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_albedo", i, materials, texturesLoaded, baseDir);
+		// 2. specular maps
+		loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular", i, materials, texturesLoaded, baseDir);
+		// 3. normal maps
+		loadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal", i, materials, texturesLoaded, baseDir);
+		// 4. height maps
+		loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_height", i, materials, texturesLoaded, baseDir);
+		// PBR Materials
+		loadMaterialTextures(material, aiTextureType_METALNESS, "texture_metallic", i, materials, texturesLoaded, baseDir);
+		loadMaterialTextures(material, aiTextureType_DIFFUSE_ROUGHNESS, "texture_roughness", i, materials, texturesLoaded, baseDir);
+		loadMaterialTextures(material, aiTextureType_EMISSIVE, "texture_emissive", i, materials, texturesLoaded, baseDir);
+		loadMaterialTextures(material, aiTextureType_AMBIENT_OCCLUSION, "texture_ao", i, materials, texturesLoaded, baseDir);
+	}
+}
+
+void ResourceManager::loadMaterialTextures(const aiMaterial* mat, const aiTextureType type, const std::string& typeName,
+                                           const uint32_t materialID, MaterialMap& materials,
                                            std::unordered_set<std::string>& texturesLoaded,
                                            const std::string& baseDir) const {
 	for (uint32_t i = 0; i < mat->GetTextureCount(type); i++) {
