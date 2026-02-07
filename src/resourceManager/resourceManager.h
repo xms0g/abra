@@ -42,11 +42,11 @@ private:
 
 	void loadModel(size_t entityID, const char* file);
 
-	void processNode(const aiNode* node, const aiScene* scene, MeshMap& meshesByMatID);
+	void processMeshes(const aiNode* node, const aiScene* scene, MeshMap& meshesByMatID);
 
 	Mesh processMesh(aiMesh* mesh) const;
 
-	void processMeshMaterials(const aiScene* scene, MaterialMap& materials, std::unordered_set<std::string>& texturesLoaded, const std::string& baseDir) const;
+	void processMaterials(const aiScene* scene, MaterialMap& materials, std::unordered_set<std::string>& texturesLoaded, const std::string& baseDir) const;
 
 	void loadMaterialTextures(const aiMaterial* mat,
 	                          aiTextureType type,

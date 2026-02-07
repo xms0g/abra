@@ -76,11 +76,11 @@ void ResourceManager::loadModel(const size_t entityID, const char* file) {
 
 	// process ASSIMP's root node recursively
 	MeshMap meshesByMatID;
-	processNode(scene->mRootNode, scene, meshesByMatID);
+	processMeshes(scene->mRootNode, scene, meshesByMatID);
 
 	MaterialMap materials;
 	std::unordered_set<std::string> texturesLoaded;
-	processMeshMaterials(scene, materials, texturesLoaded, baseDir);
+	processMaterials(scene, materials, texturesLoaded, baseDir);
 
 	{
 		std::lock_guard<std::mutex> lock(mResourceMutex);
@@ -90,7 +90,7 @@ void ResourceManager::loadModel(const size_t entityID, const char* file) {
 
 }
 
-void ResourceManager::processNode(const aiNode* node, const aiScene* scene, MeshMap& meshesByMatID) {
+void ResourceManager::processMeshes(const aiNode* node, const aiScene* scene, MeshMap& meshesByMatID) {
 	// process each mesh located at the current node
 	for (uint32_t i = 0; i < node->mNumMeshes; i++) {
 		// the node object only contains mIndices to index the actual objects in the scene.
@@ -103,7 +103,7 @@ void ResourceManager::processNode(const aiNode* node, const aiScene* scene, Mesh
 
 	// after we've processed all of the mMeshes (if any) we then recursively process each of the children nodes
 	for (uint32_t i = 0; i < node->mNumChildren; i++) {
-		processNode(node->mChildren[i], scene, meshesByMatID);
+		processMeshes(node->mChildren[i], scene, meshesByMatID);
 	}
 }
 
@@ -168,7 +168,7 @@ Mesh ResourceManager::processMesh(aiMesh* mesh) const {
 	return Mesh{vertices, indices};
 }
 
-void ResourceManager::processMeshMaterials(const aiScene* scene, MaterialMap& materials, std::unordered_set<std::string>& texturesLoaded, const std::string& baseDir) const {
+void ResourceManager::processMaterials(const aiScene* scene, MaterialMap& materials, std::unordered_set<std::string>& texturesLoaded, const std::string& baseDir) const {
 	// process materials
 	for (uint32_t i = 0; i < scene->mNumMaterials; i++) {
 		const aiMaterial* material = scene->mMaterials[i];
