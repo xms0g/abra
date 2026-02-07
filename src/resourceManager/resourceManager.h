@@ -42,8 +42,7 @@ private:
 
 	void loadModel(size_t entityID, const char* file);
 
-	void processNode(const aiNode* node, const aiScene* scene, MeshMap& meshesByMatID, MaterialMap& materials,
-		std::unordered_set<std::string>& texturesLoaded, std::string& baseDir);
+	void processNode(const aiNode* node, const aiScene* scene, MeshMap& meshesByMatID);
 
 	Mesh processMesh(aiMesh* mesh) const;
 
