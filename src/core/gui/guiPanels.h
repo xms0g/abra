@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-struct IPostEffect;
+class IPostEffect;
 class Entity;
 
 namespace  GuiPanels {

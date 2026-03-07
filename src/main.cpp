@@ -94,14 +94,14 @@ int main() {
 		};
 
 		// Suzanne
-		auto suzanne = registry.createEntity("Suzanne");
-		suzanne.addComponent<TransformComponent>(
-			glm::vec3(3.2f, 1.1f, 0.0f),
-			glm::vec3(1.0f, 45.0f, 23.0f),
-			glm::vec3(0.5f));
-
-		ResourceManager::instance().asyncLoadModel(suzanne.id(), "Suzanne/glTF/Suzanne.gltf");
-		suzanne.addComponent<DebugComponent>();
+		// auto suzanne = registry.createEntity("Suzanne");
+		// suzanne.addComponent<TransformComponent>(
+		// 	glm::vec3(3.2f, 1.1f, 0.0f),
+		// 	glm::vec3(1.0f, 45.0f, 23.0f),
+		// 	glm::vec3(0.5f));
+		//
+		// ResourceManager::instance().asyncLoadModel(suzanne.id(), "Suzanne/glTF/Suzanne.gltf");
+		// suzanne.addComponent<DebugComponent>();
 
 		//suzanne.addComponent<InstanceComponent>(&transforms);
 
@@ -149,23 +149,23 @@ int main() {
 		// 		math::generateAABB(*cubeModel.getMeshes())));
 
 		// Helmet
-		auto helmet = registry.createEntity("Helmet");
-		helmet.addComponent<TransformComponent>(
-			glm::vec3(-1.2f, 1.3f, 0.0f),
-			glm::vec3(90.0f, 0.0f, 0.0f),
-			glm::vec3(1.0f));
-
-		ResourceManager::instance().asyncLoadModel(helmet.id(), "DamagedHelmet/glTF/DamagedHelmet.gltf");
-		helmet.addComponent<DebugComponent>();
-
-		auto angel = registry.createEntity("Angel");
-		angel.addComponent<TransformComponent>(
-			glm::vec3(-5.2f, 0.0f, -1.0f),
-			glm::vec3(-90.0f, 0.0f, 0.0f),
-			glm::vec3(2.0f));
-
-		ResourceManager::instance().asyncLoadModel(angel.id(), "cemetery_angel/scene.gltf");
-		angel.addComponent<DebugComponent>();
+		// auto helmet = registry.createEntity("Helmet");
+		// helmet.addComponent<TransformComponent>(
+		// 	glm::vec3(-1.2f, 1.3f, 0.0f),
+		// 	glm::vec3(90.0f, 0.0f, 0.0f),
+		// 	glm::vec3(1.0f));
+		//
+		// ResourceManager::instance().asyncLoadModel(helmet.id(), "DamagedHelmet/glTF/DamagedHelmet.gltf");
+		// helmet.addComponent<DebugComponent>();
+		//
+		// auto angel = registry.createEntity("Angel");
+		// angel.addComponent<TransformComponent>(
+		// 	glm::vec3(-5.2f, 0.0f, -1.0f),
+		// 	glm::vec3(-90.0f, 0.0f, 0.0f),
+		// 	glm::vec3(2.0f));
+		//
+		// ResourceManager::instance().asyncLoadModel(angel.id(), "cemetery_angel/scene.gltf");
+		// angel.addComponent<DebugComponent>();
 
 		// Sponza
 		auto sponza = registry.createEntity("Sponza");
@@ -180,29 +180,29 @@ int main() {
 		// Wait all models to be ready
 		ResourceManager::instance().waitForAll();
 
-		suzanne.addComponent<MeshComponent>(ResourceManager::instance().getMeshes(suzanne.id()));
-		suzanne.addComponent<MaterialComponent>(
-			ResourceManager::instance().getMaterial(suzanne.id()));
-
-		suzanne.addComponent<BoundingVolumeComponent>(
-			std::make_shared<math::AABB>(
-				math::generateAABB(*ResourceManager::instance().getMeshes(suzanne.id()))));
-
-		helmet.addComponent<MeshComponent>(ResourceManager::instance().getMeshes(helmet.id()));
-		helmet.addComponent<MaterialComponent>(
-			ResourceManager::instance().getMaterial(helmet.id()));
-
-		helmet.addComponent<BoundingVolumeComponent>(
-			std::make_shared<math::AABB>(
-				math::generateAABB(*ResourceManager::instance().getMeshes(helmet.id()))));
-
-		angel.addComponent<MeshComponent>(ResourceManager::instance().getMeshes(angel.id()));
-		angel.addComponent<MaterialComponent>(
-			ResourceManager::instance().getMaterial(angel.id()));
-
-		angel.addComponent<BoundingVolumeComponent>(
-			std::make_shared<math::AABB>(
-				math::generateAABB(*ResourceManager::instance().getMeshes(angel.id()))));
+		// suzanne.addComponent<MeshComponent>(ResourceManager::instance().getMeshes(suzanne.id()));
+		// suzanne.addComponent<MaterialComponent>(
+		// 	ResourceManager::instance().getMaterial(suzanne.id()));
+		//
+		// suzanne.addComponent<BoundingVolumeComponent>(
+		// 	std::make_shared<math::AABB>(
+		// 		math::generateAABB(*ResourceManager::instance().getMeshes(suzanne.id()))));
+		//
+		// helmet.addComponent<MeshComponent>(ResourceManager::instance().getMeshes(helmet.id()));
+		// helmet.addComponent<MaterialComponent>(
+		// 	ResourceManager::instance().getMaterial(helmet.id()));
+		//
+		// helmet.addComponent<BoundingVolumeComponent>(
+		// 	std::make_shared<math::AABB>(
+		// 		math::generateAABB(*ResourceManager::instance().getMeshes(helmet.id()))));
+		//
+		// angel.addComponent<MeshComponent>(ResourceManager::instance().getMeshes(angel.id()));
+		// angel.addComponent<MaterialComponent>(
+		// 	ResourceManager::instance().getMaterial(angel.id()));
+		//
+		// angel.addComponent<BoundingVolumeComponent>(
+		// 	std::make_shared<math::AABB>(
+		// 		math::generateAABB(*ResourceManager::instance().getMeshes(angel.id()))));
 
 		sponza.addComponent<MeshComponent>(ResourceManager::instance().getMeshes(sponza.id()));
 		sponza.addComponent<MaterialComponent>(
@@ -244,7 +244,7 @@ int main() {
 			glm::vec4(0.3f, 0.3f, 0.3f, 0.0f),
 			glm::vec4(0.4f, 0.4f, 0.4f, 0.0f),
 			glm::vec4(0.5f, 0.5f, 0.5f, 0.0f));
-		//
+
 		// auto pointLight = registry.createEntity("Point Light");
 		// pointLight.addComponent<TransformComponent>(
 		// 	glm::vec3(-3.2f, 5.0f, -2.4f),

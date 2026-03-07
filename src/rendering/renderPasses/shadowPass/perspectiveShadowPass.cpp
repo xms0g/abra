@@ -31,8 +31,11 @@ glm::mat4 PerspectiveShadowPass::lightSpaceMatrix(const int layer) const {
 	return mLightSpaceMatrix[layer];
 }
 
-void PerspectiveShadowPass::render(const RenderContext& ctx, const glm::vec4& direction,
-                                   const glm::vec4& position, const float fovy, const int layer) {
+void PerspectiveShadowPass::render(const RenderContext& ctx,
+                                   const glm::vec4& direction,
+                                   const glm::vec4& position,
+                                   const float fovy,
+                                   const int layer) {
 	const glm::mat4 lightProjection = glm::perspective(
 		fovy,
 		static_cast<float>(ctx.shadow.width) / static_cast<float>(ctx.shadow.height),

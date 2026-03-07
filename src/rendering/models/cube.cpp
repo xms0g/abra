@@ -14,39 +14,39 @@ Models::Cube::Cube(glm::vec3 color,
 	constexpr float v[] = {
 		// Back face (-Z)
 		-0.5f, -0.5f, -0.5f, 0, 0, -1, 0, 0,
-		 0.5f, -0.5f, -0.5f, 0, 0, -1, 1, 0,
-		 0.5f,  0.5f, -0.5f, 0, 0, -1, 1, 1,
-		-0.5f,  0.5f, -0.5f, 0, 0, -1, 0, 1,
+		0.5f, -0.5f, -0.5f, 0, 0, -1, 1, 0,
+		0.5f, 0.5f, -0.5f, 0, 0, -1, 1, 1,
+		-0.5f, 0.5f, -0.5f, 0, 0, -1, 0, 1,
 
 		// Front face (+Z)
 		-0.5f, -0.5f, 0.5f, 0, 0, 1, 0, 0,
-		 0.5f, -0.5f, 0.5f, 0, 0, 1, 1, 0,
-		 0.5f,  0.5f, 0.5f, 0, 0, 1, 1, 1,
-		-0.5f,  0.5f, 0.5f, 0, 0, 1, 0, 1,
+		0.5f, -0.5f, 0.5f, 0, 0, 1, 1, 0,
+		0.5f, 0.5f, 0.5f, 0, 0, 1, 1, 1,
+		-0.5f, 0.5f, 0.5f, 0, 0, 1, 0, 1,
 
 		// Left face (-X)
 		-0.5f, -0.5f, -0.5f, -1, 0, 0, 0, 0,
-		-0.5f,  0.5f, -0.5f, -1, 0, 0, 1, 0,
-		-0.5f,  0.5f,  0.5f, -1, 0, 0, 1, 1,
-		-0.5f, -0.5f,  0.5f, -1, 0, 0, 0, 1,
+		-0.5f, 0.5f, -0.5f, -1, 0, 0, 1, 0,
+		-0.5f, 0.5f, 0.5f, -1, 0, 0, 1, 1,
+		-0.5f, -0.5f, 0.5f, -1, 0, 0, 0, 1,
 
 		// Right face (+X)
-		 0.5f, -0.5f, -0.5f, 1, 0, 0, 0, 0,
-		 0.5f,  0.5f, -0.5f, 1, 0, 0, 1, 0,
-		 0.5f,  0.5f,  0.5f, 1, 0, 0, 1, 1,
-		 0.5f, -0.5f,  0.5f, 1, 0, 0, 0, 1,
+		0.5f, -0.5f, -0.5f, 1, 0, 0, 0, 0,
+		0.5f, 0.5f, -0.5f, 1, 0, 0, 1, 0,
+		0.5f, 0.5f, 0.5f, 1, 0, 0, 1, 1,
+		0.5f, -0.5f, 0.5f, 1, 0, 0, 0, 1,
 
 		// Bottom face (-Y)
 		-0.5f, -0.5f, -0.5f, 0, -1, 0, 0, 0,
-		 0.5f, -0.5f, -0.5f, 0, -1, 0, 1, 0,
-		 0.5f, -0.5f,  0.5f, 0, -1, 0, 1, 1,
-		-0.5f, -0.5f,  0.5f, 0, -1, 0, 0, 1,
+		0.5f, -0.5f, -0.5f, 0, -1, 0, 1, 0,
+		0.5f, -0.5f, 0.5f, 0, -1, 0, 1, 1,
+		-0.5f, -0.5f, 0.5f, 0, -1, 0, 0, 1,
 
 		// Top face (+Y)
 		-0.5f, 0.5f, -0.5f, 0, 1, 0, 0, 0,
-		 0.5f, 0.5f, -0.5f, 0, 1, 0, 1, 0,
-		 0.5f, 0.5f,  0.5f, 0, 1, 0, 1, 1,
-		-0.5f, 0.5f,  0.5f, 0, 1, 0, 0, 1
+		0.5f, 0.5f, -0.5f, 0, 1, 0, 1, 0,
+		0.5f, 0.5f, 0.5f, 0, 1, 0, 1, 1,
+		-0.5f, 0.5f, 0.5f, 0, 1, 0, 0, 1
 	};
 
 	std::vector<uint32_t> indices = {
@@ -102,15 +102,19 @@ Models::Cube::Cube(glm::vec3 color,
 
 		float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
 
-		vertices[i0].tangent = vertices[i1].tangent = vertices[i2].tangent = glm::vec3(
-			                                              f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x),
-			                                              f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y),
-			                                              f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z));
+		auto tangent = glm::vec3(
+			f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x),
+			f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y),
+			f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z));
 
-		vertices[i0].bitangent = vertices[i1].bitangent = vertices[i2].bitangent = glm::vec3(
-			                                                  f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x),
-			                                                  f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y),
-			                                                  f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z));
+		auto bitangent = glm::vec3(
+			f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x),
+			f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y),
+			f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z));
+
+		vertices[i0].tangent = vertices[i1].tangent = vertices[i2].tangent = tangent;
+
+		vertices[i0].bitangent = vertices[i1].bitangent = vertices[i2].bitangent = bitangent;
 	}
 
 	mMeshes[0].emplace_back(vertices, indices);

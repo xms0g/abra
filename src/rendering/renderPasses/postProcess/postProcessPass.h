@@ -1,9 +1,9 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "IPostEffect.hpp"
 #include "../IRenderPass.hpp"
 
+class IPostEffect;
 struct RenderContext;
 
 namespace Models {

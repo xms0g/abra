@@ -13,11 +13,16 @@ class BoundingVolume {
 public:
 	virtual ~BoundingVolume() = default;
 
-	[[nodiscard]] virtual bool isOnFrustum(const Frustum& camFrustum, const glm::vec3& position,
-	                                       const glm::vec3& rotation, const glm::vec3& scale) const = 0;
+	[[nodiscard]] virtual bool isOnFrustum(const Frustum& camFrustum,
+	                                       const glm::vec3& position,
+	                                       const glm::vec3& rotation,
+	                                       const glm::vec3& scale) const = 0;
 
-	[[nodiscard]] virtual bool isMeshInFrustum(const Frustum& camFrustum, const glm::vec3& min, const glm::vec3& max,
-	                                           const glm::vec3& position, const glm::vec3& rotation,
+	[[nodiscard]] virtual bool isMeshInFrustum(const Frustum& camFrustum,
+	                                           const glm::vec3& min,
+	                                           const glm::vec3& max,
+	                                           const glm::vec3& position,
+	                                           const glm::vec3& rotation,
 	                                           const glm::vec3& scale) const = 0;
 
 protected:
@@ -33,11 +38,16 @@ public:
 
 	~Sphere() override = default;
 
-	[[nodiscard]] bool isOnFrustum(const Frustum& camFrustum, const glm::vec3& position,
-	                               const glm::vec3& rotation, const glm::vec3& scale) const override;
+	[[nodiscard]] bool isOnFrustum(const Frustum& camFrustum,
+	                               const glm::vec3& position,
+	                               const glm::vec3& rotation,
+	                               const glm::vec3& scale) const override;
 
-	[[nodiscard]] bool isMeshInFrustum(const Frustum& camFrustum, const glm::vec3& min, const glm::vec3& max,
-	                                   const glm::vec3& position, const glm::vec3& rotation,
+	[[nodiscard]] bool isMeshInFrustum(const Frustum& camFrustum,
+	                                   const glm::vec3& min,
+	                                   const glm::vec3& max,
+	                                   const glm::vec3& position,
+	                                   const glm::vec3& rotation,
 	                                   const glm::vec3& scale) const override;
 
 private:
@@ -62,11 +72,16 @@ public:
 
 	~AABB() override = default;
 
-	[[nodiscard]] bool isOnFrustum(const Frustum& camFrustum, const glm::vec3& position,
-	                               const glm::vec3& rotation, const glm::vec3& scale) const override;
+	[[nodiscard]] bool isOnFrustum(const Frustum& camFrustum,
+	                               const glm::vec3& position,
+	                               const glm::vec3& rotation,
+	                               const glm::vec3& scale) const override;
 
-	[[nodiscard]] bool isMeshInFrustum(const Frustum& camFrustum, const glm::vec3& min, const glm::vec3& max,
-	                                   const glm::vec3& position, const glm::vec3& rotation,
+	[[nodiscard]] bool isMeshInFrustum(const Frustum& camFrustum,
+	                                   const glm::vec3& min,
+	                                   const glm::vec3& max,
+	                                   const glm::vec3& position,
+	                                   const glm::vec3& rotation,
 	                                   const glm::vec3& scale) const override;
 
 private:

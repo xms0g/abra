@@ -9,7 +9,7 @@
 #include "../job/threadPool.h"
 
 struct Material;
-using MaterialMap = std::unordered_map<uint32_t, Material >;
+using MaterialMap = std::unordered_map<uint32_t, Material>;
 class Mesh;
 using MeshMap = std::unordered_map<uint32_t, std::vector<Mesh> >;
 
@@ -46,7 +46,10 @@ private:
 
 	Mesh processMesh(aiMesh* mesh) const;
 
-	void processMaterials(const aiScene* scene, MaterialMap& materials, std::unordered_set<std::string>& texturesLoaded, const std::string& baseDir) const;
+	void processMaterials(const aiScene* scene,
+	                      MaterialMap& materials,
+	                      std::unordered_set<std::string>& texturesLoaded,
+	                      const std::string& baseDir) const;
 
 	void loadMaterialTextures(const aiMaterial* mat,
 	                          aiTextureType type,

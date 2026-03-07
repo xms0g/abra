@@ -10,8 +10,10 @@ CA::CA(const std::string& name, const bool enabled) : IPostEffect(name, enabled)
 	shader->setInt("screenTexture", 0);
 }
 
-uint32_t CA::render(const uint32_t sceneTexture, const uint32_t VAO,
-                    int& toggle, const std::unique_ptr<FrameBuffer>* renderTargets) const {
+uint32_t CA::render(const uint32_t sceneTexture,
+                    const uint32_t VAO,
+                    int& toggle,
+                    const std::unique_ptr<FrameBuffer>* renderTargets) const {
 	renderTargets[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 

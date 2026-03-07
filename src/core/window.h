@@ -9,7 +9,7 @@ public:
 
     ~Window() override;
 
-    [[nodiscard]] SDL_GLContext glContext() const { return mGlContext; }
+    [[nodiscard]] SDL_GLContext glContext() const;
 
     void swapBuffer() override;
 

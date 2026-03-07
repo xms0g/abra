@@ -33,7 +33,7 @@ void ThreadPool::wait() const {
 }
 
 void ThreadPool::workerLoop() {
-	while (true) {
+	for (;;) {
 		std::function<void()> job;
 
 		{

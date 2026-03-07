@@ -6,7 +6,7 @@
 #include "../texture/texture.h"
 #include "../models/quad.h"
 #include "../renderContext/renderContext.hpp"
-#include "../../math/random.hpp"
+#include "../../math/random.h"
 
 SSAOPass::~SSAOPass() = default;
 

@@ -6,14 +6,17 @@
 #include "mesh/mesh.h"
 #include "renderContext/renderContext.hpp"
 #include "renderContext/entityData.hpp"
-#include "../math/matrix.hpp"
+#include "../math/matrix.h"
 #include "../ECS/components/material.hpp"
 #include "../ECS/components/mesh.hpp"
 #include "../ECS/components/transform.hpp"
 
 void RenderCommon::setupTransform(const EntityData& entity, const Shader& shader) {
-	const glm::mat4 model = math::computeModelMatrix(entity.transform->position, entity.transform->rotation, entity.transform->scale);
-	const glm::mat3 normal = math::computeNormalMatrix(model);
+	const glm::mat4 model = math::modelMatrix(
+		entity.transform->position,
+		entity.transform->rotation,
+		entity.transform->scale);
+	const glm::mat3 normal = math::normalMatrix(model);
 
 	shader.setMat4("model", model);
 	shader.setMat3("normalMatrix", normal);
@@ -94,7 +97,6 @@ void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shad
 	shader.setBool("material.hasNormalMap", hasNormalMap);
 	shader.setBool("material.hasHeightMap", hasHeightMap);
 	shader.setBool("material.hasEmissiveMap", hasEmissiveMap);
-
 }
 
 void RenderCommon::unbindTextures(const std::vector<Texture>& textures) {

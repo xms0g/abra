@@ -40,6 +40,7 @@ public:
 	void enableInstanceAttributes(uint32_t instanceVBO, size_t offset) const;
 
 	void uploadToGPU();
+
 private:
 	// mesh Data
 	std::vector<Vertex> mVertices;

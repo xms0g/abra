@@ -116,7 +116,9 @@ std::string Shader::loadFile(const char* fn) {
 	return ss.str();
 }
 
-std::string Shader::preprocess(const std::string& source, const char* fileName, std::unordered_set<std::string>& includedFiles) {
+std::string Shader::preprocess(const std::string& source,
+                               const char* fileName,
+                               std::unordered_set<std::string>& includedFiles) {
 	std::stringstream result;
 	std::istringstream stream(source);
 	std::string line;

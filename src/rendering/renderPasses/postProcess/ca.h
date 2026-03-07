@@ -9,8 +9,10 @@ class CA final : public IPostEffect {
 public:
 	explicit CA(const std::string& name, bool enabled = false);
 
-	uint32_t render(uint32_t sceneTexture, uint32_t VAO,
-					int& toggle, const std::unique_ptr<FrameBuffer>* renderTargets) const override;
+	uint32_t render(uint32_t sceneTexture,
+	                uint32_t VAO,
+	                int& toggle,
+	                const std::unique_ptr<FrameBuffer>* renderTargets) const override;
 
 	float& intensity() { return mIntensity; }
 

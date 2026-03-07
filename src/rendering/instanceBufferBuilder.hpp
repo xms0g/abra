@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <vector>
 #include "glad/glad.h"
-#include "../math/matrix.hpp"
+#include "../math/matrix.h"
 
 struct InstanceVBO {
 	uint32_t buffer{};
@@ -50,8 +50,8 @@ void uploadInstanceData(const T& groups, InstanceVBO& vbo) {
 			glm::vec3 rot{transform[i + 3], transform[i + 4], transform[i + 5]};
 			glm::vec3 scale{transform[i + 6], transform[i + 7], transform[i + 8]};
 
-			const glm::mat4 model = math::computeModelMatrix(pos, rot, scale);
-			const glm::mat3 normal = math::computeNormalMatrix(model);
+			const glm::mat4 model = math::modelMatrix(pos, rot, scale);
+			const glm::mat3 normal = math::normalMatrix(model);
 			gpuData.emplace_back(model, normal);
 		}
 

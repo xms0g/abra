@@ -1,20 +1,22 @@
 #include "boundingVolume.h"
 #include <algorithm>
-#include "frustum.hpp"
-#include "matrix.hpp"
+#include "frustum.h"
+#include "matrix.h"
 #include "../rendering/mesh/mesh.h"
 
-bool math::Sphere::isOnFrustum(const Frustum& camFrustum, const glm::vec3& position,
-                               const glm::vec3& rotation, const glm::vec3& scale) const {
-	const glm::mat4 modelMatrix = computeModelMatrix(position, rotation, scale);
+bool math::Sphere::isOnFrustum(const Frustum& camFrustum,
+                               const glm::vec3& position,
+                               const glm::vec3& rotation,
+                               const glm::vec3& scale) const {
+	const glm::mat4 model = modelMatrix(position, rotation, scale);
 	const glm::vec3 globalScale = {
-		glm::length(modelMatrix[0]),
-		glm::length(modelMatrix[1]),
-		glm::length(modelMatrix[2])
+		glm::length(model[0]),
+		glm::length(model[1]),
+		glm::length(model[2])
 	};
 
 	//Get our global center with process it with the global model matrix of our transform
-	const glm::vec3 globalCenter{modelMatrix * glm::vec4(mCenter, 1.f)};
+	const glm::vec3 globalCenter{model * glm::vec4(mCenter, 1.f)};
 
 	//To wrap correctly our shape, we need the maximum scale scalar.
 	const float maxScale = std::max(std::max(globalScale.x, globalScale.y), globalScale.z);
@@ -31,8 +33,12 @@ bool math::Sphere::isOnFrustum(const Frustum& camFrustum, const glm::vec3& posit
 	       globalSphere.isOnOrForwardPlane(camFrustum.bottomFace);
 }
 
-bool math::Sphere::isMeshInFrustum(const Frustum& camFrustum, const glm::vec3& min, const glm::vec3& max,
-                                   const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale) const {
+bool math::Sphere::isMeshInFrustum(const Frustum& camFrustum,
+                                   const glm::vec3& min,
+                                   const glm::vec3& max,
+                                   const glm::vec3& position,
+                                   const glm::vec3& rotation,
+                                   const glm::vec3& scale) const {
 	return false;
 }
 
@@ -40,14 +46,16 @@ bool math::Sphere::isOnOrForwardPlane(const Plane& plane) const {
 	return plane.computeSignedDistanceToPlane(mCenter) > -mRadius;
 }
 
-bool math::AABB::isOnFrustum(const Frustum& camFrustum, const glm::vec3& position,
-                             const glm::vec3& rotation, const glm::vec3& scale) const {
-	const glm::mat4 modelMatrix = computeModelMatrix(position, rotation, scale);
-	const glm::vec3 globalCenter{modelMatrix * glm::vec4(center, 1.f)};
+bool math::AABB::isOnFrustum(const Frustum& camFrustum,
+                             const glm::vec3& position,
+                             const glm::vec3& rotation,
+                             const glm::vec3& scale) const {
+	const glm::mat4 model = modelMatrix(position, rotation, scale);
+	const glm::vec3 globalCenter{model * glm::vec4(center, 1.f)};
 	// Scaled orientation
-	const glm::vec3 right = modelMatrix[0] * extents.x;
-	const glm::vec3 up = modelMatrix[1] * extents.y;
-	const glm::vec3 forward = -modelMatrix[2] * extents.z;
+	const glm::vec3 right = model[0] * extents.x;
+	const glm::vec3 up = model[1] * extents.y;
+	const glm::vec3 forward = -model[2] * extents.z;
 
 	const float newIi = std::abs(right.x) + std::abs(up.x) + std::abs(forward.x);
 	const float newIj = std::abs(right.y) + std::abs(up.y) + std::abs(forward.y);
@@ -63,9 +71,13 @@ bool math::AABB::isOnFrustum(const Frustum& camFrustum, const glm::vec3& positio
 	       globalAABB.isOnOrForwardPlane(camFrustum.farFace);
 }
 
-bool math::AABB::isMeshInFrustum(const Frustum& camFrustum, const glm::vec3& min, const glm::vec3& max,
-                                 const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale) const {
-	const glm::mat4 modelMatrix = computeModelMatrix(position, rotation, scale);
+bool math::AABB::isMeshInFrustum(const Frustum& camFrustum,
+                                 const glm::vec3& min,
+                                 const glm::vec3& max,
+                                 const glm::vec3& position,
+                                 const glm::vec3& rotation,
+                                 const glm::vec3& scale) const {
+	const glm::mat4 model = modelMatrix(position, rotation, scale);
 
 	// Define local corners
 	const glm::vec3 localCorners[8] = {
@@ -77,15 +89,15 @@ bool math::AABB::isMeshInFrustum(const Frustum& camFrustum, const glm::vec3& min
 
 	// Transform to world space immediately
 	glm::vec3 worldCorners[8];
-	for(int i = 0; i < 8; ++i) {
-		worldCorners[i] = glm::vec3(modelMatrix * glm::vec4(localCorners[i], 1.0f));
+	for (int i = 0; i < 8; ++i) {
+		worldCorners[i] = glm::vec3(model * glm::vec4(localCorners[i], 1.0f));
 	}
 
 	const Plane planes[6] = {
 		camFrustum.topFace, camFrustum.bottomFace,
 		camFrustum.rightFace, camFrustum.leftFace,
 		camFrustum.farFace, camFrustum.nearFace
-	 };
+	};
 
 	for (const auto& plane: planes) {
 		int inside = 0;

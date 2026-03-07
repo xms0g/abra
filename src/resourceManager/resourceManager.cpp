@@ -28,7 +28,7 @@ std::span<const char* const> ResourceManager::getSkyboxTexture() const {
 void ResourceManager::asyncLoadModel(size_t entityID, const char* file) {
 	mThreadPool.enqueue([this, entityID, file]() {
 		loadModel(entityID, std::string(file).c_str());
-   });
+	});
 }
 
 void ResourceManager::uploadModelsToGPU() {
@@ -80,6 +80,7 @@ void ResourceManager::loadModel(const size_t entityID, const char* file) {
 
 	MaterialMap materials;
 	std::unordered_set<std::string> texturesLoaded;
+
 	processMaterials(scene, materials, texturesLoaded, baseDir);
 
 	{
@@ -87,7 +88,6 @@ void ResourceManager::loadModel(const size_t entityID, const char* file) {
 		mMeshesByEntity.emplace(entityID, meshesByMatID);
 		mMaterialsByEntity.emplace(entityID, materials);
 	}
-
 }
 
 void ResourceManager::processMeshes(const aiNode* node, const aiScene* scene, MeshMap& meshesByMatID) {
@@ -163,33 +163,86 @@ Mesh ResourceManager::processMesh(aiMesh* mesh) const {
 		for (uint32_t j = 0; j < face.mNumIndices; j++)
 			indices.push_back(face.mIndices[j]);
 	}
-	
+
 	// return a mesh object created from the extracted mesh data
 	return Mesh{vertices, indices};
 }
 
-void ResourceManager::processMaterials(const aiScene* scene, MaterialMap& materials, std::unordered_set<std::string>& texturesLoaded, const std::string& baseDir) const {
+void ResourceManager::processMaterials(const aiScene* scene,
+                                       MaterialMap& materials,
+                                       std::unordered_set<std::string>& texturesLoaded,
+                                       const std::string& baseDir) const {
 	// process materials
 	for (uint32_t i = 0; i < scene->mNumMaterials; i++) {
 		const aiMaterial* material = scene->mMaterials[i];
 		// 1. diffuse maps
-		loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_albedo", i, materials, texturesLoaded, baseDir);
+		loadMaterialTextures(material,
+		                     aiTextureType_DIFFUSE,
+		                     "texture_albedo",
+		                     i,
+		                     materials,
+		                     texturesLoaded, baseDir);
 		// 2. specular maps
-		loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular", i, materials, texturesLoaded, baseDir);
+		loadMaterialTextures(material,
+		                     aiTextureType_SPECULAR,
+		                     "texture_specular",
+		                     i,
+		                     materials,
+		                     texturesLoaded,
+		                     baseDir);
 		// 3. normal maps
-		loadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal", i, materials, texturesLoaded, baseDir);
+		loadMaterialTextures(material,
+		                     aiTextureType_NORMALS,
+		                     "texture_normal",
+		                     i,
+		                     materials,
+		                     texturesLoaded,
+		                     baseDir);
 		// 4. height maps
-		loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_height", i, materials, texturesLoaded, baseDir);
+		loadMaterialTextures(material,
+		                     aiTextureType_HEIGHT,
+		                     "texture_height",
+		                     i,
+		                     materials,
+		                     texturesLoaded,
+		                     baseDir);
 		// PBR Materials
-		loadMaterialTextures(material, aiTextureType_METALNESS, "texture_metallic", i, materials, texturesLoaded, baseDir);
-		loadMaterialTextures(material, aiTextureType_DIFFUSE_ROUGHNESS, "texture_roughness", i, materials, texturesLoaded, baseDir);
-		loadMaterialTextures(material, aiTextureType_EMISSIVE, "texture_emissive", i, materials, texturesLoaded, baseDir);
-		loadMaterialTextures(material, aiTextureType_AMBIENT_OCCLUSION, "texture_ao", i, materials, texturesLoaded, baseDir);
+		loadMaterialTextures(material,
+		                     aiTextureType_METALNESS,
+		                     "texture_metallic",
+		                     i,
+		                     materials,
+		                     texturesLoaded,
+		                     baseDir);
+		loadMaterialTextures(material,
+		                     aiTextureType_DIFFUSE_ROUGHNESS,
+		                     "texture_roughness",
+		                     i,
+		                     materials,
+		                     texturesLoaded,
+		                     baseDir);
+		loadMaterialTextures(material,
+		                     aiTextureType_EMISSIVE,
+		                     "texture_emissive",
+		                     i,
+		                     materials,
+		                     texturesLoaded,
+		                     baseDir);
+		loadMaterialTextures(material,
+		                     aiTextureType_AMBIENT_OCCLUSION,
+		                     "texture_ao",
+		                     i,
+		                     materials,
+		                     texturesLoaded,
+		                     baseDir);
 	}
 }
 
-void ResourceManager::loadMaterialTextures(const aiMaterial* mat, const aiTextureType type, const std::string& typeName,
-                                           const uint32_t materialID, MaterialMap& materials,
+void ResourceManager::loadMaterialTextures(const aiMaterial* mat,
+                                           const aiTextureType type,
+                                           const std::string& typeName,
+                                           const uint32_t materialID,
+                                           MaterialMap& materials,
                                            std::unordered_set<std::string>& texturesLoaded,
                                            const std::string& baseDir) const {
 	for (uint32_t i = 0; i < mat->GetTextureCount(type); i++) {
@@ -209,7 +262,7 @@ void ResourceManager::loadMaterialTextures(const aiMaterial* mat, const aiTextur
 			uint32_t flag{0};
 			int twoSided{0};
 
-			if ( mat->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
+			if (mat->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
 				flag |= twoSided != 0 ? TWOSIDED : 0;
 			}
 			// if (float value{0.0f}; mat->Get(AI_MATKEY_METALLIC_FACTOR, value) == AI_SUCCESS ||
