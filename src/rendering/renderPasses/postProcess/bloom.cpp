@@ -33,7 +33,7 @@ Bloom::Bloom(const std::string& name, const int width, const int height, const b
 uint32_t Bloom::render(const uint32_t sceneTexture,
                        const uint32_t VAO,
                        int& toggle,
-                       const std::unique_ptr<FrameBuffer>* renderTargets) const {
+                       FrameBuffer** renderTargets) const {
 	(void) toggle;
 	(void) renderTargets;
 	int toggle_ = 0;

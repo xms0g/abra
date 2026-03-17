@@ -11,7 +11,7 @@ public:
 	uint32_t render(uint32_t sceneTexture,
 	                uint32_t VAO,
 	                int& toggle,
-	                const std::unique_ptr<FrameBuffer>* renderTargets) const override;
+	                FrameBuffer** renderTargets) const override;
 
 private:
 	uint32_t brightFilterPass(uint32_t sceneTexture, uint32_t VAO, int& toggle) const;

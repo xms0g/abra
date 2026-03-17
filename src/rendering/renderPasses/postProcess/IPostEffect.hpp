@@ -20,7 +20,7 @@ public:
 	virtual uint32_t render(uint32_t sceneTexture,
 	                        uint32_t VAO,
 	                        int& toggle,
-	                        const std::unique_ptr<FrameBuffer>* renderTargets) const = 0;
+	                        FrameBuffer** renderTargets) const = 0;
 
 private:
 	std::string mName;
