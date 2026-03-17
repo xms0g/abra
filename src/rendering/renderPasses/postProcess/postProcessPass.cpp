@@ -40,7 +40,7 @@ void PostProcessPass::configure(const RenderContext& ctx) {
 	};
 
 	for (auto& target: mRenderTargets) {
-		target = new FrameBuffer(ctx.screen.width, ctx.screen.height);
+		target = new FrameBuffer(static_cast<int32_t>(ctx.screen.width), static_cast<int32_t>(ctx.screen.height));
 #ifdef HDR
 		target->withTextureFP(16, true)
 #else
