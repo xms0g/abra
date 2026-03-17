@@ -20,13 +20,19 @@ Bloom::Bloom(const std::string& name, const int width, const int height, const b
 	combine->setInt("bloomBlur", 1);
 
 	for (auto& target: mRenderTargets) {
-		target = std::make_unique<FrameBuffer>(width, height);
+		target = new FrameBuffer(width, height);
 #ifdef HDR
 		target->withTextureFP(16, true)
 #else
-				target->withTexture()
+		target->withTexture()
 #endif
-				.checkStatus();
+		.checkStatus();
+	}
+}
+
+Bloom::~Bloom() {
+	for (const auto& target: mRenderTargets) {
+		delete target;
 	}
 }
 
@@ -80,8 +86,10 @@ uint32_t Bloom::blurPass(const uint32_t sceneTexture, const uint32_t VAO, int& t
 	return outTex;
 }
 
-uint32_t Bloom::combinePass(const uint32_t sceneTexture, const uint32_t bloomBlur,
-                            const uint32_t VAO, const int& toggle) const {
+uint32_t Bloom::combinePass(const uint32_t sceneTexture,
+                            const uint32_t bloomBlur,
+                            const uint32_t VAO,
+                            const int& toggle) const {
 	mRenderTargets[toggle]->bind();
 	combine->activate();
 	glDisable(GL_DEPTH_TEST);
