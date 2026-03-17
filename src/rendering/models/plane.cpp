@@ -12,10 +12,10 @@ Models::Plane::Plane(glm::vec3 color,
                      const char* heightTexture) {
 	constexpr float v[] = {
 		// Positions        // Normals		   // Texture Coords
-		5.0f, -0.5f, 5.0f, 0.0f, 1.0f, 0.0f, 2.0f, 0.0f, // top right
-		-5.0f, -0.5f, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, // top left
+		 5.0f, -0.5f,  5.0f, 0.0f, 1.0f, 0.0f, 2.0f, 0.0f, // top right
+		-5.0f, -0.5f,  5.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, // top left
 		-5.0f, -0.5f, -5.0f, 0.0f, 1.0f, 0.0f, 0.0f, 2.0f, // bottom left
-		5.0f, -0.5f, -5.0f, 0.0f, 1.0f, 0.0f, 2.0f, 2.0f // bottom right
+		 5.0f, -0.5f, -5.0f, 0.0f, 1.0f, 0.0f, 2.0f, 2.0f // bottom right
 	};
 
 	std::vector<uint32_t> indices = {

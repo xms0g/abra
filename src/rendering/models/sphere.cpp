@@ -165,7 +165,9 @@ Models::Sphere::Sphere(glm::vec3 color,
 		flag |= CASTSHADOW;
 	}
 
-	flag |= PBR;
+	if (metallic && roughness)
+		flag |= PBR;
+
 	mMaterial[0] = {flag, color, 0.0f, textures};
 }
 

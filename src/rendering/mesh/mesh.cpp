@@ -2,8 +2,9 @@
 #include "glad/glad.h"
 #include "../instanceBufferBuilder.hpp"
 
-Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices) : mVertices(std::move(vertices)),
-                                                                            mIndices(std::move(indices)) {
+Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
+	: mVertices(std::move(vertices)),
+	  mIndices(std::move(indices)) {
 	mMin = glm::vec3(FLT_MAX);
 	mMax = glm::vec3(-FLT_MAX);
 
@@ -101,8 +102,8 @@ void Mesh::uploadToGPU() {
 
 	// ids
 	glEnableVertexAttribArray(5);
-	glVertexAttribIPointer(5, 4, GL_INT, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex,
-		                       boneIDs)));
+	glVertexAttribIPointer(5, 4, GL_INT, sizeof(Vertex),
+	                       reinterpret_cast<void*>(offsetof(Vertex, boneIDs)));
 
 	// weights
 	glEnableVertexAttribArray(6);
