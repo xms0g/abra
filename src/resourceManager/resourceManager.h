@@ -7,11 +7,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include "../job/threadPool.h"
-
-struct Material;
-using MaterialMap = std::unordered_map<uint32_t, Material>;
-class Mesh;
-using MeshMap = std::unordered_map<uint32_t, std::vector<Mesh> >;
+#include "../rendering/types.hpp"
 
 class Shader;
 
