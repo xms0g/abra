@@ -42,18 +42,22 @@ private:
 
 	Mesh processMesh(aiMesh* mesh) const;
 
-	void processMaterials(const aiScene* scene,
-	                      MaterialMap& materials,
-	                      std::unordered_set<std::string>& texturesLoaded,
-	                      const std::string& baseDir) const;
+	struct MaterialLoadContext {
+		MaterialMap materials;
+		std::unordered_set<std::string> texturesLoaded;
+		std::string baseDir;
+	};
 
-	void loadMaterialTextures(const aiMaterial* mat,
-	                          aiTextureType type,
-	                          const std::string& typeName,
-	                          uint32_t materialID,
-	                          MaterialMap& materials,
-	                          std::unordered_set<std::string>& texturesLoaded,
-	                          const std::string& baseDir) const;
+	struct TextureLoadRequest {
+		const aiMaterial* mat;
+		aiTextureType type;
+		std::string_view typeName;
+		uint32_t materialID;
+	};
+
+	void processMaterials(const aiScene* scene, MaterialLoadContext& ctx) const;
+
+	void loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& ctx) const;
 
 	std::unordered_map<size_t, MaterialMap> mMaterialsByEntity;
 	std::unordered_map<size_t, MeshMap> mMeshesByEntity;
@@ -67,5 +71,21 @@ private:
 		"skybox/bottom.jpg",
 		"skybox/front.jpg",
 		"skybox/back.jpg"
+	};
+
+	struct TextureBinding {
+		aiTextureType type;
+		const char* name;
+	};
+
+	static constexpr TextureBinding textureBindings[] = {
+		{aiTextureType_DIFFUSE, "texture_albedo"},
+		{aiTextureType_SPECULAR, "texture_specular"},
+		{aiTextureType_NORMALS, "texture_normal"},
+		{aiTextureType_HEIGHT, "texture_height"},
+		{aiTextureType_METALNESS, "texture_metallic"},
+		{aiTextureType_DIFFUSE_ROUGHNESS, "texture_roughness"},
+		{aiTextureType_EMISSIVE, "texture_emissive"},
+		{aiTextureType_AMBIENT_OCCLUSION,"texture_ao"},
 	};
 };

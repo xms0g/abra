@@ -71,28 +71,24 @@ void ResourceManager::loadModel(const size_t entityID, const char* file) {
 		std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << std::endl;
 		return;
 	}
-	// retrieve the directory path of the filepath
-	std::string baseDir = path.substr(0, path.find_last_of('/')).append("/");
 
 	// process ASSIMP's root node recursively
 	MeshMap meshesByMatID;
 	processMeshes(scene->mRootNode, scene, meshesByMatID);
 
-	MaterialMap materials;
-	std::unordered_set<std::string> texturesLoaded;
-
-	processMaterials(scene, materials, texturesLoaded, baseDir);
+	MaterialLoadContext mlCtx{ .baseDir = path.substr(0, path.find_last_of('/')).append("/")};
+	processMaterials(scene, mlCtx);
 
 	{
 		std::lock_guard<std::mutex> lock(mResourceMutex);
 		mMeshesByEntity.emplace(entityID, meshesByMatID);
-		mMaterialsByEntity.emplace(entityID, materials);
+		mMaterialsByEntity.emplace(entityID, mlCtx.materials);
 	}
 }
 
 void ResourceManager::processMeshes(const aiNode* node, const aiScene* scene, MeshMap& meshesByMatID) {
 	// process each mesh located at the current node
-	for (uint32_t i = 0; i < node->mNumMeshes; i++) {
+	for (uint32_t i = 0; i < node->mNumMeshes; ++i) {
 		// the node object only contains mIndices to index the actual objects in the scene.
 		// the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
 		aiMesh* aMesh = scene->mMeshes[node->mMeshes[i]];
@@ -102,7 +98,7 @@ void ResourceManager::processMeshes(const aiNode* node, const aiScene* scene, Me
 	}
 
 	// after we've processed all of the mMeshes (if any) we then recursively process each of the children nodes
-	for (uint32_t i = 0; i < node->mNumChildren; i++) {
+	for (uint32_t i = 0; i < node->mNumChildren; ++i) {
 		processMeshes(node->mChildren[i], scene, meshesByMatID);
 	}
 }
@@ -157,10 +153,10 @@ Mesh ResourceManager::processMesh(aiMesh* mesh) const {
 		vertices.push_back(vertex);
 	}
 	// now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex mIndices.
-	for (uint32_t i = 0; i < mesh->mNumFaces; i++) {
+	for (uint32_t i = 0; i < mesh->mNumFaces; ++i) {
 		aiFace face = mesh->mFaces[i];
 		// retrieve all mIndices of the face and store them in the mIndices std::vector
-		for (uint32_t j = 0; j < face.mNumIndices; j++)
+		for (uint32_t j = 0; j < face.mNumIndices; ++j)
 			indices.push_back(face.mIndices[j]);
 	}
 
@@ -168,101 +164,37 @@ Mesh ResourceManager::processMesh(aiMesh* mesh) const {
 	return Mesh{vertices, indices};
 }
 
-void ResourceManager::processMaterials(const aiScene* scene,
-                                       MaterialMap& materials,
-                                       std::unordered_set<std::string>& texturesLoaded,
-                                       const std::string& baseDir) const {
+void ResourceManager::processMaterials(const aiScene* scene, MaterialLoadContext& ctx) const {
 	// process materials
 	for (uint32_t i = 0; i < scene->mNumMaterials; i++) {
 		const aiMaterial* material = scene->mMaterials[i];
-		// 1. diffuse maps
-		loadMaterialTextures(material,
-		                     aiTextureType_DIFFUSE,
-		                     "texture_albedo",
-		                     i,
-		                     materials,
-		                     texturesLoaded, baseDir);
-		// 2. specular maps
-		loadMaterialTextures(material,
-		                     aiTextureType_SPECULAR,
-		                     "texture_specular",
-		                     i,
-		                     materials,
-		                     texturesLoaded,
-		                     baseDir);
-		// 3. normal maps
-		loadMaterialTextures(material,
-		                     aiTextureType_NORMALS,
-		                     "texture_normal",
-		                     i,
-		                     materials,
-		                     texturesLoaded,
-		                     baseDir);
-		// 4. height maps
-		loadMaterialTextures(material,
-		                     aiTextureType_HEIGHT,
-		                     "texture_height",
-		                     i,
-		                     materials,
-		                     texturesLoaded,
-		                     baseDir);
-		// PBR Materials
-		loadMaterialTextures(material,
-		                     aiTextureType_METALNESS,
-		                     "texture_metallic",
-		                     i,
-		                     materials,
-		                     texturesLoaded,
-		                     baseDir);
-		loadMaterialTextures(material,
-		                     aiTextureType_DIFFUSE_ROUGHNESS,
-		                     "texture_roughness",
-		                     i,
-		                     materials,
-		                     texturesLoaded,
-		                     baseDir);
-		loadMaterialTextures(material,
-		                     aiTextureType_EMISSIVE,
-		                     "texture_emissive",
-		                     i,
-		                     materials,
-		                     texturesLoaded,
-		                     baseDir);
-		loadMaterialTextures(material,
-		                     aiTextureType_AMBIENT_OCCLUSION,
-		                     "texture_ao",
-		                     i,
-		                     materials,
-		                     texturesLoaded,
-		                     baseDir);
+
+		for (const auto& [type, name]: textureBindings) {
+			TextureLoadRequest req{.mat = material, .type = type, .typeName = name, .materialID = i};
+			loadMaterialTextures(req, ctx);
+		}
 	}
 }
 
-void ResourceManager::loadMaterialTextures(const aiMaterial* mat,
-                                           const aiTextureType type,
-                                           const std::string& typeName,
-                                           const uint32_t materialID,
-                                           MaterialMap& materials,
-                                           std::unordered_set<std::string>& texturesLoaded,
-                                           const std::string& baseDir) const {
-	for (uint32_t i = 0; i < mat->GetTextureCount(type); i++) {
+void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& ctx) const {
+	for (uint32_t i = 0; i < req.mat->GetTextureCount(req.type); ++i) {
 		aiString str;
-		mat->GetTexture(type, i, &str);
-		std::string path = baseDir + str.C_Str();
+		req.mat->GetTexture(req.type, i, &str);
+		std::string path = ctx.baseDir + str.C_Str();
 		// check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
-		if (texturesLoaded.contains(path))
+		if (ctx.texturesLoaded.contains(path))
 			continue;
 
 		// store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate mTextures.
-		texturesLoaded.emplace(path);
+		ctx.texturesLoaded.emplace(path);
 
-		if (materials.contains(materialID)) {
-			materials[materialID].textures.emplace_back(0, type, typeName, std::move(path));
+		if (ctx.materials.contains(req.materialID)) {
+			ctx.materials[req.materialID].textures.emplace_back(0, req.type, req.typeName, std::move(path));
 		} else {
 			uint32_t flag{0};
 			int twoSided{0};
 
-			if (mat->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
+			if (req.mat->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
 				flag |= twoSided != 0 ? TWOSIDED : 0;
 			}
 			// if (float value{0.0f}; mat->Get(AI_MATKEY_METALLIC_FACTOR, value) == AI_SUCCESS ||
@@ -274,20 +206,20 @@ void ResourceManager::loadMaterialTextures(const aiMaterial* mat,
 			float alphaCutoff{0.0f};
 			aiString alphaMode;
 
-			if (mat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode) == AI_SUCCESS) {
+			if (req.mat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode) == AI_SUCCESS) {
 				if (std::strcmp(alphaMode.C_Str(), "OPAQUE") == 0) {
 					flag |= OPAQUE | CASTSHADOW;
 				} else if (std::strcmp(alphaMode.C_Str(), "MASK") == 0) {
 					flag |= CUTOUT | CASTSHADOW;
-					mat->Get(AI_MATKEY_GLTF_ALPHACUTOFF, alphaCutoff);
+					req.mat->Get(AI_MATKEY_GLTF_ALPHACUTOFF, alphaCutoff);
 				} else if (std::strcmp(alphaMode.C_Str(), "BLEND") == 0) {
 					flag |= BLEND;
 				}
 			}
 
 			std::vector<Texture> textures;
-			textures.emplace_back(0, type, typeName, std::move(path));
-			materials[materialID] = {flag, glm::vec3(), alphaCutoff, std::move(textures)};
+			textures.emplace_back(0, req.type, req.typeName, std::move(path));
+			ctx.materials[req.materialID] = {flag, glm::vec3(), alphaCutoff, std::move(textures)};
 		}
 	}
 }
