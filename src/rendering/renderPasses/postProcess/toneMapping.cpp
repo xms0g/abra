@@ -19,7 +19,7 @@ uint32_t ToneMapping::render(
 	const uint32_t sceneTexture,
 	const uint32_t vao,
 	int& toggle,
-	FrameBuffer** renderTargets) const {
+	RenderTargetType& renderTargets) const {
 	renderTargets[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
+#include <array>
 #include "../IRenderPass.hpp"
 
 class IPostEffect;
@@ -25,6 +26,6 @@ public:
 
 private:
 	std::unique_ptr<Models::Quad> mQuad;
-	FrameBuffer* mRenderTargets[2]{};
+	std::array<std::unique_ptr<FrameBuffer>, 2> mRenderTargets;
 	std::vector<std::shared_ptr<IPostEffect> > mEffects;
 };

@@ -3,6 +3,7 @@
 #include <string>
 
 class FrameBuffer;
+using RenderTargetType = std::array<std::unique_ptr<FrameBuffer>, 2>;
 
 class IPostEffect {
 public:
@@ -17,10 +18,11 @@ public:
 
 	[[nodiscard]] bool& enabled() { return mEnabled; }
 
-	virtual uint32_t render(uint32_t sceneTexture,
-	                        uint32_t vao,
-	                        int& toggle,
-	                        FrameBuffer** renderTargets) const = 0;
+	virtual uint32_t render(
+		uint32_t sceneTexture,
+		uint32_t vao,
+		int& toggle,
+		RenderTargetType& renderTargets) const = 0;
 
 private:
 	std::string mName;

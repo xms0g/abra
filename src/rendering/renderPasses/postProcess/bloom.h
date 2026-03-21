@@ -1,4 +1,6 @@
 #pragma once
+#include <memory>
+#include <array>
 #include "IPostEffect.hpp"
 
 class Shader;
@@ -14,12 +16,12 @@ public:
 		uint32_t sceneTexture,
 		uint32_t vao,
 		int& toggle,
-		FrameBuffer** renderTargets) const override;
+		RenderTargetType& renderTargets) const override;
 
 private:
-	uint32_t brightFilterPass(uint32_t sceneTexture, uint32_t VAO, int& toggle) const;
+	uint32_t brightFilterPass(uint32_t sceneTexture, uint32_t vao, int& toggle) const;
 
-	uint32_t blurPass(uint32_t sceneTexture, uint32_t VAO, int& toggle) const;
+	uint32_t blurPass(uint32_t sceneTexture, uint32_t vao, int& toggle) const;
 
 	[[nodiscard]] uint32_t combinePass(
 		uint32_t sceneTexture,
@@ -27,7 +29,7 @@ private:
 		uint32_t vao,
 		const int& toggle) const;
 
-	FrameBuffer* mRenderTargets[2]{};
+	std::array<std::unique_ptr<FrameBuffer>, 2> mRenderTargets;
 	std::unique_ptr<Shader> brightFilter;
 	std::unique_ptr<Shader> blur;
 	std::unique_ptr<Shader> combine;

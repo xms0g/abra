@@ -14,11 +14,7 @@
 #include "../../models/quad.h"
 #include "../../renderContext/renderContext.hpp"
 
-PostProcessPass::~PostProcessPass() {
-	for (const auto& target: mRenderTargets) {
-		delete target;
-	}
-}
+PostProcessPass::~PostProcessPass() = default;
 
 std::vector<std::shared_ptr<IPostEffect>>& PostProcessPass::effects() {
 	return mEffects;
@@ -41,7 +37,7 @@ void PostProcessPass::configure(const RenderContext& ctx) {
 	};
 
 	for (auto& target: mRenderTargets) {
-		target = new FrameBuffer(static_cast<int32_t>(ctx.screen.width), static_cast<int32_t>(ctx.screen.height));
+		target = std::make_unique<FrameBuffer>(static_cast<int32_t>(ctx.screen.width), static_cast<int32_t>(ctx.screen.height));
 #ifdef HDR
 		target->withTextureFP(16, true)
 #else

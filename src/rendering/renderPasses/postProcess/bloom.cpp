@@ -20,7 +20,7 @@ Bloom::Bloom(const std::string& name, const int width, const int height, const b
 	combine->setInt("bloomBlur", 1);
 
 	for (auto& target: mRenderTargets) {
-		target = new FrameBuffer(width, height);
+		target = std::make_unique<FrameBuffer>(width, height);
 #ifdef HDR
 		target->withTextureFP(16, true)
 #else
@@ -30,17 +30,13 @@ Bloom::Bloom(const std::string& name, const int width, const int height, const b
 	}
 }
 
-Bloom::~Bloom() {
-	for (const auto& target: mRenderTargets) {
-		delete target;
-	}
-}
+Bloom::~Bloom() = default;
 
 uint32_t Bloom::render(
 	const uint32_t sceneTexture,
 	const uint32_t vao,
 	int& toggle,
-	FrameBuffer** renderTargets) const {
+	RenderTargetType& renderTargets) const {
 	(void) toggle;
 	(void) renderTargets;
 	int toggle_ = 0;
@@ -53,20 +49,20 @@ uint32_t Bloom::render(
 	return inputTex;
 }
 
-uint32_t Bloom::brightFilterPass(const uint32_t sceneTexture, const uint32_t VAO, int& toggle) const {
+uint32_t Bloom::brightFilterPass(const uint32_t sceneTexture, const uint32_t vao, int& toggle) const {
 	mRenderTargets[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	brightFilter->activate();
 
-	RenderCommon::drawQuad(sceneTexture, VAO);
+	RenderCommon::drawQuad(sceneTexture, vao);
 
 	const uint32_t outTex = mRenderTargets[toggle]->texture();
 	toggle = !toggle;
 	return outTex;
 }
 
-uint32_t Bloom::blurPass(const uint32_t sceneTexture, const uint32_t VAO, int& toggle) const {
+uint32_t Bloom::blurPass(const uint32_t sceneTexture, const uint32_t vao, int& toggle) const {
 	bool horizontal = true;
 	uint32_t outTex = sceneTexture;
 
@@ -78,7 +74,7 @@ uint32_t Bloom::blurPass(const uint32_t sceneTexture, const uint32_t VAO, int& t
 		blur->setBool("horizontal", horizontal);
 		horizontal = !horizontal;
 
-		RenderCommon::drawQuad(outTex, VAO);
+		RenderCommon::drawQuad(outTex, vao);
 
 		outTex = mRenderTargets[toggle]->texture();
 		toggle = !toggle;

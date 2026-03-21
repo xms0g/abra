@@ -13,7 +13,7 @@ public:
 		uint32_t sceneTexture,
 		uint32_t vao,
 		int& toggle,
-		FrameBuffer** renderTargets) const override;
+		RenderTargetType& renderTargets) const override;
 
 private:
 	std::unique_ptr<Shader> shader;
