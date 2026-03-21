@@ -30,8 +30,8 @@ void DeferredLightingPass::execute(const RenderContext& ctx) {
 	ctx.gBuffer->bindForRead();
 	ctx.sceneBuffer->bindForDraw();
 	glBlitFramebuffer(0, 0, ctx.gBuffer->width(), ctx.gBuffer->height(),
-					  0, 0, ctx.sceneBuffer->width(), ctx.sceneBuffer->height(),
-					  GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+	                  0, 0, ctx.sceneBuffer->width(), ctx.sceneBuffer->height(),
+	                  GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
 	ctx.sceneBuffer->bind();
 	mShader->activate();
@@ -53,5 +53,3 @@ void DeferredLightingPass::execute(const RenderContext& ctx) {
 	glEnable(GL_DEPTH_TEST);
 	ctx.sceneBuffer->unbind();
 }
-
-

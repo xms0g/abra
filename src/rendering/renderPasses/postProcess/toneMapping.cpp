@@ -15,17 +15,18 @@ float& ToneMapping::exposure() {
 	return mExposure;
 }
 
-uint32_t ToneMapping::render(const uint32_t sceneTexture,
-                             const uint32_t VAO,
-                             int& toggle,
-                             FrameBuffer** renderTargets) const {
+uint32_t ToneMapping::render(
+	const uint32_t sceneTexture,
+	const uint32_t vao,
+	int& toggle,
+	FrameBuffer** renderTargets) const {
 	renderTargets[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	shader->activate();
 	shader->setFloat("exposure", mExposure);
 
-	RenderCommon::drawQuad(sceneTexture, VAO);
+	RenderCommon::drawQuad(sceneTexture, vao);
 
 	const uint32_t texture = renderTargets[toggle]->texture();
 	renderTargets[toggle]->unbind();

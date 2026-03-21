@@ -52,9 +52,7 @@ public:
 private:
 	std::string loadFile(const char* fn);
 
-	std::string preprocess(const std::string& source,
-	                       const char* fileName,
-	                       std::unordered_set<std::string>& includedFiles);
+	std::string preprocess(const std::string& source, const char* fileName, std::unordered_set<std::string>& includedFiles);
 
 	uint32_t compileShader(const std::string& source, const char* fn, uint32_t type);
 

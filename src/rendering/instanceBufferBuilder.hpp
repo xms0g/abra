@@ -56,8 +56,11 @@ void uploadInstanceData(const T& groups, InstanceVBO& vbo) {
 		}
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo.buffer);
-		glBufferSubData(GL_ARRAY_BUFFER, vbo.offset, static_cast<long>(gpuData.size() * sizeof(InstanceData)),
-						gpuData.data());
+		glBufferSubData(
+			GL_ARRAY_BUFFER,
+			vbo.offset,
+			static_cast<long>(gpuData.size() * sizeof(InstanceData)),
+			gpuData.data());
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 }

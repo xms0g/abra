@@ -29,10 +29,10 @@ std::vector<glm::vec4> math::random::generateKernel(const int sampleCount) {
 	return kernel;
 }
 
-std::vector<float> math::random::generateNoise(int sampleCount) {
+std::vector<float> math::random::generateNoise(const int sampleCount) {
 	std::vector<float> noises;
 
-	for (unsigned int i = 0; i < sampleCount; i++) {
+	for (unsigned int i = 0; i < sampleCount; ++i) {
 		noises.push_back(randomFloats(generator) * 2.0f - 1.0f);
 		noises.push_back(randomFloats(generator) * 2.0f - 1.0f);
 		noises.push_back(0.0f);

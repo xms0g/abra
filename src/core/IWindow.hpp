@@ -5,10 +5,11 @@ class IWindow {
 public:
 	virtual ~IWindow() = default;
 
-	void init(const char* title = "Test Window",
-	          const int width = 800,
-	          const int height = 600,
-	          const bool fullscreen = false) {
+	void init(
+		const char* title = "Test Window",
+		const int width = 800,
+		const int height = 600,
+		const bool fullscreen = false) {
 		initImpl(title, width, height, fullscreen);
 	}
 

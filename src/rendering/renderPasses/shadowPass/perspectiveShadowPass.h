@@ -19,11 +19,12 @@ public:
 
 	[[nodiscard]] glm::mat4 lightSpaceMatrix(int layer) const;
 
-	void render(const RenderContext& ctx,
-	            const glm::vec4& direction,
-	            const glm::vec4& position,
-	            float fovy,
-	            int layer);
+	void render(
+		const RenderContext& ctx,
+		const glm::vec4& direction,
+		const glm::vec4& position,
+		float fovy,
+		int layer);
 
 private:
 	glm::mat4 mLightSpaceMatrix[MAX_SPOT_LIGHTS]{};

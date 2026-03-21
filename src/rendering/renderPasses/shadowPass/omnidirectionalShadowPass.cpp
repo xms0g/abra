@@ -29,9 +29,10 @@ FrameBuffer& OmnidirectionalShadowPass::depthMap() const {
 	return *mDepthMap;
 }
 
-void OmnidirectionalShadowPass::render(const RenderContext& ctx,
-									   const glm::vec4& position,
-                                       const int layer) const {
+void OmnidirectionalShadowPass::render(
+	const RenderContext& ctx,
+	const glm::vec4& position,
+	const int layer) const {
 	const glm::mat4 shadowProj = glm::perspective(
 		glm::radians(ctx.shadow.omnidirectional.fovy),
 		static_cast<float>(ctx.shadow.width) / static_cast<float>(ctx.shadow.height),
@@ -40,12 +41,9 @@ void OmnidirectionalShadowPass::render(const RenderContext& ctx,
 
 	const auto pos = glm::vec3(position);
 	std::vector<glm::mat4> shadowTransforms;
-	shadowTransforms.push_back(shadowProj * glm::lookAt(pos, pos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-	shadowTransforms.push_back(shadowProj * glm::lookAt(pos, pos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-	shadowTransforms.push_back(shadowProj * glm::lookAt(pos, pos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
-	shadowTransforms.push_back(shadowProj * glm::lookAt(pos, pos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
-	shadowTransforms.push_back(shadowProj * glm::lookAt(pos, pos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-	shadowTransforms.push_back(shadowProj * glm::lookAt(pos, pos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+	for (const auto& [dir, up]: dirUpPairs) {
+		shadowTransforms.push_back(shadowProj * glm::lookAt(pos, pos + dir, up));
+	}
 
 	mDepthShader->activate();
 	for (unsigned int i = 0; i < 6; ++i)

@@ -215,8 +215,17 @@ void RenderPipeline::configure(const Camera& camera) {
 	const glm::mat4 invProjectionMat = glm::inverse(projectionMat);
 
 	mRenderCtx->camera.ubo.self->bind();
-	mRenderCtx->camera.ubo.self->setData(glm::value_ptr(projectionMat), sizeof(glm::mat4), sizeof(glm::mat4) + sizeof(glm::vec4));
-	mRenderCtx->camera.ubo.self->setData(glm::value_ptr(invProjectionMat), sizeof(glm::mat4), 2 * sizeof(glm::mat4) + sizeof(glm::vec4));
+
+	mRenderCtx->camera.ubo.self->setData(
+		glm::value_ptr(projectionMat),
+		sizeof(glm::mat4),
+		sizeof(glm::mat4) + sizeof(glm::vec4));
+
+	mRenderCtx->camera.ubo.self->setData(
+		glm::value_ptr(invProjectionMat),
+		sizeof(glm::mat4),
+		2 * sizeof(glm::mat4) + sizeof(glm::vec4));
+
 	mRenderCtx->camera.ubo.self->unbind();
 
 	// Configure render passes
@@ -233,12 +242,24 @@ void RenderPipeline::configure(const Camera& camera) {
 	const std::vector<Shader*> shaders = {
 		opaque.get(), cutout.get(), blend.get(),
 		unlit.get(), pbr.get(), instancedOpaque.get(),
-		instancedCutout.get(), instancedBlend.get(), skybox.get()};
+		instancedCutout.get(), instancedBlend.get(), skybox.get()
+	};
 
 	for (const auto& shader: shaders) {
-		mRenderCtx->camera.ubo.self->configure(shader->ID(), mRenderCtx->camera.ubo.binding, mRenderCtx->camera.ubo.blockName);
-		mRenderCtx->light.ubo.self->configure(shader->ID(), mRenderCtx->light.ubo.binding, mRenderCtx->light.ubo.blockName);
-		mRenderCtx->shadow.ubo.self->configure(shader->ID(), mRenderCtx->shadow.ubo.binding, mRenderCtx->shadow.ubo.blockName);
+		mRenderCtx->camera.ubo.self->configure(
+			shader->ID(),
+			mRenderCtx->camera.ubo.binding,
+			mRenderCtx->camera.ubo.blockName);
+
+		mRenderCtx->light.ubo.self->configure(
+			shader->ID(),
+			mRenderCtx->light.ubo.binding,
+			mRenderCtx->light.ubo.blockName);
+
+		mRenderCtx->shadow.ubo.self->configure(
+			shader->ID(),
+			mRenderCtx->shadow.ubo.binding,
+			mRenderCtx->shadow.ubo.blockName);
 	}
 }
 
@@ -259,7 +280,11 @@ void RenderPipeline::render() {
 	}
 
 	mRenderCtx->sceneBuffer = mSceneBuffer.get();
-	glViewport(0, 0, static_cast<int32_t>(mRenderCtx->screen.width), static_cast<int32_t>(mRenderCtx->screen.height));
+	glViewport(
+		0,
+		0,
+		static_cast<int32_t>(mRenderCtx->screen.width),
+		static_cast<int32_t>(mRenderCtx->screen.height));
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 

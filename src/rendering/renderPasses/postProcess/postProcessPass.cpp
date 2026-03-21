@@ -7,6 +7,7 @@
 #include "toneMapping.h"
 #include "kernel.h"
 #include "fxaa.h"
+#include "kernels.hpp"
 #include "../../shader.h"
 #include "../../renderCommon.h"
 #include "../../buffers/frameBuffer.h"
@@ -51,11 +52,12 @@ void PostProcessPass::configure(const RenderContext& ctx) {
 }
 
 void PostProcessPass::execute(const RenderContext& ctx) {
-	uint32_t inputTex = ctx.sceneBuffer->texture();
 	int toggle = 0;
 
+	uint32_t inputTex = ctx.sceneBuffer->texture();
 	for (const auto& effect: mEffects) {
-		if (!effect->enabled()) continue;
+		if (!effect->enabled())
+			continue;
 
 		inputTex = effect->render(inputTex, mQuad->VAO(), toggle, mRenderTargets);
 	}

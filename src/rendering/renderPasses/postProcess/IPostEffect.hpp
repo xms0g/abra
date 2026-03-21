@@ -18,7 +18,7 @@ public:
 	[[nodiscard]] bool& enabled() { return mEnabled; }
 
 	virtual uint32_t render(uint32_t sceneTexture,
-	                        uint32_t VAO,
+	                        uint32_t vao,
 	                        int& toggle,
 	                        FrameBuffer** renderTargets) const = 0;
 
