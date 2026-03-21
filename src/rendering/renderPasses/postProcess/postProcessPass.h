@@ -12,6 +12,8 @@ class Quad;
 }
 
 class FrameBuffer;
+using RenderTargetType = std::array<std::unique_ptr<FrameBuffer>, 2>;
+
 class Shader;
 
 class PostProcessPass final : public IRenderPass {
@@ -26,6 +28,6 @@ public:
 
 private:
 	std::unique_ptr<Models::Quad> mQuad;
-	std::array<std::unique_ptr<FrameBuffer>, 2> mRenderTargets;
+	RenderTargetType mRenderTargets;
 	std::vector<std::shared_ptr<IPostEffect> > mEffects;
 };
