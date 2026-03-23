@@ -2,29 +2,6 @@
 
 const float PI = 3.14159265359;
 
-vec3 brdf(vec3 lightPos, vec3 worldPos, vec3 color, vec3 albedo, vec3 N, float metallic, float roughness, float ao, vec3 V, vec3 F0);
-
-vec3 calculateLights(vec3 albedo, vec3 N, float metallic, float roughness, float ao, vec3 V, vec3 worldPos) {
-    vec3 F0 = vec3(0.04);
-    F0 = mix(F0, albedo, metallic);
-
-    vec3 Lo = vec3(0.0);
-    for (int i = 0; i < lightCount.x; i++) {
-        Lo += brdf((-dirLights[i].direction * 5.0).xyz, worldPos, dirLights[i].diffuse.rgb, albedo, N, metallic, roughness, ao, V, F0);
-    }
-    for (int i = 0; i < lightCount.y; i++) {
-        Lo += brdf(pointLights[i].position.xyz, worldPos, pointLights[i].diffuse.rgb, albedo, N, metallic, roughness, ao, V, F0);
-    }
-    for (int i = 0; i < lightCount.z; i++) {
-        Lo += brdf(spotLights[i].position.xyz, worldPos, spotLights[i].diffuse.rgb, albedo, N, metallic, roughness, ao, V, F0);
-    }
-
-    vec3 ambient = vec3(0.03) * albedo * ao;
-    vec3 color = ambient + Lo;
-
-    return color;
-}
-
 vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
