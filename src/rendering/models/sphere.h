@@ -7,13 +7,14 @@
 namespace Models {
 class Sphere {
 public:
-	explicit Sphere(glm::vec3 color = glm::vec3(1.0f),
-				  bool unlit = false,
-				  const char* albedo = nullptr,
-				  const char* normal = nullptr,
-				  const char* metallic = nullptr,
-				  const char* roughness = nullptr,
-				  const char* ao = nullptr);
+	explicit Sphere(
+		glm::vec3 color = glm::vec3(1.0f),
+		bool unlit = false,
+		const char* albedo = nullptr,
+		const char* normal = nullptr,
+		const char* metallic = nullptr,
+		const char* roughness = nullptr,
+		const char* ao = nullptr);
 
 	~Sphere();
 

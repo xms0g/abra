@@ -5,13 +5,14 @@
 #include "../../config/config.hpp"
 #include "../../io/filesystem.hpp"
 
-Models::Sphere::Sphere(glm::vec3 color,
-                       bool unlit,
-                       const char* albedo,
-                       const char* normal,
-                       const char* metallic,
-                       const char* roughness,
-                       const char* ao) {
+Models::Sphere::Sphere(
+	glm::vec3 color,
+	bool unlit,
+	const char* albedo,
+	const char* normal,
+	const char* metallic,
+	const char* roughness,
+	const char* ao) {
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec2> uv;
