@@ -210,9 +210,10 @@ void RenderPipeline::configure(const Camera& camera) {
 	mRenderCtx->shadow.perspective.maxLights = MAX_SPOT_LIGHTS;
 	mRenderCtx->shadow.perspective.nearPlane = SHADOW_PERSPECTIVE_NEAR;
 	mRenderCtx->shadow.perspective.farPlane = SHADOW_PERSPECTIVE_FAR;
-	mRenderCtx->PBR.irradianceMap.textureSlot = IRRADIANCE_MAP_TEXTURE_SLOT;
-	mRenderCtx->PBR.HDRTexture = HDR_TEXTURE;
-
+	mRenderCtx->PBR.envMap.size = PBR_ENVMAP_SIZE;
+	mRenderCtx->PBR.irradianceMap.size = PBR_IRRADIANCE_MAP_SIZE;
+	mRenderCtx->PBR.irradianceMap.textureSlot = PBR_IRRADIANCE_MAP_TEXTURE_SLOT;
+	mRenderCtx->PBR.HDRTexture = PBR_HDR_TEXTURE;
 
 	// Set camera projection matrix
 	const glm::mat4 projectionMat = glm::perspective(

@@ -28,8 +28,8 @@ void PBRPass::configure(const RenderContext& ctx) {
 	Models::Cube cube;
 	const auto& cubeMesh = cube.meshes()->at(0).front();
 
-	const CubemapBuffer envMap{512};
-	const uint32_t envCubemap = texture::generateCubemap(512);
+	const CubemapBuffer envMap{ctx.PBR.envMap.size};
+	const uint32_t envCubemap = texture::generateCubemap(ctx.PBR.envMap.size);
 
 	const uint32_t HDRTexture = texture::loadHDR(fs::path(ASSET_DIR + ctx.PBR.HDRTexture).c_str());
 
@@ -61,10 +61,10 @@ void PBRPass::configure(const RenderContext& ctx) {
 	}
 
 	envMap.unbind();
-	ctx.PBR.envCubeMap = envCubemap;
+	ctx.PBR.envMap.binding = envCubemap;
 
-	const CubemapBuffer irradianceMap{32};
-	mIrradianceMap = texture::generateCubemap(32);
+	const CubemapBuffer irradianceMap{ctx.PBR.irradianceMap.size};
+	mIrradianceMap = texture::generateCubemap(ctx.PBR.irradianceMap.size);
 
 	// solve diffuse integral by convolution to create an irradiance (cube)map.
 	mIrradianceConv->activate();

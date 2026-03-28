@@ -92,10 +92,15 @@ struct RenderContext {
 
 	struct {
 		struct {
+			mutable uint32_t binding;
+			int size;
+		} envMap;
+
+		struct {
 			int textureSlot;
+			int size;
 		} irradianceMap;
 
-		mutable uint32_t envCubeMap;
 		const char* HDRTexture;
 	} PBR;
 

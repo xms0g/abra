@@ -58,6 +58,8 @@ constexpr float SSAO_INTENSITY{3.0f};
 constexpr uint32_t SSAO_UBO_BINDING{3};
 constexpr auto SSAO_UBO_BLOCK_NAME = "SSAOBlock";
 // PBR
-constexpr int IRRADIANCE_MAP_TEXTURE_SLOT{11};
-constexpr auto HDR_TEXTURE = "textures/hdr/newport_loft.hdr";
+constexpr int PBR_ENVMAP_SIZE{512};
+constexpr int PBR_IRRADIANCE_MAP_SIZE{32};
+constexpr int PBR_IRRADIANCE_MAP_TEXTURE_SLOT{11};
+constexpr auto PBR_HDR_TEXTURE = "textures/hdr/newport_loft.hdr";
 
