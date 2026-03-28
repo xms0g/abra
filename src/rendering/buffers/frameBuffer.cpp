@@ -432,9 +432,6 @@ void FrameBuffer::setDepthTextureParameters(const uint32_t target, const int dim
 }
 
 CubemapBuffer::CubemapBuffer(const int size) : mSize(size) {
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
-
 	glGenFramebuffers(1, &mFBO);
 	glGenRenderbuffers(1, &mRBO);
 
@@ -442,11 +439,38 @@ CubemapBuffer::CubemapBuffer(const int size) : mSize(size) {
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, size, size);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRBO);
+
+	glGenTextures(1, &mCubemapID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, mCubemapID);
+
+	for (unsigned int i = 0; i < 6; ++i) {
+		glTexImage2D(
+			GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+			0,
+			GL_RGB16F,
+			static_cast<int32_t>(size),
+			static_cast<int32_t>(size),
+			0,
+			GL_RGB,
+			GL_FLOAT,
+			nullptr);
+	}
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
 CubemapBuffer::~CubemapBuffer() {
 	glDeleteFramebuffers(1, &mFBO);
 	glDeleteRenderbuffers(1, &mRBO);
+	glDeleteTextures(1, &mCubemapID);
+}
+
+uint32_t CubemapBuffer::texture() const {
+	return mCubemapID;
 }
 
 void CubemapBuffer::bind() const {
@@ -458,12 +482,12 @@ void CubemapBuffer::unbind() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void CubemapBuffer::bindFace(const uint32_t cubemap, const uint32_t face) const {
+void CubemapBuffer::bindFace(const uint32_t face) const {
 	glFramebufferTexture2D(
 		GL_FRAMEBUFFER,
 		GL_COLOR_ATTACHMENT0,
 		GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
-		cubemap,
+		mCubemapID,
 		0);
 
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);

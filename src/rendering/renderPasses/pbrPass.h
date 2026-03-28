@@ -3,7 +3,6 @@
 #include "IRenderPass.hpp"
 
 class CubemapBuffer;
-class FrameBuffer;
 class Shader;
 
 class PBRPass final : public IRenderPass {
@@ -18,5 +17,6 @@ private:
 	std::unique_ptr<Shader> mEquirectangularToCube;
 	std::unique_ptr<Shader> mIrradianceConv;
 
-	uint32_t mIrradianceMap{0};
+	std::unique_ptr<CubemapBuffer> mEnvMapBuffer;
+	std::unique_ptr<CubemapBuffer> mIrradianceMapBuffer;
 };

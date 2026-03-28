@@ -73,14 +73,17 @@ public:
 
 	~CubemapBuffer();
 
+	[[nodiscard]] uint32_t texture() const;
+
 	void bind() const;
 
 	void unbind() const;
 
-	void bindFace(uint32_t cubemap, uint32_t face) const;
+	void bindFace(uint32_t face) const;
 
 private:
 	uint32_t mFBO{0};
 	uint32_t mRBO{0};
+	uint32_t mCubemapID{0};
 	int mSize{0};
 };

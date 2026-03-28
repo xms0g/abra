@@ -16,6 +16,9 @@
 PBRPass::~PBRPass() = default;
 
 void PBRPass::configure(const RenderContext& ctx) {
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	glDisable(GL_CULL_FACE);
 	for (const auto& [entity, matb]: ctx.renderQueue->pbrGroups) {
 		const auto& [material, shader, meshes] = matb;
 		shader->activate();
@@ -27,9 +30,6 @@ void PBRPass::configure(const RenderContext& ctx) {
 
 	Models::Cube cube;
 	const auto& cubeMesh = cube.meshes()->at(0).front();
-
-	const CubemapBuffer envMap{ctx.PBR.envMap.size};
-	const uint32_t envCubemap = texture::generateCubemap(ctx.PBR.envMap.size);
 
 	const uint32_t HDRTexture = texture::loadHDR(fs::path(ASSET_DIR + ctx.PBR.HDRTexture).c_str());
 
@@ -44,7 +44,7 @@ void PBRPass::configure(const RenderContext& ctx) {
 		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f))
 	};
 
-	constexpr uint32_t faces = 6;
+	constexpr uint32_t totalFaces = 6;
 	// convert HDR equirectangular environment map to cubemap equivalent
 	mEquirectangularToCube->activate();
 	mEquirectangularToCube->setInt("equirectangularMap", 0);
@@ -53,39 +53,41 @@ void PBRPass::configure(const RenderContext& ctx) {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, HDRTexture);
 
-	envMap.bind();
-	for (uint32_t i = 0; i < faces; ++i) {
-		envMap.bindFace(envCubemap, i);
+	mEnvMapBuffer = std::make_unique<CubemapBuffer>(ctx.PBR.envMap.size);
+	mEnvMapBuffer->bind();
+	for (uint32_t i = 0; i < totalFaces; ++i) {
+		mEnvMapBuffer->bindFace(i);
 		mEquirectangularToCube->setMat4("view", captureViews[i]);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		RenderCommon::drawMesh(cubeMesh);
 	}
 
-	envMap.unbind();
-	ctx.PBR.envMap.binding = envCubemap;
+	mEnvMapBuffer->unbind();
+	ctx.PBR.envMap.binding = mEnvMapBuffer->texture();
 
-	const CubemapBuffer irradianceMap{ctx.PBR.irradianceMap.size};
-	mIrradianceMap = texture::generateCubemap(ctx.PBR.irradianceMap.size);
-
+	mIrradianceMapBuffer = std::make_unique<CubemapBuffer>(ctx.PBR.irradianceMap.size);
 	// solve diffuse integral by convolution to create an irradiance (cube)map.
 	mIrradianceConv->activate();
 	mIrradianceConv->setInt("environmentMap", 0);
 	mIrradianceConv->setMat4("projection", captureProjection);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, mEnvMapBuffer->texture());
 
-	irradianceMap.bind();
-	for (uint32_t i = 0; i < faces; ++i) {
-		irradianceMap.bindFace(mIrradianceMap, i);
+	mIrradianceMapBuffer->bind();
+	for (uint32_t i = 0; i < totalFaces; ++i) {
+		mIrradianceMapBuffer->bindFace(i);
 		mIrradianceConv->setMat4("view", captureViews[i]);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		RenderCommon::drawMesh(cubeMesh);
 	}
 
-	irradianceMap.unbind();
+	mIrradianceMapBuffer->unbind();
+
+	glEnable(GL_CULL_FACE);
+	glDepthFunc(GL_LESS);
 	glViewport(0, 0, static_cast<int32_t>(ctx.screen.width), static_cast<int32_t>(ctx.screen.height));
 }
 
@@ -94,7 +96,7 @@ void PBRPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
 
 	glActiveTexture(GL_TEXTURE0 + ctx.PBR.irradianceMap.textureSlot);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, mIrradianceMap);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, mIrradianceMapBuffer->texture());
 
 	const Material* lastMaterial = nullptr;
 	const Shader* lastShader = nullptr;
