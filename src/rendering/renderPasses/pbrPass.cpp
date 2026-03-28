@@ -28,6 +28,9 @@ void PBRPass::configure(const RenderContext& ctx) {
 	mEquirectangularToCube = std::make_unique<Shader>("pbr/cubemap.vert", "pbr/equirectangularToCube.frag");
 	mIrradianceConv = std::make_unique<Shader>("pbr/cubemap.vert", "pbr/irradianceConv.frag");
 
+	mEnvMapBuffer = std::make_unique<CubemapBuffer>(ctx.PBR.envMap.size);
+	mIrradianceMapBuffer = std::make_unique<CubemapBuffer>(ctx.PBR.irradianceMap.size);
+
 	Models::Cube cube;
 	const auto& cubeMesh = cube.meshes()->at(0).front();
 
@@ -53,7 +56,6 @@ void PBRPass::configure(const RenderContext& ctx) {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, HDRTexture);
 
-	mEnvMapBuffer = std::make_unique<CubemapBuffer>(ctx.PBR.envMap.size);
 	mEnvMapBuffer->bind();
 	for (uint32_t i = 0; i < totalFaces; ++i) {
 		mEnvMapBuffer->bindFace(i);
@@ -66,7 +68,6 @@ void PBRPass::configure(const RenderContext& ctx) {
 	mEnvMapBuffer->unbind();
 	ctx.PBR.envMap.binding = mEnvMapBuffer->texture();
 
-	mIrradianceMapBuffer = std::make_unique<CubemapBuffer>(ctx.PBR.irradianceMap.size);
 	// solve diffuse integral by convolution to create an irradiance (cube)map.
 	mIrradianceConv->activate();
 	mIrradianceConv->setInt("environmentMap", 0);
