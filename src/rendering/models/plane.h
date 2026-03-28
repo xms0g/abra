@@ -7,11 +7,12 @@
 namespace Models {
 class Plane {
 public:
-	explicit Plane(glm::vec3 color,
-	               const char* diffuseTexture = nullptr,
-	               const char* specularTexture = nullptr,
-	               const char* normalTexture = nullptr,
-	               const char* heightTexture = nullptr);
+	explicit Plane(
+		glm::vec3 color,
+		const char* diffuseTexture = nullptr,
+		const char* specularTexture = nullptr,
+		const char* normalTexture = nullptr,
+		const char* heightTexture = nullptr);
 
 	~Plane();
 

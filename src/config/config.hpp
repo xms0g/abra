@@ -34,7 +34,7 @@ constexpr auto LIGHT_UBO_BLOCK_NAME = "LightBlock";
 // Shadow
 constexpr int SHADOWMAP_WIDTH{1024};
 constexpr int SHADOWMAP_HEIGHT{1024};
-constexpr int SHADOWMAP_TEXTURE_SLOT{6};
+constexpr int SHADOWMAP_TEXTURE_SLOT{8};
 constexpr float SHADOW_DIRECTIONAL_HEIGHT{5.0};
 constexpr float SHADOW_DIRECTIONAL_NEAR{1.0f};
 constexpr float SHADOW_DIRECTIONAL_FAR{7.5f};
@@ -57,4 +57,7 @@ constexpr float SSAO_BIAS{0.025f};
 constexpr float SSAO_INTENSITY{3.0f};
 constexpr uint32_t SSAO_UBO_BINDING{3};
 constexpr auto SSAO_UBO_BLOCK_NAME = "SSAOBlock";
+// PBR
+constexpr int IRRADIANCE_MAP_TEXTURE_SLOT{11};
+constexpr auto HDR_TEXTURE = "textures/hdr/newport_loft.hdr";
 

@@ -17,6 +17,33 @@ uint32_t texture::generate(const uint32_t width, const uint32_t height, const fl
 	return textureID;
 }
 
+uint32_t texture::generateCubemap(const uint32_t size) {
+	uint32_t textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	for (unsigned int i = 0; i < 6; ++i) {
+		glTexImage2D(
+			GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+			0,
+			GL_RGB16F,
+			size,
+			size,
+			0,
+			GL_RGB,
+			GL_FLOAT,
+			nullptr);
+	}
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	return textureID;
+}
+
 uint32_t texture::load(const char* path, const uint32_t flag) {
 	uint32_t textureID;
 
@@ -94,6 +121,7 @@ uint32_t texture::loadHDR(const char* path) {
 	uint32_t hdrTexture;
 	int width, height, channel;
 
+	stbi_set_flip_vertically_on_load(true);
 	float* data = stbi_loadf(path, &width, &height, &channel, 0);
 	if (!data) {
 		std::cerr << "HDR texture failed to load at path: " << path << std::endl;

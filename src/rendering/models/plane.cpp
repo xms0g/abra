@@ -5,11 +5,12 @@
 #include "../../config/config.hpp"
 #include "../../io/filesystem.hpp"
 
-Models::Plane::Plane(glm::vec3 color,
-                     const char* diffuseTexture,
-                     const char* specularTexture,
-                     const char* normalTexture,
-                     const char* heightTexture) {
+Models::Plane::Plane(
+	glm::vec3 color,
+	const char* diffuseTexture,
+	const char* specularTexture,
+	const char* normalTexture,
+	const char* heightTexture) {
 	constexpr float v[] = {
 		// Positions        // Normals		   // Texture Coords
 		 5.0f, -0.5f,  5.0f, 0.0f, 1.0f, 0.0f, 2.0f, 0.0f, // top right

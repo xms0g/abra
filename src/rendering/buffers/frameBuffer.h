@@ -66,3 +66,21 @@ private:
 	std::vector<uint32_t> mTextureIDs;
 	std::vector<uint32_t> mAttachments;
 };
+
+class CubemapBuffer {
+public:
+	CubemapBuffer(int size);
+
+	~CubemapBuffer();
+
+	void bind() const;
+
+	void unbind() const;
+
+	void bindFace(uint32_t cubemap, uint32_t face) const;
+
+private:
+	uint32_t mFBO{0};
+	uint32_t mRBO{0};
+	int mSize{0};
+};

@@ -90,6 +90,15 @@ struct RenderContext {
 		} perspective;
 	} shadow;
 
+	struct {
+		struct {
+			int textureSlot;
+		} irradianceMap;
+
+		mutable uint32_t envCubeMap;
+		const char* HDRTexture;
+	} PBR;
+
 	RenderContext() = default;
 	RenderContext(const RenderContext&) = delete;
 	RenderContext& operator=(const RenderContext&) = delete;

@@ -5,12 +5,13 @@
 #include "../../config/config.hpp"
 #include "../../io/filesystem.hpp"
 
-Models::Cube::Cube(glm::vec3 color,
-                   bool unlit,
-                   const char* diffuseTexture,
-                   const char* specularTexture,
-                   const char* normalTexture,
-                   const char* heightTexture) {
+Models::Cube::Cube(
+	glm::vec3 color,
+	bool unlit,
+	const char* diffuseTexture,
+	const char* specularTexture,
+	const char* normalTexture,
+	const char* heightTexture) {
 	constexpr float v[] = {
 		// Back face (-Z)
 		-0.5f, -0.5f, -0.5f,  0,  0, -1, 0, 0,

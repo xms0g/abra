@@ -18,6 +18,7 @@
 #include "renderPasses/ssaoPass.h"
 #include "renderPasses/debugPass.h"
 #include "renderPasses/forwardOpaquePass.h"
+#include "renderPasses/pbrPass.h"
 #include "renderPasses/blendInstancedPass.h"
 #include "renderPasses/blendPass.h"
 #include "renderPasses/opaqueInstancedPass.h"
@@ -71,7 +72,7 @@ RenderPipeline::RenderPipeline(Registry* registry) {
 	cutout = std::make_unique<Shader>("object.vert", "cutout.frag");
 	blend = std::make_unique<Shader>("object.vert", "blend.frag");
 	unlit = std::make_unique<Shader>("unlit.vert", "unlit.frag");
-	pbr = std::make_unique<Shader>("pbr.vert", "pbr.frag");
+	pbr = std::make_unique<Shader>("pbr/pbr.vert", "pbr/pbr.frag");
 	instancedOpaque = std::make_unique<Shader>("instanced.vert", "opaque.frag");
 	instancedCutout = std::make_unique<Shader>("instanced.vert", "cutout.frag");
 	instancedBlend = std::make_unique<Shader>("instanced.vert", "blend.frag");
@@ -142,6 +143,10 @@ void RenderPipeline::configure(const Camera& camera) {
 		mRenderPasses.push_back(std::make_shared<ForwardOpaquePass>());
 	}
 
+	if (!mRenderQueue.pbrGroups.empty()) {
+		mRenderPasses.push_back(std::make_shared<PBRPass>());
+	}
+
 	if (!mRenderQueue.debugGroups.empty()) {
 		mRenderPasses.push_back(std::make_shared<DebugPass>());
 	}
@@ -205,6 +210,9 @@ void RenderPipeline::configure(const Camera& camera) {
 	mRenderCtx->shadow.perspective.maxLights = MAX_SPOT_LIGHTS;
 	mRenderCtx->shadow.perspective.nearPlane = SHADOW_PERSPECTIVE_NEAR;
 	mRenderCtx->shadow.perspective.farPlane = SHADOW_PERSPECTIVE_FAR;
+	mRenderCtx->PBR.irradianceMap.textureSlot = IRRADIANCE_MAP_TEXTURE_SLOT;
+	mRenderCtx->PBR.HDRTexture = HDR_TEXTURE;
+
 
 	// Set camera projection matrix
 	const glm::mat4 projectionMat = glm::perspective(
@@ -375,10 +383,12 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			} else {
 				mRenderQueue.deferredGroups.push_back(group);
 			}
-		} else if (material.flag & PBR || material.flag & CUTOUT) {
+		} else if (material.flag & CUTOUT) {
 			mRenderQueue.forwardOpaqueGroups.push_back(group);
 		} else if (material.flag & BLEND) {
 			mRenderQueue.blendGroups.push_back(group);
+		} else if (material.flag & PBR) {
+			mRenderQueue.pbrGroups.push_back(group);
 		}
 	}
 }

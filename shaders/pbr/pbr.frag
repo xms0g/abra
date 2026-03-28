@@ -29,16 +29,15 @@ vec3 calculateLights(vec3 albedo, vec3 N, float metallic, float roughness, float
         Lo += brdf(spotLights[i].position.xyz, worldPos, spotLights[i].diffuse.rgb, albedo, N, metallic, roughness, ao, V, F0);
     }
 
-//    vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
-//    vec3 kD = 1.0 - kS;
-//    kD *= 1.0 - metallic;
-//    vec3 irradiance = texture(irradianceMap, N).rgb;
-//    vec3 diffuse = irradiance * albedo;
-//    vec3 ambient = (kD * diffuse) * ao;
-//
-//    vec3 color = ambient + Lo;
-    vec3 ambient = vec3(0.03) * albedo * ao;
+    vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;
+    vec3 irradiance = texture(irradianceMap, N).rgb;
+    vec3 diffuse = irradiance * albedo;
+    vec3 ambient = (kD * diffuse) * ao;
+
     vec3 color = ambient + Lo;
+
     return color;
 }
 
