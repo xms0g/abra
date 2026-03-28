@@ -49,6 +49,7 @@ void PBRPass::configure(const RenderContext& ctx) {
 	mEquirectangularToCube->activate();
 	mEquirectangularToCube->setInt("equirectangularMap", 0);
 	mEquirectangularToCube->setMat4("projection", captureProjection);
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, HDRTexture);
 
@@ -56,6 +57,7 @@ void PBRPass::configure(const RenderContext& ctx) {
 	for (uint32_t i = 0; i < faces; ++i) {
 		envMap.bindFace(envCubemap, i);
 		mEquirectangularToCube->setMat4("view", captureViews[i]);
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		RenderCommon::drawMesh(cubeMesh);
 	}
@@ -70,6 +72,7 @@ void PBRPass::configure(const RenderContext& ctx) {
 	mIrradianceConv->activate();
 	mIrradianceConv->setInt("environmentMap", 0);
 	mIrradianceConv->setMat4("projection", captureProjection);
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 
@@ -77,6 +80,7 @@ void PBRPass::configure(const RenderContext& ctx) {
 	for (uint32_t i = 0; i < faces; ++i) {
 		irradianceMap.bindFace(mIrradianceMap, i);
 		mIrradianceConv->setMat4("view", captureViews[i]);
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		RenderCommon::drawMesh(cubeMesh);
 	}

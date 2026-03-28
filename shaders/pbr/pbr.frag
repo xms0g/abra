@@ -7,9 +7,9 @@ in VS_OUT
 } fs_in;
 
 #include "ub/camera.glsl"
-#include "common/pbrMaterial.glsl"
+#include "pbr/material.glsl"
 #include "common/normalMap.glsl"
-#include "common/brdf.glsl"
+#include "pbr/brdf.glsl"
 
 // IBL
 uniform samplerCube irradianceMap;
@@ -37,6 +37,7 @@ vec3 calculateLights(vec3 albedo, vec3 N, float metallic, float roughness, float
     vec3 ambient = (kD * diffuse) * ao;
 
     vec3 color = ambient + Lo;
+    color = color / (color + vec3(1.0));
 
     return color;
 }
