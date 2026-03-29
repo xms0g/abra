@@ -2,9 +2,9 @@
 #include <cstdint>
 #include <vector>
 
-class IBuffer {
+class IFrameBuffer {
 public:
-	virtual ~IBuffer() = default;
+	virtual ~IFrameBuffer() = default;
 
 	[[nodiscard]] virtual uint32_t texture() const = 0;
 
@@ -19,7 +19,7 @@ protected:
 	uint32_t mRBO{0};
 };
 
-class FrameBuffer final : public IBuffer {
+class FrameBuffer final : public IFrameBuffer {
 public:
 	FrameBuffer(int width, int height);
 
@@ -82,7 +82,7 @@ private:
 	std::vector<uint32_t> mAttachments;
 };
 
-class CubemapBuffer final : public IBuffer {
+class CubemapBuffer final : public IFrameBuffer {
 public:
 	CubemapBuffer(int size);
 

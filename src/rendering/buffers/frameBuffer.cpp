@@ -4,7 +4,7 @@
 #include <vector>
 #include "glad/glad.h"
 
-void IBuffer::checkStatus() {
+void IFrameBuffer::checkStatus() {
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 		throw std::runtime_error("ERROR::FRAMEBUFFER::NOT_COMPLETE!\n");
 	}
