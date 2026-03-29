@@ -8,14 +8,14 @@
 #include "../../ECS/components/transform.hpp"
 #include "../../ECS/components/instance.hpp"
 
-GuiSystem::GuiSystem(SDL_Window* window, const SDL_GLContext gl_context) {
+GuiSystem::GuiSystem(SDL_Window* window, const SDL_GLContext context) {
 	RequireComponent<TransformComponent>(true);
 	RequireComponent<PointLightComponent>(true);
 	RequireComponent<SpotLightComponent>(true);
 	RequireComponent<DirectionalLightComponent>(true);
 	RequireComponent<DebugComponent>(true);
 	// Initialize the ImGui context
-	GuiBackend::init(window, gl_context, "#version 410");
+	GuiBackend::init(window, context, "#version 410");
 }
 
 GuiSystem::~GuiSystem() {

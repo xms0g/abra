@@ -6,7 +6,7 @@ struct IPostEffect;
 
 class GuiSystem final : public System {
 public:
-	GuiSystem(SDL_Window* window, SDL_GLContext gl_context);
+	GuiSystem(SDL_Window* window, SDL_GLContext context);
 
 	~GuiSystem() override;
 
