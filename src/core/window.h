@@ -13,7 +13,7 @@ public:
 
     void swapBuffer() override;
 
-private:
+protected:
     void initImpl(const char* title, int width, int height, bool fullscreen) override;
 
     void clearImpl(float r, float g, float b, float a) override;

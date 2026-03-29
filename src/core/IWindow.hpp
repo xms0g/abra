@@ -21,12 +21,12 @@ public:
 		clearImpl(r, g, b, a);
 	}
 
+	virtual void swapBuffer() = 0;
+
 protected:
 	virtual void initImpl(const char* title, int width, int height, bool fullscreen) = 0;
 
 	virtual void clearImpl(float r, float g, float b, float a) = 0;
 
-	virtual void swapBuffer() = 0;
-
-	T* mWindow = nullptr;
+	T* mWindow{nullptr};
 };

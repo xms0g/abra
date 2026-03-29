@@ -5,26 +5,28 @@ Camera::Camera(
 	const glm::vec3& position,
 	const glm::vec3& up,
 	const float yaw,
-	const float pitch) : mPosition(position),
-	                     mFront(0.0f, 0.0f, -1.0f),
-	                     mWorldUp(up),
-	                     mYaw(yaw),
-	                     mPitch(pitch),
-	                     mMovementSpeed(SPEED),
-	                     mMouseSensitivity(SENSITIVITY) {
+	const float pitch)
+	: mPosition(position),
+	  mFront(0.0f, 0.0f, -1.0f),
+	  mWorldUp(up),
+	  mYaw(yaw),
+	  mPitch(pitch),
+	  mMovementSpeed(SPEED),
+	  mMouseSensitivity(SENSITIVITY) {
 	update();
 }
 
 Camera::Camera(
 	const float posX, const float posY, const float posZ,
 	const float upX, const float upY, const float upZ,
-	const float yaw, const float pitch) : mPosition(posX, posY, posZ),
-	                                      mFront(0.0f, 0.0f, -1.0f),
-	                                      mWorldUp(upX, upY, upZ),
-	                                      mYaw(yaw),
-	                                      mPitch(pitch),
-	                                      mMovementSpeed(SPEED),
-	                                      mMouseSensitivity(SENSITIVITY) {
+	const float yaw, const float pitch)
+	: mPosition(posX, posY, posZ),
+	  mFront(0.0f, 0.0f, -1.0f),
+	  mWorldUp(upX, upY, upZ),
+	  mYaw(yaw),
+	  mPitch(pitch),
+	  mMovementSpeed(SPEED),
+	  mMouseSensitivity(SENSITIVITY) {
 	update();
 }
 
