@@ -66,25 +66,26 @@ void LightSystem::update(const RenderContext& ctx) {
 }
 
 void LightSystem::updateLightUBO(const RenderContext& ctx) const {
-	mUBO->bind();
 	uint32_t offset = 0;
 
 	auto uploadDataToGPU = [this, &offset]<typename T>(T& lights, const uint32_t maxLightCount) -> size_t {
 		using lightType = std::remove_pointer_t<typename T::value_type>;
 		const size_t lightCount = std::min(lights.size(), static_cast<size_t>(maxLightCount));
 
-		for (size_t i = 0; i < lightCount; i++) {
+		for (size_t i = 0; i < lightCount; ++i) {
 			mUBO->setData(lights[i], sizeof(lightType), offset + i * sizeof(lightType));
 		}
 		offset += maxLightCount * sizeof(lightType);
 		return lightCount;
 	};
 
+	mUBO->bind();
 	const size_t dirCount = uploadDataToGPU(mDirLights, ctx.light.maxDirLights);
 	const size_t pointCount = uploadDataToGPU(mPointLights, ctx.light.maxPointLights);
 	const size_t spotCount = uploadDataToGPU(mSpotLights, ctx.light.maxSpotLights);
 
 	auto lightCount = glm::ivec4(dirCount, pointCount, spotCount, 0);
+
 	mUBO->setData(glm::value_ptr(lightCount), sizeof(glm::ivec4), offset);
 	mUBO->unbind();
 }

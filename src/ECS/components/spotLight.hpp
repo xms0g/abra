@@ -21,13 +21,14 @@ struct alignas(16) SpotLightComponent {
 		const glm::vec4 s,
 		const glm::vec3 att,
 		const bool cs,
-		const glm::vec4 cut) : position(pos),
-		                       direction(dir),
-		                       ambient(a),
-		                       diffuse(dif),
-		                       specular(s),
-		                       attenuation(att),
-		                       castShadow(cs),
-		                       cutOff(cut) {
+		const glm::vec4 cut)
+		: position(pos),
+		  direction(dir),
+		  ambient(a),
+		  diffuse(dif),
+		  specular(s),
+		  attenuation(att),
+		  castShadow(cs),
+		  cutOff(cut) {
 	}
 };

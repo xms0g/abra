@@ -14,9 +14,10 @@ struct alignas(16) DirectionalLightComponent {
 		const glm::vec4 dir,
 		const glm::vec4 a,
 		const glm::vec4 dif,
-		const glm::vec4 s) : direction(dir),
-		                     ambient(a),
-		                     diffuse(dif),
-		                     specular(s) {
+		const glm::vec4 s)
+		: direction(dir),
+		  ambient(a),
+		  diffuse(dif),
+		  specular(s) {
 	}
 };
