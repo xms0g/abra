@@ -74,6 +74,8 @@ private:
 
 	void setDepthTextureParameters(uint32_t target, int dim);
 
+	int getInternalFormat(uint32_t format, bool alpha, bool depth);
+
 	int mWidth{0};
 	int mHeight{0};
 	std::vector<uint32_t> mTextureIDs;

@@ -1,4 +1,6 @@
 #include "frameBuffer.h"
+
+#include <cassert>
 #include <vector>
 #include "glad/glad.h"
 
@@ -113,21 +115,7 @@ FrameBuffer& FrameBuffer::withTextureMultisampled(const int multisampledCount) {
 
 FrameBuffer& FrameBuffer::withTextureFP(const uint32_t format, const bool alpha) {
 	const uint32_t fmt = alpha ? GL_RGBA : GL_RGB;
-	int internalFormat{0};
-
-	if (format == 16) {
-		if (alpha) {
-			internalFormat = GL_RGBA16F;
-		} else {
-			internalFormat = GL_RGB16F;
-		}
-	} else if (format == 32) {
-		if (alpha) {
-			internalFormat = GL_RGBA32F;
-		} else {
-			internalFormat = GL_RGB32F;
-		}
-	}
+	const int internalFormat = getInternalFormat(format, alpha, false);
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
@@ -159,21 +147,8 @@ FrameBuffer& FrameBuffer::withTextureFPMultisampled(
 	const int multisampledCount,
 	const uint32_t format,
 	const bool alpha) {
-	int internalFormat{0};
+	const int internalFormat = getInternalFormat(format, alpha, false);
 
-	if (format == 16) {
-		if (alpha) {
-			internalFormat = GL_RGBA16F;
-		} else {
-			internalFormat = GL_RGB16F;
-		}
-	} else if (format == 32) {
-		if (alpha) {
-			internalFormat = GL_RGBA32F;
-		} else {
-			internalFormat = GL_RGB32F;
-		}
-	}
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextureIDs.push_back(textureID);
@@ -195,13 +170,7 @@ FrameBuffer& FrameBuffer::withTextureFPMultisampled(
 }
 
 FrameBuffer& FrameBuffer::withTextureDepth(const uint32_t format, const bool onlyForShadowMap) {
-	uint32_t internalFormat{0};
-
-	if (format == 16) {
-		internalFormat = GL_DEPTH_COMPONENT16;
-	} else if (format == 24) {
-		internalFormat = GL_DEPTH_COMPONENT24;
-	}
+	const int internalFormat = getInternalFormat(format, false, true);
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
@@ -236,13 +205,7 @@ FrameBuffer& FrameBuffer::withTextureDepthArray(
 	const int layerCount,
 	const uint32_t format,
 	const bool onlyForShadowMap) {
-	uint32_t internalFormat{0};
-
-	if (format == 16) {
-		internalFormat = GL_DEPTH_COMPONENT16;
-	} else if (format == 24) {
-		internalFormat = GL_DEPTH_COMPONENT24;
-	}
+	const int internalFormat = getInternalFormat(format, false, true);
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
@@ -264,6 +227,7 @@ FrameBuffer& FrameBuffer::withTextureDepthArray(
 	setDepthTextureParameters(GL_TEXTURE_2D_ARRAY, 2);
 
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, textureID, 0);
+
 	if (onlyForShadowMap) {
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
@@ -273,13 +237,7 @@ FrameBuffer& FrameBuffer::withTextureDepthArray(
 }
 
 FrameBuffer& FrameBuffer::withTextureCubemapDepth(const uint32_t format, const bool onlyForShadowMap) {
-	uint32_t internalFormat{0};
-
-	if (format == 16) {
-		internalFormat = GL_DEPTH_COMPONENT16;
-	} else if (format == 24) {
-		internalFormat = GL_DEPTH_COMPONENT24;
-	}
+	const int internalFormat = getInternalFormat(format, false, true);
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
@@ -314,13 +272,7 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(
 	const int layerCount,
 	const uint32_t format,
 	const bool onlyForShadowMap) {
-	uint32_t internalFormat{0};
-
-	if (format == 16) {
-		internalFormat = GL_DEPTH_COMPONENT16;
-	} else if (format == 24) {
-		internalFormat = GL_DEPTH_COMPONENT24;
-	}
+	const int internalFormat = getInternalFormat(format, false, true);
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
@@ -353,12 +305,7 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(
 }
 
 FrameBuffer& FrameBuffer::withRenderBufferDepth(const uint32_t format) {
-	uint32_t internalFormat{0};
-	if (format == 16) {
-		internalFormat = GL_DEPTH_COMPONENT16;
-	} else if (format == 24) {
-		internalFormat = GL_DEPTH_COMPONENT24;
-	}
+	const uint32_t internalFormat = getInternalFormat(format, false, true);
 
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
@@ -371,12 +318,7 @@ FrameBuffer& FrameBuffer::withRenderBufferDepth(const uint32_t format) {
 }
 
 FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(const int multisampledCount, const uint32_t format) {
-	uint32_t internalFormat{0};
-	if (format == 16) {
-		internalFormat = GL_DEPTH_COMPONENT16;
-	} else if (format == 24) {
-		internalFormat = GL_DEPTH_COMPONENT24;
-	}
+	const uint32_t internalFormat = getInternalFormat(format, false, true);
 
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
@@ -436,6 +378,21 @@ void FrameBuffer::setDepthTextureParameters(const uint32_t target, const int dim
 
 	constexpr float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
 	glTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, borderColor);
+}
+
+int FrameBuffer::getInternalFormat(const uint32_t format, const bool alpha, const bool depth) {
+	if (depth) {
+		return format == 16 ? GL_DEPTH_COMPONENT16 : format == 24 ? GL_DEPTH_COMPONENT24 : GL_DEPTH_COMPONENT32;
+	}
+
+	if (format == 16)
+		return alpha ? GL_RGBA16F : GL_RGB16F;
+
+	if (format == 32)
+		return alpha ? GL_RGBA32F : GL_RGB32F;
+
+	assert(false && "Unsupported format");
+	return 0;
 }
 
 CubemapBuffer::CubemapBuffer(const int size) : mSize(size) {
