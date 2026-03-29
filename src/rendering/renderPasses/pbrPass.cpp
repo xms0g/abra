@@ -29,7 +29,9 @@ void PBRPass::configure(const RenderContext& ctx) {
 	mIrradianceConv = std::make_unique<Shader>("pbr/cubemap.vert", "pbr/irradianceConv.frag");
 
 	mEnvMapBuffer = std::make_unique<CubemapBuffer>(ctx.PBR.envMap.size);
+	mEnvMapBuffer->checkStatus();
 	mIrradianceMapBuffer = std::make_unique<CubemapBuffer>(ctx.PBR.irradianceMap.size);
+	mIrradianceMapBuffer->checkStatus();
 
 	Models::Cube cube;
 	const auto& cubeMesh = cube.meshes()->at(0).front();

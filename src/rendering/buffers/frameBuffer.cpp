@@ -2,6 +2,12 @@
 #include <vector>
 #include "glad/glad.h"
 
+void IBuffer::checkStatus() {
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+		throw std::runtime_error("ERROR::FRAMEBUFFER::NOT_COMPLETE!\n");
+	}
+}
+
 FrameBuffer::FrameBuffer(const int width, const int height) : mWidth(width), mHeight(height) {
 	glGenFramebuffers(1, &mFBO);
 	bind();
@@ -63,7 +69,6 @@ FrameBuffer& FrameBuffer::withTexture() {
 	mTextureIDs.push_back(textureID);
 
 	glBindTexture(GL_TEXTURE_2D, textureID);
-
 	glTexImage2D(
 		GL_TEXTURE_2D,
 		0,
@@ -74,6 +79,7 @@ FrameBuffer& FrameBuffer::withTexture() {
 		GL_RGBA,
 		GL_UNSIGNED_BYTE,
 		nullptr);
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -122,6 +128,7 @@ FrameBuffer& FrameBuffer::withTextureFP(const uint32_t format, const bool alpha)
 			internalFormat = GL_RGB32F;
 		}
 	}
+
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextureIDs.push_back(textureID);
@@ -137,6 +144,7 @@ FrameBuffer& FrameBuffer::withTextureFP(const uint32_t format, const bool alpha)
 		fmt,
 		GL_FLOAT,
 		nullptr);
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -214,6 +222,7 @@ FrameBuffer& FrameBuffer::withTextureDepth(const uint32_t format, const bool onl
 	setDepthTextureParameters(GL_TEXTURE_2D, 2);
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, textureID, 0);
+
 	if (onlyForShadowMap) {
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
@@ -301,8 +310,10 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepth(const uint32_t format, const b
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(const int layerCount, const uint32_t format,
-                                                       const bool onlyForShadowMap) {
+FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(
+	const int layerCount,
+	const uint32_t format,
+	const bool onlyForShadowMap) {
 	uint32_t internalFormat{0};
 
 	if (format == 16) {
@@ -331,6 +342,7 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(const int layerCount, con
 	setDepthTextureParameters(GL_TEXTURE_CUBE_MAP_ARRAY, 3);
 	// attach depth texture as FBO's depth buffer
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, textureID, 0);
+
 	if (onlyForShadowMap) {
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
@@ -402,13 +414,8 @@ FrameBuffer& FrameBuffer::configureAttachments() {
 	}
 
 	glDrawBuffers(static_cast<int>(mAttachments.size()), mAttachments.data());
-	return *this;
-}
 
-void FrameBuffer::checkStatus() {
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		throw std::runtime_error("ERROR::FRAMEBUFFER::NOT_COMPLETE!\n");
-	}
+	return *this;
 }
 
 void FrameBuffer::setAttachment(const uint32_t textureID, const uint32_t target) {

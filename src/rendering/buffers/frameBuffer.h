@@ -2,27 +2,44 @@
 #include <cstdint>
 #include <vector>
 
-class FrameBuffer {
+class IBuffer {
+public:
+	virtual ~IBuffer() = default;
+
+	[[nodiscard]] virtual uint32_t texture() const = 0;
+
+	virtual void bind() const = 0;
+
+	virtual void unbind() const = 0;
+
+	void checkStatus();
+
+protected:
+	uint32_t mFBO{0};
+	uint32_t mRBO{0};
+};
+
+class FrameBuffer final : public IBuffer {
 public:
 	FrameBuffer(int width, int height);
 
-	~FrameBuffer();
+	~FrameBuffer() override;
 
 	[[nodiscard]] int width() const;
 
 	[[nodiscard]] int height() const;
 
-	[[nodiscard]] uint32_t texture() const;
+	[[nodiscard]] uint32_t texture() const override;
 
 	[[nodiscard]] const std::vector<uint32_t>& textures() const;
 
-	void bind() const;
+	void bind() const override;
 
 	void bindForRead() const;
 
 	void bindForDraw() const;
 
-	void unbind() const;
+	void unbind() const override;
 
 	void attachLayer(uint32_t attachment, int layer) const;
 
@@ -52,8 +69,6 @@ public:
 
 	FrameBuffer& configureAttachments();
 
-	void checkStatus();
-
 private:
 	void setAttachment(uint32_t textureID, uint32_t target);
 
@@ -61,29 +76,25 @@ private:
 
 	int mWidth{0};
 	int mHeight{0};
-	uint32_t mFBO{0};
-	uint32_t mRBO{0};
 	std::vector<uint32_t> mTextureIDs;
 	std::vector<uint32_t> mAttachments;
 };
 
-class CubemapBuffer {
+class CubemapBuffer final : public IBuffer {
 public:
 	CubemapBuffer(int size);
 
-	~CubemapBuffer();
+	~CubemapBuffer() override;
 
-	[[nodiscard]] uint32_t texture() const;
+	[[nodiscard]] uint32_t texture() const override;
 
-	void bind() const;
+	void bind() const override;
 
-	void unbind() const;
+	void unbind() const override;
 
 	void bindFace(uint32_t face) const;
 
 private:
-	uint32_t mFBO{0};
-	uint32_t mRBO{0};
 	uint32_t mCubemapID{0};
 	int mSize{0};
 };

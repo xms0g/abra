@@ -76,7 +76,7 @@ void ResourceManager::loadModel(const size_t entityID, const char* file) {
 	MeshMap meshesByMatID;
 	processMeshes(scene->mRootNode, scene, meshesByMatID);
 
-	MaterialLoadContext mlCtx{ .baseDir = path.substr(0, path.find_last_of('/')).append("/")};
+	MaterialLoadContext mlCtx{.baseDir = path.substr(0, path.find_last_of('/')).append("/")};
 	processMaterials(scene, mlCtx);
 
 	{
@@ -109,7 +109,7 @@ Mesh ResourceManager::processMesh(aiMesh* mesh) const {
 	std::vector<uint32_t> indices;
 
 	// walk through each of the mesh's mVertices
-	for (uint32_t i = 0; i < mesh->mNumVertices; i++) {
+	for (uint32_t i = 0; i < mesh->mNumVertices; ++i) {
 		Vertex vertex{};
 		glm::vec3 vector;
 		// we declare a placeholder std::vector since assimp uses its own std::vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
@@ -166,11 +166,15 @@ Mesh ResourceManager::processMesh(aiMesh* mesh) const {
 
 void ResourceManager::processMaterials(const aiScene* scene, MaterialLoadContext& ctx) const {
 	// process materials
-	for (uint32_t i = 0; i < scene->mNumMaterials; i++) {
+	for (uint32_t i = 0; i < scene->mNumMaterials; ++i) {
 		const aiMaterial* material = scene->mMaterials[i];
 
 		for (const auto& [type, name]: textureBindings) {
-			TextureLoadRequest req{.mat = material, .type = type, .typeName = name, .materialID = i};
+			TextureLoadRequest req{
+				.mat = material,
+				.type = type,
+				.typeName = name,
+				.materialID = i};
 			loadMaterialTextures(req, ctx);
 		}
 	}
