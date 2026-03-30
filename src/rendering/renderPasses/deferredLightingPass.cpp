@@ -20,9 +20,9 @@ void DeferredLightingPass::configure(const RenderContext& ctx) {
 	mShader->setInt("shadowCubemap", ctx.shadow.textureSlot + 1);
 	mShader->setInt("persShadowMap", ctx.shadow.textureSlot + 2);
 
-	ctx.camera.ubo.self->configure(mShader->ID(), ctx.camera.ubo.binding, ctx.camera.ubo.blockName);
-	ctx.light.ubo.self->configure(mShader->ID(), ctx.light.ubo.binding, ctx.light.ubo.blockName);
-	ctx.shadow.ubo.self->configure(mShader->ID(), ctx.shadow.ubo.binding, ctx.shadow.ubo.blockName);
+	ctx.camera.ubo.self->configure(mShader->id(), ctx.camera.ubo.binding, ctx.camera.ubo.blockName);
+	ctx.light.ubo.self->configure(mShader->id(), ctx.light.ubo.binding, ctx.light.ubo.blockName);
+	ctx.shadow.ubo.self->configure(mShader->id(), ctx.shadow.ubo.binding, ctx.shadow.ubo.blockName);
 }
 
 void DeferredLightingPass::execute(const RenderContext& ctx) {

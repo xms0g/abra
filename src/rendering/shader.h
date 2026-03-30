@@ -17,7 +17,7 @@ public:
 
 	Shader& operator=(Shader&& other) noexcept;
 
-	[[nodiscard]] uint32_t ID() const { return mID; }
+	[[nodiscard]] uint32_t id() const { return mID; }
 
 	// use/activate the shader
 	void activate() const;

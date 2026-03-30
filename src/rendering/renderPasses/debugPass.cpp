@@ -21,7 +21,7 @@ void DebugPass::configure(const RenderContext& ctx) {
 	for (const auto& shader: mDebugShaders) {
 		if (!shader)
 			continue;
-		ctx.camera.ubo.self->configure(shader->ID(), ctx.camera.ubo.binding, ctx.camera.ubo.blockName);
+		ctx.camera.ubo.self->configure(shader->id(), ctx.camera.ubo.binding, ctx.camera.ubo.blockName);
 	}
 }
 

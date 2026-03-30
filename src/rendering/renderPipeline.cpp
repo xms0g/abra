@@ -256,17 +256,17 @@ void RenderPipeline::configure(const Camera& camera) {
 
 	for (const auto& shader: shaders) {
 		mRenderCtx->camera.ubo.self->configure(
-			shader->ID(),
+			shader->id(),
 			mRenderCtx->camera.ubo.binding,
 			mRenderCtx->camera.ubo.blockName);
 
 		mRenderCtx->light.ubo.self->configure(
-			shader->ID(),
+			shader->id(),
 			mRenderCtx->light.ubo.binding,
 			mRenderCtx->light.ubo.blockName);
 
 		mRenderCtx->shadow.ubo.self->configure(
-			shader->ID(),
+			shader->id(),
 			mRenderCtx->shadow.ubo.binding,
 			mRenderCtx->shadow.ubo.blockName);
 	}

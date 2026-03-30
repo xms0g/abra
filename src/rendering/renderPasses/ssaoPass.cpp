@@ -56,8 +56,8 @@ void SSAOPass::configure(const RenderContext& ctx) {
 	mUBO->setData(mKernel.data(), uboSize, 0);
 	mUBO->unbind();
 
-	mUBO->configure(mShader->ID(), ctx.ssao.ubo.binding, ctx.ssao.ubo.blockName);
-	ctx.camera.ubo.self->configure(mShader->ID(), ctx.camera.ubo.binding, ctx.camera.ubo.blockName);
+	mUBO->configure(mShader->id(), ctx.ssao.ubo.binding, ctx.ssao.ubo.blockName);
+	ctx.camera.ubo.self->configure(mShader->id(), ctx.camera.ubo.binding, ctx.camera.ubo.blockName);
 }
 
 void SSAOPass::execute(const RenderContext& ctx) {
