@@ -5,6 +5,7 @@
 #include "../buffers/uniformBuffer.h"
 #include "../renderCommon.h"
 #include "../renderContext/renderContext.hpp"
+#include "../models/quad.h"
 
 DeferredLightingPass::~DeferredLightingPass() = default;
 
