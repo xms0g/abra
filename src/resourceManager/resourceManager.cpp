@@ -201,8 +201,8 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 			if (req.mat->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
 				flag |= twoSided != 0 ? TWOSIDED : 0;
 			}
-			// if (float value{0.0f}; mat->Get(AI_MATKEY_METALLIC_FACTOR, value) == AI_SUCCESS ||
-			//                        mat->Get(AI_MATKEY_ROUGHNESS_FACTOR, value) == AI_SUCCESS) {
+			// if (float value{0.0f}; req.mat->Get(AI_MATKEY_METALLIC_FACTOR, value) == AI_SUCCESS ||
+			//                        req.mat->Get(AI_MATKEY_ROUGHNESS_FACTOR, value) == AI_SUCCESS) {
 			// 	flag |= value > 0.0f ? PBR : 0;
 			// }
 

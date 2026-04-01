@@ -43,13 +43,13 @@ public:
 
 	void attachLayer(uint32_t attachment, int layer) const;
 
-	FrameBuffer& withTexture();
+	FrameBuffer& withTexture(uint32_t channels);
 
-	FrameBuffer& withTextureMultisampled(int multisampledCount);
+	FrameBuffer& withTextureMultisampled(int multisampledCount, uint32_t channels);
 
-	FrameBuffer& withTextureFP(uint32_t format, bool alpha);
+	FrameBuffer& withTextureFP(uint32_t format, uint32_t channels);
 
-	FrameBuffer& withTextureFPMultisampled(int multisampledCount, uint32_t format, bool alpha);
+	FrameBuffer& withTextureFPMultisampled(int multisampledCount, uint32_t format, uint32_t channels);
 
 	FrameBuffer& withTextureDepth(uint32_t format, bool onlyForShadowMap);
 
@@ -74,7 +74,7 @@ private:
 
 	void setDepthTextureParameters(uint32_t target, int dim);
 
-	int getInternalFormat(uint32_t format, bool alpha, bool depth);
+	int getInternalFormat(uint32_t format, uint32_t channels, bool depth = false);
 
 	int mWidth{0};
 	int mHeight{0};
@@ -84,17 +84,19 @@ private:
 
 class CubemapBuffer final : public IFrameBuffer {
 public:
-	CubemapBuffer(int size);
+	CubemapBuffer(int size, bool mipmap = false, bool prefilter = false);
 
 	~CubemapBuffer() override;
 
 	[[nodiscard]] uint32_t texture() const override;
 
+	[[nodiscard]] uint32_t rbo() const;
+
 	void bind() const override;
 
 	void unbind() const override;
 
-	void bindFace(uint32_t face) const;
+	void bindFace(uint32_t face, int32_t mip = 0) const;
 
 private:
 	uint32_t mCubemapID{0};

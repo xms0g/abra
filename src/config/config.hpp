@@ -61,5 +61,9 @@ constexpr auto SSAO_UBO_BLOCK_NAME = "SSAOBlock";
 constexpr int PBR_ENVMAP_SIZE{512};
 constexpr int PBR_IRRADIANCE_MAP_SIZE{32};
 constexpr int PBR_IRRADIANCE_MAP_TEXTURE_SLOT{11};
+constexpr int PBR_PREFILTER_MAP_SIZE{128};
+constexpr int PBR_PREFILTER_MAP_TEXTURE_SLOT{12};
+constexpr int PBR_BRDF_LUT_SIZE{512};
+constexpr int PBR_BRDF_LUT_TEXTURE_SLOT{13};
 constexpr auto PBR_HDR_TEXTURE = "textures/hdr/newport_loft.hdr";
 

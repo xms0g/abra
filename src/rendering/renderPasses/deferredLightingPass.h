@@ -1,10 +1,7 @@
 #pragma once
 #include <memory>
 #include "IRenderPass.hpp"
-
-namespace Models {
-class SingleQuad;
-}
+#include "../models/quad.h"
 
 class FrameBuffer;
 class Shader;

@@ -101,6 +101,16 @@ struct RenderContext {
 			int size;
 		} irradianceMap;
 
+		struct {
+			int textureSlot;
+			int size;
+		} prefilterMap;
+
+		struct {
+			int textureSlot;
+			int size;
+		} brdfLUT;
+
 		const char* HDRTexture;
 	} PBR;
 

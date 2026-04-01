@@ -90,28 +90,28 @@ void RenderPipeline::configure(const Camera& camera) {
 	glEnable(GL_MULTISAMPLE);
 	mIntermediateBuffer = std::make_unique<FrameBuffer>(mSceneBuffer->width(), mSceneBuffer->height());
 # ifdef HDR
-	mIntermediateBuffer->withTextureFP(16, true)
+	mIntermediateBuffer->withTextureFP(16, 4)
 			.withRenderBufferDepth(24)
 			.checkStatus();
 	mIntermediateBuffer->unbind();
 
 	mSceneBuffer->bind();
-	mSceneBuffer->withTextureFPMultisampled(MULTISAMPLED_COUNT, 16, true)
+	mSceneBuffer->withTextureFPMultisampled(MULTISAMPLED_COUNT, 16, 4)
 # else
-	mIntermediateBuffer->withTexture()
+	mIntermediateBuffer->withTexture(4)
 			.withRenderBufferDepth(24)
 			.checkStatus();
 	mIntermediateBuffer->unbind();
 
 	mSceneBuffer->bind();
-	mSceneBuffer->withTextureMultisampled(MULTISAMPLED_COUNT)
+	mSceneBuffer->withTextureMultisampled(MULTISAMPLED_COUNT, 4)
 # endif
 			.withRenderBufferDepthMultisampled(MULTISAMPLED_COUNT, 24)
 #else
 # ifdef HDR
-	mSceneBuffer->withTextureFP(16, true)
+	mSceneBuffer->withTextureFP(16, 4)
 # else
-	mSceneBuffer->withTexture()
+	mSceneBuffer->withTexture(4)
 # endif
 			.withTextureDepth(24, false)
 #endif
@@ -213,6 +213,10 @@ void RenderPipeline::configure(const Camera& camera) {
 	mRenderCtx->PBR.envMap.size = PBR_ENVMAP_SIZE;
 	mRenderCtx->PBR.irradianceMap.size = PBR_IRRADIANCE_MAP_SIZE;
 	mRenderCtx->PBR.irradianceMap.textureSlot = PBR_IRRADIANCE_MAP_TEXTURE_SLOT;
+	mRenderCtx->PBR.prefilterMap.size = PBR_PREFILTER_MAP_SIZE;
+	mRenderCtx->PBR.prefilterMap.textureSlot = PBR_PREFILTER_MAP_TEXTURE_SLOT;
+	mRenderCtx->PBR.brdfLUT.size = PBR_BRDF_LUT_SIZE;
+	mRenderCtx->PBR.brdfLUT.textureSlot = PBR_BRDF_LUT_TEXTURE_SLOT;
 	mRenderCtx->PBR.HDRTexture = PBR_HDR_TEXTURE;
 
 	// Set camera projection matrix

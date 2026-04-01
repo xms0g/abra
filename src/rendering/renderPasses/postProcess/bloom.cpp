@@ -22,9 +22,9 @@ Bloom::Bloom(const std::string& name, const int width, const int height, const b
 	for (auto& target: mRenderTargets) {
 		target = std::make_unique<FrameBuffer>(width, height);
 #ifdef HDR
-		target->withTextureFP(16, true)
+		target->withTextureFP(16, 4)
 #else
-		target->withTexture()
+		target->withTexture(4)
 #endif
 				.checkStatus();
 	}

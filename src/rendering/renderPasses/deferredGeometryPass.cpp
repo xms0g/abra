@@ -19,12 +19,12 @@ const FrameBuffer* DeferredGeometryPass::gBuffer() const {
 
 void DeferredGeometryPass::configure(const RenderContext& ctx) {
 	mGBuffer = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
-	mGBuffer->withTextureFP(16, true)
-			.withTextureFP(16, true)
+	mGBuffer->withTextureFP(16, 4)
+			.withTextureFP(16, 4)
 #ifdef HDR
-			.withTextureFP(16, true)
+			.withTextureFP(16, 4)
 #else
-			.withTexture()
+			.withTexture(4)
 #endif
 			.configureAttachments()
 			.withTextureDepth(24, false)

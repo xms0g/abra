@@ -65,7 +65,9 @@ void FrameBuffer::attachLayer(const uint32_t attachment, const int layer) const 
 	glFramebufferTextureLayer(GL_FRAMEBUFFER, attachment, texture(), 0, layer);
 }
 
-FrameBuffer& FrameBuffer::withTexture() {
+FrameBuffer& FrameBuffer::withTexture(const uint32_t channels) {
+	const int32_t format = channels == 1 ? GL_R : channels == 2 ? GL_RG: channels == 3 ? GL_RGB : GL_RGBA;
+
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextureIDs.push_back(textureID);
@@ -74,11 +76,11 @@ FrameBuffer& FrameBuffer::withTexture() {
 	glTexImage2D(
 		GL_TEXTURE_2D,
 		0,
-		GL_RGBA,
+		format,
 		mWidth,
 		mHeight,
 		0,
-		GL_RGBA,
+		format,
 		GL_UNSIGNED_BYTE,
 		nullptr);
 
@@ -92,7 +94,9 @@ FrameBuffer& FrameBuffer::withTexture() {
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTextureMultisampled(const int multisampledCount) {
+FrameBuffer& FrameBuffer::withTextureMultisampled(const int multisampledCount, const uint32_t channels) {
+	const int32_t format = channels == 1 ? GL_R : channels == 2 ? GL_RG: channels == 3 ? GL_RGB : GL_RGBA;
+
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextureIDs.push_back(textureID);
@@ -101,7 +105,7 @@ FrameBuffer& FrameBuffer::withTextureMultisampled(const int multisampledCount) {
 	glTexImage2DMultisample(
 		GL_TEXTURE_2D_MULTISAMPLE,
 		multisampledCount,
-		GL_RGBA,
+		format,
 		mWidth,
 		mHeight,
 		GL_TRUE);
@@ -113,9 +117,9 @@ FrameBuffer& FrameBuffer::withTextureMultisampled(const int multisampledCount) {
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTextureFP(const uint32_t format, const bool alpha) {
-	const uint32_t fmt = alpha ? GL_RGBA : GL_RGB;
-	const int internalFormat = getInternalFormat(format, alpha, false);
+FrameBuffer& FrameBuffer::withTextureFP(const uint32_t format, const uint32_t channels) {
+	const uint32_t fmt = channels == 1 ? GL_R : channels == 2 ? GL_RG: channels == 3 ? GL_RGB : GL_RGBA;
+	const int internalFormat = getInternalFormat(format, channels);
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
@@ -133,6 +137,8 @@ FrameBuffer& FrameBuffer::withTextureFP(const uint32_t format, const bool alpha)
 		GL_FLOAT,
 		nullptr);
 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -146,8 +152,8 @@ FrameBuffer& FrameBuffer::withTextureFP(const uint32_t format, const bool alpha)
 FrameBuffer& FrameBuffer::withTextureFPMultisampled(
 	const int multisampledCount,
 	const uint32_t format,
-	const bool alpha) {
-	const int internalFormat = getInternalFormat(format, alpha, false);
+	const uint32_t channels) {
+	const int internalFormat = getInternalFormat(format, channels);
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
@@ -170,7 +176,7 @@ FrameBuffer& FrameBuffer::withTextureFPMultisampled(
 }
 
 FrameBuffer& FrameBuffer::withTextureDepth(const uint32_t format, const bool onlyForShadowMap) {
-	const int internalFormat = getInternalFormat(format, false, true);
+	const int internalFormat = getInternalFormat(format, 0, true);
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
@@ -205,7 +211,7 @@ FrameBuffer& FrameBuffer::withTextureDepthArray(
 	const int layerCount,
 	const uint32_t format,
 	const bool onlyForShadowMap) {
-	const int internalFormat = getInternalFormat(format, false, true);
+	const int internalFormat = getInternalFormat(format, 0, true);
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
@@ -237,7 +243,7 @@ FrameBuffer& FrameBuffer::withTextureDepthArray(
 }
 
 FrameBuffer& FrameBuffer::withTextureCubemapDepth(const uint32_t format, const bool onlyForShadowMap) {
-	const int internalFormat = getInternalFormat(format, false, true);
+	const int internalFormat = getInternalFormat(format, 0, true);
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
@@ -272,7 +278,7 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(
 	const int layerCount,
 	const uint32_t format,
 	const bool onlyForShadowMap) {
-	const int internalFormat = getInternalFormat(format, false, true);
+	const int internalFormat = getInternalFormat(format, 0, true);
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
@@ -305,7 +311,7 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(
 }
 
 FrameBuffer& FrameBuffer::withRenderBufferDepth(const uint32_t format) {
-	const uint32_t internalFormat = getInternalFormat(format, false, true);
+	const uint32_t internalFormat = getInternalFormat(format, 0, true);
 
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
@@ -318,7 +324,7 @@ FrameBuffer& FrameBuffer::withRenderBufferDepth(const uint32_t format) {
 }
 
 FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(const int multisampledCount, const uint32_t format) {
-	const uint32_t internalFormat = getInternalFormat(format, false, true);
+	const uint32_t internalFormat = getInternalFormat(format, 0, true);
 
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
@@ -380,22 +386,22 @@ void FrameBuffer::setDepthTextureParameters(const uint32_t target, const int dim
 	glTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, borderColor);
 }
 
-int FrameBuffer::getInternalFormat(const uint32_t format, const bool alpha, const bool depth) {
+int FrameBuffer::getInternalFormat(const uint32_t format, const uint32_t channels, const bool depth) {
 	if (depth) {
 		return format == 16 ? GL_DEPTH_COMPONENT16 : format == 24 ? GL_DEPTH_COMPONENT24 : GL_DEPTH_COMPONENT32;
 	}
 
 	if (format == 16)
-		return alpha ? GL_RGBA16F : GL_RGB16F;
+		return channels == 1 ? GL_R16F : channels == 2 ? GL_RG16F : channels == 3 ? GL_RGB16F : GL_RGBA16F;
 
 	if (format == 32)
-		return alpha ? GL_RGBA32F : GL_RGB32F;
+		return channels == 1 ? GL_R32F : channels == 2 ? GL_RG32F : channels == 3 ? GL_RGB32F : GL_RGBA32F;
 
 	assert(false && "Unsupported format");
-	return 0;
 }
 
-CubemapBuffer::CubemapBuffer(const int size) : mSize(size) {
+CubemapBuffer::CubemapBuffer(const int size, const bool mipmap, const bool prefilter)
+	: mSize(size) {
 	glGenFramebuffers(1, &mFBO);
 	glGenRenderbuffers(1, &mRBO);
 
@@ -423,8 +429,15 @@ CubemapBuffer::CubemapBuffer(const int size) : mSize(size) {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	if (prefilter) {
+		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+	}
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 CubemapBuffer::~CubemapBuffer() {
@@ -437,6 +450,10 @@ uint32_t CubemapBuffer::texture() const {
 	return mCubemapID;
 }
 
+uint32_t CubemapBuffer::rbo() const {
+	return mRBO;
+}
+
 void CubemapBuffer::bind() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
 	glViewport(0, 0, mSize, mSize);
@@ -446,13 +463,13 @@ void CubemapBuffer::unbind() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void CubemapBuffer::bindFace(const uint32_t face) const {
+void CubemapBuffer::bindFace(const uint32_t face, const int32_t mip) const {
 	glFramebufferTexture2D(
 		GL_FRAMEBUFFER,
 		GL_COLOR_ATTACHMENT0,
 		GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
 		mCubemapID,
-		0);
+		mip);
 
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
 }
