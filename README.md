@@ -15,6 +15,8 @@ Itâ€™s designed for clarity, experimentation, and real-time graphics research â€
   - Spot Light + Shadow Mapping
 - **HDR Rendering**
   - Full HDR workflow with tone mapping and manual exposure control.
+- **PBR**
+  - IBL (environment lighting)
 - **SSAO**
   - Only avaliable in the deferred pipeline.
 - **Frustum Culling**
@@ -51,7 +53,6 @@ Itâ€™s designed for clarity, experimentation, and real-time graphics research â€
 | WASD | Move                     |
 | RMB  | enable/disable Free Look |
 ## Roadmap
-- [ ] IBL
 - [ ] Cascaded shadow maps
 ## License
 This project is licensed under the BSD 3-Clause License. See the LICENSE file for details.
