@@ -75,7 +75,7 @@ void ShadowPass::omnidirectionalShadowPass(const RenderContext& ctx) const {
 	glViewport(0, 0, ctx.shadow.width, ctx.shadow.height);
 
 	const auto& lights = *ctx.light.pointLights;
-	for (int i = 0; i < lights.size(); i++) {
+	for (int i = 0; i < lights.size(); ++i) {
 		const auto& light = lights[i];
 		if (!light->castShadow) continue;
 
@@ -95,7 +95,7 @@ void ShadowPass::perspectiveShadowPass(const RenderContext& ctx) const {
 	glViewport(0, 0, ctx.shadow.width, ctx.shadow.height);
 
 	const auto& lights = *ctx.light.spotLights;
-	for (int i = 0; i < lights.size(); i++) {
+	for (int i = 0; i < lights.size(); ++i) {
 		const auto& light = lights[i];
 		if (!light->castShadow) continue;
 

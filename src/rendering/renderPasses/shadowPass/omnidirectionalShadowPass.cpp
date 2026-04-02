@@ -14,9 +14,10 @@ OmnidirectionalShadowPass::OmnidirectionalShadowPass(const RenderContext& ctx) {
 			.checkStatus();
 	mDepthMap->unbind();
 
-	mDepthShader = std::make_unique<Shader>("depth/depthCubemap.vert",
-	                                        "depth/depthCubemap.frag",
-	                                        "depth/depthCubemap.geom");
+	mDepthShader = std::make_unique<Shader>(
+		"depth/depthCubemap.vert",
+		"depth/depthCubemap.frag",
+		"depth/depthCubemap.geom");
 }
 
 OmnidirectionalShadowPass::~OmnidirectionalShadowPass() = default;
@@ -41,7 +42,7 @@ void OmnidirectionalShadowPass::render(
 
 	const auto pos = glm::vec3(position);
 	std::vector<glm::mat4> shadowTransforms;
-	for (const auto& [dir, up]: dirUpPairs) {
+	for (const auto& [dir, up]: mDirUpPairs) {
 		shadowTransforms.push_back(shadowProj * glm::lookAt(pos, pos + dir, up));
 	}
 
