@@ -42,9 +42,9 @@ void PBRPass::configure(const RenderContext& ctx) {
 			.checkStatus();
 
 	createEnvMap(ctx);
-	createIrradianceMap(ctx);
+	createIrradianceMap();
 	createPrefilterMap(ctx);
-	createBrdfLUT(ctx);
+	createBrdfLUT();
 
 	glEnable(GL_CULL_FACE);
 	glDepthFunc(GL_LESS);
@@ -118,7 +118,7 @@ void PBRPass::createEnvMap(const RenderContext& ctx) {
 	ctx.PBR.envMap.binding = mEnvMapBuffer->texture();
 }
 
-void PBRPass::createIrradianceMap(const RenderContext& ctx) {
+void PBRPass::createIrradianceMap() {
 	const auto irradianceConv = Shader{"pbr/cubemap.vert", "pbr/irradianceConv.frag"};
 	const auto& cubeMesh = cube.meshes()->at(0).front();
 
@@ -180,7 +180,7 @@ void PBRPass::createPrefilterMap(const RenderContext& ctx) {
 	mPrefilterMapBuffer->unbind();
 }
 
-void PBRPass::createBrdfLUT(const RenderContext& ctx) const {
+void PBRPass::createBrdfLUT() const {
 	const Models::SingleQuad quad;
 	const auto brdfLUT = Shader{"pbr/brdfLUT.vert", "pbr/brdfLUT.frag"};
 	// generate a 2D LUT from the BRDF equations used.

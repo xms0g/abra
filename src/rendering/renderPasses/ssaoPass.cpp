@@ -21,10 +21,10 @@ const UniformBuffer* SSAOPass::ubo() const {
 void SSAOPass::configure(const RenderContext& ctx) {
 	mQuad = std::make_unique<Models::SingleQuad>();
 	mFBO = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
-	mFBO->withTextureFP(16, 4)
+	mFBO->withTextureFP(16, 1)
 			.checkStatus();
 	mBlurFBO = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
-	mBlurFBO->withTextureFP(16, 4)
+	mBlurFBO->withTextureFP(16, 1)
 			.checkStatus();
 
 	mShader = std::make_unique<Shader>("models/quad.vert", "ssao.frag");

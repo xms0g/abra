@@ -19,11 +19,11 @@ public:
 private:
 	void createEnvMap(const RenderContext& ctx);
 
-	void createIrradianceMap(const RenderContext& ctx);
+	void createIrradianceMap();
 
 	void createPrefilterMap(const RenderContext& ctx);
 
-	void createBrdfLUT(const RenderContext& ctx) const;
+	void createBrdfLUT() const;
 
 	std::unique_ptr<CubemapBuffer> mEnvMapBuffer;
 	std::unique_ptr<CubemapBuffer> mIrradianceMapBuffer;
