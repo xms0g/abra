@@ -86,6 +86,6 @@ private:
 		{aiTextureType_NORMALS, "texture_normal"},
 		{aiTextureType_HEIGHT, "texture_height"},
 		{aiTextureType_EMISSIVE, "texture_emissive"},
-		{aiTextureType_AMBIENT_OCCLUSION,"texture_ao"},
+		{aiTextureType_LIGHTMAP,"texture_ao"},
 	};
 };
