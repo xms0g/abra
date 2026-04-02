@@ -8,8 +8,7 @@ enum TextureType {
 	EMISSION = 4,
 	HEIGHT = 5,
 	NORMAL = 6,
-	METALNESS = 15,
-	ROUGHNESS = 16,
+	METALLIC_ROUGHNESS = 18,
 	AO = 17
 };
 

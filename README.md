@@ -41,6 +41,8 @@ It’s designed for clarity, experimentation, and real-time graphics research �
   - Plane
   - Sphere
   - Screen Quad – for post-processing, deferred pipeline, and blitting
+- **Supported Model Format**
+  - This renderer currently supports glTF 2.0 models only.Other formats (e.g., OBJ, FBX) are not supported.
 ## Screenshots
 ![Screenshot1](assets/screenshot1.png)
 ![Screenshot1](assets/screenshot5.png)
