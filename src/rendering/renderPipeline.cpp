@@ -358,14 +358,14 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			continue;
 		}
 		// Set shader
-		if (material.flag & OPAQUE) {
+		if (material.flag & PBR) {
+			matb.shader = pbr.get();
+		} else if (material.flag & OPAQUE) {
 			if (material.flag & UNLIT) {
 				matb.shader = unlit.get();
 			} else {
 				matb.shader = opaque.get();
 			}
-		} else if (material.flag & PBR) {
-			matb.shader = pbr.get();
 		} else if (material.flag & CUTOUT) {
 			matb.shader = cutout.get();
 		} else if (material.flag & BLEND) {
@@ -382,7 +382,9 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			mRenderQueue.shadowGroups.push_back(group);
 		}
 
-		if (material.flag & OPAQUE) {
+		if (material.flag & PBR) {
+			mRenderQueue.pbrGroups.push_back(group);
+		} else if (material.flag & OPAQUE) {
 			if (matc.renderFlag & FORWARD_PASS) {
 				mRenderQueue.forwardOpaqueGroups.push_back(group);
 			} else {
@@ -392,8 +394,6 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			mRenderQueue.forwardOpaqueGroups.push_back(group);
 		} else if (material.flag & BLEND) {
 			mRenderQueue.blendGroups.push_back(group);
-		} else if (material.flag & PBR) {
-			mRenderQueue.pbrGroups.push_back(group);
 		}
 	}
 }

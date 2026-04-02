@@ -174,7 +174,8 @@ void ResourceManager::processMaterials(const aiScene* scene, MaterialLoadContext
 				.mat = material,
 				.type = type,
 				.typeName = name,
-				.materialID = i};
+				.materialID = i
+			};
 			loadMaterialTextures(req, ctx);
 		}
 	}
@@ -197,14 +198,16 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 		} else {
 			uint32_t flag{0};
 			int twoSided{0};
+			float matPBR{0.0f};
 
 			if (req.mat->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
 				flag |= twoSided != 0 ? TWOSIDED : 0;
 			}
-			// if (float value{0.0f}; req.mat->Get(AI_MATKEY_METALLIC_FACTOR, value) == AI_SUCCESS ||
-			//                        req.mat->Get(AI_MATKEY_ROUGHNESS_FACTOR, value) == AI_SUCCESS) {
-			// 	flag |= value > 0.0f ? PBR : 0;
-			// }
+
+			if (req.mat->Get(AI_MATKEY_METALLIC_FACTOR, matPBR) == AI_SUCCESS ||
+			    req.mat->Get(AI_MATKEY_ROUGHNESS_FACTOR, matPBR) == AI_SUCCESS) {
+				flag |= (matPBR > 0.0f) ? PBR : 0;
+			}
 
 			// Only supports GLTF
 			float alphaCutoff{0.0f};
