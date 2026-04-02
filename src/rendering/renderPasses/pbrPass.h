@@ -1,14 +1,12 @@
 #pragma once
 #include <memory>
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 #include "IRenderPass.hpp"
-
-namespace Models {
-class SingleQuad;
-}
+#include "../models/cube.h"
 
 class CubemapBuffer;
 class FrameBuffer;
-class Shader;
 
 class PBRPass final : public IRenderPass {
 public:
@@ -19,15 +17,29 @@ public:
 	void execute(const RenderContext& ctx) override;
 
 private:
-	std::unique_ptr<Shader> mEquirectangularToCube;
-	std::unique_ptr<Shader> mIrradianceConv;
-	std::unique_ptr<Shader> mPrefilter;
-	std::unique_ptr<Shader> mBrdfLUT;
+	void createEnvMap(const RenderContext& ctx);
+
+	void createIrradianceMap(const RenderContext& ctx);
+
+	void createPrefilterMap(const RenderContext& ctx);
+
+	void createBrdfLUT(const RenderContext& ctx) const;
 
 	std::unique_ptr<CubemapBuffer> mEnvMapBuffer;
 	std::unique_ptr<CubemapBuffer> mIrradianceMapBuffer;
 	std::unique_ptr<CubemapBuffer> mPrefilterMapBuffer;
 	std::unique_ptr<FrameBuffer> mBrdfLUTBuffer;
 
-	std::unique_ptr<Models::SingleQuad> mQuad;
+	Models::Cube cube;
+	static constexpr int FACES = 6;
+
+	glm::mat4 mCaptureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+	glm::mat4 mCaptureViews[FACES] = {
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)),
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f))
+	};
 };
