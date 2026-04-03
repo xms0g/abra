@@ -57,10 +57,10 @@ out vec4 fragColor;
 
 void main() {
     vec3 albedo = pow(texture(material.texture_albedo, fs_in.TexCoord).rgb, vec3(2.2));
-    float metallic = texture(material.texture_metallicRoughness, fs_in.TexCoord).b;
-    float roughness = texture(material.texture_metallicRoughness, fs_in.TexCoord).g;
+    float ao = texture(material.texture_occlusionRoughnessMetallic, fs_in.TexCoord).r;
+    float roughness = texture(material.texture_occlusionRoughnessMetallic, fs_in.TexCoord).g;
+    float metallic = texture(material.texture_occlusionRoughnessMetallic, fs_in.TexCoord).b;
     vec3 emissive = material.hasEmissiveMap ? pow(texture(material.texture_emissive, fs_in.TexCoord).rgb, vec3(2.2)) : vec3(0.0);
-    float ao = texture(material.texture_ao, fs_in.TexCoord).r;
 
     vec3 N = normal(fs_in.TBN, fs_in.TexCoord, true);
     vec3 V = normalize(viewPos.xyz - fs_in.WorldPos);

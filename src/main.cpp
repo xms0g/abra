@@ -149,14 +149,14 @@ int main() {
 		// 		math::generateAABB(*cubeModel.getMeshes())));
 
 		// Helmet
-		// auto helmet = registry.createEntity("Helmet");
-		// helmet.addComponent<TransformComponent>(
-		// 	glm::vec3(-1.2f, 1.3f, 0.0f),
-		// 	glm::vec3(90.0f, 0.0f, 0.0f),
-		// 	glm::vec3(1.0f));
-		//
-		// ResourceManager::instance().asyncLoadModel(helmet.id(), "DamagedHelmet/glTF/DamagedHelmet.gltf");
-		// helmet.addComponent<DebugComponent>();
+		auto helmet = registry.createEntity("Helmet");
+		helmet.addComponent<TransformComponent>(
+			glm::vec3(-1.2f, 1.3f, 0.0f),
+			glm::vec3(90.0f, 0.0f, 0.0f),
+			glm::vec3(1.0f));
+
+		ResourceManager::instance().asyncLoadModel(helmet.id(), "DamagedHelmet/glTF/DamagedHelmet.gltf");
+
 		//
 		// auto angel = registry.createEntity("Angel");
 		// angel.addComponent<TransformComponent>(
@@ -168,14 +168,13 @@ int main() {
 		// angel.addComponent<DebugComponent>();
 
 		// Sponza
-		auto sponza = registry.createEntity("Sponza");
-		sponza.addComponent<TransformComponent>(
-			glm::vec3(0.0f, 0.0f, 0.0f),
-			glm::vec3(0.0f),
-			glm::vec3(0.02f));
-
-		ResourceManager::instance().asyncLoadModel(sponza.id(), "Sponza/glTF/Sponza.gltf");
-		sponza.addComponent<DebugComponent>();
+		// auto sponza = registry.createEntity("Sponza");
+		// sponza.addComponent<TransformComponent>(
+		// 	glm::vec3(0.0f, 0.0f, 0.0f),
+		// 	glm::vec3(0.0f),
+		// 	glm::vec3(0.010f));
+		//
+		// ResourceManager::instance().asyncLoadModel(sponza.id(), "Sponza/glTF/Sponza.gltf");
 
 		// Wait all models to be ready
 		ResourceManager::instance().waitForAll();
@@ -188,14 +187,15 @@ int main() {
 		// 	std::make_shared<math::AABB>(
 		// 		math::generateAABB(*ResourceManager::instance().getMeshes(suzanne.id()))));
 		//
-		// helmet.addComponent<MeshComponent>(ResourceManager::instance().getMeshes(helmet.id()));
-		// helmet.addComponent<MaterialComponent>(
-		// 	ResourceManager::instance().getMaterial(helmet.id()));
-		//
-		// helmet.addComponent<BoundingVolumeComponent>(
-		// 	std::make_shared<math::AABB>(
-		// 		math::generateAABB(*ResourceManager::instance().getMeshes(helmet.id()))));
-		//
+		helmet.addComponent<MeshComponent>(ResourceManager::instance().getMeshes(helmet.id()));
+		helmet.addComponent<MaterialComponent>(
+			ResourceManager::instance().getMaterial(helmet.id()));
+
+		helmet.addComponent<BoundingVolumeComponent>(
+			std::make_shared<math::AABB>(
+				math::generateAABB(*ResourceManager::instance().getMeshes(helmet.id()))));
+		helmet.addComponent<DebugComponent>();
+
 		// angel.addComponent<MeshComponent>(ResourceManager::instance().getMeshes(angel.id()));
 		// angel.addComponent<MaterialComponent>(
 		// 	ResourceManager::instance().getMaterial(angel.id()));
@@ -204,44 +204,113 @@ int main() {
 		// 	std::make_shared<math::AABB>(
 		// 		math::generateAABB(*ResourceManager::instance().getMeshes(angel.id()))));
 
-		sponza.addComponent<MeshComponent>(ResourceManager::instance().getMeshes(sponza.id()));
-		sponza.addComponent<MaterialComponent>(
-			ResourceManager::instance().getMaterial(sponza.id()));
+		// sponza.addComponent<DebugComponent>();
+		// sponza.addComponent<MeshComponent>(ResourceManager::instance().getMeshes(sponza.id()));
+		// sponza.addComponent<MaterialComponent>(
+		// 	ResourceManager::instance().getMaterial(sponza.id()));
+		//
+		// sponza.addComponent<BoundingVolumeComponent>(
+		// 	std::make_shared<math::AABB>(
+		// 		math::generateAABB(*ResourceManager::instance().getMeshes(sponza.id()))));
 
-		sponza.addComponent<BoundingVolumeComponent>(
+		//
+		Models::Sphere goldSphere{
+			glm::vec3(0.0f, 0.0f, 0.0f),
+			false,
+			"textures/pbr/gold/albedo.png",
+			"textures/pbr/gold/normal.png",
+			"textures/pbr/gold/occlusionRoughnessMetallic.png"
+		};
+
+		Models::Sphere plasticSphere{
+			glm::vec3(0.0f, 0.0f, 0.0f),
+			false,
+			"textures/pbr/plastic/albedo.png",
+			"textures/pbr/plastic/normal.png",
+			"textures/pbr/plastic/occlusionRoughnessMetallic.png",
+		};
+
+		Models::Sphere ironSphere{
+			glm::vec3(0.0f, 0.0f, 0.0f),
+			false,
+			"textures/pbr/rusted_iron/albedo.png",
+			"textures/pbr/rusted_iron/normal.png",
+			"textures/pbr/rusted_iron/occlusionRoughnessMetallic.png"
+		};
+
+		Models::Sphere wallSphere{
+			glm::vec3(0.0f, 0.0f, 0.0f),
+			false,
+			"textures/pbr/wall/albedo.png",
+			"textures/pbr/wall/normal.png",
+			"textures/pbr/wall/occlusionRoughnessMetallic.png"
+		};
+
+		auto gsphere = registry.createEntity("Gold Sphere");
+		gsphere.addComponent<TransformComponent>(
+			glm::vec3(2.0f + 0 * 2.5f, 1.3f, 0.0f),
+			glm::vec3(0.0),
+			glm::vec3(1.0f));
+
+		gsphere.addComponent<MeshComponent>(goldSphere.meshes());
+		gsphere.addComponent<MaterialComponent>(goldSphere.material());
+
+		gsphere.addComponent<DebugComponent>();
+
+		gsphere.addComponent<BoundingVolumeComponent>(
 			std::make_shared<math::AABB>(
-				math::generateAABB(*ResourceManager::instance().getMeshes(sponza.id()))));
+				math::generateAABB(*goldSphere.meshes())));
 
+		auto psphere = registry.createEntity("Plastic Sphere");
+		psphere.addComponent<TransformComponent>(
+			glm::vec3(2.0f + 1 * 2.5f, 1.3f, 0.0f),
+			glm::vec3(0.0),
+			glm::vec3(1.0f));
+
+		psphere.addComponent<MeshComponent>(plasticSphere.meshes());
+		psphere.addComponent<MaterialComponent>(plasticSphere.material());
+
+		psphere.addComponent<DebugComponent>();
+
+		psphere.addComponent<BoundingVolumeComponent>(
+			std::make_shared<math::AABB>(
+				math::generateAABB(*plasticSphere.meshes())));
 		//
-		// Models::Sphere sphereModel{
-		// 	glm::vec3(0.0f, 0.0f, 0.0f),
-		// 	false,
-		// 	"textures/pbr/rusted_iron/albedo.png",
-		// 	"textures/pbr/rusted_iron/normal.png",
-		// 	"textures/pbr/rusted_iron/metallic.png",
-		// 	"textures/pbr/rusted_iron/roughness.png",
-		// 	"textures/pbr/rusted_iron/ao.png"
-		// };
-		// for (int i = 0; i < 3; i++) {
-		// 	auto sphere = registry.createEntity("Sphere");
-		// 	sphere.addComponent<TransformComponent>(
-		// 		glm::vec3(6.0f + i * 2.5f, 2.6f, 0.0f),
-		// 		glm::vec3(0.0),
-		// 		glm::vec3(1.0f));
+		auto isphere = registry.createEntity("Iron Sphere");
+		isphere.addComponent<TransformComponent>(
+			glm::vec3(2.0f + 2 * 2.5f, 1.3f, 0.0f),
+			glm::vec3(0.0),
+			glm::vec3(1.0f));
+
+		isphere.addComponent<MeshComponent>(ironSphere.meshes());
+		isphere.addComponent<MaterialComponent>(ironSphere.material());
+
+		isphere.addComponent<DebugComponent>();
+
+		isphere.addComponent<BoundingVolumeComponent>(
+			std::make_shared<math::AABB>(
+				math::generateAABB(*ironSphere.meshes())));
 		//
-		// 	sphere.addComponent<MeshComponent>(sphereModel.meshes());
-		// 	sphere.addComponent<MaterialComponent>(sphereModel.material());
-		//
-		// 	sphere.addComponent<DebugComponent>();
-		//
-		// 	sphere.addComponent<BoundingVolumeComponent>(
-		// 		std::make_shared<math::AABB>(
-		// 			math::generateAABB(*sphereModel.meshes())));
-		// }
+		auto wsphere = registry.createEntity("Wall Sphere");
+		wsphere.addComponent<TransformComponent>(
+			glm::vec3(2.0f + 3 * 2.5f, 1.3f, 0.0f),
+			glm::vec3(0.0),
+			glm::vec3(1.0f));
+
+		wsphere.addComponent<MeshComponent>(wallSphere.meshes());
+		wsphere.addComponent<MaterialComponent>(wallSphere.material());
+
+		wsphere.addComponent<DebugComponent>();
+
+		wsphere.addComponent<BoundingVolumeComponent>(
+			std::make_shared<math::AABB>(
+				math::generateAABB(*wallSphere.meshes())));
+
+
 		auto dirLight = registry.createEntity("Directional Light");
 		dirLight.addComponent<DirectionalLightComponent>(
 			glm::vec4(-0.2f, -1.0f, -0.3f, 0.0f),
-			glm::vec4(0.3f, 0.3f, 0.3f, 0.0f),
+			glm::vec4(0.1f, 0.1f, 0.1f, 0.0f),
 			glm::vec4(0.4f, 0.4f, 0.4f, 0.0f),
 			glm::vec4(0.5f, 0.5f, 0.5f, 0.0f));
 
