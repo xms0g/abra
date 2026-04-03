@@ -38,7 +38,7 @@ void PerspectiveShadowPass::render(
 	const glm::vec4& direction,
 	const glm::vec4& position,
 	const float fovy,
-	const int layer) {
+	const uint32_t layer) {
 	const glm::mat4 lightProjection = glm::perspective(
 		fovy,
 		static_cast<float>(ctx.shadow.width) / static_cast<float>(ctx.shadow.height),

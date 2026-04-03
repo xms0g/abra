@@ -49,7 +49,7 @@ void PostProcessPass::configure(const RenderContext& ctx) {
 }
 
 void PostProcessPass::execute(const RenderContext& ctx) {
-	int toggle = 0;
+	bool toggle = false;
 
 	uint32_t inputTex = ctx.sceneBuffer->texture();
 	for (const auto& effect: mEffects) {

@@ -34,7 +34,7 @@ FrameBuffer& OmnidirectionalShadowPass::depthMap() const {
 void OmnidirectionalShadowPass::render(
 	const RenderContext& ctx,
 	const glm::vec4& position,
-	const int layer) const {
+	const uint32_t layer) const {
 	const glm::mat4 shadowProj = glm::perspective(
 		glm::radians(ctx.shadow.omnidirectional.fovy),
 		static_cast<float>(ctx.shadow.width) / static_cast<float>(ctx.shadow.height),

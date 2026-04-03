@@ -18,7 +18,7 @@ float& ToneMapping::exposure() {
 uint32_t ToneMapping::render(
 	const uint32_t sceneTexture,
 	const uint32_t vao,
-	int& toggle,
+	bool& toggle,
 	RenderTargetType& renderTargets) const {
 	renderTargets[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);

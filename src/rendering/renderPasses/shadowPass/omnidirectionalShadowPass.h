@@ -17,7 +17,7 @@ public:
 
 	[[nodiscard]] FrameBuffer& depthMap() const;
 
-	void render(const RenderContext& ctx, const glm::vec4& position, int layer) const;
+	void render(const RenderContext& ctx, const glm::vec4& position, uint32_t layer) const;
 
 private:
 	std::unique_ptr<FrameBuffer> mDepthMap;

@@ -8,13 +8,14 @@ inline float lerp(const float a, const float b, const float t) {
 	return a + (b - a) * t;
 }
 
-std::vector<glm::vec4> math::random::generateKernel(const int sampleCount) {
+std::vector<glm::vec4> math::random::generateKernel(const uint32_t sampleCount) {
 	std::vector<glm::vec4> kernel;
 
 	for (unsigned int i = 0; i < sampleCount; ++i) {
-		glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, // [-1.0, 1.0]
-						 randomFloats(generator) * 2.0 - 1.0,
-						 randomFloats(generator)); // [0.0, 1.0]
+		glm::vec3 sample(
+			randomFloats(generator) * 2.0 - 1.0, // [-1.0, 1.0]
+			randomFloats(generator) * 2.0 - 1.0,
+			randomFloats(generator)); // [0.0, 1.0]
 
 		sample = glm::normalize(sample);
 		sample *= randomFloats(generator);
@@ -29,7 +30,7 @@ std::vector<glm::vec4> math::random::generateKernel(const int sampleCount) {
 	return kernel;
 }
 
-std::vector<float> math::random::generateNoise(const int sampleCount) {
+std::vector<float> math::random::generateNoise(const uint32_t sampleCount) {
 	std::vector<float> noises;
 
 	for (unsigned int i = 0; i < sampleCount; ++i) {

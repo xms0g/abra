@@ -42,7 +42,7 @@ void Mesh::enableInstanceAttributes(const uint32_t instanceVBO, const size_t off
 	glBindVertexArray(mVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
 	// Model matrix attributes (7–10)
-	for (int i = 0; i < 4; i++) {
+	for (uint32_t i = 0; i < 4; ++i) {
 		glEnableVertexAttribArray(7 + i);
 		glVertexAttribPointer(7 + i, 4, GL_FLOAT, GL_FALSE, sizeof(InstanceData),
 		                      reinterpret_cast<void*>(offset + sizeof(glm::vec4) * i));
@@ -50,7 +50,7 @@ void Mesh::enableInstanceAttributes(const uint32_t instanceVBO, const size_t off
 	}
 
 	// Normal matrix attributes (11–13)
-	for (int i = 0; i < 3; i++) {
+	for (uint32_t i = 0; i < 3; ++i) {
 		glEnableVertexAttribArray(11 + i);
 		glVertexAttribPointer(11 + i, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData),
 		                      reinterpret_cast<void*>(offset + sizeof(glm::mat4) + sizeof(glm::vec3) * i));
@@ -70,10 +70,18 @@ void Mesh::uploadToGPU() {
 
 	// bind the buffer to be used
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO);
-	glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(Vertex), mVertices.data(), GL_STATIC_DRAW);
+	glBufferData(
+		GL_ARRAY_BUFFER,
+		static_cast<long>(mVertices.size() * sizeof(Vertex)),
+		mVertices.data(),
+		GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndices.size() * sizeof(uint32_t), mIndices.data(), GL_STATIC_DRAW);
+	glBufferData(
+		GL_ELEMENT_ARRAY_BUFFER,
+		static_cast<long>(mIndices.size() * sizeof(uint32_t)),
+		mIndices.data(),
+		GL_STATIC_DRAW);
 
 	// set the vertex attribute pointers
 	// vertex Positions

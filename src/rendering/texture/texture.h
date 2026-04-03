@@ -20,7 +20,7 @@ struct Texture {
 };
 
 namespace texture {
-uint32_t generate(uint32_t width, uint32_t height, const float* data);
+uint32_t generate(int32_t width, int32_t height, const float* data);
 
 uint32_t load(const char* path, uint32_t flag);
 

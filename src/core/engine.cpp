@@ -38,7 +38,7 @@ void Engine::run() {
 	while (isRunning) {
 		mWindow->clear(0.0f, 0.0f, 0.0f, 1.0f);
 
-		mDeltaTime = (SDL_GetTicks() - mMillisecsPreviousFrame) / 1000.0f;
+		mDeltaTime = static_cast<float>(SDL_GetTicks() - mMillisecsPreviousFrame) / 1000.0f;
 		mMillisecsPreviousFrame = SDL_GetTicks();
 
 		mInput->process(*mCamera, mWindow->nativeHandle(), mDeltaTime, isRunning);

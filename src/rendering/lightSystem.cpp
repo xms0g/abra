@@ -13,9 +13,11 @@ LightSystem::LightSystem(const RenderContext& ctx) {
 	RequireComponent<PointLightComponent>(true);
 	RequireComponent<SpotLightComponent>(true);
 
-	const uint32_t totalLightBufferSize = ctx.light.maxDirLights * sizeof(DirectionalLightComponent) +
-	                                ctx.light.maxPointLights * sizeof(PointLightComponent) +
-	                                ctx.light.maxSpotLights * sizeof(SpotLightComponent) + sizeof(glm::ivec4);
+	const uint32_t totalLightBufferSize =
+			ctx.light.maxDirLights * sizeof(DirectionalLightComponent) +
+			ctx.light.maxPointLights * sizeof(PointLightComponent) +
+			ctx.light.maxSpotLights * sizeof(SpotLightComponent) +
+			sizeof(glm::ivec4);
 
 	mUBO = std::make_unique<UniformBuffer>(totalLightBufferSize, ctx.light.ubo.binding);
 }

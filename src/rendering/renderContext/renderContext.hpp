@@ -23,8 +23,8 @@ struct RenderContext {
 
 	struct {
 		const FrameBuffer* buffer;
-		int kernelSize;
-		int noiseTextureSize;
+		uint32_t kernelSize;
+		uint32_t noiseTextureSize;
 		float radius;
 		float bias;
 		float intensity;
@@ -65,8 +65,8 @@ struct RenderContext {
 
 	struct {
 		const std::array<uint32_t, 3>* textures;
-		int textureSlot;
-		int width, height;
+		uint32_t textureSlot;
+		uint32_t width, height;
 
 		struct {
 			const UniformBuffer* self;
@@ -75,17 +75,17 @@ struct RenderContext {
 		} ubo;
 
 		struct  {
-			int maxLights;
+			uint32_t maxLights;
 			float height, nearPlane, farPlane, left, right, bottom, top;
 		} directional;
 
 		struct {
-			int maxLights;
+			uint32_t maxLights;
 			float nearPlane, farPlane, fovy;
 		} omnidirectional;
 
 		struct {
-			int maxLights;
+			uint32_t maxLights;
 			float nearPlane, farPlane;
 		} perspective;
 	} shadow;
@@ -93,22 +93,22 @@ struct RenderContext {
 	struct {
 		struct {
 			mutable uint32_t binding;
-			int size;
+			uint32_t size;
 		} envMap;
 
 		struct {
-			int textureSlot;
-			int size;
+			uint32_t textureSlot;
+			uint32_t size;
 		} irradianceMap;
 
 		struct {
-			int textureSlot;
-			int size;
+			uint32_t textureSlot;
+			uint32_t size;
 		} prefilterMap;
 
 		struct {
-			int textureSlot;
-			int size;
+			uint32_t textureSlot;
+			uint32_t size;
 		} brdfLUT;
 
 		const char* HDRTexture;

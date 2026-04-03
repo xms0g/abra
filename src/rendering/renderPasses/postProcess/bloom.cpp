@@ -35,11 +35,11 @@ Bloom::~Bloom() = default;
 uint32_t Bloom::render(
 	const uint32_t sceneTexture,
 	const uint32_t vao,
-	int& toggle,
+	bool& toggle,
 	RenderTargetType& renderTargets) const {
 	(void) toggle;
 	(void) renderTargets;
-	int toggle_ = 0;
+	bool toggle_ = false;
 	uint32_t inputTex = sceneTexture;
 
 	inputTex = brightFilterPass(inputTex, vao, toggle_);
@@ -49,7 +49,7 @@ uint32_t Bloom::render(
 	return inputTex;
 }
 
-uint32_t Bloom::brightFilterPass(const uint32_t sceneTexture, const uint32_t vao, int& toggle) const {
+uint32_t Bloom::brightFilterPass(const uint32_t sceneTexture, const uint32_t vao, bool& toggle) const {
 	mRenderTargets[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -62,7 +62,7 @@ uint32_t Bloom::brightFilterPass(const uint32_t sceneTexture, const uint32_t vao
 	return outTex;
 }
 
-uint32_t Bloom::blurPass(const uint32_t sceneTexture, const uint32_t vao, int& toggle) const {
+uint32_t Bloom::blurPass(const uint32_t sceneTexture, const uint32_t vao, bool& toggle) const {
 	bool horizontal = true;
 	uint32_t outTex = sceneTexture;
 
@@ -87,7 +87,7 @@ uint32_t Bloom::combinePass(
 	const uint32_t sceneTexture,
 	const uint32_t bloomBlur,
 	const uint32_t vao,
-	const int& toggle) const {
+	const bool& toggle) const {
 	mRenderTargets[toggle]->bind();
 	combine->activate();
 	glDisable(GL_DEPTH_TEST);

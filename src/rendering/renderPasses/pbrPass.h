@@ -31,7 +31,7 @@ private:
 	std::unique_ptr<FrameBuffer> mBrdfLUTBuffer;
 
 	Models::Cube cube;
-	static constexpr int FACES = 6;
+	static constexpr uint32_t FACES = 6;
 
 	glm::mat4 mCaptureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
 	glm::mat4 mCaptureViews[FACES] = {

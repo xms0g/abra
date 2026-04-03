@@ -93,7 +93,7 @@ bool math::AABB::isMeshInFrustum(
 
 	// Transform to world space immediately
 	glm::vec3 worldCorners[8];
-	for (int i = 0; i < 8; ++i) {
+	for (uint32_t i = 0; i < 8; ++i) {
 		worldCorners[i] = glm::vec3(model * glm::vec4(localCorners[i], 1.0f));
 	}
 
@@ -104,7 +104,7 @@ bool math::AABB::isMeshInFrustum(
 	};
 
 	for (const auto& plane: planes) {
-		int inside = 0;
+		uint32_t inside = 0;
 
 		for (const auto& corner: worldCorners) {
 			if (plane.computeSignedDistanceToPlane(corner) >= 0) {

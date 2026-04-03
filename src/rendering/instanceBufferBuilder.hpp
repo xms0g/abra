@@ -6,7 +6,7 @@
 
 struct InstanceVBO {
 	uint32_t buffer{};
-	int offset{0};
+	uint32_t offset{0};
 };
 
 struct InstanceData {
@@ -45,7 +45,7 @@ void uploadInstanceData(const T& groups, InstanceVBO& vbo) {
 		gpuData.reserve(transforms->size() / 9);
 
 		auto transform = *transforms;
-		for (int i = 0; i < transform.size(); i += 9) {
+		for (uint32_t i = 0; i < transform.size(); i += 9) {
 			glm::vec3 pos{transform[i], transform[i + 1], transform[i + 2]};
 			glm::vec3 rot{transform[i + 3], transform[i + 4], transform[i + 5]};
 			glm::vec3 scale{transform[i + 6], transform[i + 7], transform[i + 8]};

@@ -13,7 +13,7 @@ Grayscale::Grayscale(const std::string& name, const bool enabled) : IPostEffect(
 uint32_t Grayscale::render(
 	const uint32_t sceneTexture,
 	const uint32_t vao,
-	int& toggle,
+	bool& toggle,
 	RenderTargetType& renderTargets) const {
 	renderTargets[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);

@@ -16,7 +16,7 @@ struct Vertex {
 	// bitangent
 	glm::vec3 bitangent;
 	//bone indexes which will influence this vertex
-	int boneIDs[MAX_BONE_INFLUENCE];
+	int32_t boneIDs[MAX_BONE_INFLUENCE];
 	//weights from each bone
 	float weights[MAX_BONE_INFLUENCE];
 };

@@ -156,12 +156,12 @@ uint32_t Shader::compileShader(const std::string& source, const char* fn, const 
 	glCompileShader(shader);
 
 	// Check compile errors
-	GLint success;
+	int32_t success;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 
 	if (!success) {
 		std::string infoLog;
-		GLint maxLength = 0;
+		int32_t maxLength = 0;
 
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
 		infoLog.resize(maxLength);
@@ -189,12 +189,12 @@ uint32_t Shader::linkShader(const uint32_t vertex, const uint32_t fragment, cons
 	glLinkProgram(mID);
 
 	// Check linking errors
-	GLint success;
+	int32_t success;
 	glGetProgramiv(mID, GL_LINK_STATUS, &success);
 
 	if (!success) {
 		std::string infoLog;
-		GLint maxLength = 0;
+		int32_t maxLength = 0;
 
 		glGetProgramiv(mID, GL_INFO_LOG_LENGTH, &maxLength);
 		infoLog.resize(maxLength);

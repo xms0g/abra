@@ -15,13 +15,13 @@ Models::Sphere::Sphere(
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec2> uv;
-	std::vector<unsigned int> indices;
+	std::vector<uint32_t> indices;
 
 	constexpr unsigned int X_SEGMENTS = 64;
 	constexpr unsigned int Y_SEGMENTS = 64;
 	constexpr float PI = 3.14159265359f;
 
-	for (unsigned int x = 0; x <= X_SEGMENTS; ++x) {
+	for (uint32_t x = 0; x <= X_SEGMENTS; ++x) {
 		for (unsigned int y = 0; y <= Y_SEGMENTS; ++y) {
 			float xSegment = static_cast<float>(x) / static_cast<float>(X_SEGMENTS);
 			float ySegment = static_cast<float>(y) / static_cast<float>(Y_SEGMENTS);
@@ -35,7 +35,7 @@ Models::Sphere::Sphere(
 		}
 	}
 
-	for (unsigned int y = 0; y < Y_SEGMENTS; ++y) {
+	for (uint32_t y = 0; y < Y_SEGMENTS; ++y) {
 		for (unsigned int x = 0; x < X_SEGMENTS; ++x) {
 			unsigned int i0 = y * (X_SEGMENTS + 1) + x;
 			unsigned int i1 = (y + 1) * (X_SEGMENTS + 1) + x;
@@ -53,7 +53,7 @@ Models::Sphere::Sphere(
 	}
 
 	std::vector<float> v;
-	for (unsigned int i = 0; i < positions.size(); ++i) {
+	for (uint32_t i = 0; i < positions.size(); ++i) {
 		v.push_back(positions[i].x);
 		v.push_back(positions[i].y);
 		v.push_back(positions[i].z);
@@ -69,7 +69,7 @@ Models::Sphere::Sphere(
 	}
 
 	std::vector<Vertex> vertices;
-	for (int i = 0; i < v.size(); i += 8) {
+	for (uint32_t i = 0; i < v.size(); i += 8) {
 		Vertex vertex{};
 		vertex.position = glm::vec3(v[i], v[i + 1], v[i + 2]);
 		vertex.normal = glm::vec3(v[i + 3], v[i + 4], v[i + 5]);

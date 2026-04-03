@@ -50,7 +50,7 @@ Models::Cubemap::Cubemap(std::span<const char* const> faces) {
 	};
 
 	std::vector<Vertex> vertices;
-	for (int i = 0; i < 36; i++) {
+	for (uint32_t i = 0; i < 36; ++i) {
 		Vertex vertex{};
 		vertex.position = glm::vec3(v[i*3], v[i*3+1], v[i*3+2]);
 		vertices.emplace_back(vertex);

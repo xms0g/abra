@@ -54,7 +54,7 @@ public:
 		const glm::vec3& rotation,
 		const glm::vec3& scale) const override;
 
-private:
+protected:
 	[[nodiscard]] bool isOnOrForwardPlane(const Plane& plane) const override;
 
 	glm::vec3 mCenter{0.f, 0.f, 0.f};
@@ -90,7 +90,7 @@ public:
 		const glm::vec3& rotation,
 		const glm::vec3& scale) const override;
 
-private:
+protected:
 	[[nodiscard]] bool isOnOrForwardPlane(const Plane& plane) const override;
 
 	glm::vec3 center{0.f, 0.f, 0.f};

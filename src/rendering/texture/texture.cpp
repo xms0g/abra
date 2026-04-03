@@ -4,7 +4,7 @@
 #include "image/stb_image.h"
 #include "../material/material.hpp"
 
-uint32_t texture::generate(const uint32_t width, const uint32_t height, const float* data) {
+uint32_t texture::generate(const int32_t width, const int32_t height, const float* data) {
 	uint32_t textureID;
 
 	glGenTextures(1, &textureID);
@@ -14,8 +14,8 @@ uint32_t texture::generate(const uint32_t width, const uint32_t height, const fl
 		GL_TEXTURE_2D,
 		0,
 		GL_RGB16F,
-		static_cast<int32_t>(width),
-		static_cast<int32_t>(height),
+		width,
+		height,
 		0,
 		GL_RGB,
 		GL_FLOAT,
@@ -32,7 +32,7 @@ uint32_t texture::generate(const uint32_t width, const uint32_t height, const fl
 uint32_t texture::load(const char* path, const uint32_t flag) {
 	uint32_t textureID;
 
-	int width, height, channel;
+	int32_t width, height, channel;
 	unsigned char* data = stbi_load(path, &width, &height, &channel, 0);
 
 	if (!data) {
@@ -77,7 +77,7 @@ uint32_t texture::loadCubemap(const std::vector<std::string>& faces) {
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 
-	int width, height, depth;
+	int32_t width, height, depth;
 	for (uint32_t i = 0; i < faces.size(); i++) {
 		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &depth, 0);
 
@@ -104,7 +104,7 @@ uint32_t texture::loadCubemap(const std::vector<std::string>& faces) {
 
 uint32_t texture::loadHDR(const char* path) {
 	uint32_t hdrTexture;
-	int width, height, channel;
+	int32_t width, height, channel;
 
 	stbi_set_flip_vertically_on_load(true);
 	float* data = stbi_loadf(path, &width, &height, &channel, 0);

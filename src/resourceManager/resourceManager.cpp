@@ -209,7 +209,7 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 				flag |= (matPBR > 0.0f) ? PBR : 0;
 			}
 
-			// Only supports GLTF
+			// Only supports glTF
 			float alphaCutoff{0.0f};
 			aiString alphaMode;
 

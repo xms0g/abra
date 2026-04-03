@@ -15,19 +15,19 @@ public:
 	uint32_t render(
 		uint32_t sceneTexture,
 		uint32_t vao,
-		int& toggle,
+		bool& toggle,
 		RenderTargetType& renderTargets) const override;
 
 private:
-	uint32_t brightFilterPass(uint32_t sceneTexture, uint32_t vao, int& toggle) const;
+	uint32_t brightFilterPass(uint32_t sceneTexture, uint32_t vao, bool& toggle) const;
 
-	uint32_t blurPass(uint32_t sceneTexture, uint32_t vao, int& toggle) const;
+	uint32_t blurPass(uint32_t sceneTexture, uint32_t vao, bool& toggle) const;
 
 	[[nodiscard]] uint32_t combinePass(
 		uint32_t sceneTexture,
 		uint32_t bloomBlur,
 		uint32_t vao,
-		const int& toggle) const;
+		const bool& toggle) const;
 
 	std::array<std::unique_ptr<FrameBuffer>, 2> mRenderTargets;
 	std::unique_ptr<Shader> brightFilter;

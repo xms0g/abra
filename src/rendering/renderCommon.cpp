@@ -65,7 +65,7 @@ void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shad
 	bool hasDiffuseMap{false};
 	bool hasEmissiveMap{false};
 
-	for (int i = 0; i < textures.size(); i++) {
+	for (size_t i = 0; i < textures.size(); ++i) {
 		glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
 
 		if (textures[i].type == ALBEDO) {
@@ -100,7 +100,7 @@ void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shad
 }
 
 void RenderCommon::unbindTextures(const std::vector<Texture>& textures) {
-	for (int i = 0; i < textures.size(); i++) {
+	for (size_t i = 0; i < textures.size(); ++i) {
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}

@@ -21,7 +21,7 @@ public:
 	virtual uint32_t render(
 		uint32_t sceneTexture,
 		uint32_t vao,
-		int& toggle,
+		bool& toggle,
 		RenderTargetType& renderTargets) const = 0;
 
 private:
