@@ -99,7 +99,12 @@ void ShadowPass::perspectiveShadowPass(const RenderContext& ctx) const {
 		const auto& light = lights[i];
 		if (!light->castShadow) continue;
 
-		mImpl->perspectiveShadowPass->depthMap().attachLayer(GL_DEPTH_ATTACHMENT, i);
+		glFramebufferTextureLayer(
+			GL_FRAMEBUFFER,
+			GL_DEPTH_ATTACHMENT,
+			mImpl->perspectiveShadowPass->depthMap().texture(),
+			0,
+			i);
 
 		mImpl->perspectiveShadowPass->render(ctx, light->direction, light->position, light->cutOff.y, i);
 		shadowData.persLightSpaceMatrix[i] = mImpl->perspectiveShadowPass->lightSpaceMatrix(i);

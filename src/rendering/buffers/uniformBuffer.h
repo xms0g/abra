@@ -3,7 +3,7 @@
 
 class UniformBuffer {
 public:
-	explicit UniformBuffer(int size, uint32_t binding);
+	explicit UniformBuffer(int32_t size, uint32_t binding);
 
 	~UniformBuffer();
 

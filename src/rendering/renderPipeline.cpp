@@ -90,37 +90,38 @@ void RenderPipeline::configure(const Camera& camera) {
 	glEnable(GL_MULTISAMPLE);
 	mIntermediateBuffer = std::make_unique<FrameBuffer>(mSceneBuffer->width(), mSceneBuffer->height());
 # ifdef HDR
-	mIntermediateBuffer->withTextureFP(16, 4)
-			.withRenderBufferDepth(24)
+	mIntermediateBuffer->withTextureFP(GL_RGBA)
+			.withRenderBufferDepth(GL_DEPTH_COMPONENT24)
 			.checkStatus();
 	mIntermediateBuffer->unbind();
 
 	mSceneBuffer->bind();
-	mSceneBuffer->withTextureFPMultisampled(MULTISAMPLED_COUNT, 16, 4)
+	mSceneBuffer->withTextureFPMultisampled(MULTISAMPLED_COUNT, GL_RGBA)
 # else
-	mIntermediateBuffer->withTexture(4)
-			.withRenderBufferDepth(24)
+	mIntermediateBuffer->withTexture(GL_RGBA)
+			.withRenderBufferDepth(GL_DEPTH_COMPONENT24)
 			.checkStatus();
 	mIntermediateBuffer->unbind();
 
 	mSceneBuffer->bind();
-	mSceneBuffer->withTextureMultisampled(MULTISAMPLED_COUNT, 4)
+	mSceneBuffer->withTextureMultisampled(MULTISAMPLED_COUNT, GL_RGBA)
 # endif
-			.withRenderBufferDepthMultisampled(MULTISAMPLED_COUNT, 24)
+			.withRenderBufferDepthMultisampled(MULTISAMPLED_COUNT, GL_DEPTH_COMPONENT24)
 #else
 # ifdef HDR
-	mSceneBuffer->withTextureFP(16, 4)
+			mSceneBuffer->withTextureFP(GL_RGBA)
 # else
-	mSceneBuffer->withTexture(4)
+			mSceneBuffer->withTexture(GL_RGBA)
 # endif
-			.withTextureDepth(24, false)
+			.withTextureDepth(GL_DEPTH_COMPONENT24, false)
 #endif
 			.checkStatus();
 	mSceneBuffer->unbind();
 
 	// Create camera buffer
-	mCameraUBO = std::make_unique<UniformBuffer>(3 * sizeof(glm::mat4) + sizeof(glm::vec4),
-	                                             mRenderCtx->camera.ubo.binding);
+	mCameraUBO = std::make_unique<UniformBuffer>(
+		3 * sizeof(glm::mat4) + sizeof(glm::vec4),
+		mRenderCtx->camera.ubo.binding);
 	// Create render passes
 	mShadowPass = std::make_shared<ShadowPass>();
 	mPostProcessPass = std::make_shared<PostProcessPass>();

@@ -1,4 +1,5 @@
 #include "omnidirectionalShadowPass.h"
+#include "glad/glad.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "../../shader.h"
@@ -10,7 +11,7 @@
 
 OmnidirectionalShadowPass::OmnidirectionalShadowPass(const RenderContext& ctx) {
 	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadow.width, ctx.shadow.height);
-	mDepthMap->withTextureCubemapDepthArray(ctx.shadow.omnidirectional.maxLights, 16, true)
+	mDepthMap->withTextureCubemapDepthArray(ctx.shadow.omnidirectional.maxLights, GL_DEPTH_COMPONENT24, true)
 			.checkStatus();
 	mDepthMap->unbind();
 

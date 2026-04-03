@@ -21,13 +21,13 @@ protected:
 
 class FrameBuffer final : public IFrameBuffer {
 public:
-	FrameBuffer(int width, int height);
+	FrameBuffer(int32_t width, int32_t height);
 
 	~FrameBuffer() override;
 
-	[[nodiscard]] int width() const;
+	[[nodiscard]] int32_t width() const;
 
-	[[nodiscard]] int height() const;
+	[[nodiscard]] int32_t height() const;
 
 	[[nodiscard]] uint32_t texture() const override;
 
@@ -41,50 +41,48 @@ public:
 
 	void unbind() const override;
 
-	void attachLayer(uint32_t attachment, int layer) const;
+	FrameBuffer& withTexture(uint32_t format);
 
-	FrameBuffer& withTexture(uint32_t channels);
+	FrameBuffer& withTextureMultisampled(int32_t multisampledCount, uint32_t format);
 
-	FrameBuffer& withTextureMultisampled(int multisampledCount, uint32_t channels);
+	FrameBuffer& withTextureFP(uint32_t format);
 
-	FrameBuffer& withTextureFP(uint32_t format, uint32_t channels);
+	FrameBuffer& withTextureFPMultisampled(int32_t multisampledCount, uint32_t format, uint32_t channels);
 
-	FrameBuffer& withTextureFPMultisampled(int multisampledCount, uint32_t format, uint32_t channels);
+	FrameBuffer& withTextureDepth(int32_t internalFormat, bool onlyForShadowMap);
 
-	FrameBuffer& withTextureDepth(uint32_t format, bool onlyForShadowMap);
+	FrameBuffer& withTextureDepthArray(int32_t layerCount, int32_t internalFormat, bool onlyForShadowMap);
 
-	FrameBuffer& withTextureDepthArray(int layerCount, uint32_t format, bool onlyForShadowMap);
+	FrameBuffer& withTextureCubemapDepth(int32_t internalFormat, bool onlyForShadowMap);
 
-	FrameBuffer& withTextureCubemapDepth(uint32_t format, bool onlyForShadowMap);
+	FrameBuffer& withTextureCubemapDepthArray(int32_t layerCount, int32_t internalFormat, bool onlyForShadowMap);
 
-	FrameBuffer& withTextureCubemapDepthArray(int layerCount, uint32_t format, bool onlyForShadowMap);
+	FrameBuffer& withRenderBufferDepth(uint32_t internalFormat);
 
-	FrameBuffer& withRenderBufferDepth(uint32_t format);
+	FrameBuffer& withRenderBufferDepthMultisampled(int32_t multisampledCount, uint32_t internalFormat);
 
-	FrameBuffer& withRenderBufferDepthMultisampled(int multisampledCount, uint32_t format);
+	FrameBuffer& withRenderBufferDepthStencil(int32_t internalFormat);
 
-	FrameBuffer& withRenderBufferDepthStencil();
-
-	FrameBuffer& withRenderBufferDepthStencilMultisampled(int multisampledCount);
+	FrameBuffer& withRenderBufferDepthStencilMultisampled(int32_t multisampledCount, int32_t internalFormat);
 
 	FrameBuffer& configureAttachments();
 
 private:
 	void setAttachment(uint32_t textureID, uint32_t target);
 
-	void setDepthTextureParameters(uint32_t target, int dim);
+	void setDepthTextureParameters(uint32_t target, int32_t dim);
 
-	int getInternalFormat(uint32_t format, uint32_t channels, bool depth = false);
+	int32_t getInternalFormat(uint32_t format, bool isFloat = false);
 
-	int mWidth{0};
-	int mHeight{0};
+	int32_t mWidth{0};
+	int32_t mHeight{0};
 	std::vector<uint32_t> mTextureIDs;
 	std::vector<uint32_t> mAttachments;
 };
 
 class CubemapBuffer final : public IFrameBuffer {
 public:
-	CubemapBuffer(int size, bool mipmap = false, bool prefilter = false);
+	CubemapBuffer(int32_t size, bool mipmap = false, bool prefilter = false);
 
 	~CubemapBuffer() override;
 
@@ -100,5 +98,5 @@ public:
 
 private:
 	uint32_t mCubemapID{0};
-	int mSize{0};
+	int32_t mSize{0};
 };

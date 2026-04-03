@@ -1,4 +1,5 @@
 #include "postProcessPass.h"
+#include "glad/glad.h"
 #include "grayscale.h"
 #include "sepia.h"
 #include "bloom.h"
@@ -39,9 +40,9 @@ void PostProcessPass::configure(const RenderContext& ctx) {
 	for (auto& target: mRenderTargets) {
 		target = std::make_unique<FrameBuffer>(static_cast<int32_t>(ctx.screen.width), static_cast<int32_t>(ctx.screen.height));
 #ifdef HDR
-		target->withTextureFP(16, 4)
+		target->withTextureFP(GL_RGBA)
 #else
-		target->withTexture(4)
+		target->withTexture(GL_RGBA)
 #endif
 		.checkStatus();
 	}

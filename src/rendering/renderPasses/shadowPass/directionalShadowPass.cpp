@@ -10,7 +10,7 @@
 
 DirectionalShadowPass::DirectionalShadowPass(const RenderContext& ctx) {
 	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadow.width, ctx.shadow.height);
-	mDepthMap->withTextureDepth(24, true)
+	mDepthMap->withTextureDepth(GL_DEPTH_COMPONENT24, true)
 			.checkStatus();
 	mDepthMap->unbind();
 

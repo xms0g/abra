@@ -38,7 +38,7 @@ void PBRPass::configure(const RenderContext& ctx) {
 	mPrefilterMapBuffer->checkStatus();
 
 	mBrdfLUTBuffer = std::make_unique<FrameBuffer>(ctx.PBR.brdfLUT.size, ctx.PBR.brdfLUT.size);
-	mBrdfLUTBuffer->withTextureFP(16, 2)
+	mBrdfLUTBuffer->withTextureFP(GL_RG)
 			.checkStatus();
 
 	createEnvMap(ctx);

@@ -1,4 +1,5 @@
 #include "perspectiveShadowPass.h"
+#include "glad/glad.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "../../shader.h"
@@ -8,9 +9,10 @@
 #include "../../buffers/frameBuffer.h"
 #include "../../renderCommon.h"
 
+
 PerspectiveShadowPass::PerspectiveShadowPass(const RenderContext& ctx) {
 	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadow.width, ctx.shadow.height);
-	mDepthMap->withTextureDepthArray(ctx.shadow.perspective.maxLights, 24, true)
+	mDepthMap->withTextureDepthArray(ctx.shadow.perspective.maxLights, GL_DEPTH_COMPONENT24, true)
 			.checkStatus();
 	mDepthMap->unbind();
 
