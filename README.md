@@ -42,7 +42,20 @@ It’s designed for clarity, experimentation, and real-time graphics research �
   - Sphere
   - Screen Quad – for post-processing, deferred pipeline, and blitting
 - **Supported Model Format**
-  - This renderer currently supports glTF 2.0 models only.Other formats (e.g., OBJ, FBX) are not supported.
+  - Abra currently supports glTF 2.0 models only.Other formats (e.g., OBJ, FBX) are not supported.
+- **PBR Workflow**
+    - The engine follows the glTF metallic-roughness workflow.
+    - Texture Conventions
+      - Albedo (Base Color)
+        - sRGB
+      - Normal Map
+        - Linear
+      - Ambient Occlusion-Metallic-Roughness (packed)
+        - Linear
+        - Channels:
+          - R → Ambient Occlusion
+          - G → Roughness
+          - B → Metallic
 ## Screenshots
 ![Screenshot1](assets/screenshot1.png)
 ![Screenshot1](assets/screenshot5.png)
