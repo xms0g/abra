@@ -145,9 +145,8 @@ FrameBuffer& FrameBuffer::withTextureFP(const uint32_t format) {
 
 FrameBuffer& FrameBuffer::withTextureFPMultisampled(
 	const int32_t multisampledCount,
-	const uint32_t format,
-	const uint32_t channels) {
-	const int32_t internalFormat = getInternalFormat(format, channels);
+	const uint32_t format) {
+	const int32_t internalFormat = getInternalFormat(format, true);
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);

@@ -47,7 +47,7 @@ public:
 
 	FrameBuffer& withTextureFP(uint32_t format);
 
-	FrameBuffer& withTextureFPMultisampled(int32_t multisampledCount, uint32_t format, uint32_t channels);
+	FrameBuffer& withTextureFPMultisampled(int32_t multisampledCount, uint32_t format);
 
 	FrameBuffer& withTextureDepth(int32_t internalFormat, bool onlyForShadowMap);
 
