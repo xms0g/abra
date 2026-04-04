@@ -100,10 +100,13 @@
             "uri" : "Default_albedo.jpg"
         },
         {
-            "uri" : "Default_occlusionRoughnessMetallic.jpg"
+            "uri" : "Default_metalRoughness.jpg"
         },
         {
             "uri" : "Default_emissive.jpg"
+        },
+        {
+            "uri" : "Default_AO.jpg"
         },
         {
             "uri" : "Default_normal.jpg"
@@ -121,10 +124,10 @@
             },
             "name" : "Material_MR",
             "normalTexture" : {
-                "index" : 3
+                "index" : 4
             },
             "occlusionTexture" : {
-                "index" : 1
+                "index" : 3
             },
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {

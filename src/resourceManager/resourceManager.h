@@ -79,7 +79,8 @@ private:
 	};
 
 	static constexpr TextureBinding textureBindings[] = {
-		{aiTextureType_UNKNOWN, "texture_occlusionRoughnessMetallic"},
+		{aiTextureType_UNKNOWN, "texture_roughnessMetallic"},
+		{aiTextureType_LIGHTMAP, "texture_ao"},
 		{aiTextureType_DIFFUSE, "texture_albedo"},
 		{aiTextureType_SPECULAR, "texture_specular"},
 		{aiTextureType_NORMALS, "texture_normal"},

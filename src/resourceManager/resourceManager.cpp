@@ -184,8 +184,10 @@ void ResourceManager::processMaterials(const aiScene* scene, MaterialLoadContext
 void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& ctx) const {
 	for (uint32_t i = 0; i < req.mat->GetTextureCount(req.type); ++i) {
 		aiString str;
+
 		req.mat->GetTexture(req.type, i, &str);
 		std::string path = ctx.baseDir + str.C_Str();
+
 		// check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
 		if (ctx.texturesLoaded.contains(path))
 			continue;
@@ -197,23 +199,23 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 			ctx.materials[req.materialID].textures.emplace_back(0, req.type, req.typeName, std::move(path));
 		} else {
 			uint32_t flag{0};
-			int twoSided{0};
-			float matPBR{0.0f};
 
-			if (req.mat->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
+			if (int twoSided{0};
+				req.mat->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
 				flag |= twoSided != 0 ? TWOSIDED : 0;
 			}
 
-			if (req.mat->Get(AI_MATKEY_METALLIC_FACTOR, matPBR) == AI_SUCCESS ||
-			    req.mat->Get(AI_MATKEY_ROUGHNESS_FACTOR, matPBR) == AI_SUCCESS) {
+			if (float matPBR{0.0f};
+				req.mat->Get(AI_MATKEY_METALLIC_FACTOR, matPBR) == AI_SUCCESS ||
+				req.mat->Get(AI_MATKEY_ROUGHNESS_FACTOR, matPBR) == AI_SUCCESS) {
 				flag |= (matPBR > 0.0f) ? PBR : 0;
 			}
 
 			// Only supports glTF
 			float alphaCutoff{0.0f};
-			aiString alphaMode;
 
-			if (req.mat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode) == AI_SUCCESS) {
+			if (aiString alphaMode;
+				req.mat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode) == AI_SUCCESS) {
 				if (std::strcmp(alphaMode.C_Str(), "OPAQUE") == 0) {
 					flag |= OPAQUE | CASTSHADOW;
 				} else if (std::strcmp(alphaMode.C_Str(), "MASK") == 0) {
