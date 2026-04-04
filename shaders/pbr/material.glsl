@@ -1,10 +1,12 @@
 struct Material {
     sampler2D texture_albedo;
     sampler2D texture_normal;
-    sampler2D texture_occlusionRoughnessMetallic;
+    sampler2D texture_roughnessMetallic;
     sampler2D texture_emissive;
-    sampler2D texture_ao;
+    sampler2D texture_ao; // optional
     bool hasEmissiveMap;
+    bool hasAOMap;
+    bool hasORM;
 };
 
 uniform Material material;

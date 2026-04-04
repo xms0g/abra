@@ -136,7 +136,7 @@ Models::Sphere::Sphere(
 	if (occlusionRoughnessMetallic) {
 		textures.emplace_back(
 			texture::load(fs::path(ASSET_DIR + occlusionRoughnessMetallic).c_str(), 1),
-			OCCLUSION_ROUGHNESS_METALLIC,
+			ROUGHNESS_METALLIC,
 			"texture_occlusionRoughnessMetallic",
 			occlusionRoughnessMetallic);
 	}

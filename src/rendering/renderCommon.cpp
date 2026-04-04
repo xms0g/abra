@@ -64,7 +64,10 @@ void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shad
 	bool hasSpecularMap{false};
 	bool hasDiffuseMap{false};
 	bool hasEmissiveMap{false};
+	bool hasAOMap{false};
+	bool hasORM{false};
 
+	std::string_view roughMetal;
 	for (size_t i = 0; i < textures.size(); ++i) {
 		glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
 
@@ -87,6 +90,19 @@ void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shad
 			hasEmissiveMap = true;
 		}
 
+		if (textures[i].type == ROUGHNESS_METALLIC) {
+			roughMetal = textures[i].path;
+		}
+
+		if (textures[i].type == AO) {
+			if (roughMetal == textures[i].path) {
+				hasORM = true;
+				continue;
+			}
+			
+			hasAOMap = true;
+		}
+
 		// now set the sampler to the correct texture unit
 		shader.setInt(std::string("material.").append(textures[i].name), i);
 		// and finally bind the texture
@@ -97,6 +113,8 @@ void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shad
 	shader.setBool("material.hasNormalMap", hasNormalMap);
 	shader.setBool("material.hasHeightMap", hasHeightMap);
 	shader.setBool("material.hasEmissiveMap", hasEmissiveMap);
+	shader.setBool("material.hasAOMap", hasAOMap);
+	shader.setBool("material.hasORM", hasORM);
 }
 
 void RenderCommon::unbindTextures(const std::vector<Texture>& textures) {

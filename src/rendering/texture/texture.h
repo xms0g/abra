@@ -8,7 +8,8 @@ enum TextureType {
 	EMISSION = 4,
 	HEIGHT = 5,
 	NORMAL = 6,
-	OCCLUSION_ROUGHNESS_METALLIC = 18
+	AO = 10,
+	ROUGHNESS_METALLIC = 18
 };
 
 struct Texture {

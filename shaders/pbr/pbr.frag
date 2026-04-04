@@ -56,12 +56,17 @@ vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 albedo, float metallic, float 
 out vec4 fragColor;
 
 void main() {
+    float ao = 1.0;
     vec3 albedo = pow(texture(material.texture_albedo, fs_in.TexCoord).rgb, vec3(2.2));
-    float ao = texture(material.texture_occlusionRoughnessMetallic, fs_in.TexCoord).r;
-    float roughness = texture(material.texture_occlusionRoughnessMetallic, fs_in.TexCoord).g;
-    float metallic = texture(material.texture_occlusionRoughnessMetallic, fs_in.TexCoord).b;
+    float roughness = texture(material.texture_roughnessMetallic, fs_in.TexCoord).g;
+    float metallic = texture(material.texture_roughnessMetallic, fs_in.TexCoord).b;
     vec3 emissive = material.hasEmissiveMap ? pow(texture(material.texture_emissive, fs_in.TexCoord).rgb, vec3(2.2)) : vec3(0.0);
 
+    if (material.hasORM) {
+        ao = texture(material.texture_roughnessMetallic, fs_in.TexCoord).r;
+    } else if (material.hasAOMap) {
+        ao = texture(material.texture_ao, fs_in.TexCoord).r;
+    }
     vec3 N = normal(fs_in.TBN, fs_in.TexCoord, true);
     vec3 V = normalize(viewPos.xyz - fs_in.WorldPos);
     vec3 R = reflect(-V, N);
