@@ -219,6 +219,12 @@ void RenderPipeline::configure(const Camera& camera) {
 	mRenderCtx->PBR.brdfLUT.size = PBR_BRDF_LUT_SIZE;
 	mRenderCtx->PBR.brdfLUT.textureSlot = PBR_BRDF_LUT_TEXTURE_SLOT;
 	mRenderCtx->PBR.HDRTexture = PBR_HDR_TEXTURE;
+	mRenderCtx->PBR.albedoTextureSlot = PBR_ALBEDO_TEXTURE_SLOT;
+	mRenderCtx->PBR.normalTextureSlot = PBR_NORMAL_TEXTURE_SLOT;
+	mRenderCtx->PBR.roughnessMetallicTextureSlot = PBR_RM_TEXTURE_SLOT;
+	mRenderCtx->PBR.aoTextureSlot = PBR_AO_TEXTURE_SLOT;
+	mRenderCtx->PBR.emissiveTextureSlot = PBR_EMISSIVE_TEXTURE_SLOT;
+	mRenderCtx->PBR.heightTextureSlot = PBR_HEIGHT_TEXTURE_SLOT;
 
 	// Set camera projection matrix
 	const glm::mat4 projectionMat = glm::perspective(
@@ -274,6 +280,14 @@ void RenderPipeline::configure(const Camera& camera) {
 			shader->id(),
 			mRenderCtx->shadow.ubo.binding,
 			mRenderCtx->shadow.ubo.blockName);
+
+		shader->activate();
+		shader->setInt("material.texture_albedo", PBR_ALBEDO_TEXTURE_SLOT);
+		shader->setInt("material.texture_normal", PBR_NORMAL_TEXTURE_SLOT);
+		shader->setInt("material.texture_roughnessMetallic", PBR_RM_TEXTURE_SLOT);
+		shader->setInt("material.texture_ao", PBR_AO_TEXTURE_SLOT);
+		shader->setInt("material.texture_emissive", PBR_EMISSIVE_TEXTURE_SLOT);
+		shader->setInt("material.texture_height", PBR_HEIGHT_TEXTURE_SLOT);
 	}
 }
 

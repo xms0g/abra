@@ -169,11 +169,10 @@ void ResourceManager::processMaterials(const aiScene* scene, MaterialLoadContext
 	for (uint32_t i = 0; i < scene->mNumMaterials; ++i) {
 		const aiMaterial* material = scene->mMaterials[i];
 
-		for (const auto& [type, name]: textureBindings) {
+		for (const auto& type: textureBindings) {
 			TextureLoadRequest req{
 				.mat = material,
 				.type = type,
-				.typeName = name,
 				.materialID = i
 			};
 			loadMaterialTextures(req, ctx);
@@ -196,7 +195,7 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 		ctx.texturesLoaded.emplace(path);
 
 		if (ctx.materials.contains(req.materialID)) {
-			ctx.materials[req.materialID].textures.emplace_back(0, req.type, req.typeName, std::move(path));
+			ctx.materials[req.materialID].textures.emplace_back(0, req.type, std::move(path));
 		} else {
 			uint32_t flag{0};
 
@@ -227,7 +226,7 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 			}
 
 			std::vector<Texture> textures;
-			textures.emplace_back(0, req.type, req.typeName, std::move(path));
+			textures.emplace_back(0, req.type, std::move(path));
 			ctx.materials[req.materialID] = {flag, glm::vec3(), alphaCutoff, std::move(textures)};
 		}
 	}

@@ -103,8 +103,6 @@ void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shad
 			hasAOMap = true;
 		}
 
-		// now set the sampler to the correct texture unit
-		shader.setInt(std::string("material.").append(textures[i].name), i);
 		// and finally bind the texture
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}

@@ -15,7 +15,6 @@ enum TextureType {
 struct Texture {
     uint32_t id;
 	uint32_t type;
-    std::string_view name;
     std::string path;
 };
 

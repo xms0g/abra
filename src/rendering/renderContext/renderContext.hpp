@@ -41,6 +41,7 @@ struct RenderContext {
 		const std::vector<PointLightComponent*>* pointLights;
 		const std::vector<SpotLightComponent*>* spotLights;
 		uint32_t maxDirLights, maxPointLights, maxSpotLights;
+
 		struct {
 			const UniformBuffer* self;
 			uint32_t binding;
@@ -52,6 +53,7 @@ struct RenderContext {
 		const Camera* self;
 		const math::Frustum* frustum;
 		glm::mat4 skyView;
+
 		struct {
 			const UniformBuffer* self;
 			uint32_t binding;
@@ -74,7 +76,7 @@ struct RenderContext {
 			const char* blockName;
 		} ubo;
 
-		struct  {
+		struct {
 			uint32_t maxLights;
 			float height, nearPlane, farPlane, left, right, bottom, top;
 		} directional;
@@ -111,10 +113,19 @@ struct RenderContext {
 			uint32_t size;
 		} brdfLUT;
 
+		uint32_t albedoTextureSlot;
+		uint32_t normalTextureSlot;
+		uint32_t roughnessMetallicTextureSlot;
+		uint32_t aoTextureSlot;
+		uint32_t emissiveTextureSlot;
+		uint32_t heightTextureSlot;
+
 		const char* HDRTexture;
 	} PBR;
 
 	RenderContext() = default;
+
 	RenderContext(const RenderContext&) = delete;
+
 	RenderContext& operator=(const RenderContext&) = delete;
 };

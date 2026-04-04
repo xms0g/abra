@@ -51,7 +51,6 @@ private:
 	struct TextureLoadRequest {
 		const aiMaterial* mat;
 		aiTextureType type;
-		std::string_view typeName;
 		uint32_t materialID;
 	};
 
@@ -73,18 +72,12 @@ private:
 		"skybox/back.jpg"
 	};
 
-	struct TextureBinding {
-		aiTextureType type;
-		const char* name;
-	};
-
-	static constexpr TextureBinding textureBindings[] = {
-		{aiTextureType_UNKNOWN, "texture_roughnessMetallic"},
-		{aiTextureType_LIGHTMAP, "texture_ao"},
-		{aiTextureType_DIFFUSE, "texture_albedo"},
-		{aiTextureType_SPECULAR, "texture_specular"},
-		{aiTextureType_NORMALS, "texture_normal"},
-		{aiTextureType_HEIGHT, "texture_height"},
-		{aiTextureType_EMISSIVE, "texture_emissive"},
+	static constexpr aiTextureType textureBindings[] = {
+		aiTextureType_DIFFUSE,
+		aiTextureType_NORMALS,
+		aiTextureType_UNKNOWN,
+		aiTextureType_LIGHTMAP,
+		aiTextureType_EMISSIVE,
+		aiTextureType_HEIGHT
 	};
 };

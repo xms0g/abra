@@ -10,7 +10,7 @@ Models::Sphere::Sphere(
 	bool unlit,
 	const char* albedo,
 	const char* normal,
-	const char* occlusionRoughnessMetallic) {
+	const char* roughnessMetallic) {
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec2> uv;
@@ -120,7 +120,6 @@ Models::Sphere::Sphere(
 		textures.emplace_back(
 			texture::load(fs::path(ASSET_DIR + albedo).c_str(), 1),
 			ALBEDO,
-			"texture_albedo",
 			albedo
 		);
 	}
@@ -129,16 +128,14 @@ Models::Sphere::Sphere(
 		textures.emplace_back(
 			texture::load(fs::path(ASSET_DIR + normal).c_str(), 1),
 			NORMAL,
-			"texture_normal",
 			normal);
 	}
 
-	if (occlusionRoughnessMetallic) {
+	if (roughnessMetallic) {
 		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + occlusionRoughnessMetallic).c_str(), 1),
+			texture::load(fs::path(ASSET_DIR + roughnessMetallic).c_str(), 1),
 			ROUGHNESS_METALLIC,
-			"texture_occlusionRoughnessMetallic",
-			occlusionRoughnessMetallic);
+			roughnessMetallic);
 	}
 
 	uint32_t flag{0};
@@ -148,7 +145,7 @@ Models::Sphere::Sphere(
 		flag |= CASTSHADOW;
 	}
 
-	if (occlusionRoughnessMetallic)
+	if (roughnessMetallic)
 		flag |= PBR;
 
 	mMaterial[0] = {flag, color, 0.0f, textures};
