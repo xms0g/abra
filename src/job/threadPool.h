@@ -22,7 +22,7 @@ private:
 	std::queue<std::function<void()>> mJobs;
 
 	std::mutex mMutex;
-	std::condition_variable mCV;
+	std::condition_variable mHasJob;
 	std::atomic<bool> mStop{false};
 	std::atomic<size_t> mActiveJobs{0};
 };

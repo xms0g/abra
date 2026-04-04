@@ -7,8 +7,11 @@ ThreadPool::ThreadPool(const size_t threadCount) {
 }
 
 ThreadPool::~ThreadPool() {
-	mStop = true;
-	mCV.notify_all();
+	{
+		std::lock_guard<std::mutex> lock(mMutex);
+		mStop = true;
+		mHasJob.notify_all();
+	}
 
 	for (auto& t : mWorkers) {
 		if (t.joinable())
@@ -23,7 +26,7 @@ void ThreadPool::enqueue(std::function<void()> job) {
 	}
 
 	++mActiveJobs;
-	mCV.notify_one();
+	mHasJob.notify_one();
 }
 
 void ThreadPool::wait() const {
@@ -38,7 +41,7 @@ void ThreadPool::workerLoop() {
 
 		{
 			std::unique_lock<std::mutex> lock(mMutex);
-			mCV.wait(lock, [&]() {
+			mHasJob.wait(lock, [&]() {
 				return mStop || !mJobs.empty();
 			});
 
