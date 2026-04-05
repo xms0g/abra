@@ -6,11 +6,10 @@
 enum MaterialFlag: uint32_t {
 	OPAQUE = 1 << 0,
 	BLEND = 1 << 1,
-	CUTOUT = 1 << 2,
-	CASTSHADOW = 1 << 3,
-	TWOSIDED = 1 << 4,
-	UNLIT = 1 << 5,
-	PBR = 1 << 6
+	CASTSHADOW = 1 << 2,
+	TWOSIDED = 1 << 3,
+	UNLIT = 1 << 4,
+	PBR = 1 << 5
 };
 
 struct Texture;

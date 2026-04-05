@@ -23,7 +23,6 @@ void RenderCommon::setupTransform(const EntityData& entity, const Shader& shader
 }
 
 void RenderCommon::setupMaterial(const EntityData& entity, const Material& material, const Shader& shader) {
-	shader.setFloat("material.shininess", entity.material->shininess);
 	shader.setFloat("material.heightScale", entity.material->heightScale);
 	shader.setFloat("material.alphaCutout", material.alphaCutout);
 
@@ -59,10 +58,7 @@ void RenderCommon::drawQuad(const uint32_t sceneTexture, const uint32_t VAO) {
 
 
 void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shader& shader) {
-	bool hasNormalMap{false};
 	bool hasHeightMap{false};
-	bool hasSpecularMap{false};
-	bool hasDiffuseMap{false};
 	bool hasEmissiveMap{false};
 	bool hasAOMap{false};
 	bool hasORM{false};
@@ -70,17 +66,6 @@ void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shad
 	std::string_view roughMetal;
 	for (size_t i = 0; i < textures.size(); ++i) {
 		glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
-
-		if (textures[i].type == ALBEDO) {
-			hasDiffuseMap = true;
-		}
-		if (textures[i].type == SPECULAR) {
-			hasSpecularMap = true;
-		}
-
-		if (textures[i].type == NORMAL) {
-			hasNormalMap = true;
-		}
 
 		if (textures[i].type == HEIGHT) {
 			hasHeightMap = true;
@@ -106,9 +91,7 @@ void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shad
 		// and finally bind the texture
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}
-	shader.setBool("material.hasDiffuseMap", hasDiffuseMap);
-	shader.setBool("material.hasSpecularMap", hasSpecularMap);
-	shader.setBool("material.hasNormalMap", hasNormalMap);
+
 	shader.setBool("material.hasHeightMap", hasHeightMap);
 	shader.setBool("material.hasEmissiveMap", hasEmissiveMap);
 	shader.setBool("material.hasAOMap", hasAOMap);
@@ -123,12 +106,16 @@ void RenderCommon::unbindTextures(const std::vector<Texture>& textures) {
 }
 
 void RenderCommon::bindShadowMaps(const RenderContext& ctx) {
+	static uint32_t dirShadowMapSlot = ctx.shadow.textures->at(0);
+	static uint32_t omniShadowMapSlot = ctx.shadow.textures->at(1);
+	static uint32_t persShadowMapSlot = ctx.shadow.textures->at(2);
+
 	glActiveTexture(GL_TEXTURE0 + ctx.shadow.textureSlot);
-	glBindTexture(GL_TEXTURE_2D, ctx.shadow.textures->at(0));
+	glBindTexture(GL_TEXTURE_2D, dirShadowMapSlot);
 
 	glActiveTexture(GL_TEXTURE0 + ctx.shadow.textureSlot + 1);
-	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, ctx.shadow.textures->at(1));
+	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, omniShadowMapSlot);
 
 	glActiveTexture(GL_TEXTURE0 + ctx.shadow.textureSlot + 2);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, ctx.shadow.textures->at(2));
+	glBindTexture(GL_TEXTURE_2D_ARRAY, persShadowMapSlot);
 }

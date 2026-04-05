@@ -41,7 +41,7 @@ vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 albedo, float metallic, float 
     // sample both the pre-filter map and the BRDF lut and combine them together as per the Split-Sum approximation to get the IBL specular part.
     const float MAX_REFLECTION_LOD = 4.0;
 
-    vec3 prefilteredColor = textureLod(prefilterMap, R,  roughness * MAX_REFLECTION_LOD).rgb;
+    vec3 prefilteredColor = textureLod(prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
     vec2 brdf = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
@@ -56,17 +56,28 @@ vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 albedo, float metallic, float 
 out vec4 fragColor;
 
 void main() {
-    float ao = 1.0;
-    vec3 albedo = pow(texture(material.texture_albedo, fs_in.TexCoord).rgb, vec3(2.2));
-    float roughness = texture(material.texture_roughnessMetallic, fs_in.TexCoord).g;
-    float metallic = texture(material.texture_roughnessMetallic, fs_in.TexCoord).b;
-    vec3 emissive = material.hasEmissiveMap ? pow(texture(material.texture_emissive, fs_in.TexCoord).rgb, vec3(2.2)) : vec3(0.0);
+    vec4 albedoSample = texture(material.texture_albedo, fs_in.TexCoord);
+    if (albedoSample.a < material.alphaCutout) {
+        discard;
+    }
 
+    vec3 albedo = pow(albedoSample.rgb, vec3(2.2));
+
+    vec3 orm = texture(material.texture_roughnessMetallic, fs_in.TexCoord).rgb;
+    float roughness = orm.g;
+    float metallic = orm.b;
+
+    float ao = 1.0;
     if (material.hasORM) {
-        ao = texture(material.texture_roughnessMetallic, fs_in.TexCoord).r;
+        ao = orm.r;
     } else if (material.hasAOMap) {
         ao = texture(material.texture_ao, fs_in.TexCoord).r;
     }
+
+    vec3 emissive = material.hasEmissiveMap
+        ? pow(texture(material.texture_emissive, fs_in.TexCoord).rgb, vec3(2.2))
+        : vec3(0.0);
+
     vec3 N = normal(fs_in.TBN, fs_in.TexCoord, true);
     vec3 V = normalize(viewPos.xyz - fs_in.WorldPos);
     vec3 R = reflect(-V, N);

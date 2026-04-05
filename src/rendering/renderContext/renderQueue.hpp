@@ -9,7 +9,6 @@ class Entity;
 struct RenderQueue {
 	// Instance groups
 	std::vector<InstanceGroup> opaqueInstancedGroups;
-	std::vector<InstanceGroup> cutoutInstancedGroups;
 	std::vector<InstanceGroup> blendInstancedGroups;
 	// Render groups
 	std::vector<RenderGroup> debugGroups;

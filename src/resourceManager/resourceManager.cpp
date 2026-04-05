@@ -218,7 +218,7 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 				if (std::strcmp(alphaMode.C_Str(), "OPAQUE") == 0) {
 					flag |= OPAQUE | CASTSHADOW;
 				} else if (std::strcmp(alphaMode.C_Str(), "MASK") == 0) {
-					flag |= CUTOUT | CASTSHADOW;
+					flag |= OPAQUE | CASTSHADOW;
 					req.mat->Get(AI_MATKEY_GLTF_ALPHACUTOFF, alphaCutoff);
 				} else if (std::strcmp(alphaMode.C_Str(), "BLEND") == 0) {
 					flag |= BLEND;

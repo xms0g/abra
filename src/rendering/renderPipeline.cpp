@@ -69,12 +69,10 @@ RenderPipeline::RenderPipeline(Registry* registry) {
 	mLightSystem = &registry->getSystem<LightSystem>();
 
 	opaque = std::make_unique<Shader>("object.vert", "opaque.frag");
-	cutout = std::make_unique<Shader>("object.vert", "cutout.frag");
 	blend = std::make_unique<Shader>("object.vert", "blend.frag");
 	unlit = std::make_unique<Shader>("unlit.vert", "unlit.frag");
 	pbr = std::make_unique<Shader>("pbr/pbr.vert", "pbr/pbr.frag");
 	instancedOpaque = std::make_unique<Shader>("instanced.vert", "opaque.frag");
-	instancedCutout = std::make_unique<Shader>("instanced.vert", "cutout.frag");
 	instancedBlend = std::make_unique<Shader>("instanced.vert", "blend.frag");
 	skybox = std::make_unique<Shader>("skybox.vert", "skybox.frag");
 }
@@ -260,9 +258,8 @@ void RenderPipeline::configure(const Camera& camera) {
 
 	// Configure shaders
 	const std::vector<Shader*> shaders = {
-		opaque.get(), cutout.get(), blend.get(),
-		unlit.get(), pbr.get(), instancedOpaque.get(),
-		instancedCutout.get(), instancedBlend.get(), skybox.get()
+		opaque.get(), blend.get(), unlit.get(), pbr.get(),
+		instancedOpaque.get(), instancedBlend.get(), skybox.get()
 	};
 
 	for (const auto& shader: shaders) {
@@ -353,8 +350,6 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			// Set shader
 			if (material.flag & OPAQUE) {
 				matb.shader = instancedOpaque.get();
-			} else if (material.flag & CUTOUT) {
-				matb.shader = instancedCutout.get();
 			} else if (material.flag & BLEND) {
 				matb.shader = instancedBlend.get();
 			}
@@ -364,8 +359,6 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 
 			if (material.flag & OPAQUE) {
 				mRenderQueue.opaqueInstancedGroups.push_back(instance);
-			} else if (material.flag & CUTOUT) {
-				mRenderQueue.cutoutInstancedGroups.push_back(instance);
 			} else if (material.flag & BLEND) {
 				mRenderQueue.blendInstancedGroups.push_back(instance);
 			}
@@ -381,8 +374,6 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			} else {
 				matb.shader = opaque.get();
 			}
-		} else if (material.flag & CUTOUT) {
-			matb.shader = cutout.get();
 		} else if (material.flag & BLEND) {
 			matb.shader = blend.get();
 		}
@@ -405,8 +396,6 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			} else {
 				mRenderQueue.deferredGroups.push_back(group);
 			}
-		} else if (material.flag & CUTOUT) {
-			mRenderQueue.forwardOpaqueGroups.push_back(group);
 		} else if (material.flag & BLEND) {
 			mRenderQueue.blendGroups.push_back(group);
 		}
