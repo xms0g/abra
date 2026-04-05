@@ -16,7 +16,8 @@ It’s designed for clarity, experimentation, and real-time graphics research �
 - **HDR Rendering**
   - Full HDR workflow with tone mapping and manual exposure control.
 - **PBR**
-  - IBL (environment lighting)
+  - Image-based Lighting (IBL) with prefiltered environment cubemaps.
+  - Load-time diffuse & specular irradiance cubemap convolution.
 - **SSAO**
   - Only avaliable in the deferred pipeline.
 - **Frustum Culling**
@@ -50,12 +51,17 @@ It’s designed for clarity, experimentation, and real-time graphics research �
         - sRGB
       - Normal Map
         - Linear
-      - Ambient Occlusion-Metallic-Roughness (packed)
+      - Roughness-Metallic (packed)
         - Linear
         - Channels:
-          - R → Ambient Occlusion
+          - R → unused
           - G → Roughness
           - B → Metallic
+      - Occlusion Map
+        - Linear
+        - Channels:
+          - R → AO
+        - Optionally AO can be baked into the Roughness-Metallic texture.
 ## Screenshots
 ![Screenshot1](assets/screenshot1.png)
 ![Screenshot5](assets/screenshot5.png)

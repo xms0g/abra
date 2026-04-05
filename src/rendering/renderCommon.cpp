@@ -106,16 +106,12 @@ void RenderCommon::unbindTextures(const std::vector<Texture>& textures) {
 }
 
 void RenderCommon::bindShadowMaps(const RenderContext& ctx) {
-	static uint32_t dirShadowMapSlot = ctx.shadow.textures->at(0);
-	static uint32_t omniShadowMapSlot = ctx.shadow.textures->at(1);
-	static uint32_t persShadowMapSlot = ctx.shadow.textures->at(2);
-
 	glActiveTexture(GL_TEXTURE0 + ctx.shadow.textureSlot);
-	glBindTexture(GL_TEXTURE_2D, dirShadowMapSlot);
+	glBindTexture(GL_TEXTURE_2D, ctx.shadow.textures->at(0));
 
 	glActiveTexture(GL_TEXTURE0 + ctx.shadow.textureSlot + 1);
-	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, omniShadowMapSlot);
+	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, ctx.shadow.textures->at(1));
 
 	glActiveTexture(GL_TEXTURE0 + ctx.shadow.textureSlot + 2);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, persShadowMapSlot);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, ctx.shadow.textures->at(2));
 }
