@@ -1,7 +1,9 @@
 #pragma once
 #include <cstdint>
+#include <unordered_set>
 #include <vector>
 #include "glm/glm.hpp"
+#include "../texture/texture.h"
 
 enum MaterialFlag: uint32_t {
 	OPAQUE = 1 << 0,
@@ -12,7 +14,6 @@ enum MaterialFlag: uint32_t {
 	PBR = 1 << 5
 };
 
-struct Texture;
 class Shader;
 class Mesh;
 
@@ -21,6 +22,13 @@ struct Material {
 	glm::vec3 color;
 	float alphaCutoff;
 	std::vector<Texture> textures;
+
+	[[nodiscard]] bool hasTexture(const std::string_view p, uint32_t desiredType) const {
+		return std::find_if(textures.begin(), textures.end(),
+		                    [p, desiredType](const Texture& tex) {
+			                    return tex.path == p && tex.type == desiredType;
+		                    }) != textures.end();
+	}
 };
 
 struct MaterialBatch {

@@ -40,7 +40,7 @@ void ResourceManager::uploadModelsToGPU() {
 		}
 	}
 
-	std::unordered_map<std::string_view, uint32_t> idByPath;
+	std::unordered_map<std::string, uint32_t> idByPath;
 
 	for (auto& [entityID, materials]: mMaterialsByEntity) {
 		for (auto& [matID, material]: materials) {
@@ -229,6 +229,9 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 		req.mat->GetTexture(req.type, i, &str);
 		std::string path = materialLoadCtx.baseDir + str.C_Str();
 
-		material.textures.emplace_back(0, req.type, path);
+		if (material.hasTexture(path, req.type))
+			break;
+
+		material.textures.emplace_back(0, req.type, std::move(path));
 	}
 }
