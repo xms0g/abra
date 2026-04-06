@@ -57,7 +57,7 @@ out vec4 fragColor;
 
 void main() {
     vec4 albedoSample = texture(material.texture_albedo, fs_in.TexCoord);
-    if (albedoSample.a < material.alphaCutout) {
+    if (albedoSample.a < material.alphaCutoff) {
         discard;
     }
 

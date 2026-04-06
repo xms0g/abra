@@ -24,7 +24,7 @@ void RenderCommon::setupTransform(const EntityData& entity, const Shader& shader
 
 void RenderCommon::setupMaterial(const EntityData& entity, const Material& material, const Shader& shader) {
 	shader.setFloat("material.heightScale", entity.material->heightScale);
-	shader.setFloat("material.alphaCutout", material.alphaCutout);
+	shader.setFloat("material.alphaCutoff", material.alphaCutoff);
 
 	if (material.textures.empty()) {
 		shader.setVec3("material.color", material.color);

@@ -6,7 +6,7 @@ struct Material {
     sampler2D texture_emissive;
     sampler2D texture_height;
 
-    float alphaCutout;
+    float alphaCutoff;
 
     bool hasEmissiveMap;
     bool hasAOMap;
