@@ -40,15 +40,18 @@ void ResourceManager::uploadModelsToGPU() {
 		}
 	}
 
-	std::unordered_set<std::string> texturesLoaded;
+	std::unordered_map<std::string, uint32_t> idByPath;
+
 	for (auto& [entityID, materials]: mMaterialsByEntity) {
 		for (auto& [matID, material]: materials) {
-			for (auto& texture: material.textures) {
-				if (texturesLoaded.contains(texture.path))
+			for (auto& [id, type, path]: material.textures) {
+				if (idByPath.contains(path)) {
+					id = idByPath.at(path);
 					continue;
+				}
 
-				texture.id = texture::load(texture.path.c_str(), material.flag);
-				texturesLoaded.emplace(texture.path);
+				id = texture::load(path.c_str(), material.flag);
+				idByPath.emplace(path, id);
 			}
 		}
 	}
@@ -185,54 +188,47 @@ void ResourceManager::processMaterials(const aiScene* scene, MaterialLoadContext
 	}
 }
 
-void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& ctx) const {
+void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& materialLoadCtx) const {
+	if (!materialLoadCtx.materials.contains(req.materialID)) {
+		uint32_t flag{0};
+
+		if (int twoSided{0};
+			req.mat->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
+			flag |= twoSided != 0 ? TWOSIDED : 0;
+		}
+
+		if (float matPBR{0.0f};
+			req.mat->Get(AI_MATKEY_METALLIC_FACTOR, matPBR) == AI_SUCCESS ||
+			req.mat->Get(AI_MATKEY_ROUGHNESS_FACTOR, matPBR) == AI_SUCCESS) {
+			flag |= (matPBR > 0.0f) ? PBR : 0;
+		}
+
+		// Only supports glTF
+		float alphaCutoff{0.0f};
+
+		if (aiString alphaMode;
+			req.mat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode) == AI_SUCCESS) {
+			if (std::strcmp(alphaMode.C_Str(), "OPAQUE") == 0) {
+				flag |= OPAQUE | CASTSHADOW;
+			} else if (std::strcmp(alphaMode.C_Str(), "MASK") == 0) {
+				flag |= OPAQUE | CASTSHADOW;
+				req.mat->Get(AI_MATKEY_GLTF_ALPHACUTOFF, alphaCutoff);
+			} else if (std::strcmp(alphaMode.C_Str(), "BLEND") == 0) {
+				flag |= BLEND;
+			}
+		}
+
+		materialLoadCtx.materials[req.materialID] = {.flag = flag, .alphaCutoff = alphaCutoff};
+	}
+
+	auto& material = materialLoadCtx.materials[req.materialID];
+
 	for (uint32_t i = 0; i < req.mat->GetTextureCount(req.type); ++i) {
 		aiString str;
 
 		req.mat->GetTexture(req.type, i, &str);
-		std::string path = ctx.baseDir + str.C_Str();
+		std::string path = materialLoadCtx.baseDir + str.C_Str();
 
-		// check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
-		if (ctx.texturesLoaded.contains(path))
-			continue;
-
-		// store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate mTextures.
-		ctx.texturesLoaded.emplace(path);
-
-		if (ctx.materials.contains(req.materialID)) {
-			ctx.materials[req.materialID].textures.emplace_back(0, req.type, std::move(path));
-		} else {
-			uint32_t flag{0};
-
-			if (int twoSided{0};
-				req.mat->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
-				flag |= twoSided != 0 ? TWOSIDED : 0;
-			}
-
-			if (float matPBR{0.0f};
-				req.mat->Get(AI_MATKEY_METALLIC_FACTOR, matPBR) == AI_SUCCESS ||
-				req.mat->Get(AI_MATKEY_ROUGHNESS_FACTOR, matPBR) == AI_SUCCESS) {
-				flag |= (matPBR > 0.0f) ? PBR : 0;
-			}
-
-			// Only supports glTF
-			float alphaCutoff{0.0f};
-
-			if (aiString alphaMode;
-				req.mat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode) == AI_SUCCESS) {
-				if (std::strcmp(alphaMode.C_Str(), "OPAQUE") == 0) {
-					flag |= OPAQUE | CASTSHADOW;
-				} else if (std::strcmp(alphaMode.C_Str(), "MASK") == 0) {
-					flag |= OPAQUE | CASTSHADOW;
-					req.mat->Get(AI_MATKEY_GLTF_ALPHACUTOFF, alphaCutoff);
-				} else if (std::strcmp(alphaMode.C_Str(), "BLEND") == 0) {
-					flag |= BLEND;
-				}
-			}
-
-			std::vector<Texture> textures;
-			textures.emplace_back(0, req.type, std::move(path));
-			ctx.materials[req.materialID] = {flag, glm::vec3(), alphaCutoff, std::move(textures)};
-		}
+		material.textures.emplace_back(0, req.type, path);
 	}
 }

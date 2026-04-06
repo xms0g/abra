@@ -38,7 +38,6 @@ private:
 
 	struct MaterialLoadContext {
 		MaterialMap materials;
-		std::unordered_set<std::string> texturesLoaded;
 		std::vector<uint32_t> materialsToLoad;
 		std::string baseDir;
 	};
@@ -61,7 +60,7 @@ private:
 
 	void processMaterials(const aiScene* scene, MaterialLoadContext& materialLoadCtx) const;
 
-	void loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& ctx) const;
+	void loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& materialLoadCtx) const;
 
 	std::unordered_map<size_t, MaterialMap> mMaterialsByEntity;
 	std::unordered_map<size_t, MeshMap> mMeshesByEntity;
