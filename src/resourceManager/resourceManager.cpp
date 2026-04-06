@@ -74,9 +74,9 @@ void ResourceManager::loadModel(const size_t entityID, const char* file) {
 
 	// process ASSIMP's root node recursively
 	MeshMap meshesByMatID;
-	processMeshes(scene->mRootNode, scene, meshesByMatID);
-
 	MaterialLoadContext mlCtx{.baseDir = path.substr(0, path.find_last_of('/')).append("/")};
+
+	processMeshes(scene->mRootNode, scene, meshesByMatID, mlCtx);
 	processMaterials(scene, mlCtx);
 
 	{
@@ -86,7 +86,11 @@ void ResourceManager::loadModel(const size_t entityID, const char* file) {
 	}
 }
 
-void ResourceManager::processMeshes(const aiNode* node, const aiScene* scene, MeshMap& meshesByMatID) {
+void ResourceManager::processMeshes(
+	const aiNode* node,
+	const aiScene* scene,
+	MeshMap& meshesByMatID,
+	MaterialLoadContext& materialLoadCtx) {
 	// process each mesh located at the current node
 	for (uint32_t i = 0; i < node->mNumMeshes; ++i) {
 		// the node object only contains mIndices to index the actual objects in the scene.
@@ -95,11 +99,12 @@ void ResourceManager::processMeshes(const aiNode* node, const aiScene* scene, Me
 		const Mesh mesh = processMesh(aMesh);
 
 		meshesByMatID[aMesh->mMaterialIndex].push_back(mesh);
+		materialLoadCtx.materialsToLoad.push_back(aMesh->mMaterialIndex);
 	}
 
 	// after we've processed all of the mMeshes (if any) we then recursively process each of the children nodes
 	for (uint32_t i = 0; i < node->mNumChildren; ++i) {
-		processMeshes(node->mChildren[i], scene, meshesByMatID);
+		processMeshes(node->mChildren[i], scene, meshesByMatID, materialLoadCtx);
 	}
 }
 
@@ -164,18 +169,18 @@ Mesh ResourceManager::processMesh(aiMesh* mesh) const {
 	return Mesh{vertices, indices};
 }
 
-void ResourceManager::processMaterials(const aiScene* scene, MaterialLoadContext& ctx) const {
+void ResourceManager::processMaterials(const aiScene* scene, MaterialLoadContext& materialLoadCtx) const {
 	// process materials
-	for (uint32_t i = 0; i < scene->mNumMaterials; ++i) {
-		const aiMaterial* material = scene->mMaterials[i];
+	for (const auto& matID: materialLoadCtx.materialsToLoad) {
+		const aiMaterial* material = scene->mMaterials[matID];
 
 		for (const auto& type: textureBindings) {
 			TextureLoadRequest req{
 				.mat = material,
 				.type = type,
-				.materialID = i
+				.materialID = matID
 			};
-			loadMaterialTextures(req, ctx);
+			loadMaterialTextures(req, materialLoadCtx);
 		}
 	}
 }

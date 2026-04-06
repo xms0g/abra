@@ -36,15 +36,10 @@ private:
 
 	~ResourceManager() = default;
 
-	void loadModel(size_t entityID, const char* file);
-
-	void processMeshes(const aiNode* node, const aiScene* scene, MeshMap& meshesByMatID);
-
-	Mesh processMesh(aiMesh* mesh) const;
-
 	struct MaterialLoadContext {
 		MaterialMap materials;
 		std::unordered_set<std::string> texturesLoaded;
+		std::vector<uint32_t> materialsToLoad;
 		std::string baseDir;
 	};
 
@@ -54,7 +49,17 @@ private:
 		uint32_t materialID;
 	};
 
-	void processMaterials(const aiScene* scene, MaterialLoadContext& ctx) const;
+	void loadModel(size_t entityID, const char* file);
+
+	void processMeshes(
+		const aiNode* node,
+		const aiScene* scene,
+		MeshMap& meshesByMatID,
+		MaterialLoadContext& materialLoadCtx);
+
+	Mesh processMesh(aiMesh* mesh) const;
+
+	void processMaterials(const aiScene* scene, MaterialLoadContext& materialLoadCtx) const;
 
 	void loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& ctx) const;
 
