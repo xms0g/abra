@@ -63,32 +63,32 @@ void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shad
 	bool hasAOMap{false};
 	bool hasORM{false};
 
-	std::string_view roughMetal;
+	std::string_view roughMetalPath;
 	for (size_t i = 0; i < textures.size(); ++i) {
-		glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
 
-		if (textures[i].type == HEIGHT) {
-			hasHeightMap = true;
-		}
+		switch (textures[i].type) {
+			case HEIGHT:
+				hasHeightMap = true;
+				break;
+			case EMISSION:
+				hasEmissiveMap = true;
+				break;
+			case ROUGHNESS_METALLIC:
+				roughMetalPath = textures[i].path;
+				break;
+			case AO: {
+				if (roughMetalPath == textures[i].path) {
+					hasORM = true;
+					continue;
+				}
 
-		if (textures[i].type == EMISSION) {
-			hasEmissiveMap = true;
-		}
-
-		if (textures[i].type == ROUGHNESS_METALLIC) {
-			roughMetal = textures[i].path;
-		}
-
-		if (textures[i].type == AO) {
-			if (roughMetal == textures[i].path) {
-				hasORM = true;
-				continue;
+				hasAOMap = true;
+				break;
 			}
-			
-			hasAOMap = true;
+			default: break;
 		}
 
-		// and finally bind the texture
+		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}
 

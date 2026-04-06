@@ -40,7 +40,7 @@ void ResourceManager::uploadModelsToGPU() {
 		}
 	}
 
-	std::unordered_map<std::string, uint32_t> idByPath;
+	std::unordered_map<std::string_view, uint32_t> idByPath;
 
 	for (auto& [entityID, materials]: mMaterialsByEntity) {
 		for (auto& [matID, material]: materials) {
