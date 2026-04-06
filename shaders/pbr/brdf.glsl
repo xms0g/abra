@@ -1,5 +1,3 @@
-#include "ub/light.glsl"
-
 const float PI = 3.14159265359;
 
 float radicalInverse_VdC(uint bits) {
