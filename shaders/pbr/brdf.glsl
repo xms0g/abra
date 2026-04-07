@@ -75,12 +75,12 @@ float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
     return ggx1 * ggx2;
 }
 
-vec3 brdf(vec3 lightPos, vec3 worldPos, vec3 color, vec3 albedo, vec3 N, float metallic, float roughness, float ao, vec3 V, vec3 F0) {
+vec3 brdf(vec3 lightPos, vec3 worldPos, vec3 lightColor, vec3 albedo, vec3 N, float metallic, float roughness, float ao, vec3 V, vec3 F0) {
     vec3 L = normalize(lightPos - worldPos);
     vec3 H = normalize(V + L);
     float distance = length(lightPos - worldPos);
     float attenuation = 1.0 / (distance * distance);
-    vec3 radiance = color * attenuation;
+    vec3 radiance = lightColor * attenuation;
 
     // Cook-Torrance BRDF
     float NDF = distributionGGX(N, H, roughness);
