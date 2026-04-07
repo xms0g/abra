@@ -75,7 +75,7 @@ float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
     return ggx1 * ggx2;
 }
 
-vec3 brdf(vec3 lightPos, vec3 worldPos, vec3 radiance, vec3 albedo, vec3 N, float metallic, float roughness, float ao, vec3 V, vec3 F0) {
+vec3 brdf(vec3 lightPos, vec3 N, vec3 V, vec3 F0, vec3 worldPos, vec3 radiance, vec3 albedo, float metallic, float roughness, float ao) {
     vec3 L = normalize(lightPos - worldPos);
     vec3 H = normalize(V + L);
     // Cook-Torrance BRDF
