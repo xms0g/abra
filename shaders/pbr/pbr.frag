@@ -7,6 +7,7 @@ in VS_OUT
 } fs_in;
 
 #include "ub/camera.glsl"
+#include "ub/light.glsl"
 #include "pbr/material.glsl"
 #include "common/normalMap.glsl"
 #include "pbr/brdf.glsl"
@@ -74,9 +75,10 @@ void main() {
         ao = texture(material.texture_ao, fs_in.TexCoord).r;
     }
 
-    vec3 emissive = material.hasEmissiveMap
-        ? pow(texture(material.texture_emissive, fs_in.TexCoord).rgb, vec3(2.2))
-        : vec3(0.0);
+    vec3 emissive = vec3(0.0);
+    if (material.hasEmissiveMap) {
+        emissive = pow(texture(material.texture_emissive, fs_in.TexCoord).rgb, vec3(2.2));
+    }
 
     vec3 N = normal(fs_in.TBN, fs_in.TexCoord, true);
     vec3 V = normalize(viewPos.xyz - fs_in.WorldPos);
