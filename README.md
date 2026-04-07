@@ -65,10 +65,11 @@ Itâ€™s designed for clarity, experimentation, and real-time graphics research â€
 ## Screenshots
 ![Screenshot1](assets/screenshot1.png)
 ![Screenshot5](assets/screenshot5.png)
-![Screenshot3](assets/screenshot3.png)
-![Screenshot](assets/screenshot.png)
 ![Screenshot2](assets/screenshot2.png)
+![Screenshot](assets/screenshot.png)
+![Screenshot3](assets/screenshot3.png)
 ![Screenshot4](assets/screenshot4.png)
+
 
 ## Controls
 | Key  | Action                   |
