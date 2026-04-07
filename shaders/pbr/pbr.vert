@@ -5,6 +5,7 @@ layout (location = 2) in vec2 aTexCoord;
 layout (location = 3) in vec3 aTangent;
 
 #include "ub/camera.glsl"
+#include "ub/shadow.glsl"
 #include "common/TBN.glsl"
 
 uniform mat4 model;
@@ -15,13 +16,16 @@ out VS_OUT
     vec2 TexCoord;
     vec3 WorldPos;
     mat3 TBN;
+    vec3 FragPos;
+    vec4 FragPosLightSpace;
 } vs_out;
 
-void main()
-{
+void main() {
     vs_out.TexCoord = aTexCoord;
     vs_out.WorldPos = vec3(model * vec4(aPos, 1.0));
     vs_out.TBN = TBN(model, aTangent, normalMatrix, aNormal);
+    vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
+    vs_out.FragPosLightSpace = lightSpaceMatrix * vec4(vs_out.WorldPos, 1.0);
 
     gl_Position =  projection * view * vec4(vs_out.WorldPos, 1.0);
 }

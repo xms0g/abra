@@ -23,6 +23,9 @@ void PBRPass::configure(const RenderContext& ctx) {
 	for (const auto& [entity, matb]: ctx.renderQueue->pbrGroups) {
 		const auto& [material, shader, meshes] = matb;
 		shader->activate();
+		shader->setInt("shadowMap", ctx.shadow.textureSlot);
+		shader->setInt("shadowCubemap", ctx.shadow.textureSlot + 1);
+		shader->setInt("persShadowMap", ctx.shadow.textureSlot + 2);
 		shader->setInt("irradianceMap", ctx.PBR.irradianceMap.textureSlot);
 		shader->setInt("prefilterMap", ctx.PBR.prefilterMap.textureSlot);
 		shader->setInt("brdfLUT", ctx.PBR.brdfLUT.textureSlot);
@@ -52,8 +55,9 @@ void PBRPass::configure(const RenderContext& ctx) {
 }
 
 void PBRPass::execute(const RenderContext& ctx) {
-	RenderCommon::bindShadowMaps(ctx);
 	ctx.sceneBuffer->bind();
+
+	RenderCommon::bindShadowMaps(ctx);
 
 	glActiveTexture(GL_TEXTURE0 + ctx.PBR.irradianceMap.textureSlot);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, mIrradianceMapBuffer->texture());
