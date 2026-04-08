@@ -23,6 +23,7 @@ const vec3 gridSamplingDisk[20] = vec3[](
 
 float calculateDirectionalShadow(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir);
 float calculateOmnidirectionalShadow(vec3 worldPos, vec3 normal, vec3 lightPos, vec3 viewPos, int lightIndex);
+float calculatePerspectiveShadow(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir, int lightIndex);
 
 vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 worldPos, vec4 fragPosLightSpace, vec3 albedo, float metallic, float roughness, float ao) {
     vec3 F0 = vec3(0.04);
@@ -52,8 +53,23 @@ vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 worldPos, vec4 fragPosLightSpa
         Lo += brdf(lightPos, N, V, F0, worldPos, radiance, albedo, metallic, roughness, ao) * (1.0 - shadow);
     }
 
-    for (int i = 0; i < lightCount.z; i++) {
-        // Lo += brdf(spotLights[i].position.xyz, worldPos, spotLights[i].diffuse.rgb, albedo, N, metallic, roughness, ao, V, F0);
+    for (int i = 0; i < lightCount.z; ++i) {
+        SpotLight light = spotLights[i];
+        vec3 lightPos = light.position.xyz;
+        vec3 lightDir = normalize(lightPos - worldPos);
+        float distance = length(lightPos - worldPos);
+        float attenuation = 1.0 / (light.attenuation.x + light.attenuation.y * distance + light.attenuation.z * (distance * distance));
+        // spotlight intensity
+        float theta = dot(lightDir, normalize(-light.direction.xyz));
+        float epsilon = light.cutOff.x - light.cutOff.y;
+        float intensity = clamp((theta - light.cutOff.y) / epsilon, 0.0, 1.0);
+
+        vec3 radiance = light.diffuse.rgb * light.intensity * intensity * attenuation;
+
+        vec4 fragPosPersLightSpace = persLightSpaceMatrix[i] * vec4(worldPos, 1.0);
+        float shadow = calculatePerspectiveShadow(fragPosPersLightSpace, N, lightDir, i);
+
+        Lo += brdf(lightPos, N, V, F0, worldPos, radiance, albedo, metallic, roughness, ao) * (1.0 - shadow);
     }
 
     vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
@@ -106,9 +122,9 @@ float calculateDirectionalShadow(vec4 fragPosLightSpace, vec3 normal, vec3 light
 }
 
 float calculateOmnidirectionalShadow(vec3 worldPos, vec3 normal, vec3 lightPos, vec3 viewPos, int lightIndex) {
-    vec3 fragToLight = worldPos - lightPos.xyz;
+    vec3 fragToLight = worldPos - lightPos;
     float currentDepth = length(fragToLight);
-    vec3 lightDir = normalize(worldPos - lightPos);
+    vec3 lightDir = normalize(fragToLight);
     float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
     float viewDistance = length(viewPos - worldPos);
     float diskRadius = (1.0 + (viewDistance / omniFarPlanes.x)) * 0.005;
@@ -126,6 +142,35 @@ float calculateOmnidirectionalShadow(vec3 worldPos, vec3 normal, vec3 lightPos, 
 
     }
     shadow /= float(samples);
+
+    return shadow;
+}
+
+float calculatePerspectiveShadow(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir, int lightIndex) {
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    // transform to [0,1]
+    projCoords = projCoords * 0.5 + 0.5;
+    // outside light frustum:
+    if (projCoords.x < 0.0 || projCoords.x > 1.0 || projCoords.y < 0.0 || projCoords.y > 1.0 || projCoords.z > 1.0) {
+        return 0.0;
+    }
+
+    float currentDepth = projCoords.z;
+    // simple bias based on normal and light direction (reduces peter-panning)
+    float biasLocal = max(0.005 * (1.0 - dot(normal, lightDir)), 0.0005);
+    // PCF
+    float shadow = 0.0;
+    int samples = 2;
+    vec2 texelSize = 1.0 / textureSize(persShadowMap, 0).xy;
+
+    for (int x = -samples; x <= samples; ++x) {
+        for (int y = -samples; y <= samples; ++y) {
+            float pcfDepth = texture(persShadowMap, vec3(projCoords.xy + vec2(x, y) * texelSize, lightIndex)).r;
+            shadow += currentDepth - biasLocal > pcfDepth ? 1.0 : 0.0;
+        }
+    }
+
+    shadow /= float((2 * samples + 1) * (2 * samples + 1));
 
     return shadow;
 }

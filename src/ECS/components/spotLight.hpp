@@ -9,7 +9,8 @@ struct alignas(16) SpotLightComponent {
 	glm::vec4 specular;
 	glm::vec3 attenuation; // (Kc, Kl, kq)
 	bool castShadow;
-	glm::vec4 cutOff; // (cutOff, outerCutOff, padding, padding)
+	glm::vec3 cutOff; // (cutOff, outerCutOff, padding)
+	float intensity;
 
 	SpotLightComponent() = default;
 
@@ -21,7 +22,8 @@ struct alignas(16) SpotLightComponent {
 		const glm::vec4 s,
 		const glm::vec3 att,
 		const bool cs,
-		const glm::vec4 cut)
+		const glm::vec3 cut,
+		float i)
 		: position(pos),
 		  direction(dir),
 		  ambient(a),
@@ -29,6 +31,7 @@ struct alignas(16) SpotLightComponent {
 		  specular(s),
 		  attenuation(att),
 		  castShadow(cs),
-		  cutOff(cut) {
+		  cutOff(cut),
+		  intensity(i) {
 	}
 };

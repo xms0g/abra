@@ -76,6 +76,8 @@ void GuiPanels::renderDirLight(const Entity& entity) {
 	Ui::colorField4("Ambient", dir.ambient, 0.01f, 100);
 	Ui::colorField4("Diffuse", dir.diffuse, 0.01f, 100);
 	Ui::colorField4("Specular", dir.specular, 0.01f, 100);
+	Ui::sliderFloat("Intensity", &dir.intensity, 100.0, 1.0, 30.0);
+
 }
 
 void GuiPanels::renderSpotLight(const Entity& entity) {
@@ -86,7 +88,8 @@ void GuiPanels::renderSpotLight(const Entity& entity) {
 	Ui::colorField4("Diffuse", splc.diffuse, 0.01f, 100);
 	Ui::colorField4("Specular", splc.specular, 0.01f, 100);
 	Ui::dragFloat3("Attenua", splc.attenuation, 0.01f, 100);
-	Ui::dragFloat4("Cutoff", splc.cutOff, 0.01f, 100);
+	Ui::dragFloat3("Cutoff", splc.cutOff, 0.01f, 100);
+	Ui::sliderFloat("Intensity", &splc.intensity, 100.0, 1.0, 30.0);
 	ImGui::Checkbox("Cast Shadow", &splc.castShadow);
 }
 
@@ -97,6 +100,7 @@ void GuiPanels::renderPointLight(const Entity& entity) {
 	Ui::colorField4("Diffuse", plc.diffuse, 0.01f, 100);
 	Ui::colorField4("Specular", plc.specular, 0.01f, 100);
 	Ui::dragFloat3("Attenua", plc.attenuation, 0.01f, 100);
+	Ui::sliderFloat("Intensity", &plc.intensity, 100.0, 1.0, 30.0);
 	ImGui::Checkbox("Cast Shadow", &plc.castShadow);
 }
 

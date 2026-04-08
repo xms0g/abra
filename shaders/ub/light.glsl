@@ -36,7 +36,8 @@ struct SpotLight {
     vec3 attenuation;
     bool castShadow;
 
-    vec4 cutOff;
+    vec3 cutOff;
+    float intensity;
 };
 
 layout (std140) uniform LightBlock
