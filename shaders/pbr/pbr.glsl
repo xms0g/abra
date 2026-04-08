@@ -122,17 +122,17 @@ float calculateDirectionalShadow(vec4 fragPosLightSpace, vec3 normal, vec3 light
 }
 
 float calculateOmnidirectionalShadow(vec3 worldPos, vec3 normal, vec3 lightPos, vec3 viewPos, int lightIndex) {
-    vec3 fragToLight = worldPos - lightPos;
-    float currentDepth = length(fragToLight);
-    vec3 lightDir = normalize(fragToLight);
-    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    vec3 lightToFrag = worldPos - lightPos;
+    float currentDepth = length(lightToFrag);
+    vec3 lightDir = normalize(lightPos - worldPos);
+    float bias = max(0.1 * (1.0 - dot(normal, lightDir)), 0.01);
     float viewDistance = length(viewPos - worldPos);
     float diskRadius = (1.0 + (viewDistance / omniFarPlanes.x)) * 0.005;
     float shadow = 0.0;
     int samples = 20;
 
     for (int i = 0; i < samples; ++i) {
-        vec3 sampleDir = normalize(fragToLight + gridSamplingDisk[i] * diskRadius);
+        vec3 sampleDir = normalize(lightToFrag + gridSamplingDisk[i] * diskRadius);
         float closestDepth = texture(shadowCubemap, vec4(sampleDir, float(lightIndex))).r;
         closestDepth *= omniFarPlanes.x;// undo mapping [0;1]
 
