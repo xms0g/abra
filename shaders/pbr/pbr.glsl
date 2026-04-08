@@ -1,4 +1,4 @@
-#include "ub/light.glsl"
+#include "ub/shadow.glsl"
 #include "pbr/brdf.glsl"
 
 #define ENVIROMENT_INTENSITY 0.5
@@ -13,21 +13,47 @@ uniform samplerCube irradianceMap;
 uniform samplerCube prefilterMap;
 uniform sampler2D brdfLUT;
 
-vec3 calculateDirectionalLight(DirectionalLight light, vec3 N, vec3 V, vec3 F0, vec3 worldPos, vec4 fragPosLightSpace, vec3 albedo, float metallic, float roughness, float ao);
+const vec3 gridSamplingDisk[20] = vec3[](
+    vec3(1, 1, 1), vec3(1, -1, 1), vec3(-1, -1, 1), vec3(-1, 1, 1),
+    vec3(1, 1, -1), vec3(1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+    vec3(1, 1, 0), vec3(1, -1, 0), vec3(-1, -1, 0), vec3(-1, 1, 0),
+    vec3(1, 0, 1), vec3(-1, 0, 1), vec3(1, 0, -1), vec3(-1, 0, -1),
+    vec3(0, 1, 1), vec3(0, -1, 1), vec3(0, -1, -1), vec3(0, 1, -1)
+);
 
-vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 worldPos, vec3 albedo, float metallic, float roughness, float ao) {
+float calculateDirectionalShadow(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir);
+float calculateOmnidirectionalShadow(vec3 worldPos, vec3 normal, vec3 lightPos, vec3 viewPos, int lightIndex);
+
+vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 worldPos, vec4 fragPosLightSpace, vec3 albedo, float metallic, float roughness, float ao) {
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo, metallic);
 
     vec3 Lo = vec3(0.0);
-    for (int i = 0; i < lightCount.x; i++) {
-        Lo += calculateDirectionalLight(dirLights[i], N, V, F0, worldPos, fs_in.FragPosLightSpace, albedo, metallic, roughness, ao);
+    for (int i = 0; i < lightCount.x; ++i) {
+        DirectionalLight light = dirLights[i];
+        vec3 lightDir = normalize(-light.direction.xyz);
+        vec3 lightPos = lightDir * 5.0;
+        vec3 radiance = light.diffuse.rgb * light.intensity;
+
+        float shadow = calculateDirectionalShadow(fragPosLightSpace, N, lightDir);
+
+        Lo += brdf(lightPos, N, V, F0, worldPos, radiance, albedo, metallic, roughness, ao) * (1.0 - shadow);
     }
-    for (int i = 0; i < lightCount.y; i++) {
-        //Lo += brdf(pointLights[i].position.xyz, worldPos, pointLights[i].diffuse.rgb, albedo, N, metallic, roughness, ao, V, F0);
+
+    for (int i = 0; i < lightCount.y; ++i) {
+        PointLight light = pointLights[i];
+        vec3 lightPos = light.position.xyz;
+        float distance = length(lightPos - worldPos);
+        float attenuation = 1.0 / (light.attenuation.x + light.attenuation.y * distance + light.attenuation.z * (distance * distance));
+        vec3 radiance = light.diffuse.rgb * light.intensity * attenuation;
+
+        float shadow = calculateOmnidirectionalShadow(worldPos, N, lightPos, viewPos.xyz, i);
+
+        Lo += brdf(lightPos, N, V, F0, worldPos, radiance, albedo, metallic, roughness, ao) * (1.0 - shadow);
     }
+
     for (int i = 0; i < lightCount.z; i++) {
-       // Lo += brdf(spotLights[i].position.xyz, worldPos, spotLights[i].diffuse.rgb, albedo, N, metallic, roughness, ao, V, F0);
+        // Lo += brdf(spotLights[i].position.xyz, worldPos, spotLights[i].diffuse.rgb, albedo, N, metallic, roughness, ao, V, F0);
     }
 
     vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
@@ -57,7 +83,7 @@ float calculateDirectionalShadow(vec4 fragPosLightSpace, vec3 normal, vec3 light
     projCoords = projCoords * 0.5 + 0.5;
 
     if (projCoords.z > 1.0 || projCoords.x < 0.0 || projCoords.x > 1.0 || projCoords.y < 0.0 || projCoords.y > 1.0) {
-        return 0.0; // no shadow
+        return 0.0;// no shadow
     }
     // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
@@ -79,13 +105,28 @@ float calculateDirectionalShadow(vec4 fragPosLightSpace, vec3 normal, vec3 light
     return shadow;
 }
 
-vec3 calculateDirectionalLight(DirectionalLight light, vec3 N, vec3 V, vec3 F0, vec3 worldPos, vec4 fragPosLightSpace, vec3 albedo, float metallic, float roughness, float ao) {
-    vec3 lightDir = normalize(-light.direction.xyz);
-    vec3 lightPos = lightDir * 5.0;
-    vec3 radiance = light.diffuse.rgb * light.intensity;
+float calculateOmnidirectionalShadow(vec3 worldPos, vec3 normal, vec3 lightPos, vec3 viewPos, int lightIndex) {
+    vec3 fragToLight = worldPos - lightPos.xyz;
+    float currentDepth = length(fragToLight);
+    vec3 lightDir = normalize(worldPos - lightPos);
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    float viewDistance = length(viewPos - worldPos);
+    float diskRadius = (1.0 + (viewDistance / omniFarPlanes.x)) * 0.005;
+    float shadow = 0.0;
+    int samples = 20;
 
-    float shadow = calculateDirectionalShadow(fragPosLightSpace, N, lightDir);
+    for (int i = 0; i < samples; ++i) {
+        vec3 sampleDir = normalize(fragToLight + gridSamplingDisk[i] * diskRadius);
+        float closestDepth = texture(shadowCubemap, vec4(sampleDir, float(lightIndex))).r;
+        closestDepth *= omniFarPlanes.x;// undo mapping [0;1]
 
-    return brdf(lightPos, N, V, F0, worldPos, radiance, albedo, metallic, roughness, ao) * (1.0 - shadow);
+        if (currentDepth - bias > closestDepth) {
+            shadow += 1.0;
+        }
+
+    }
+    shadow /= float(samples);
+
+    return shadow;
 }
 

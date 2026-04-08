@@ -23,7 +23,7 @@ struct alignas(16) DirectionalLightComponent {
 		  ambient(a),
 		  diffuse(dif),
 		  specular(s),
-		  intensity(i),
-		  padding(0.0) {
+		  padding(0.0),
+		  intensity(i) {
 	}
 };

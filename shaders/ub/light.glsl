@@ -20,6 +20,9 @@ struct PointLight {
     vec3 attenuation;
 
     bool castShadow;
+
+    vec3 padding;
+    float intensity;
 };
 
 struct SpotLight {

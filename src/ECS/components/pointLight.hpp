@@ -10,6 +10,9 @@ struct alignas(16) PointLightComponent {
 	glm::vec3 attenuation{};
 	bool castShadow{};
 
+	glm::vec3 padding{};
+	float intensity;
+
 	PointLightComponent() = default;
 
 	explicit PointLightComponent(
@@ -18,12 +21,15 @@ struct alignas(16) PointLightComponent {
 		const glm::vec4 dif,
 		const glm::vec4 s,
 		const glm::vec3 att,
-		const bool cs)
+		const bool cs,
+		const float i)
 		: position(pos),
 		  ambient(a),
 		  diffuse(dif),
 		  specular(s),
 		  attenuation(att),
-		  castShadow(cs) {
+		  castShadow(cs),
+		  padding(0.0),
+		  intensity(i) {
 	}
 };

@@ -4,11 +4,11 @@ in VS_OUT
     vec2 TexCoord;
     vec3 WorldPos;
     mat3 TBN;
-    vec3 FragPos;
     vec4 FragPosLightSpace;
 } fs_in;
 
 #include "ub/camera.glsl"
+#include "ub/light.glsl"
 #include "pbr/material.glsl"
 #include "common/normalMap.glsl"
 #include "pbr/pbr.glsl"
@@ -43,7 +43,7 @@ void main() {
     vec3 V = normalize(viewPos.xyz - fs_in.WorldPos);
     vec3 R = reflect(-V, N);
 
-    vec3 result = calculateLights(N, V, R, fs_in.WorldPos, albedo, metallic, roughness, ao) + emissive;
+    vec3 result = calculateLights(N, V, R, fs_in.WorldPos, fs_in.FragPosLightSpace, albedo, metallic, roughness, ao) + emissive;
 
     fragColor = vec4(result, 1.0);
 }
