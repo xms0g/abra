@@ -19,18 +19,28 @@ const FrameBuffer* DeferredGeometryPass::gBuffer() const {
 
 void DeferredGeometryPass::configure(const RenderContext& ctx) {
 	mGBuffer = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
-	mGBuffer->withTextureFP(GL_RGBA)
-			.withTextureFP(GL_RGBA)
+	mGBuffer->withTextureFP(GL_RGBA)	// position
+			.withTextureFP(GL_RGBA)		// normal
 #ifdef HDR
 			.withTextureFP(GL_RGBA)
 #else
-			.withTexture(GL_RGBA)
+			.withTexture(GL_RGBA)		// albedo
+			.withTexture(GL_RGBA)		// orm
+			.withTexture(GL_RGBA)		// emissive
 #endif
 			.configureAttachments()
 			.withTextureDepth(GL_DEPTH_COMPONENT24, false)
 			.checkStatus();
 
 	mShader = std::make_unique<Shader>("deferred/gbuffer.vert", "deferred/gbuffer.frag");
+	mShader->activate();
+	mShader->setInt("material.texture_albedo", ctx.PBR.albedoTextureSlot);
+	mShader->setInt("material.texture_normal", ctx.PBR.normalTextureSlot);
+	mShader->setInt("material.texture_roughnessMetallic", ctx.PBR.roughnessMetallicTextureSlot);
+	mShader->setInt("material.texture_ao", ctx.PBR.aoTextureSlot);
+	mShader->setInt("material.texture_emissive", ctx.PBR.emissiveTextureSlot);
+	mShader->setInt("material.texture_height", ctx.PBR.heightTextureSlot);
+
 	ctx.camera.ubo.self->configure(mShader->id(), ctx.camera.ubo.binding, ctx.camera.ubo.blockName);
 }
 

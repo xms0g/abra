@@ -22,8 +22,8 @@ void ForwardOpaquePass::configure(const RenderContext& ctx) {
 }
 
 void ForwardOpaquePass::execute(const RenderContext& ctx) {
-	RenderCommon::bindShadowMaps(ctx);
 	ctx.sceneBuffer->bind();
+	RenderCommon::bindShadowMaps(ctx);
 
 	const Material* lastMaterial = nullptr;
 	const Shader* lastShader = nullptr;

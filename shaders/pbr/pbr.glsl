@@ -1,4 +1,4 @@
-#include "ub/shadow.glsl"
+#include "ub/light.glsl"
 #include "pbr/brdf.glsl"
 
 #define ENVIROMENT_INTENSITY 0.5
@@ -83,8 +83,8 @@ vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 worldPos, vec4 fragPosLightSpa
     const float MAX_REFLECTION_LOD = 4.0;
 
     vec3 prefilteredColor = textureLod(prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
-    vec2 brdf = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
-    vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
+    vec2 integratedBRDF = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
+    vec3 specular = prefilteredColor * (F * integratedBRDF.x + integratedBRDF.y);
 
     vec3 ambient = (kD * diffuse + specular) * ao * ENVIROMENT_INTENSITY;
     vec3 color = ambient + Lo;
@@ -107,7 +107,7 @@ float calculateDirectionalShadow(vec4 fragPosLightSpace, vec3 normal, vec3 light
     float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
     // PCF
     float shadow = 0.0;
-    int samples = 2;
+    int samples = 5;
     vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
 
     for (int x = -samples; x <= samples; ++x) {

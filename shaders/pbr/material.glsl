@@ -7,8 +7,10 @@ struct Material {
     sampler2D texture_height;
 
     float alphaCutoff;
+    float heightScale;
 
     bool hasEmissiveMap;
+    bool hasHeightMap;
     bool hasAOMap;
     bool hasORM;
 };

@@ -34,6 +34,8 @@ struct RenderContext {
 			uint32_t binding;
 			const char* blockName;
 		} ubo;
+
+		int32_t textureSlot;
 	} ssao;
 
 	struct {
@@ -67,7 +69,7 @@ struct RenderContext {
 
 	struct {
 		const std::array<uint32_t, 3>* textures;
-		uint32_t textureSlot;
+		int32_t textureSlot;
 		uint32_t width, height;
 
 		struct {
@@ -99,26 +101,26 @@ struct RenderContext {
 		} envMap;
 
 		struct {
-			uint32_t textureSlot;
+			int32_t textureSlot;
 			uint32_t size;
 		} irradianceMap;
 
 		struct {
-			uint32_t textureSlot;
+			int32_t textureSlot;
 			uint32_t size;
 		} prefilterMap;
 
 		struct {
-			uint32_t textureSlot;
+			int32_t textureSlot;
 			uint32_t size;
 		} brdfLUT;
 
-		uint32_t albedoTextureSlot;
-		uint32_t normalTextureSlot;
-		uint32_t roughnessMetallicTextureSlot;
-		uint32_t aoTextureSlot;
-		uint32_t emissiveTextureSlot;
-		uint32_t heightTextureSlot;
+		int32_t albedoTextureSlot;
+		int32_t normalTextureSlot;
+		int32_t roughnessMetallicTextureSlot;
+		int32_t aoTextureSlot;
+		int32_t emissiveTextureSlot;
+		int32_t heightTextureSlot;
 
 		const char* HDRTexture;
 	} PBR;
