@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <vector>
 
+struct InstanceGroup;
 struct RenderableObject;
 struct RenderContext;
 struct EntityData;
@@ -13,6 +14,8 @@ class Entity;
 
 namespace RenderCommon {
 void forward(const std::vector<RenderableObject>& objects);
+
+void instanced(const std::vector<InstanceGroup>& objects);
 
 void setupTransform(const EntityData& entity, const Shader& shader);
 

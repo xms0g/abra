@@ -2,14 +2,15 @@
 #include "IRenderPass.hpp"
 #include "../instanceBufferBuilder.hpp"
 
-class BlendInstancedPass final : public IRenderPass {
+class InstancedPass final : public IRenderPass {
 public:
-	~BlendInstancedPass() override;
+	~InstancedPass() override;
 
 	void configure(const RenderContext& ctx) override;
 
 	void execute(const RenderContext& ctx) override;
-	
+
 private:
-	InstanceVBO mVBO;
+	InstanceVBO mOpaqueVBO;
+	InstanceVBO mBlendVBO;
 };

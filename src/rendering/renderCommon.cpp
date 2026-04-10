@@ -6,6 +6,7 @@
 #include "mesh/mesh.h"
 #include "renderContext/renderContext.hpp"
 #include "renderContext/renderableObject.hpp"
+#include "renderContext/instanceGroup.hpp"
 #include "renderContext/entityData.hpp"
 #include "../math/matrix.h"
 #include "../ECS/components/material.hpp"
@@ -35,6 +36,30 @@ void RenderCommon::forward(const std::vector<RenderableObject>& objects) {
 	}
 	if (lastMaterial)
 		unbindTextures(lastMaterial->textures);
+}
+
+void RenderCommon::instanced(const std::vector<InstanceGroup>& objects) {
+	for (const auto& [entity, transforms, matb]: objects) {
+		const size_t count = transforms->size() / 9;
+
+		const auto& [material, shader, meshes] = matb;
+		for (const auto& mesh: *meshes) {
+			shader->activate();
+
+			setupMaterial(entity, *material, *shader);
+			bindTextures(material->textures, *shader);
+
+			mesh.bind();
+			glDrawElementsInstanced(
+				GL_TRIANGLES,
+				static_cast<int32_t>(mesh.indices().size()),
+				GL_UNSIGNED_INT,
+				nullptr,
+				static_cast<int32_t>(count));
+
+			unbindTextures(material->textures);
+		}
+	}
 }
 
 void RenderCommon::setupTransform(const EntityData& entity, const Shader& shader) {
@@ -91,7 +116,6 @@ void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shad
 
 	std::string_view roughMetalPath;
 	for (size_t i = 0; i < textures.size(); ++i) {
-
 		switch (textures[i].type) {
 			case HEIGHT:
 				hasHeightMap = true;

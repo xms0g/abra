@@ -18,8 +18,7 @@
 #include "renderPasses/ssaoPass.h"
 #include "renderPasses/debugPass.h"
 #include "renderPasses/forwardPass.h"
-#include "renderPasses/blendInstancedPass.h"
-#include "renderPasses/opaqueInstancedPass.h"
+#include "renderPasses/instancedPass.h"
 #include "renderPasses/beginScenePass.h"
 #include "renderPasses/frustumCullingPass.h"
 #include "renderPasses/skyboxPass.h"
@@ -143,12 +142,8 @@ void RenderPipeline::configure(const Camera& camera) {
 		mRenderPasses.push_back(std::make_shared<DebugPass>());
 	}
 
-	if (!mRenderQueue.opaqueInstancedGroups.empty()) {
-		mRenderPasses.push_back(std::make_shared<OpaqueInstancedPass>());
-	}
-
-	if (!mRenderQueue.blendInstancedGroups.empty()) {
-		mRenderPasses.push_back(std::make_shared<BlendInstancedPass>());
+	if (!mRenderQueue.opaqueInstancedGroups.empty() || !mRenderQueue.blendInstancedGroups.empty()) {
+		mRenderPasses.push_back(std::make_shared<InstancedPass>());
 	}
 
 	mRenderPasses.push_back(std::make_shared<SkyboxPass>());
@@ -270,6 +265,9 @@ void RenderPipeline::configure(const Camera& camera) {
 
 		shader->activate();
 		shader->setInt("material.texture_albedo", PBR_ALBEDO_TEXTURE_SLOT);
+		shader->setInt("shadowMap", mRenderCtx->shadow.textureSlot);
+		shader->setInt("shadowCubemap", mRenderCtx->shadow.textureSlot + 1);
+		shader->setInt("persShadowMap", mRenderCtx->shadow.textureSlot + 2);
 	}
 }
 
