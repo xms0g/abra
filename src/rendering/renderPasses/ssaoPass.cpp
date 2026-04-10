@@ -71,8 +71,8 @@ void SSAOPass::ssao(const RenderContext& ctx) const {
 
 	mShader->activate();
 
-	ctx.gBuffer->bindTexture(0, 5);
-	ctx.gBuffer->bindTexture(1, 1);
+	ctx.gBuffer->bindTexture(0, 5); // the depth texture
+	ctx.gBuffer->bindTexture(1, 1); // normal texture
 
 	glActiveTexture(GL_TEXTURE0 + 2);
 	glBindTexture(GL_TEXTURE_2D, mNoiseTexture);
@@ -87,8 +87,7 @@ void SSAOPass::blur() const {
 	mBlurFBO->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 	mBlurShader->activate();
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, mFBO->texture());
+	mFBO->bindTexture(0);
 
 	glBindVertexArray(mQuad->VAO());
 	glDrawArrays(GL_TRIANGLES, 0, 6);

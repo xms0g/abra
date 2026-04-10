@@ -36,10 +36,6 @@ int32_t FrameBuffer::height() const {
 }
 
 uint32_t FrameBuffer::texture() const {
-	if (mTextures.size() > 1) {
-		throw std::runtime_error("ERROR::FRAMEBUFFER::MULTIPLE_TEXTURES_ATTACHED!\n");
-	}
-
 	return mTextures[0].first;
 }
 
