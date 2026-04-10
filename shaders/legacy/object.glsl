@@ -10,7 +10,7 @@ in VS_OUT
 
 #include "ub/camera.glsl"
 #include "ub/shadow.glsl"
-#include "common/material.glsl"
-#include "common/blinnPhong.glsl"
+#include "legacy/material.glsl"
+#include "legacy/blinnPhong.glsl"
 #include "common/normalMap.glsl"
 #include "common/parallaxMap.glsl"

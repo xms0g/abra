@@ -16,7 +16,6 @@ struct RenderQueue {
 	std::vector<RenderGroup> deferredGroups;
 	std::vector<RenderGroup> blendGroups;
 	std::vector<RenderGroup> shadowGroups;
-	std::vector<RenderGroup> pbrGroups;
 	std::vector<RenderGroup> skybox;
 	// Renderable Objects
 	std::vector<RenderableObject> deferredObjects;
@@ -24,5 +23,4 @@ struct RenderQueue {
 	std::vector<RenderableObject> blendObjects;
 	std::vector<RenderableObject> dbgObjects;
 	std::vector<RenderableObject> shadowingObjects;
-	std::vector<RenderableObject> pbrObjects;
 };

@@ -45,7 +45,6 @@ private:
 	std::unique_ptr<Shader> opaque;
 	std::unique_ptr<Shader> blend;
 	std::unique_ptr<Shader> unlit;
-	std::unique_ptr<Shader> pbr;
 	std::unique_ptr<Shader> instancedOpaque;
 	std::unique_ptr<Shader> instancedBlend;
 	std::unique_ptr<Shader> skybox;

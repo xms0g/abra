@@ -18,7 +18,6 @@
 #include "renderPasses/ssaoPass.h"
 #include "renderPasses/debugPass.h"
 #include "renderPasses/forwardOpaquePass.h"
-#include "renderPasses/pbrPass.h"
 #include "renderPasses/blendInstancedPass.h"
 #include "renderPasses/blendPass.h"
 #include "renderPasses/opaqueInstancedPass.h"
@@ -71,7 +70,6 @@ RenderPipeline::RenderPipeline(Registry* registry) {
 	opaque = std::make_unique<Shader>("object.vert", "opaque.frag");
 	blend = std::make_unique<Shader>("object.vert", "blend.frag");
 	unlit = std::make_unique<Shader>("unlit.vert", "unlit.frag");
-	pbr = std::make_unique<Shader>("pbr/pbr.vert", "pbr/pbr.frag");
 	instancedOpaque = std::make_unique<Shader>("instanced.vert", "opaque.frag");
 	instancedBlend = std::make_unique<Shader>("instanced.vert", "blend.frag");
 	skybox = std::make_unique<Shader>("skybox.vert", "skybox.frag");
@@ -142,10 +140,6 @@ void RenderPipeline::configure(const Camera& camera) {
 		mRenderPasses.push_back(std::make_shared<ForwardOpaquePass>());
 	}
 
-	if (!mRenderQueue.pbrGroups.empty()) {
-		mRenderPasses.push_back(std::make_shared<PBRPass>());
-	}
-
 	if (!mRenderQueue.debugGroups.empty()) {
 		mRenderPasses.push_back(std::make_shared<DebugPass>());
 	}
@@ -182,6 +176,7 @@ void RenderPipeline::configure(const Camera& camera) {
 	mRenderCtx->ssao.radius = SSAO_RADIUS;
 	mRenderCtx->ssao.bias = SSAO_BIAS;
 	mRenderCtx->ssao.intensity = SSAO_INTENSITY;
+	mRenderCtx->ssao.textureSlot = SSAO_TEXTURE_SLOT;
 	mRenderCtx->light.ubo.self = &mLightSystem->ubo();
 	mRenderCtx->light.ubo.blockName = LIGHT_UBO_BLOCK_NAME;
 	mRenderCtx->light.dirLights = &mLightSystem->dirLights();
@@ -258,7 +253,7 @@ void RenderPipeline::configure(const Camera& camera) {
 
 	// Configure shaders
 	const std::vector<Shader*> shaders = {
-		opaque.get(), blend.get(), unlit.get(), pbr.get(),
+		opaque.get(), blend.get(), unlit.get(),
 		instancedOpaque.get(), instancedBlend.get(), skybox.get()
 	};
 
@@ -280,11 +275,6 @@ void RenderPipeline::configure(const Camera& camera) {
 
 		shader->activate();
 		shader->setInt("material.texture_albedo", PBR_ALBEDO_TEXTURE_SLOT);
-		shader->setInt("material.texture_normal", PBR_NORMAL_TEXTURE_SLOT);
-		shader->setInt("material.texture_roughnessMetallic", PBR_RM_TEXTURE_SLOT);
-		shader->setInt("material.texture_ao", PBR_AO_TEXTURE_SLOT);
-		shader->setInt("material.texture_emissive", PBR_EMISSIVE_TEXTURE_SLOT);
-		shader->setInt("material.texture_height", PBR_HEIGHT_TEXTURE_SLOT);
 	}
 }
 
@@ -366,9 +356,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			continue;
 		}
 		// Set shader
-		if (material.flag & PBR) {
-			matb.shader = pbr.get();
-		} else if (material.flag & OPAQUE) {
+		if (material.flag & OPAQUE) {
 			if (material.flag & UNLIT) {
 				matb.shader = unlit.get();
 			} else {
@@ -389,13 +377,9 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		}
 
 		if (material.flag & PBR) {
-			mRenderQueue.pbrGroups.push_back(group);
+			mRenderQueue.deferredGroups.push_back(group);
 		} else if (material.flag & OPAQUE) {
-			if (matc.renderFlag & FORWARD_PASS) {
-				mRenderQueue.forwardOpaqueGroups.push_back(group);
-			} else {
-				mRenderQueue.deferredGroups.push_back(group);
-			}
+			mRenderQueue.forwardOpaqueGroups.push_back(group);
 		} else if (material.flag & BLEND) {
 			mRenderQueue.blendGroups.push_back(group);
 		}
