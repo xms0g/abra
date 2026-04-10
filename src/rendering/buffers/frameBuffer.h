@@ -12,6 +12,8 @@ public:
 
 	virtual void unbind() const = 0;
 
+	virtual void bindTexture(uint32_t slot, uint32_t index) const = 0;
+
 	void checkStatus();
 
 protected:
@@ -31,7 +33,7 @@ public:
 
 	[[nodiscard]] uint32_t texture() const override;
 
-	[[nodiscard]] const std::vector<uint32_t>& textures() const;
+	[[nodiscard]] const std::vector<std::pair<uint32_t, uint32_t>>& textures() const;
 
 	void bind() const override;
 
@@ -40,6 +42,8 @@ public:
 	void bindForDraw() const;
 
 	void unbind() const override;
+
+	void bindTexture(uint32_t slot, uint32_t textureIndex = 0) const override;
 
 	FrameBuffer& withTexture(uint32_t format);
 
@@ -76,7 +80,7 @@ private:
 
 	int32_t mWidth{0};
 	int32_t mHeight{0};
-	std::vector<uint32_t> mTextureIDs;
+	std::vector<std::pair<uint32_t, uint32_t>> mTextures;
 	std::vector<uint32_t> mAttachments;
 };
 
@@ -95,6 +99,8 @@ public:
 	void unbind() const override;
 
 	void bindFace(uint32_t face, int32_t mip = 0) const;
+
+	void bindTexture(uint32_t slot, uint32_t textureIndex = 0) const override;
 
 private:
 	uint32_t mCubemapID{0};

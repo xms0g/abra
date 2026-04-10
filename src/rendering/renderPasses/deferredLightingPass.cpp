@@ -74,22 +74,14 @@ void DeferredLightingPass::execute(const RenderContext& ctx) {
 
 	RenderCommon::bindShadowMaps(ctx);
 
-	for (size_t i = 0; i < ctx.gBuffer->textures().size() - 1; ++i) {
-		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, ctx.gBuffer->textures()[i]);
+	for (size_t i = 0; i < ctx.gBuffer->textures().size() - 1; ++i) { // Don't bind the depth texture
+		ctx.gBuffer->bindTexture(i, i);
 	}
 
-	glActiveTexture(GL_TEXTURE0 + ctx.ssao.textureSlot);
-	glBindTexture(GL_TEXTURE_2D, ctx.ssao.buffer->texture());
-
-	glActiveTexture(GL_TEXTURE0 + ctx.PBR.irradianceMap.textureSlot);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, mIrradianceMapBuffer->texture());
-
-	glActiveTexture(GL_TEXTURE0 + ctx.PBR.prefilterMap.textureSlot);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, mPrefilterMapBuffer->texture());
-
-	glActiveTexture(GL_TEXTURE0 + ctx.PBR.brdfLUT.textureSlot);
-	glBindTexture(GL_TEXTURE_2D, mBrdfLUTBuffer->texture());
+	ctx.ssao.buffer->bindTexture(ctx.ssao.textureSlot);
+	mIrradianceMapBuffer->bindTexture(ctx.PBR.irradianceMap.textureSlot);
+	mPrefilterMapBuffer->bindTexture(ctx.PBR.prefilterMap.textureSlot);
+	mBrdfLUTBuffer->bindTexture(ctx.PBR.brdfLUT.textureSlot);
 
 	glDisable(GL_DEPTH_TEST);
 	glBindVertexArray(mQuad->VAO());
@@ -123,7 +115,7 @@ void DeferredLightingPass::createEnvMap(const RenderContext& ctx) {
 
 	mEnvMapBuffer->unbind();
 
-	glBindTexture(GL_TEXTURE_CUBE_MAP, mEnvMapBuffer->texture());
+	mEnvMapBuffer->bindTexture(0);
 	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
 	ctx.PBR.envMap.binding = mEnvMapBuffer->texture();
@@ -138,8 +130,7 @@ void DeferredLightingPass::createIrradianceMap() {
 	irradianceConv.setInt("environmentMap", 0);
 	irradianceConv.setMat4("projection", mCaptureProjection);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, mEnvMapBuffer->texture());
+	mEnvMapBuffer->bindTexture(0);
 
 	mIrradianceMapBuffer->bind();
 	for (uint32_t i = 0; i < FACES; ++i) {
@@ -162,8 +153,7 @@ void DeferredLightingPass::createPrefilterMap(const RenderContext& ctx) {
 	prefilter.setInt("environmentMap", 0);
 	prefilter.setMat4("projection", mCaptureProjection);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, mEnvMapBuffer->texture());
+	mEnvMapBuffer->bindTexture(0);
 
 	constexpr uint32_t mipLevels = 5;
 

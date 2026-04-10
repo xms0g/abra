@@ -15,8 +15,8 @@ FrameBuffer::FrameBuffer(const int32_t width, const int32_t height) : mWidth(wid
 }
 
 FrameBuffer::~FrameBuffer() {
-	if (!mTextureIDs.empty()) {
-		for (const auto& textureID: mTextureIDs) {
+	if (!mTextures.empty()) {
+		for (const auto& [textureID, type]: mTextures) {
 			glDeleteTextures(1, &textureID);
 		}
 	}
@@ -36,11 +36,15 @@ int32_t FrameBuffer::height() const {
 }
 
 uint32_t FrameBuffer::texture() const {
-	return mTextureIDs.front();
+	if (mTextures.size() > 1) {
+		throw std::runtime_error("ERROR::FRAMEBUFFER::MULTIPLE_TEXTURES_ATTACHED!\n");
+	}
+
+	return mTextures[0].first;
 }
 
-const std::vector<uint32_t>& FrameBuffer::textures() const {
-	return mTextureIDs;
+const std::vector<std::pair<uint32_t, uint32_t>>& FrameBuffer::textures() const {
+	return mTextures;
 }
 
 void FrameBuffer::bind() const {
@@ -60,12 +64,19 @@ void FrameBuffer::unbind() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void FrameBuffer::bindTexture(const uint32_t slot, const uint32_t textureIndex) const {
+	auto [id, type]= mTextures[textureIndex];
+
+	glActiveTexture(GL_TEXTURE0 + slot);
+	glBindTexture(type, id);
+}
+
 FrameBuffer& FrameBuffer::withTexture(const uint32_t format) {
 	const int32_t internalFormat = getInternalFormat(format);
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
-	mTextureIDs.push_back(textureID);
+	mTextures.emplace_back(textureID, GL_TEXTURE_2D);
 
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	glTexImage2D(
@@ -94,7 +105,7 @@ FrameBuffer& FrameBuffer::withTextureMultisampled(const int32_t multisampledCoun
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
-	mTextureIDs.push_back(textureID);
+	mTextures.emplace_back(textureID, GL_TEXTURE_2D_MULTISAMPLE);
 
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureID);
 	glTexImage2DMultisample(
@@ -117,7 +128,7 @@ FrameBuffer& FrameBuffer::withTextureFP(const uint32_t format) {
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
-	mTextureIDs.push_back(textureID);
+	mTextures.emplace_back(textureID, GL_TEXTURE_2D);
 
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	glTexImage2D(
@@ -150,7 +161,7 @@ FrameBuffer& FrameBuffer::withTextureFPMultisampled(
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
-	mTextureIDs.push_back(textureID);
+	mTextures.emplace_back(textureID, GL_TEXTURE_2D_MULTISAMPLE);
 
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureID);
 	glTexImage2DMultisample(
@@ -171,7 +182,7 @@ FrameBuffer& FrameBuffer::withTextureFPMultisampled(
 FrameBuffer& FrameBuffer::withTextureDepth(const int32_t internalFormat, const bool onlyForShadowMap) {
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
-	mTextureIDs.push_back(textureID);
+	mTextures.emplace_back(textureID, GL_TEXTURE_2D);
 
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	glTexImage2D(
@@ -205,7 +216,7 @@ FrameBuffer& FrameBuffer::withTextureDepthArray(
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
-	mTextureIDs.push_back(textureID);
+	mTextures.emplace_back(textureID, GL_TEXTURE_2D_ARRAY);
 
 	glBindTexture(GL_TEXTURE_2D_ARRAY, textureID);
 	glTexImage3D(
@@ -235,7 +246,7 @@ FrameBuffer& FrameBuffer::withTextureDepthArray(
 FrameBuffer& FrameBuffer::withTextureCubemapDepth(const int32_t internalFormat, const bool onlyForShadowMap) {
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
-	mTextureIDs.push_back(textureID);
+	mTextures.emplace_back(textureID, GL_TEXTURE_CUBE_MAP);
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 	for (uint32_t i = 0; i < 6; ++i)
@@ -270,7 +281,7 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
-	mTextureIDs.push_back(textureID);
+	mTextures.emplace_back(textureID, GL_TEXTURE_CUBE_MAP_ARRAY);
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, textureID);
 	glTexImage3D(
@@ -344,7 +355,7 @@ FrameBuffer& FrameBuffer::withRenderBufferDepthStencilMultisampled(const int32_t
 }
 
 FrameBuffer& FrameBuffer::configureAttachments() {
-	if (mTextureIDs.empty()) {
+	if (mTextures.empty()) {
 		throw std::runtime_error("ERROR::FRAMEBUFFER::NO_TEXTURES_ATTACHED!\n");
 	}
 
@@ -354,7 +365,7 @@ FrameBuffer& FrameBuffer::configureAttachments() {
 }
 
 void FrameBuffer::setAttachment(const uint32_t textureID, const uint32_t target) {
-	const uint32_t attachment = GL_COLOR_ATTACHMENT0 + mTextureIDs.size() - 1;
+	const uint32_t attachment = GL_COLOR_ATTACHMENT0 + mTextures.size() - 1;
 	mAttachments.push_back(attachment);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, target, textureID, 0);
 }
@@ -467,4 +478,9 @@ void CubemapBuffer::bindFace(const uint32_t face, const int32_t mip) const {
 		mip);
 
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+}
+
+void CubemapBuffer::bindTexture(const uint32_t slot, const uint32_t textureIndex) const {
+	glActiveTexture(GL_TEXTURE0 + slot);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, mCubemapID);
 }
