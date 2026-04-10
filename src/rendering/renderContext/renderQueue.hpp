@@ -12,14 +12,14 @@ struct RenderQueue {
 	std::vector<InstanceGroup> blendInstancedGroups;
 	// Render groups
 	std::vector<RenderGroup> debugGroups;
-	std::vector<RenderGroup> forwardOpaqueGroups;
+	std::vector<RenderGroup> opaqueGroups;
 	std::vector<RenderGroup> deferredGroups;
 	std::vector<RenderGroup> blendGroups;
 	std::vector<RenderGroup> shadowGroups;
 	std::vector<RenderGroup> skybox;
 	// Renderable Objects
 	std::vector<RenderableObject> deferredObjects;
-	std::vector<RenderableObject> forwardObjects;
+	std::vector<RenderableObject> opaqueObjects;
 	std::vector<RenderableObject> blendObjects;
 	std::vector<RenderableObject> dbgObjects;
 	std::vector<RenderableObject> shadowingObjects;

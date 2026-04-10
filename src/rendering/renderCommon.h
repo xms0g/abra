@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <vector>
 
+struct RenderableObject;
 struct RenderContext;
 struct EntityData;
 struct Material;
@@ -11,6 +12,8 @@ class Shader;
 class Entity;
 
 namespace RenderCommon {
+void forward(const std::vector<RenderableObject>& objects);
+
 void setupTransform(const EntityData& entity, const Shader& shader);
 
 void setupMaterial(const EntityData& entity, const Material& material, const Shader& shader);

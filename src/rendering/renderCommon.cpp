@@ -5,11 +5,37 @@
 #include "texture/texture.h"
 #include "mesh/mesh.h"
 #include "renderContext/renderContext.hpp"
+#include "renderContext/renderableObject.hpp"
 #include "renderContext/entityData.hpp"
 #include "../math/matrix.h"
 #include "../ECS/components/material.hpp"
 #include "../ECS/components/mesh.hpp"
 #include "../ECS/components/transform.hpp"
+
+void RenderCommon::forward(const std::vector<RenderableObject>& objects) {
+	const Material* lastMaterial = nullptr;
+	const Shader* lastShader = nullptr;
+
+	for (const auto& [entity, material, shader, mesh]: objects) {
+		if (lastShader != shader) {
+			lastShader = shader;
+			lastShader->activate();
+			lastMaterial = nullptr;
+		}
+
+		setupTransform(*entity, *lastShader);
+
+		if (lastMaterial != material) {
+			setupMaterial(*entity, *material, *lastShader);
+			bindTextures(material->textures, *lastShader);
+			lastMaterial = material;
+		}
+
+		drawMesh(*mesh);
+	}
+	if (lastMaterial)
+		unbindTextures(lastMaterial->textures);
+}
 
 void RenderCommon::setupTransform(const EntityData& entity, const Shader& shader) {
 	const glm::mat4 model = math::modelMatrix(

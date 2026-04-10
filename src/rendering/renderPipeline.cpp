@@ -17,9 +17,8 @@
 #include "renderPasses/deferredLightingPass.h"
 #include "renderPasses/ssaoPass.h"
 #include "renderPasses/debugPass.h"
-#include "renderPasses/forwardOpaquePass.h"
+#include "renderPasses/forwardPass.h"
 #include "renderPasses/blendInstancedPass.h"
-#include "renderPasses/blendPass.h"
 #include "renderPasses/opaqueInstancedPass.h"
 #include "renderPasses/beginScenePass.h"
 #include "renderPasses/frustumCullingPass.h"
@@ -136,8 +135,8 @@ void RenderPipeline::configure(const Camera& camera) {
 		mRenderPasses.push_back(mDeferredLightingPass);
 	}
 
-	if (!mRenderQueue.forwardOpaqueGroups.empty()) {
-		mRenderPasses.push_back(std::make_shared<ForwardOpaquePass>());
+	if (!mRenderQueue.opaqueGroups.empty() || !mRenderQueue.blendGroups.empty()) {
+		mRenderPasses.push_back(std::make_shared<ForwardPass>());
 	}
 
 	if (!mRenderQueue.debugGroups.empty()) {
@@ -146,10 +145,6 @@ void RenderPipeline::configure(const Camera& camera) {
 
 	if (!mRenderQueue.opaqueInstancedGroups.empty()) {
 		mRenderPasses.push_back(std::make_shared<OpaqueInstancedPass>());
-	}
-
-	if (!mRenderQueue.blendGroups.empty()) {
-		mRenderPasses.push_back(std::make_shared<BlendPass>());
 	}
 
 	if (!mRenderQueue.blendInstancedGroups.empty()) {
@@ -379,7 +374,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		if (material.flag & PBR) {
 			mRenderQueue.deferredGroups.push_back(group);
 		} else if (material.flag & OPAQUE) {
-			mRenderQueue.forwardOpaqueGroups.push_back(group);
+			mRenderQueue.opaqueGroups.push_back(group);
 		} else if (material.flag & BLEND) {
 			mRenderQueue.blendGroups.push_back(group);
 		}
@@ -406,7 +401,7 @@ void RenderPipeline::sortEntities() {
 
 	// Sort opaque objects front to back
 	sortBatches(mRenderQueue.deferredGroups, false);
-	sortBatches(mRenderQueue.forwardOpaqueGroups, false);
+	sortBatches(mRenderQueue.opaqueGroups, false);
 	sortBatches(mRenderQueue.blendGroups, true);
 
 	// for (auto& [entity, transforms, materials]: renderQueues.blendInstancedGroup) {

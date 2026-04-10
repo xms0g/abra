@@ -1,9 +1,9 @@
 #pragma once
 #include "IRenderPass.hpp"
 
-class ForwardOpaquePass final : public IRenderPass {
+class ForwardPass final : public IRenderPass {
 public:
-	~ForwardOpaquePass() override;
+	~ForwardPass() override;
 
 	void configure(const RenderContext& ctx) override;
 
