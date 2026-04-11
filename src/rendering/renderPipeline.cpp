@@ -167,6 +167,12 @@ void RenderPipeline::configure(const Camera& camera) {
 	mRenderCtx->ssao.bias = SSAO_BIAS;
 	mRenderCtx->ssao.intensity = SSAO_INTENSITY;
 	mRenderCtx->ssao.textureSlot = SSAO_TEXTURE_SLOT;
+	mRenderCtx->gBuffer.positionTextureIdx = G_POSITION_TEXTURE_IDX;
+	mRenderCtx->gBuffer.normalTextureIdx = G_NORMAL_TEXTURE_IDX;
+	mRenderCtx->gBuffer.albedoTextureIdx = G_ALBEDO_TEXTURE_IDX;
+	mRenderCtx->gBuffer.ormTextureIdx = G_ORM_TEXTURE_IDX;
+	mRenderCtx->gBuffer.emissiveTextureIdx = G_EMISSIVE_TEXTURE_IDX;
+	mRenderCtx->gBuffer.depthTextureIdx = G_DEPTH_TEXTURE_IDX;
 	mRenderCtx->light.ubo.self = &mLightSystem->ubo();
 	mRenderCtx->light.ubo.blockName = LIGHT_UBO_BLOCK_NAME;
 	mRenderCtx->light.dirLights = &mLightSystem->dirLights();
@@ -237,7 +243,7 @@ void RenderPipeline::configure(const Camera& camera) {
 	}
 
 	if (mDeferredGeometryPass) {
-		mRenderCtx->gBuffer = mDeferredGeometryPass->gBuffer();
+		mRenderCtx->gBuffer.self = mDeferredGeometryPass->gBuffer();
 		mRenderCtx->ssao.buffer = mSSAOPass->blurFBO();
 	}
 

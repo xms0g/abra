@@ -71,8 +71,8 @@ void SSAOPass::ssao(const RenderContext& ctx) const {
 
 	mShader->activate();
 
-	ctx.gBuffer->bindTexture(0, 5); // the depth texture
-	ctx.gBuffer->bindTexture(1, 1); // normal texture
+	ctx.gBuffer.self->bindTexture(0, ctx.gBuffer.depthTextureIdx); // the depth texture
+	ctx.gBuffer.self->bindTexture(1, ctx.gBuffer.normalTextureIdx); // normal texture
 
 	glActiveTexture(GL_TEXTURE0 + 2);
 	glBindTexture(GL_TEXTURE_2D, mNoiseTexture);

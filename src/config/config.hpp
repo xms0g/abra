@@ -3,8 +3,8 @@
 #include <cstdint>
 
 // PATH
-constexpr std::string SHADER_DIR = "shaders/";
-constexpr std::string ASSET_DIR = "assets/";
+inline std::string SHADER_DIR = "shaders/";
+inline std::string ASSET_DIR = "assets/";
 
 // MSAA
 constexpr uint32_t MULTISAMPLED_COUNT{4};
@@ -34,7 +34,7 @@ constexpr auto LIGHT_UBO_BLOCK_NAME = "LightBlock";
 // Shadow
 constexpr uint32_t SHADOWMAP_WIDTH{1024};
 constexpr uint32_t SHADOWMAP_HEIGHT{1024};
-constexpr uint32_t SHADOWMAP_TEXTURE_SLOT{6};
+constexpr int32_t SHADOWMAP_TEXTURE_SLOT{6};
 
 constexpr float SHADOW_DIRECTIONAL_HEIGHT{5.0};
 constexpr float SHADOW_DIRECTIONAL_NEAR{1.0f};
@@ -64,20 +64,28 @@ constexpr auto SSAO_UBO_BLOCK_NAME = "SSAOBlock";
 constexpr uint32_t PBR_ENVMAP_SIZE{512};
 
 constexpr uint32_t PBR_IRRADIANCE_MAP_SIZE{32};
-constexpr uint32_t PBR_IRRADIANCE_MAP_TEXTURE_SLOT{9};
+constexpr int32_t PBR_IRRADIANCE_MAP_TEXTURE_SLOT{9};
 
 constexpr uint32_t PBR_PREFILTER_MAP_SIZE{128};
-constexpr uint32_t PBR_PREFILTER_MAP_TEXTURE_SLOT{10};
+constexpr int32_t PBR_PREFILTER_MAP_TEXTURE_SLOT{10};
 
 constexpr uint32_t PBR_BRDF_LUT_SIZE{512};
-constexpr uint32_t PBR_BRDF_LUT_TEXTURE_SLOT{11};
+constexpr int32_t PBR_BRDF_LUT_TEXTURE_SLOT{11};
 
 constexpr auto PBR_HDR_TEXTURE = "textures/hdr/newport_loft.hdr";
 // Texture Slots
-constexpr uint32_t PBR_ALBEDO_TEXTURE_SLOT{0};
-constexpr uint32_t PBR_NORMAL_TEXTURE_SLOT{1};
-constexpr uint32_t PBR_RM_TEXTURE_SLOT{2};
-constexpr uint32_t PBR_AO_TEXTURE_SLOT{3};
-constexpr uint32_t PBR_EMISSIVE_TEXTURE_SLOT{4};
-constexpr uint32_t PBR_HEIGHT_TEXTURE_SLOT{5};
+constexpr int32_t PBR_ALBEDO_TEXTURE_SLOT{0};
+constexpr int32_t PBR_NORMAL_TEXTURE_SLOT{1};
+constexpr int32_t PBR_RM_TEXTURE_SLOT{2};
+constexpr int32_t PBR_AO_TEXTURE_SLOT{3};
+constexpr int32_t PBR_EMISSIVE_TEXTURE_SLOT{4};
+constexpr int32_t PBR_HEIGHT_TEXTURE_SLOT{5};
+// GBuffer
+constexpr int32_t G_POSITION_TEXTURE_IDX{0};
+constexpr int32_t G_NORMAL_TEXTURE_IDX{1};
+constexpr int32_t G_ALBEDO_TEXTURE_IDX{2};
+constexpr int32_t G_ORM_TEXTURE_IDX{3};
+constexpr int32_t G_EMISSIVE_TEXTURE_IDX{4};
+constexpr int32_t G_DEPTH_TEXTURE_IDX{5};
+
 

@@ -19,7 +19,18 @@ struct RenderContext {
 	RenderQueue* renderQueue;
 	mutable const FrameBuffer* sceneBuffer;
 	const FrameBuffer* intermediateBuffer;
-	const FrameBuffer* gBuffer;
+
+	struct {
+		const FrameBuffer* self;
+
+		int32_t positionTextureIdx;
+		int32_t normalTextureIdx;
+		int32_t albedoTextureIdx;
+		int32_t ormTextureIdx;
+		int32_t emissiveTextureIdx;
+		int32_t depthTextureIdx;
+	} gBuffer;
+
 
 	struct {
 		const FrameBuffer* buffer;

@@ -63,9 +63,9 @@ void DeferredLightingPass::configure(const RenderContext& ctx) {
 
 void DeferredLightingPass::execute(const RenderContext& ctx) {
 	// Copy depth buffer of gBuffer to scene buffer for the proper depth testing
-	ctx.gBuffer->bindForRead();
+	ctx.gBuffer.self->bindForRead();
 	ctx.sceneBuffer->bindForDraw();
-	glBlitFramebuffer(0, 0, ctx.gBuffer->width(), ctx.gBuffer->height(),
+	glBlitFramebuffer(0, 0, ctx.gBuffer.self->width(), ctx.gBuffer.self->height(),
 	                  0, 0, ctx.sceneBuffer->width(), ctx.sceneBuffer->height(),
 	                  GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
@@ -74,9 +74,11 @@ void DeferredLightingPass::execute(const RenderContext& ctx) {
 
 	RenderCommon::bindShadowMaps(ctx);
 
-	for (size_t i = 0; i < ctx.gBuffer->textures().size() - 1; ++i) { // Don't bind the depth texture
-		ctx.gBuffer->bindTexture(i, i);
-	}
+	ctx.gBuffer.self->bindTexture(0, ctx.gBuffer.positionTextureIdx);
+	ctx.gBuffer.self->bindTexture(1, ctx.gBuffer.normalTextureIdx);
+	ctx.gBuffer.self->bindTexture(2, ctx.gBuffer.albedoTextureIdx);
+	ctx.gBuffer.self->bindTexture(3, ctx.gBuffer.ormTextureIdx);
+	ctx.gBuffer.self->bindTexture(4, ctx.gBuffer.emissiveTextureIdx);
 
 	ctx.ssao.buffer->bindTexture(ctx.ssao.textureSlot);
 	mIrradianceMapBuffer->bindTexture(ctx.PBR.irradianceMap.textureSlot);

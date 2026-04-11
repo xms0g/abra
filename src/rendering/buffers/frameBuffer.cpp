@@ -35,8 +35,8 @@ int32_t FrameBuffer::height() const {
 	return mHeight;
 }
 
-uint32_t FrameBuffer::texture() const {
-	return mTextures[0].first;
+uint32_t FrameBuffer::texture(const uint32_t index) const {
+	return mTextures[index].first;
 }
 
 const std::vector<std::pair<uint32_t, uint32_t>>& FrameBuffer::textures() const {
@@ -448,7 +448,7 @@ CubemapBuffer::~CubemapBuffer() {
 	glDeleteTextures(1, &mCubemapID);
 }
 
-uint32_t CubemapBuffer::texture() const {
+uint32_t CubemapBuffer::texture(uint32_t index) const {
 	return mCubemapID;
 }
 
