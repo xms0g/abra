@@ -4,9 +4,9 @@ in VS_OUT
     vec3 WorldPos;
 } fs_in;
 
-uniform samplerCube environmentMap;
+#include "pbr/constants.glsl"
 
-const float PI = 3.14159265359;
+uniform samplerCube environmentMap;
 
 out vec4 fragColor;
 

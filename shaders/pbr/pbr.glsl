@@ -1,3 +1,6 @@
+#ifndef PBR_GLSL
+#define PBR_GLSL
+
 #include "ub/light.glsl"
 #include "pbr/brdf.glsl"
 
@@ -174,4 +177,6 @@ float calculatePerspectiveShadow(vec4 fragPosLightSpace, vec3 normal, vec3 light
 
     return shadow;
 }
+
+#endif
 

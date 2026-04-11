@@ -4,6 +4,7 @@ in VS_OUT
     vec3 WorldPos;
 } fs_in;
 
+#include "pbr/sampling.glsl"
 #include "pbr/brdf.glsl"
 
 uniform samplerCube environmentMap;
@@ -18,7 +19,6 @@ void main() {
     vec3 R = N;
     vec3 V = R;
 
-    const uint SAMPLE_COUNT = 1024u;
     vec3 prefilteredColor = vec3(0.0);
     float totalWeight = 0.0;
 

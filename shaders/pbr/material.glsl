@@ -1,3 +1,6 @@
+#ifndef MATERIAL_GLSL
+#define MATERIAL_GLSL
+
 struct Material {
     sampler2D texture_albedo;
     sampler2D texture_normal;
@@ -16,3 +19,5 @@ struct Material {
 };
 
 uniform Material material;
+
+#endif
