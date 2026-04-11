@@ -2,17 +2,14 @@
 #include <memory>
 #include <vector>
 #include <array>
+#include "IPostEffect.hpp"
 #include "../IRenderPass.hpp"
 
-class IPostEffect;
 struct RenderContext;
 
 namespace Models {
 class Quad;
 }
-
-class FrameBuffer;
-using RenderTargetType = std::array<std::unique_ptr<FrameBuffer>, 2>;
 
 class Shader;
 
@@ -28,6 +25,6 @@ public:
 
 private:
 	std::unique_ptr<Models::Quad> mQuad;
-	RenderTargetType mRenderTargets;
+	PingPongBuffer mPingPong;
 	std::vector<std::shared_ptr<IPostEffect> > mEffects;
 };

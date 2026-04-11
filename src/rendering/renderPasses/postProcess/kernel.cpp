@@ -16,8 +16,8 @@ uint32_t Kernel::render(
 	const uint32_t sceneTexture,
 	const uint32_t vao,
 	bool& toggle,
-	RenderTargetType& renderTargets) const {
-	renderTargets[toggle]->bind();
+	PingPongBuffer& pingPong) const {
+	pingPong[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	shader->activate();
@@ -25,8 +25,8 @@ uint32_t Kernel::render(
 
 	RenderCommon::drawQuad(sceneTexture, vao);
 
-	const uint32_t texture = renderTargets[toggle]->texture();
-	renderTargets[toggle]->unbind();
+	const uint32_t texture = pingPong[toggle]->texture();
+	pingPong[toggle]->unbind();
 	toggle = !toggle;
 	return texture;
 }

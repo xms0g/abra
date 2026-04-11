@@ -3,7 +3,7 @@
 #include <string>
 
 class FrameBuffer;
-using RenderTargetType = std::array<std::unique_ptr<FrameBuffer>, 2>;
+using PingPongBuffer = std::array<std::unique_ptr<FrameBuffer>, 2>;
 
 class IPostEffect {
 public:
@@ -22,7 +22,7 @@ public:
 		uint32_t sceneTexture,
 		uint32_t vao,
 		bool& toggle,
-		RenderTargetType& renderTargets) const = 0;
+		PingPongBuffer& pingPong) const = 0;
 
 private:
 	std::string mName;

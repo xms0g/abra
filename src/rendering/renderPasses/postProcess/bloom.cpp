@@ -36,9 +36,9 @@ uint32_t Bloom::render(
 	const uint32_t sceneTexture,
 	const uint32_t vao,
 	bool& toggle,
-	RenderTargetType& renderTargets) const {
+	PingPongBuffer& pingPong) const {
 	(void) toggle;
-	(void) renderTargets;
+	(void) pingPong;
 	bool toggle_ = false;
 	uint32_t inputTex = sceneTexture;
 

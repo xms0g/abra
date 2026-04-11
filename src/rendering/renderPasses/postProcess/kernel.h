@@ -13,7 +13,7 @@ public:
 		uint32_t sceneTexture,
 		uint32_t vao,
 		bool& toggle,
-		RenderTargetType& renderTargets) const override;
+		PingPongBuffer& pingPong) const override;
 
 private:
 	std::unique_ptr<Shader> shader;

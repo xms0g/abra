@@ -37,7 +37,7 @@ void PostProcessPass::configure(const RenderContext& ctx) {
 		std::make_shared<FXAA>("FXAA", false),
 	};
 
-	for (auto& target: mRenderTargets) {
+	for (auto& target: mPingPong) {
 		target = std::make_unique<FrameBuffer>(static_cast<int32_t>(ctx.screen.width), static_cast<int32_t>(ctx.screen.height));
 #ifdef HDR
 		target->withTextureFP(GL_RGBA)
@@ -56,7 +56,7 @@ void PostProcessPass::execute(const RenderContext& ctx) {
 		if (!effect->enabled())
 			continue;
 
-		inputTex = effect->render(inputTex, mQuad->VAO(), toggle, mRenderTargets);
+		inputTex = effect->render(inputTex, mQuad->VAO(), toggle, mPingPong);
 	}
 
 	mQuad->shader().activate();
