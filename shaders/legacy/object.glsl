@@ -1,3 +1,6 @@
+#ifndef LEGACY_OBJECT_GLSL
+#define LEGACY_OBJECT_GLSL
+
 in VS_OUT
 {
     vec2 TexCoord;
@@ -14,3 +17,5 @@ in VS_OUT
 #include "legacy/blinnPhong.glsl"
 #include "common/normalMap.glsl"
 #include "common/parallaxMap.glsl"
+
+#endif

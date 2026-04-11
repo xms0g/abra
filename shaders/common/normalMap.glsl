@@ -1,3 +1,6 @@
+#ifndef COMMON_NORMAL_MAP_GLSL
+#define COMMON_NORMAL_MAP_GLSL
+
 vec3 normal(mat3 TBN, vec2 texCoord, bool hasNormalMap) {
     if (!hasNormalMap)
         return TBN[2];
@@ -10,3 +13,5 @@ vec3 normal(mat3 TBN, vec2 texCoord, bool hasNormalMap) {
 
     return n;
 }
+
+#endif

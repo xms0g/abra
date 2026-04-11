@@ -1,5 +1,5 @@
-#ifndef MATERIAL_GLSL
-#define MATERIAL_GLSL
+#ifndef PBR_MATERIAL_GLSL
+#define PBR_MATERIAL_GLSL
 
 struct Material {
     sampler2D texture_albedo;

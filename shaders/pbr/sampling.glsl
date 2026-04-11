@@ -1,5 +1,5 @@
-#ifndef SAMPLING_GLSL
-#define SAMPLING_GLSL
+#ifndef PBR_SAMPLING_GLSL
+#define PBR_SAMPLING_GLSL
 
 #include "pbr/constants.glsl"
 

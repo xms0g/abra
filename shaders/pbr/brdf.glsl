@@ -1,5 +1,5 @@
-#ifndef BRDF_GLSL
-#define BRDF_GLSL
+#ifndef PBR_BRDF_GLSL
+#define PBR_BRDF_GLSL
 
 #include "pbr/constants.glsl"
 

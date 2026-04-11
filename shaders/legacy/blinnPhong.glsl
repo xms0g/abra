@@ -1,3 +1,6 @@
+#ifndef LEGACY_PHONG_GLSL
+#define LEGACY_PHONG_GLSL
+
 #include "ub/light.glsl"
 
 uniform sampler2D shadowMap;
@@ -183,3 +186,5 @@ vec3 calculateSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir
     vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + finalSpecular));
     return lighting;
 }
+
+#endif

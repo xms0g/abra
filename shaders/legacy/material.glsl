@@ -1,3 +1,6 @@
+#ifndef LEGACY_MATERIAL_GLSL
+#define LEGACY_MATERIAL_GLSL
+
 struct Material {
     sampler2D texture_albedo;
     sampler2D texture_specular;
@@ -14,3 +17,5 @@ struct Material {
 };
 
 uniform Material material;
+
+#endif

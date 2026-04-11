@@ -1,3 +1,6 @@
+#ifndef COMMON_PARALLAX_MAP_GLSL
+#define COMMON_PARALLAX_MAP_GLSL
+
 vec2 parallaxMapping(vec2 texCoord, vec3 viewDir, float heightScale, bool hasHeightMap) {
     if (!hasHeightMap) {
         return texCoord;
@@ -43,3 +46,5 @@ vec2 parallaxMapping(vec2 texCoord, vec3 viewDir, float heightScale, bool hasHei
 
     return finalTexCoords;
 }
+
+#endif

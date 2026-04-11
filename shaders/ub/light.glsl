@@ -1,3 +1,6 @@
+#ifndef UB_LIGHT_GLSL
+#define UB_LIGHT_GLSL
+
 #include "common/constants.glsl"
 
 struct DirectionalLight {
@@ -47,3 +50,5 @@ layout (std140) uniform LightBlock
     SpotLight spotLights[MAX_SPOT_LIGHTS];
     ivec4 lightCount;
 };
+
+#endif
