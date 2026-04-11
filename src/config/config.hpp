@@ -73,7 +73,7 @@ constexpr uint32_t PBR_BRDF_LUT_SIZE{512};
 constexpr int32_t PBR_BRDF_LUT_TEXTURE_SLOT{11};
 
 constexpr auto PBR_HDR_TEXTURE = "textures/hdr/newport_loft.hdr";
-// Texture Slots
+// PBR Textures Slots
 constexpr int32_t PBR_ALBEDO_TEXTURE_SLOT{0};
 constexpr int32_t PBR_NORMAL_TEXTURE_SLOT{1};
 constexpr int32_t PBR_RM_TEXTURE_SLOT{2};

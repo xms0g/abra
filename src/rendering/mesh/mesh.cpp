@@ -31,15 +31,15 @@ const glm::vec3& Mesh::max() const {
 }
 
 void Mesh::bind() const {
-	glBindVertexArray(mVAO);
+	mVAO->bind();
 }
 
 void Mesh::unbind() const {
-	glBindVertexArray(0);
+	mVAO->unbind();
 }
 
 void Mesh::enableInstanceAttributes(const uint32_t instanceVBO, const size_t offset) const {
-	glBindVertexArray(mVAO);
+	mVAO->bind();
 	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
 	// Model matrix attributes (7–10)
 	for (uint32_t i = 0; i < 4; ++i) {
@@ -61,62 +61,33 @@ void Mesh::enableInstanceAttributes(const uint32_t instanceVBO, const size_t off
 void Mesh::uploadToGPU() {
 	// now that we have all the required data, set the vertex buffers and its attribute pointers.
 	// create vao
-	glGenVertexArrays(1, &mVAO);
-	glBindVertexArray(mVAO);
+	mVAO = std::make_shared<VertexArray>();
+	mVAO->bind();
 
-	// create buffers
-	glGenBuffers(1, &mVBO);
-	glGenBuffers(1, &mEBO);
-
+	mVBO = std::make_shared<VertexBuffer>(STATIC);
+	mIBO = std::make_shared<IndexBuffer>();
 	// bind the buffer to be used
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO);
-	glBufferData(
-		GL_ARRAY_BUFFER,
-		static_cast<long>(mVertices.size() * sizeof(Vertex)),
-		mVertices.data(),
-		GL_STATIC_DRAW);
+	mVBO->bind();
+	mVBO->setData(mVertices.data(), static_cast<uint32_t>(mVertices.size() * sizeof(Vertex)));
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
-	glBufferData(
-		GL_ELEMENT_ARRAY_BUFFER,
-		static_cast<long>(mIndices.size() * sizeof(uint32_t)),
-		mIndices.data(),
-		GL_STATIC_DRAW);
+	mIBO->bind();
+	mIBO->setData(mIndices.data(), static_cast<uint32_t>(mIndices.size() * sizeof(uint32_t)));
 
 	// set the vertex attribute pointers
 	// vertex Positions
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
-
+	mVAO->setAttribute(0, 3, GL_FLOAT, false, sizeof(Vertex), nullptr);
 	// vertex normals
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-	                      reinterpret_cast<void*>(offsetof(Vertex, normal)));
-
+	mVAO->setAttribute(1, 3, GL_FLOAT, false, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, normal)));
 	// vertex texture coords
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-	                      reinterpret_cast<void*>(offsetof(Vertex, texcoord)));
-
+	mVAO->setAttribute(2, 2, GL_FLOAT, false, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, texcoord)));
 	// vertex tangent
-	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-	                      reinterpret_cast<void*>(offsetof(Vertex, tangent)));
-
+	mVAO->setAttribute(3, 3, GL_FLOAT, false, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, tangent)));
 	// vertex bitangent
-	glEnableVertexAttribArray(4);
-	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-	                      reinterpret_cast<void*>(offsetof(Vertex, bitangent)));
-
+	mVAO->setAttribute(4, 3, GL_FLOAT, false, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, bitangent)));
 	// ids
-	glEnableVertexAttribArray(5);
-	glVertexAttribIPointer(5, 4, GL_INT, sizeof(Vertex),
-	                       reinterpret_cast<void*>(offsetof(Vertex, boneIDs)));
-
+	mVAO->setAttribute(5, 4, GL_INT, false, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, boneIDs)));
 	// weights
-	glEnableVertexAttribArray(6);
-	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-	                      reinterpret_cast<void*>(offsetof(Vertex, weights)));
+	mVAO->setAttribute(6, 4, GL_FLOAT, false, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, weights)));
 
-	glBindVertexArray(0);
+	mVAO->unbind();
 }

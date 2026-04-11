@@ -1,25 +1,8 @@
 #pragma once
 #include <vector>
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-
-struct Vertex {
-#define MAX_BONE_INFLUENCE 4
-	// position
-	glm::vec3 position;
-	// normal
-	glm::vec3 normal;
-	// texCoords
-	glm::vec2 texcoord;
-	// tangent
-	glm::vec3 tangent;
-	// bitangent
-	glm::vec3 bitangent;
-	//bone indexes which will influence this vertex
-	int32_t boneIDs[MAX_BONE_INFLUENCE];
-	//weights from each bone
-	float weights[MAX_BONE_INFLUENCE];
-};
+#include <memory>
+#include "vertexArray.h"
+#include "../buffers/vertexBuffer.h"
 
 class Mesh {
 public:
@@ -45,7 +28,9 @@ private:
 	// mesh Data
 	std::vector<Vertex> mVertices;
 	std::vector<uint32_t> mIndices;
-	uint32_t mVAO{}, mVBO{}, mEBO{};
+	std::shared_ptr<VertexArray> mVAO;
+	std::shared_ptr<VertexBuffer> mVBO;
+	std::shared_ptr<IndexBuffer> mIBO;
 	// Bounding Volume
 	glm::vec3 mMin{}, mMax{};
 };

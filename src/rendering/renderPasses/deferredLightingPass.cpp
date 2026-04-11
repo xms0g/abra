@@ -9,7 +9,6 @@
 #include "../../io/filesystem.hpp"
 #include "../../config/config.hpp"
 
-
 DeferredLightingPass::~DeferredLightingPass() = default;
 
 void DeferredLightingPass::configure(const RenderContext& ctx) {
