@@ -3,6 +3,8 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#define PTR(a) reinterpret_cast<void*>(offsetof(Vertex, a))
+
 struct Vertex {
 #define MAX_BONE_INFLUENCE 4
 	// position
@@ -54,7 +56,7 @@ public:
 
 	void unbind() const;
 
-	void setData(const void* data, uint32_t size);
+	void setData(const void* data, uint32_t size) const;
 
 private:
 	uint32_t mIBO{0};

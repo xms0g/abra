@@ -1,5 +1,4 @@
 #include "vertexBuffer.h"
-#include "glad/glad.h"
 
 VertexBuffer::VertexBuffer(const BufferUsage usage): mUsage(usage) {
 	glGenBuffers(1, &mVBO);
@@ -37,6 +36,6 @@ void IndexBuffer::unbind() const {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void IndexBuffer::setData(const void* data, const uint32_t size) {
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+void IndexBuffer::setData(const void* data, const uint32_t size) const {
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, mUsage);
 }

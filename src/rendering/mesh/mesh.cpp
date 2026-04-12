@@ -99,17 +99,17 @@ void Mesh::uploadToGPU() {
 	// vertex Positions
 	mVAO->setAttribute(0, 3, GL_FLOAT, false, sizeof(Vertex), nullptr);
 	// vertex normals
-	mVAO->setAttribute(1, 3, GL_FLOAT, false, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, normal)));
+	mVAO->setAttribute(1, 3, GL_FLOAT, false, sizeof(Vertex), PTR(normal));
 	// vertex texture coords
-	mVAO->setAttribute(2, 2, GL_FLOAT, false, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, texcoord)));
+	mVAO->setAttribute(2, 2, GL_FLOAT, false, sizeof(Vertex), PTR(texcoord));
 	// vertex tangent
-	mVAO->setAttribute(3, 3, GL_FLOAT, false, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, tangent)));
+	mVAO->setAttribute(3, 3, GL_FLOAT, false, sizeof(Vertex), PTR(tangent));
 	// vertex bitangent
-	mVAO->setAttribute(4, 3, GL_FLOAT, false, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, bitangent)));
+	mVAO->setAttribute(4, 3, GL_FLOAT, false, sizeof(Vertex), PTR(bitangent));
 	// ids
-	mVAO->setAttribute(5, 4, GL_INT, false, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, boneIDs)));
+	mVAO->setAttribute(5, 4, GL_INT, false, sizeof(Vertex), PTR(boneIDs));
 	// weights
-	mVAO->setAttribute(6, 4, GL_FLOAT, false, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, weights)));
+	mVAO->setAttribute(6, 4, GL_FLOAT, false, sizeof(Vertex), PTR(weights));
 
 	mVAO->unbind();
 }
