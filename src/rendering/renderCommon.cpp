@@ -39,13 +39,13 @@ void RenderCommon::forward(const std::vector<RenderableObject>& objects) {
 }
 
 void RenderCommon::instanced(const std::vector<InstanceGroup>& objects) {
-	for (const auto& [entity, transforms, matb]: objects) {
+	for (const auto& [entity, transforms, matBatch]: objects) {
 		const size_t count = transforms->size() / 9;
 
-		const auto& [material, shader, meshes] = matb;
-		for (const auto& mesh: *meshes) {
-			shader->activate();
+		const auto& [material, shader, meshes] = matBatch;
+		shader->activate();
 
+		for (const auto& mesh: *meshes) {
 			setupMaterial(entity, *material, *shader);
 			bindTextures(material->textures, *shader);
 
