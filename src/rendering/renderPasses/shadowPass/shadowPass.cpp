@@ -42,7 +42,7 @@ void ShadowPass::configure(const RenderContext& ctx) {
 	mImpl->omnidirShadowPass = std::make_unique<OmnidirectionalShadowPass>(ctx);
 	mImpl->perspectiveShadowPass = std::make_unique<PerspectiveShadowPass>(ctx);
 
-	mUBO = std::make_unique<UniformBuffer>(sizeof(ShadowData), ctx.shadow.ubo.binding);
+	mUBO = std::make_unique<UniformBuffer>(DYNAMIC, sizeof(ShadowData), ctx.shadow.ubo.binding);
 
 	mShadowMaps = {
 		mImpl->dirShadowPass->depthTexture(),

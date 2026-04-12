@@ -114,6 +114,7 @@ void RenderPipeline::configure(const Camera& camera) {
 
 	// Create camera buffer
 	mCameraUBO = std::make_unique<UniformBuffer>(
+		DYNAMIC,
 		3 * sizeof(glm::mat4) + sizeof(glm::vec4),
 		mRenderCtx->camera.ubo.binding);
 	// Create render passes

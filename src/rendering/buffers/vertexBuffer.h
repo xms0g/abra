@@ -1,7 +1,7 @@
 #pragma once
-#include "glad/glad.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "buffer.hpp"
 
 #define PTR(a) reinterpret_cast<void*>(offsetof(Vertex, a))
 
@@ -23,42 +23,17 @@ struct Vertex {
 	float weights[MAX_BONE_INFLUENCE];
 };
 
-enum BufferUsage {
-	STATIC = GL_STATIC_DRAW,
-	DYNAMIC = GL_DYNAMIC_DRAW,
-	STREAM = GL_STREAM_DRAW
-};
-
-class VertexBuffer {
+class VertexBuffer : public Buffer {
 public:
 	explicit VertexBuffer(BufferUsage usage);
 
-	~VertexBuffer();
-
-	void bind() const;
-
-	void unbind() const;
-
 	void setData(const void* data, uint32_t size, uint32_t offset) const;
-
-private:
-	uint32_t mVBO{0};
-	BufferUsage mUsage{STATIC};
 };
 
-class IndexBuffer {
+class IndexBuffer : public Buffer {
 public:
 	explicit IndexBuffer(BufferUsage usage);
 
-	~IndexBuffer();
-
-	void bind() const;
-
-	void unbind() const;
-
 	void setData(const void* data, uint32_t size) const;
 
-private:
-	uint32_t mIBO{0};
-	BufferUsage mUsage{STATIC};
 };

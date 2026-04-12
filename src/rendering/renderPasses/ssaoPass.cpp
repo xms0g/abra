@@ -51,7 +51,7 @@ void SSAOPass::configure(const RenderContext& ctx) {
 
 	uint32_t uboSize = ctx.ssao.kernelSize * sizeof(glm::vec4);
 
-	mUBO = std::make_unique<UniformBuffer>(uboSize, ctx.ssao.ubo.binding);
+	mUBO = std::make_unique<UniformBuffer>(DYNAMIC, uboSize, ctx.ssao.ubo.binding);
 	mUBO->bind();
 	mUBO->setData(mKernel.data(), uboSize, 0);
 	mUBO->unbind();

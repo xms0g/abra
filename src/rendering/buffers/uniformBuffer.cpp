@@ -1,28 +1,15 @@
 #include "uniformBuffer.h"
-#include "glad/glad.h"
 
-UniformBuffer::UniformBuffer(const int32_t size, const uint32_t binding) {
-	glGenBuffers(1, &mUBO);
-	glBindBuffer(GL_UNIFORM_BUFFER, mUBO);
-	glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	glBindBufferRange(GL_UNIFORM_BUFFER, binding, mUBO, 0, size);
-}
-
-UniformBuffer::~UniformBuffer() {
-	glDeleteBuffers(1, &mUBO);
-}
-
-void UniformBuffer::bind() const {
-	glBindBuffer(GL_UNIFORM_BUFFER, mUBO);
-}
-
-void UniformBuffer::unbind() const {
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+UniformBuffer::UniformBuffer(const BufferUsage usage, const int32_t size, const uint32_t binding)
+	: Buffer(GL_UNIFORM_BUFFER, usage) {
+	bind();
+	glBufferData(mTarget, size, nullptr, usage);
+	unbind();
+	glBindBufferRange(mTarget, binding, mID, 0, size);
 }
 
 void UniformBuffer::setData(const void* data, const size_t size, const size_t offset) const {
-	glBufferSubData(GL_UNIFORM_BUFFER, static_cast<long>(offset), static_cast<long>(size), data);
+	glBufferSubData(mTarget, static_cast<long>(offset), static_cast<long>(size), data);
 }
 
 void UniformBuffer::configure(
