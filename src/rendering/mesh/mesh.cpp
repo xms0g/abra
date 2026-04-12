@@ -60,12 +60,10 @@ void Mesh::unbind() const {
 }
 
 void Mesh::enableInstanceAttributes(
-	const VertexBuffer& instanceVBO,
 	const int32_t stride,
 	const size_t offset,
 	const size_t modelMatrixOffset,
 	const size_t normalMatrixOffset) const {
-	instanceVBO.bind();
 	// --- Model Matrix (Attribute Locations 7, 8, 9, 10) ---
 	// A mat4 takes 4 slots. Each slot is a vec4.
 	for (uint32_t i = 0; i < 4; ++i) {
@@ -83,7 +81,6 @@ void Mesh::enableInstanceAttributes(
 		                   reinterpret_cast<void*>(offset + normalMatrixOffset + sizeof(glm::vec3) * i));
 		glVertexAttribDivisor(attribIndex, 1);
 	}
-	instanceVBO.unbind();
 }
 
 void Mesh::uploadToGPU() {

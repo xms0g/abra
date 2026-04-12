@@ -50,7 +50,6 @@ void InstancedPass::prepareInstanceBuffer(const T& groups, std::unique_ptr<Verte
 		for (auto& mesh : *matb.meshes) {
 			mesh.bind();
 			mesh.enableInstanceAttributes(
-				*vbo,
 				sizeof(InstanceData),
 				currentOffset,
 				offsetof(InstanceData, modelMatrix),

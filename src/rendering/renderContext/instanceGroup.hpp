@@ -4,7 +4,7 @@
 #include "../material/material.hpp"
 
 struct InstanceGroup {
-	EntityData eData;
+	EntityCore entity;
 	const std::vector<float>* transforms{}; // ptr to P,R,S data
-	MaterialBatch matb;
+	MaterialBatch matBatch;
 };

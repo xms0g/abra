@@ -62,7 +62,7 @@ void RenderCommon::instanced(const std::vector<InstanceGroup>& objects) {
 	}
 }
 
-void RenderCommon::setupTransform(const EntityData& entity, const Shader& shader) {
+void RenderCommon::setupTransform(const EntityCore& entity, const Shader& shader) {
 	const glm::mat4 model = math::modelMatrix(
 		entity.transform->position,
 		entity.transform->rotation,
@@ -73,7 +73,7 @@ void RenderCommon::setupTransform(const EntityData& entity, const Shader& shader
 	shader.setMat3("normalMatrix", normal);
 }
 
-void RenderCommon::setupMaterial(const EntityData& entity, const Material& material, const Shader& shader) {
+void RenderCommon::setupMaterial(const EntityCore& entity, const Material& material, const Shader& shader) {
 	shader.setFloat("material.heightScale", entity.material->heightScale);
 	shader.setFloat("material.alphaCutoff", material.alphaCutoff);
 

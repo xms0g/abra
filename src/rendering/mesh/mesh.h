@@ -29,7 +29,6 @@ public:
 	void unbind() const;
 
 	void enableInstanceAttributes(
-		const VertexBuffer& instanceVBO,
 		int32_t stride,
 		size_t offset,
 		size_t modelMatrixOffset,

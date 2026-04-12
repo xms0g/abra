@@ -9,7 +9,7 @@ class BoundingVolume;
 struct MaterialComponent;
 struct TransformComponent;
 
-struct EntityData {
+struct EntityCore {
 	const DebugComponent* debug{};
 	const TransformComponent* transform{};
 	const MaterialComponent* material{};
