@@ -39,7 +39,7 @@ public:
 
 	void unbind() const;
 
-	void setData(const void* data, uint32_t size) const;
+	void setData(const void* data, uint32_t size, uint32_t offset) const;
 
 private:
 	uint32_t mVBO{0};

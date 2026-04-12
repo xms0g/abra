@@ -12,13 +12,13 @@ InstancedPass::~InstancedPass() = default;
 
 void InstancedPass::configure(const RenderContext& ctx) {
 	if (!ctx.renderQueue->opaqueInstancedGroups.empty()) {
-		InstanceBufferBuilder::prepareInstanceBuffer(ctx.renderQueue->opaqueInstancedGroups, mOpaqueVBO);
-		InstanceBufferBuilder::uploadInstanceData(ctx.renderQueue->opaqueInstancedGroups, mOpaqueVBO);
+		prepareInstanceBuffer(ctx.renderQueue->opaqueInstancedGroups, mOpaqueVBO);
+		uploadInstanceData(ctx.renderQueue->opaqueInstancedGroups, *mOpaqueVBO);
 	}
 
 	if (!ctx.renderQueue->blendInstancedGroups.empty()) {
-		InstanceBufferBuilder::prepareInstanceBuffer(ctx.renderQueue->blendInstancedGroups, mBlendVBO);
-		InstanceBufferBuilder::uploadInstanceData(ctx.renderQueue->blendInstancedGroups, mBlendVBO);
+		prepareInstanceBuffer(ctx.renderQueue->blendInstancedGroups, mBlendVBO);
+		uploadInstanceData(ctx.renderQueue->blendInstancedGroups, *mBlendVBO);
 	}
 }
 
@@ -40,5 +40,4 @@ void InstancedPass::execute(const RenderContext& ctx) {
 
 	RenderCommon::instanced(ctx.renderQueue->opaqueInstancedGroups);
 	ctx.sceneBuffer->unbind();
-
 }

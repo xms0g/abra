@@ -28,7 +28,12 @@ public:
 
 	void unbind() const;
 
-	void enableInstanceAttributes(uint32_t instanceVBO, size_t offset) const;
+	void enableInstanceAttributes(
+		const VertexBuffer& instanceVBO,
+		int32_t stride,
+		size_t offset,
+		size_t modelMatrixOffset,
+		size_t normalMatrixOffset) const;
 
 	void uploadToGPU();
 

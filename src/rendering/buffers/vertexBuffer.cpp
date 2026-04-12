@@ -1,6 +1,6 @@
 #include "vertexBuffer.h"
 
-VertexBuffer::VertexBuffer(const BufferUsage usage): mUsage(usage) {
+VertexBuffer::VertexBuffer(const BufferUsage usage) : mUsage(usage) {
 	glGenBuffers(1, &mVBO);
 }
 
@@ -16,11 +16,24 @@ void VertexBuffer::unbind() const {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void VertexBuffer::setData(const void* data, const uint32_t size) const {
-	glBufferData(GL_ARRAY_BUFFER, size, data, mUsage);
+void VertexBuffer::setData(const void* data, const uint32_t size, const uint32_t offset) const {
+	switch (mUsage) {
+		case STATIC:
+			glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+			break;
+		case DYNAMIC: {
+			if (data == nullptr) {
+				glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+				return;
+			}
+			glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
+			break;
+		}
+		default: break;
+	}
 }
 
-IndexBuffer::IndexBuffer(const BufferUsage usage): mUsage(usage) {
+IndexBuffer::IndexBuffer(const BufferUsage usage) : mUsage(usage) {
 	glGenBuffers(1, &mIBO);
 }
 

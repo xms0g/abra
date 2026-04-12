@@ -1,6 +1,5 @@
 #include "mesh.h"
 #include "glad/glad.h"
-#include "../instanceBufferBuilder.hpp"
 
 Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
 	: mVertices(std::move(vertices)),
@@ -60,24 +59,31 @@ void Mesh::unbind() const {
 	mVAO->unbind();
 }
 
-void Mesh::enableInstanceAttributes(const uint32_t instanceVBO, const size_t offset) const {
-	mVAO->bind();
-	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-	// Model matrix attributes (7–10)
+void Mesh::enableInstanceAttributes(
+	const VertexBuffer& instanceVBO,
+	const int32_t stride,
+	const size_t offset,
+	const size_t modelMatrixOffset,
+	const size_t normalMatrixOffset) const {
+	instanceVBO.bind();
+	// --- Model Matrix (Attribute Locations 7, 8, 9, 10) ---
+	// A mat4 takes 4 slots. Each slot is a vec4.
 	for (uint32_t i = 0; i < 4; ++i) {
-		glEnableVertexAttribArray(7 + i);
-		glVertexAttribPointer(7 + i, 4, GL_FLOAT, GL_FALSE, sizeof(InstanceData),
-		                      reinterpret_cast<void*>(offset + sizeof(glm::vec4) * i));
-		glVertexAttribDivisor(7 + i, 1);
+		const uint32_t attribIndex = 7 + i;
+		mVAO->setAttribute(attribIndex, 4, GL_FLOAT, false, stride,
+		                   reinterpret_cast<void*>(offset + modelMatrixOffset + sizeof(glm::vec4) * i));
+		glVertexAttribDivisor(attribIndex, 1);
 	}
 
-	// Normal matrix attributes (11–13)
+	// --- Normal Matrix (Attribute Locations 11, 12, 13) ---
+	// A mat3 takes 3 slots. Each slot is a vec3.
 	for (uint32_t i = 0; i < 3; ++i) {
-		glEnableVertexAttribArray(11 + i);
-		glVertexAttribPointer(11 + i, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData),
-		                      reinterpret_cast<void*>(offset + sizeof(glm::mat4) + sizeof(glm::vec3) * i));
-		glVertexAttribDivisor(11 + i, 1);
+		const uint32_t attribIndex = 11 + i;
+		mVAO->setAttribute(attribIndex, 3, GL_FLOAT, false, stride,
+		                   reinterpret_cast<void*>(offset + normalMatrixOffset + sizeof(glm::vec3) * i));
+		glVertexAttribDivisor(attribIndex, 1);
 	}
+	instanceVBO.unbind();
 }
 
 void Mesh::uploadToGPU() {
@@ -90,7 +96,7 @@ void Mesh::uploadToGPU() {
 	mIBO = std::make_unique<IndexBuffer>(STATIC);
 	// bind the buffer to be used
 	mVBO->bind();
-	mVBO->setData(mVertices.data(), static_cast<uint32_t>(mVertices.size() * sizeof(Vertex)));
+	mVBO->setData(mVertices.data(), static_cast<uint32_t>(mVertices.size() * sizeof(Vertex)), 0);
 
 	mIBO->bind();
 	mIBO->setData(mIndices.data(), static_cast<uint32_t>(mIndices.size() * sizeof(uint32_t)));
