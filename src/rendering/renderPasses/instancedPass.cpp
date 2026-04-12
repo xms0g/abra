@@ -1,12 +1,22 @@
 #include "instancedPass.h"
 #include "glad/glad.h"
 #include "../buffers/frameBuffer.h"
+#include "../buffers/vertexBuffer.h"
 #include "../renderCommon.h"
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/instanceGroup.hpp"
 #include "../renderContext/renderQueue.hpp"
 #include "../material/material.hpp"
 #include "../mesh/mesh.h"
+#include "../../math/matrix.h"
+
+struct InstanceData {
+	glm::mat4 modelMatrix;
+	glm::mat3 normalMatrix;
+	float padding[3];
+};
+
+InstancedPass::InstancedPass() = default;
 
 InstancedPass::~InstancedPass() = default;
 
