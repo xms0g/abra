@@ -14,6 +14,28 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
 	}
 }
 
+Mesh::Mesh(Mesh&& other) noexcept {
+	mVertices = std::move(other.mVertices);
+	mIndices = std::move(other.mIndices);
+	mMin = std::move(other.mMin);
+	mMax = std::move(other.mMax);
+	mVAO = std::move(other.mVAO);
+	mIBO = std::move(other.mIBO);
+	mVBO = std::move(other.mVBO);
+}
+
+Mesh& Mesh::operator=(Mesh&& other) noexcept {
+	if (this != &other) {
+		mVertices = std::move(other.mVertices);
+		mIndices = std::move(other.mIndices);
+		mMin = std::move(other.mMin);
+		mVAO = std::move(other.mVAO);
+		mIBO = std::move(other.mIBO);
+		mVBO = std::move(other.mVBO);
+	}
+	return *this;
+}
+
 const std::vector<Vertex>& Mesh::vertices() const {
 	return mVertices;
 }
@@ -61,11 +83,11 @@ void Mesh::enableInstanceAttributes(const uint32_t instanceVBO, const size_t off
 void Mesh::uploadToGPU() {
 	// now that we have all the required data, set the vertex buffers and its attribute pointers.
 	// create vao
-	mVAO = std::make_shared<VertexArray>();
+	mVAO = std::make_unique<VertexArray>();
 	mVAO->bind();
 
-	mVBO = std::make_shared<VertexBuffer>(STATIC);
-	mIBO = std::make_shared<IndexBuffer>();
+	mVBO = std::make_unique<VertexBuffer>(STATIC);
+	mIBO = std::make_unique<IndexBuffer>(STATIC);
 	// bind the buffer to be used
 	mVBO->bind();
 	mVBO->setData(mVertices.data(), static_cast<uint32_t>(mVertices.size() * sizeof(Vertex)));

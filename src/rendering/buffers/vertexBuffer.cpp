@@ -9,14 +9,6 @@ VertexBuffer::~VertexBuffer() {
 	glDeleteBuffers(1, &mVBO);
 }
 
-uint32_t VertexBuffer::offset() const {
-	return mOffset;
-}
-
-void VertexBuffer::offset(const uint32_t offset) {
-	mOffset = offset;
-}
-
 void VertexBuffer::bind() const {
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO);
 }
@@ -29,7 +21,7 @@ void VertexBuffer::setData(const void* data, const uint32_t size) const {
 	glBufferData(GL_ARRAY_BUFFER, size, data, mUsage);
 }
 
-IndexBuffer::IndexBuffer() {
+IndexBuffer::IndexBuffer(const BufferUsage usage): mUsage(usage) {
 	glGenBuffers(1, &mIBO);
 }
 

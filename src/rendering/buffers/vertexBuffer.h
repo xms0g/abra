@@ -29,13 +29,9 @@ enum BufferUsage {
 
 class VertexBuffer {
 public:
-	VertexBuffer(BufferUsage usage);
+	explicit VertexBuffer(BufferUsage usage);
 
 	~VertexBuffer();
-
-	[[nodiscard]] uint32_t offset() const;
-
-	void offset(uint32_t offset);
 
 	void bind() const;
 
@@ -45,13 +41,12 @@ public:
 
 private:
 	uint32_t mVBO{0};
-	uint32_t mOffset{0};
 	BufferUsage mUsage{STATIC};
 };
 
 class IndexBuffer {
 public:
-	IndexBuffer();
+	explicit IndexBuffer(BufferUsage usage);
 
 	~IndexBuffer();
 
@@ -63,4 +58,5 @@ public:
 
 private:
 	uint32_t mIBO{0};
+	BufferUsage mUsage{STATIC};
 };

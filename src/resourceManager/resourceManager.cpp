@@ -84,7 +84,7 @@ void ResourceManager::loadModel(const size_t entityID, const char* file) {
 
 	{
 		std::lock_guard<std::mutex> lock(mResourceMutex);
-		mMeshesByEntity.emplace(entityID, meshesByMatID);
+		mMeshesByEntity.emplace(entityID, std::move(meshesByMatID));
 		mMaterialsByEntity.emplace(entityID, mlCtx.materials);
 	}
 }
@@ -99,9 +99,9 @@ void ResourceManager::processMeshes(
 		// the node object only contains mIndices to index the actual objects in the scene.
 		// the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
 		aiMesh* aMesh = scene->mMeshes[node->mMeshes[i]];
-		const Mesh mesh = processMesh(aMesh);
+		Mesh mesh = processMesh(aMesh);
 
-		meshesByMatID[aMesh->mMaterialIndex].push_back(mesh);
+		meshesByMatID[aMesh->mMaterialIndex].emplace_back(std::move(mesh));
 		materialLoadCtx.materialsToLoad.push_back(aMesh->mMaterialIndex);
 	}
 
@@ -169,7 +169,7 @@ Mesh ResourceManager::processMesh(aiMesh* mesh) const {
 	}
 
 	// return a mesh object created from the extracted mesh data
-	return Mesh{vertices, indices};
+	return {vertices, indices};
 }
 
 void ResourceManager::processMaterials(const aiScene* scene, MaterialLoadContext& materialLoadCtx) const {
