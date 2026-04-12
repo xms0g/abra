@@ -5,7 +5,7 @@
 struct InstanceGroup;
 struct RenderableObject;
 struct RenderContext;
-struct EntityData;
+struct EntityCore;
 struct Material;
 struct Texture;
 class Mesh;
@@ -17,9 +17,9 @@ void forward(const std::vector<RenderableObject>& objects);
 
 void instanced(const std::vector<InstanceGroup>& objects);
 
-void setupTransform(const EntityData& entity, const Shader& shader);
+void setupTransform(const EntityCore& entity, const Shader& shader);
 
-void setupMaterial(const EntityData& entity, const Material& material, const Shader& shader);
+void setupMaterial(const EntityCore& entity, const Material& material, const Shader& shader);
 
 void drawMesh(const Mesh& mesh);
 

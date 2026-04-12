@@ -3,6 +3,6 @@
 #include "../material/material.hpp"
 
 struct RenderGroup {
-	EntityData eData;
-	MaterialBatch matb;
+	EntityCore entity;
+	MaterialBatch matBatch;
 };

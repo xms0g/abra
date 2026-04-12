@@ -314,8 +314,8 @@ void RenderPipeline::refreshCameraData() const {
 }
 
 void RenderPipeline::batchEntity(const Entity& entity) {
-	const auto& matc = entity.getComponent<MaterialComponent>();
-	const EntityData eData{
+	const auto& matComponent = entity.getComponent<MaterialComponent>();
+	const EntityCore entityCore{
 		&entity.getComponent<DebugComponent>(),
 		&entity.getComponent<TransformComponent>(),
 		&entity.getComponent<MaterialComponent>(),
@@ -323,28 +323,28 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 	};
 
 	if (entity.hasComponent<SkyboxComponent>()) {
-		const auto& material = matc.materials->at(0);
+		const auto& material = matComponent.materials->at(0);
 		auto& meshes = entity.getComponent<MeshComponent>().meshes->at(0);
-		const MaterialBatch matb{&material, skybox.get(), &meshes};
-		const RenderGroup group{eData, matb};
+		const MaterialBatch matBatch{&material, skybox.get(), &meshes};
+		const RenderGroup group{entityCore, matBatch};
 		mRenderQueue.skybox.push_back(group);
 		return;
 	}
 
 	for (auto& [matID, meshes]: *entity.getComponent<MeshComponent>().meshes) {
-		const auto& material = matc.materials->at(matID);
-		MaterialBatch matb{&material, nullptr, &meshes};
+		const auto& material = matComponent.materials->at(matID);
+		MaterialBatch matBatch{&material, nullptr, &meshes};
 
-		if (matc.renderFlag & INSTANCED_PASS) {
+		if (matComponent.renderFlag & INSTANCED_PASS) {
 			// Set shader
 			if (material.flag & OPAQUE) {
-				matb.shader = instancedOpaque.get();
+				matBatch.shader = instancedOpaque.get();
 			} else if (material.flag & BLEND) {
-				matb.shader = instancedBlend.get();
+				matBatch.shader = instancedBlend.get();
 			}
 
-			const auto& ic = entity.getComponent<InstanceComponent>();
-			InstanceGroup instance{eData, ic.transforms, matb};
+			const auto& instComponent = entity.getComponent<InstanceComponent>();
+			InstanceGroup instance{entityCore, instComponent.transforms, matBatch};
 
 			if (material.flag & OPAQUE) {
 				mRenderQueue.opaqueInstancedGroups.push_back(instance);
@@ -357,15 +357,15 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		// Set shader
 		if (material.flag & OPAQUE) {
 			if (material.flag & UNLIT) {
-				matb.shader = unlit.get();
+				matBatch.shader = unlit.get();
 			} else {
-				matb.shader = opaque.get();
+				matBatch.shader = opaque.get();
 			}
 		} else if (material.flag & BLEND) {
-			matb.shader = blend.get();
+			matBatch.shader = blend.get();
 		}
 
-		const RenderGroup group{eData, matb};
+		const RenderGroup group{entityCore, matBatch};
 
 		if (entity.hasComponent<DebugComponent>()) {
 			mRenderQueue.debugGroups.push_back(group);
@@ -393,8 +393,8 @@ void RenderPipeline::sortEntities() {
 			batch.begin(),
 			batch.end(),
 			[&camPos, &transparent](const RenderGroup& a, const RenderGroup& b) {
-				const float da = glm::length2(camPos - a.eData.transform->position);
-				const float db = glm::length2(camPos - b.eData.transform->position);
+				const float da = glm::length2(camPos - a.entity.transform->position);
+				const float db = glm::length2(camPos - b.entity.transform->position);
 
 				if (transparent)
 					return da > db;
