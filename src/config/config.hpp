@@ -58,7 +58,7 @@ constexpr float SSAO_RADIUS{0.5f};
 constexpr float SSAO_BIAS{0.025f};
 constexpr float SSAO_INTENSITY{3.0f};
 constexpr uint32_t SSAO_UBO_BINDING{3};
-constexpr int32_t SSAO_TEXTURE_SLOT{5};
+constexpr int32_t SSAO_TEXTURE_SLOT{4};
 constexpr auto SSAO_UBO_BLOCK_NAME = "SSAOBlock";
 // PBR
 constexpr uint32_t PBR_ENVMAP_SIZE{512};
@@ -85,7 +85,6 @@ constexpr int32_t G_POSITION_TEXTURE_IDX{0};
 constexpr int32_t G_NORMAL_TEXTURE_IDX{1};
 constexpr int32_t G_ALBEDO_TEXTURE_IDX{2};
 constexpr int32_t G_ORM_TEXTURE_IDX{3};
-constexpr int32_t G_EMISSIVE_TEXTURE_IDX{4};
-constexpr int32_t G_DEPTH_TEXTURE_IDX{5};
+constexpr int32_t G_DEPTH_TEXTURE_IDX{4};
 
 

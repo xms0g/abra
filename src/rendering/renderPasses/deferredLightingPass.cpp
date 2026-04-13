@@ -24,7 +24,6 @@ void DeferredLightingPass::configure(const RenderContext& ctx) {
 	mShader->setInt("gNormal", 1);
 	mShader->setInt("gAlbedo", 2);
 	mShader->setInt("gORM", 3);
-	mShader->setInt("gEmissive", 4);
 	mShader->setInt("ssao", ctx.ssao.textureSlot);
 	mShader->setInt("shadowMap", ctx.shadow.textureSlot);
 	mShader->setInt("shadowCubemap", ctx.shadow.textureSlot + 1);
@@ -77,7 +76,6 @@ void DeferredLightingPass::execute(const RenderContext& ctx) {
 	ctx.gBuffer.self->bindTexture(1, ctx.gBuffer.normalTextureIdx);
 	ctx.gBuffer.self->bindTexture(2, ctx.gBuffer.albedoTextureIdx);
 	ctx.gBuffer.self->bindTexture(3, ctx.gBuffer.ormTextureIdx);
-	ctx.gBuffer.self->bindTexture(4, ctx.gBuffer.emissiveTextureIdx);
 
 	ctx.ssao.buffer->bindTexture(ctx.ssao.textureSlot);
 	mIrradianceMapBuffer->bindTexture(ctx.PBR.irradianceMap.textureSlot);

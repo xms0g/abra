@@ -11,11 +11,10 @@ in VS_OUT
 #include "common/normalMap.glsl"
 #include "common/parallaxMap.glsl"
 
-layout (location = 0) out vec3 gPosition;
-layout (location = 1) out vec3 gNormal;
-layout (location = 2) out vec3 gAlbedo;
+layout (location = 0) out vec4 gPosition;
+layout (location = 1) out vec4 gNormal;
+layout (location = 2) out vec4 gAlbedo;
 layout (location = 3) out vec3 gORM;
-layout (location = 4) out vec3 gEmissive;
 
 void main() {
     vec2 texCoord = parallaxMapping(fs_in.TexCoord, fs_in.TangentViewDir, material.heightScale, material.hasHeightMap);
@@ -26,11 +25,11 @@ void main() {
     }
 
     // store the fragment position vector in the first gbuffer texture
-    gPosition = fs_in.WorldPos;
+    gPosition.rgb = fs_in.WorldPos;
     // also store the per-fragment normals into the gbuffer
-    gNormal = normal(fs_in.TBN, texCoord, true);
+    gNormal.rgb = normal(fs_in.TBN, texCoord, true);
     // and the diffuse per-fragment color
-    gAlbedo = pow(albedoSample.rgb, vec3(2.2));
+    gAlbedo.rgb = pow(albedoSample.rgb, vec3(2.2));
     // Occulusion - Roughness - Metallic
     vec3 orm = texture(material.texture_roughnessMetallic, texCoord).rgb;
     float ao = 1.0;
@@ -39,13 +38,14 @@ void main() {
     } else if (material.hasAOMap) {
         ao = texture(material.texture_ao, texCoord).r;
     }
-    gORM.r = ao;
-    gORM.g = orm.g;
-    gORM.b = orm.b;
+    gORM = vec3(ao, orm.g, orm.b);
     // Emissive
     vec3 emissive = vec3(0.0);
     if (material.hasEmissiveMap) {
         emissive = pow(texture(material.texture_emissive, texCoord).rgb, vec3(2.2));
     }
-    gEmissive = emissive;
+
+    gPosition.a = emissive.r;
+    gNormal.a = emissive.g;
+    gAlbedo.a = emissive.b;
 }

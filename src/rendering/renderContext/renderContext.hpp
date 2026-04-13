@@ -27,7 +27,6 @@ struct RenderContext {
 		int32_t normalTextureIdx;
 		int32_t albedoTextureIdx;
 		int32_t ormTextureIdx;
-		int32_t emissiveTextureIdx;
 		int32_t depthTextureIdx;
 	} gBuffer;
 

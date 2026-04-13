@@ -26,7 +26,7 @@ void DeferredGeometryPass::configure(const RenderContext& ctx) {
 #else
 			.withTexture(GL_RGBA)		// albedo
 			.withTexture(GL_RGBA)		// orm
-			.withTexture(GL_RGBA)		// emissive
+			// Emissive placed into alpha channels in position, normal, albedo
 #endif
 			.configureAttachments()
 			.withTextureDepth(GL_DEPTH_COMPONENT24, false)
