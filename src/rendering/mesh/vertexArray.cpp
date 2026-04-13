@@ -3,15 +3,15 @@
 #include "glm/glm.hpp"
 
 VertexArray::VertexArray() {
-	glGenVertexArrays(1, &mVAO);
+	glGenVertexArrays(1, &mID);
 }
 
 VertexArray::~VertexArray() {
-	glDeleteVertexArrays(1, &mVAO);
+	glDeleteVertexArrays(1, &mID);
 }
 
 void VertexArray::bind() const {
-	glBindVertexArray(mVAO);
+	glBindVertexArray(mID);
 }
 
 void VertexArray::unbind() const {
