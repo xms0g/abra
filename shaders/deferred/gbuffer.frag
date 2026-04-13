@@ -45,7 +45,7 @@ void main() {
         emissive = pow(texture(material.texture_emissive, texCoord).rgb, vec3(2.2));
     }
 
-    gPosition.a = emissive.r;
-    gNormal.a = emissive.g;
+    gPosition.w = emissive.r;
+    gNormal.w = emissive.g;
     gAlbedo.a = emissive.b;
 }
