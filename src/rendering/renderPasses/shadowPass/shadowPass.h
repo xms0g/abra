@@ -3,6 +3,9 @@
 #include <memory>
 #include "../IRenderPass.hpp"
 
+class DirectionalShadowPass;
+class OmnidirectionalShadowPass;
+class PerspectiveShadowPass;
 struct RenderContext;
 class UniformBuffer;
 
@@ -29,7 +32,7 @@ private:
 
 	std::array<uint32_t, 3> mShadowMaps{};
 	std::unique_ptr<UniformBuffer> mUBO;
-
-	struct ShadowPassImpl;
-	std::unique_ptr<ShadowPassImpl> mImpl;
+	std::unique_ptr<DirectionalShadowPass> dirShadowPass;
+	std::unique_ptr<OmnidirectionalShadowPass> omnidirShadowPass;
+	std::unique_ptr<PerspectiveShadowPass> persShadowPass;
 };
