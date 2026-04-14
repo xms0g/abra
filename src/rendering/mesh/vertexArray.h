@@ -20,5 +20,5 @@ public:
 		const void* offset);
 
 private:
-	uint32_t mID;
+	uint32_t mID{};
 };

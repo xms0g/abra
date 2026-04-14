@@ -16,8 +16,8 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
 Mesh::Mesh(Mesh&& other) noexcept {
 	mVertices = std::move(other.mVertices);
 	mIndices = std::move(other.mIndices);
-	mMin = std::move(other.mMin);
-	mMax = std::move(other.mMax);
+	mMin = other.mMin;
+	mMax = other.mMax;
 	mVAO = std::move(other.mVAO);
 	mIBO = std::move(other.mIBO);
 	mVBO = std::move(other.mVBO);
@@ -27,7 +27,8 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept {
 	if (this != &other) {
 		mVertices = std::move(other.mVertices);
 		mIndices = std::move(other.mIndices);
-		mMin = std::move(other.mMin);
+		mMin = other.mMin;
+		mMax = other.mMax;
 		mVAO = std::move(other.mVAO);
 		mIBO = std::move(other.mIBO);
 		mVBO = std::move(other.mVBO);
