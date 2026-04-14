@@ -34,7 +34,7 @@ FrameBuffer& OmnidirectionalShadowPass::depthMap() const {
 void OmnidirectionalShadowPass::render(
 	const RenderContext& ctx,
 	const glm::vec4& position,
-	const uint32_t layer) const {
+	const int32_t layer) const {
 	const glm::mat4 shadowProj = glm::perspective(
 		glm::radians(ctx.shadow.omnidirectional.fovy),
 		static_cast<float>(ctx.shadow.width) / static_cast<float>(ctx.shadow.height),
@@ -48,8 +48,9 @@ void OmnidirectionalShadowPass::render(
 	}
 
 	mDepthShader->activate();
-	for (unsigned int i = 0; i < 6; ++i)
+	for (uint32_t i = 0; i < 6; ++i) {
 		mDepthShader->setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
+	}
 
 	mDepthShader->setFloat("omniFarPlane", ctx.shadow.omnidirectional.farPlane);
 	mDepthShader->setVec3("lightPos", position);

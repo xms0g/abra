@@ -65,12 +65,13 @@ void ShadowPass::omnidirectionalShadowPass(const RenderContext& ctx) const {
 	omnidirShadowPass->depthMap().bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
-	glViewport(0, 0, ctx.shadow.width, ctx.shadow.height);
+	glViewport(0, 0, static_cast<int32_t>(ctx.shadow.width), static_cast<int32_t>(ctx.shadow.height));
 
 	const auto& lights = *ctx.light.pointLights;
-	for (size_t i = 0; i < lights.size(); ++i) {
+	for (int32_t i = 0; i < lights.size(); ++i) {
 		const auto& light = lights[i];
-		if (!light->castShadow) continue;
+		if (!light->castShadow)
+			continue;
 
 		omnidirShadowPass->render(ctx, light->position, i);
 		shadowData.omniFarPlanes[i] = ctx.shadow.omnidirectional.farPlane;
@@ -85,12 +86,13 @@ void ShadowPass::perspectiveShadowPass(const RenderContext& ctx) const {
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
-	glViewport(0, 0, ctx.shadow.width, ctx.shadow.height);
+	glViewport(0, 0, static_cast<int32_t>(ctx.shadow.width), static_cast<int32_t>(ctx.shadow.height));
 
 	const auto& lights = *ctx.light.spotLights;
-	for (size_t i = 0; i < lights.size(); ++i) {
+	for (int32_t i = 0; i < lights.size(); ++i) {
 		const auto& light = lights[i];
-		if (!light->castShadow) continue;
+		if (!light->castShadow)
+			continue;
 
 		glFramebufferTextureLayer(
 			GL_FRAMEBUFFER,
