@@ -33,8 +33,8 @@ struct RenderContext {
 
 	struct {
 		const FrameBuffer* buffer;
-		uint32_t kernelSize;
-		uint32_t noiseTextureSize;
+		int32_t kernelSize;
+		int32_t noiseTextureSize;
 		float radius;
 		float bias;
 		float intensity;
