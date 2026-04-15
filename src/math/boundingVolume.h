@@ -13,24 +13,19 @@ class BoundingVolume {
 public:
 	virtual ~BoundingVolume() = default;
 
-	[[nodiscard]] virtual bool isOnFrustum(
-		const Frustum& camFrustum,
-		const glm::vec3& position,
-		const glm::vec3& rotation,
-		const glm::vec3& scale) const = 0;
+	[[nodiscard]] virtual bool isOnFrustum(const Frustum& camFrustum, const glm::mat4& model) const = 0;
 
 	[[nodiscard]] virtual bool isMeshInFrustum(
 		const Frustum& camFrustum,
 		const glm::vec3& min,
 		const glm::vec3& max,
-		const glm::vec3& position,
-		const glm::vec3& rotation,
-		const glm::vec3& scale) const = 0;
+		const glm::mat4& model) const = 0;
 
 protected:
 	[[nodiscard]] virtual bool isOnOrForwardPlane(const Plane& plane) const = 0;
 };
 
+// Sphere
 class Sphere final : public BoundingVolume {
 public:
 	Sphere() = default;
@@ -40,19 +35,13 @@ public:
 
 	~Sphere() override = default;
 
-	[[nodiscard]] bool isOnFrustum(
-		const Frustum& camFrustum,
-		const glm::vec3& position,
-		const glm::vec3& rotation,
-		const glm::vec3& scale) const override;
+	[[nodiscard]] bool isOnFrustum(const Frustum& camFrustum, const glm::mat4& model) const override;
 
 	[[nodiscard]] bool isMeshInFrustum(
 		const Frustum& camFrustum,
 		const glm::vec3& min,
 		const glm::vec3& max,
-		const glm::vec3& position,
-		const glm::vec3& rotation,
-		const glm::vec3& scale) const override;
+		const glm::mat4& model) const override;
 
 protected:
 	[[nodiscard]] bool isOnOrForwardPlane(const Plane& plane) const override;
@@ -61,6 +50,7 @@ protected:
 	float mRadius{0.f};
 };
 
+// AABB
 class AABB final : public BoundingVolume {
 public:
 	AABB() = default;
@@ -76,19 +66,13 @@ public:
 
 	~AABB() override = default;
 
-	[[nodiscard]] bool isOnFrustum(
-		const Frustum& camFrustum,
-		const glm::vec3& position,
-		const glm::vec3& rotation,
-		const glm::vec3& scale) const override;
+	[[nodiscard]] bool isOnFrustum(const Frustum& camFrustum, const glm::mat4& model) const override;
 
 	[[nodiscard]] bool isMeshInFrustum(
 		const Frustum& camFrustum,
 		const glm::vec3& min,
 		const glm::vec3& max,
-		const glm::vec3& position,
-		const glm::vec3& rotation,
-		const glm::vec3& scale) const override;
+		const glm::mat4& model) const override;
 
 protected:
 	[[nodiscard]] bool isOnOrForwardPlane(const Plane& plane) const override;

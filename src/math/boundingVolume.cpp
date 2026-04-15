@@ -1,15 +1,9 @@
 #include "boundingVolume.h"
 #include <algorithm>
 #include "frustum.h"
-#include "matrix.h"
 #include "../rendering/mesh/mesh.h"
 
-bool math::Sphere::isOnFrustum(
-	const Frustum& camFrustum,
-	const glm::vec3& position,
-	const glm::vec3& rotation,
-	const glm::vec3& scale) const {
-	const glm::mat4 model = modelMatrix(position, rotation, scale);
+bool math::Sphere::isOnFrustum(const Frustum& camFrustum, const glm::mat4& model) const {
 	const glm::vec3 globalScale = {
 		glm::length(model[0]),
 		glm::length(model[1]),
@@ -38,9 +32,7 @@ bool math::Sphere::isMeshInFrustum(
 	const Frustum& camFrustum,
 	const glm::vec3& min,
 	const glm::vec3& max,
-	const glm::vec3& position,
-	const glm::vec3& rotation,
-	const glm::vec3& scale) const {
+	const glm::mat4& model) const {
 	return false;
 }
 
@@ -48,12 +40,7 @@ bool math::Sphere::isOnOrForwardPlane(const Plane& plane) const {
 	return plane.computeSignedDistanceToPlane(mCenter) > -mRadius;
 }
 
-bool math::AABB::isOnFrustum(
-	const Frustum& camFrustum,
-	const glm::vec3& position,
-	const glm::vec3& rotation,
-	const glm::vec3& scale) const {
-	const glm::mat4 model = modelMatrix(position, rotation, scale);
+bool math::AABB::isOnFrustum(const Frustum& camFrustum, const glm::mat4& model) const {
 	const glm::vec3 globalCenter{model * glm::vec4(center, 1.f)};
 	// Scaled orientation
 	const glm::vec3 right = model[0] * extents.x;
@@ -78,11 +65,7 @@ bool math::AABB::isMeshInFrustum(
 	const Frustum& camFrustum,
 	const glm::vec3& min,
 	const glm::vec3& max,
-	const glm::vec3& position,
-	const glm::vec3& rotation,
-	const glm::vec3& scale) const {
-	const glm::mat4 model = modelMatrix(position, rotation, scale);
-
+	const glm::mat4& model) const {
 	// Define local corners
 	const glm::vec3 localCorners[8] = {
 		{min.x, min.y, min.z}, {max.x, min.y, min.z},

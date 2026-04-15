@@ -7,6 +7,7 @@
 #include "../../ECS/registry.h"
 #include "../../ECS/components/transform.hpp"
 #include "../../math/boundingVolume.h"
+#include "../../math/matrix.h"
 
 FrustumCullingPass::~FrustumCullingPass() = default;
 
@@ -18,21 +19,17 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 		outQueue.clear();
 
 		for (const auto& [entity, matBatch]: groups) {
-			if (!entity.bv->isOnFrustum(*ctx.camera.frustum,
-			                            entity.transform->position,
-			                            entity.transform->rotation,
-			                            entity.transform->scale)) {
+			const glm::mat4 model = math::modelMatrix(
+				entity.transform->position,
+				entity.transform->rotation,
+				entity.transform->scale);
+			if (!entity.bv->isOnFrustum(*ctx.camera.frustum, model)) {
 				continue;
 			}
 
 			const auto& [material, shader, meshes] = matBatch;
 			for (const auto& mesh: *meshes) {
-				const bool isVisible = entity.bv->isMeshInFrustum(
-					*ctx.camera.frustum,
-					mesh.min(), mesh.max(),
-					entity.transform->position,
-					entity.transform->rotation,
-					entity.transform->scale);
+				const bool isVisible = entity.bv->isMeshInFrustum(*ctx.camera.frustum, mesh.min(), mesh.max(), model);
 
 				if (isVisible) {
 					outQueue.push_back({&entity, material, shader, &mesh});
