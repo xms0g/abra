@@ -68,7 +68,7 @@ void Mesh::enableInstanceAttributes(const int32_t stride, const size_t offset) c
 
 	for (const auto& [type, index, size, normalized, attrOffset, divisor]: instancingLayout.getAttributes()) {
 		const auto finalPointer = reinterpret_cast<void*>(offset + attrOffset);
-		mVAO->setAttribute(index, size, type, normalized, stride, finalPointer);
+		mVAO->setAttribute(index, size, type, normalized ? GL_TRUE : GL_FALSE, stride, finalPointer);
 		glVertexAttribDivisor(index, divisor);
 	}
 }
