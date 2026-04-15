@@ -60,27 +60,16 @@ void Mesh::unbind() const {
 	mVAO->unbind();
 }
 
-void Mesh::enableInstanceAttributes(
-	const int32_t stride,
-	const size_t offset,
-	const size_t modelMatrixOffset,
-	const size_t normalMatrixOffset) const {
-	// --- Model Matrix (Attribute Locations 7, 8, 9, 10) ---
-	// A mat4 takes 4 slots. Each slot is a vec4.
-	for (uint32_t i = 0; i < 4; ++i) {
-		const uint32_t attribIndex = 7 + i;
-		mVAO->setAttribute(attribIndex, 4, GL_FLOAT, false, stride,
-		                   reinterpret_cast<void*>(offset + modelMatrixOffset + sizeof(glm::vec4) * i));
-		glVertexAttribDivisor(attribIndex, 1);
-	}
+void Mesh::enableInstanceAttributes(const int32_t stride, const size_t offset) const {
+	VertexLayout instancingLayout;
 
-	// --- Normal Matrix (Attribute Locations 11, 12, 13) ---
-	// A mat3 takes 3 slots. Each slot is a vec3.
-	for (uint32_t i = 0; i < 3; ++i) {
-		const uint32_t attribIndex = 11 + i;
-		mVAO->setAttribute(attribIndex, 3, GL_FLOAT, false, stride,
-		                   reinterpret_cast<void*>(offset + normalMatrixOffset + sizeof(glm::vec3) * i));
-		glVertexAttribDivisor(attribIndex, 1);
+	instancingLayout.pushMatrix<glm::mat4>(7, 1); // Model Matrix (slots 7-10)
+	instancingLayout.pushMatrix<glm::mat3>(11, 1); // Normal Matrix (slots 11-13)
+
+	for (const auto& [type, index, size, normalized, attrOffset, divisor]: instancingLayout.getAttributes()) {
+		const auto finalPointer = reinterpret_cast<void*>(offset + attrOffset);
+		mVAO->setAttribute(index, size, type, normalized, stride, finalPointer);
+		glVertexAttribDivisor(index, divisor);
 	}
 }
 
@@ -100,20 +89,19 @@ void Mesh::uploadToGPU() {
 	mIBO->setData(mIndices.data(), static_cast<uint32_t>(mIndices.size() * sizeof(uint32_t)));
 
 	// set the vertex attribute pointers
-	// vertex Positions
-	mVAO->setAttribute(0, 3, GL_FLOAT, false, sizeof(Vertex), nullptr);
-	// vertex normals
-	mVAO->setAttribute(1, 3, GL_FLOAT, false, sizeof(Vertex), PTR(normal));
-	// vertex texture coords
-	mVAO->setAttribute(2, 2, GL_FLOAT, false, sizeof(Vertex), PTR(texcoord));
-	// vertex tangent
-	mVAO->setAttribute(3, 3, GL_FLOAT, false, sizeof(Vertex), PTR(tangent));
-	// vertex bitangent
-	mVAO->setAttribute(4, 3, GL_FLOAT, false, sizeof(Vertex), PTR(bitangent));
-	// ids
-	mVAO->setAttribute(5, 4, GL_INT, false, sizeof(Vertex), PTR(boneIDs));
-	// weights
-	mVAO->setAttribute(6, 4, GL_FLOAT, false, sizeof(Vertex), PTR(weights));
+	VertexLayout layout;
+	layout.push<float>(0, 3); // Position
+	layout.push<float>(1, 3); // Normal
+	layout.push<float>(2, 2); // TexCoords
+	layout.push<float>(3, 3); // Tangent
+	layout.push<float>(4, 3); // Bitangent
+	layout.push<int>(5, 4);	// Bone IDs (Integers!)
+	layout.push<float>(6, 4);	// Bone Weights
+
+	for (const auto& [type, index, size, normalized, offset, divisor]: layout.getAttributes()) {
+		const auto pointer = reinterpret_cast<void*>(offset);
+		mVAO->setAttribute(index, size, type, normalized ? GL_TRUE : GL_FALSE, layout.getStride(), pointer);
+	}
 
 	mVAO->unbind();
 }

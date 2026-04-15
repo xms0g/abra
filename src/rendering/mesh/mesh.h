@@ -28,11 +28,7 @@ public:
 
 	void unbind() const;
 
-	void enableInstanceAttributes(
-		int32_t stride,
-		size_t offset,
-		size_t modelMatrixOffset,
-		size_t normalMatrixOffset) const;
+	void enableInstanceAttributes(int32_t stride, size_t offset) const;
 
 	void uploadToGPU();
 

@@ -27,7 +27,7 @@ public:
 	}
 
 protected:
-	uint32_t mID;
+	uint32_t mID{};
 	uint32_t mTarget;
 	BufferUsage mUsage;
 };
