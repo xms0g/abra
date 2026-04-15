@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 #include "buffer.hpp"
 
 struct Vertex {
@@ -61,36 +60,24 @@ public:
 		static_assert(false, "Type not supported in VertexLayout");
 	}
 
+	template<typename T>
+	void pushMatrix(const uint32_t startIndex, const uint32_t divisor = 1) {
+		static_assert(false, "Type not supported in VertexLayout");
+	}
+
 	// Specialization for Float
 	template<>
-	void push<float>(const uint32_t index, const int32_t size, const bool normalized) {
-		mAttributes.push_back({GL_FLOAT, index, size, normalized, mStride});
-		mStride += size * sizeof(float);
-	}
+	void push<float>(uint32_t index, int32_t size, bool normalized);
 
 	// Specialization for Int (Used for Bone IDs)
 	template<>
-	void push<int>(const uint32_t index, const int32_t size, const bool normalized) {
-		mAttributes.push_back({GL_INT, index, size, normalized, mStride});
-		mStride += size * sizeof(int);
-	}
+	void push<int>(uint32_t index, int32_t size, bool normalized);
 
-	template<typename T>
-	void pushMatrix(const uint32_t startIndex, const uint32_t divisor = 1) {
-		if constexpr (std::is_same_v<T, glm::mat4>) {
-			for (uint32_t i = 0; i < 4; ++i) {
-				// A mat4 is 4 columns of vec4
-				mAttributes.push_back({GL_FLOAT, startIndex + i, 4, false, mStride, divisor});
-				mStride += sizeof(glm::vec4);
-			}
-		} else if constexpr (std::is_same_v<T, glm::mat3>) {
-			for (uint32_t i = 0; i < 3; ++i) {
-				// A mat3 is 3 columns of vec3
-				mAttributes.push_back({GL_FLOAT, startIndex + i, 3, false, mStride, divisor});
-				mStride += sizeof(glm::vec3);
-			}
-		}
-	}
+	template<>
+	void pushMatrix<glm::mat4>(uint32_t startIndex, uint32_t divisor);
+
+	template<>
+	void pushMatrix<glm::mat3>(uint32_t startIndex, uint32_t divisor);
 
 private:
 	std::vector<VertexAttribute> mAttributes;
