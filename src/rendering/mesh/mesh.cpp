@@ -73,7 +73,6 @@ void Mesh::enableInstanceAttributes(const size_t offset) const {
 	instancingLayout.pushMatrix<glm::mat3>(11, 1); // Normal Matrix (slots 11-13)
 	instancingLayout.addPadding(sizeof(glm::vec3)); // padding
 
-
 	for (const auto& [type, index, size, normalized, attrOffset, divisor]: instancingLayout.attributes()) {
 		const auto finalPointer = reinterpret_cast<void*>(offset + attrOffset);
 		mVAO->setAttribute(index, size, type, normalized ? GL_TRUE : GL_FALSE, instancingLayout.stride(), finalPointer);

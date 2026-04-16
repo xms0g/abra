@@ -17,7 +17,7 @@ layout (location = 2) out vec4 gAlbedo;
 layout (location = 3) out vec3 gORM;
 
 void main() {
-    vec2 texCoord = parallaxMapping(fs_in.TexCoord, fs_in.TangentViewDir, material.heightScale, material.hasHeightMap);
+    vec2 texCoord = parallaxMapping(fs_in.TexCoord, fs_in.TangentViewDir, material.heightScale, (material.flags & HAS_HEIGHT_MAP) != 0);
 
     vec4 albedoSample = texture(material.texture_albedo, texCoord);
     if (albedoSample.a < material.alphaCutoff) {
@@ -33,15 +33,15 @@ void main() {
     // Occulusion - Roughness - Metallic
     vec3 orm = texture(material.texture_roughnessMetallic, texCoord).rgb;
     float ao = 1.0;
-    if (material.hasORM) {
+    if ((material.flags & HAS_ORM) != 0) {
         ao = orm.r;
-    } else if (material.hasAOMap) {
+    } else if ((material.flags & HAS_AO_MAP) != 0) {
         ao = texture(material.texture_ao, texCoord).r;
     }
     gORM = vec3(ao, orm.g, orm.b);
     // Emissive
     vec3 emissive = vec3(0.0);
-    if (material.hasEmissiveMap) {
+    if ((material.flags & HAS_EMISSIVE_MAP) != 0) {
         emissive = pow(texture(material.texture_emissive, texCoord).rgb, vec3(2.2));
     }
 

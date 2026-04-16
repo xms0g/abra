@@ -11,14 +11,18 @@ enum MaterialFlag: uint32_t {
 	CASTSHADOW = 1 << 2,
 	TWOSIDED = 1 << 3,
 	UNLIT = 1 << 4,
-	PBR = 1 << 5
+	PBR = 1 << 5,
+	HAS_HEIGHT_MAP = 1 << 6,
+	HAS_EMISSIVE_MAP = 1 << 7,
+	HAS_AO_MAP = 1 << 8,
+	HAS_ORM = 1 << 9,
 };
 
 class Shader;
 class Mesh;
 
 struct Material {
-	uint32_t flag;
+	uint32_t flags;
 	glm::vec3 color;
 	float alphaCutoff;
 	std::vector<Texture> textures;

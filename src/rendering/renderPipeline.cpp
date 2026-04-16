@@ -337,31 +337,31 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 
 		if (matComponent.renderFlag & INSTANCED_PASS) {
 			// Set shader
-			if (material.flag & OPAQUE) {
+			if (material.flags & OPAQUE) {
 				matBatch.shader = instancedOpaque.get();
-			} else if (material.flag & BLEND) {
+			} else if (material.flags & BLEND) {
 				matBatch.shader = instancedBlend.get();
 			}
 
 			const auto& instComponent = entity.getComponent<InstanceComponent>();
 			InstanceGroup instance{entityCore, instComponent.transforms, matBatch};
 
-			if (material.flag & OPAQUE) {
+			if (material.flags & OPAQUE) {
 				mRenderQueue.opaqueInstancedGroups.push_back(instance);
-			} else if (material.flag & BLEND) {
+			} else if (material.flags & BLEND) {
 				mRenderQueue.blendInstancedGroups.push_back(instance);
 			}
 
 			continue;
 		}
 		// Set shader
-		if (material.flag & OPAQUE) {
-			if (material.flag & UNLIT) {
+		if (material.flags & OPAQUE) {
+			if (material.flags & UNLIT) {
 				matBatch.shader = unlit.get();
 			} else {
 				matBatch.shader = opaque.get();
 			}
-		} else if (material.flag & BLEND) {
+		} else if (material.flags & BLEND) {
 			matBatch.shader = blend.get();
 		}
 
@@ -371,15 +371,15 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			mRenderQueue.debugGroups.push_back(group);
 		}
 
-		if (material.flag & CASTSHADOW) {
+		if (material.flags & CASTSHADOW) {
 			mRenderQueue.shadowGroups.push_back(group);
 		}
 
-		if (material.flag & PBR) {
+		if (material.flags & PBR) {
 			mRenderQueue.deferredGroups.push_back(group);
-		} else if (material.flag & OPAQUE) {
+		} else if (material.flags & OPAQUE) {
 			mRenderQueue.opaqueGroups.push_back(group);
-		} else if (material.flag & BLEND) {
+		} else if (material.flags & BLEND) {
 			mRenderQueue.blendGroups.push_back(group);
 		}
 	}

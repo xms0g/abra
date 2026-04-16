@@ -82,7 +82,7 @@ void RenderCommon::setupMaterial(const EntityCore& entity, const Material& mater
 		shader.setVec3("material.color", material.color);
 	}
 
-	if (material.flag & TWOSIDED) {
+	if (material.flags & TWOSIDED) {
 		glDisable(GL_CULL_FACE);
 	} else {
 		glEnable(GL_CULL_FACE);
@@ -110,30 +110,27 @@ void RenderCommon::drawQuad(const uint32_t sceneTexture, const uint32_t VAO) {
 
 
 void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shader& shader) {
-	bool hasHeightMap{false};
-	bool hasEmissiveMap{false};
-	bool hasAOMap{false};
-	bool hasORM{false};
+	uint32_t flags{0};
+	uint32_t roughMetalID{0};
 
-	std::string_view roughMetalPath;
 	for (size_t i = 0; i < textures.size(); ++i) {
 		switch (textures[i].type) {
 			case HEIGHT:
-				hasHeightMap = true;
+				flags |= HAS_HEIGHT_MAP;
 				break;
 			case EMISSION:
-				hasEmissiveMap = true;
+				flags |= HAS_EMISSIVE_MAP;
 				break;
 			case ROUGHNESS_METALLIC:
-				roughMetalPath = textures[i].path;
+				roughMetalID = textures[i].id;
 				break;
 			case AO: {
-				if (roughMetalPath == textures[i].path) {
-					hasORM = true;
+				if (roughMetalID == textures[i].id) {
+					flags |= HAS_ORM;
 					continue;
 				}
 
-				hasAOMap = true;
+				flags |= HAS_AO_MAP;
 				break;
 			}
 			default: break;
@@ -143,10 +140,7 @@ void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shad
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}
 
-	shader.setBool("material.hasHeightMap", hasHeightMap);
-	shader.setBool("material.hasEmissiveMap", hasEmissiveMap);
-	shader.setBool("material.hasAOMap", hasAOMap);
-	shader.setBool("material.hasORM", hasORM);
+	shader.setUint("material.flags", flags);
 }
 
 void RenderCommon::unbindTextures(const std::vector<Texture>& textures) {

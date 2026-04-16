@@ -1,6 +1,11 @@
 #ifndef PBR_MATERIAL_GLSL
 #define PBR_MATERIAL_GLSL
 
+#define HAS_HEIGHT_MAP      (1u << 6)
+#define HAS_EMISSIVE_MAP    (1u << 7)
+#define HAS_AO_MAP          (1u << 8)
+#define HAS_ORM             (1u << 9)
+
 struct Material {
     sampler2D texture_albedo;
     sampler2D texture_normal;
@@ -11,11 +16,7 @@ struct Material {
 
     float alphaCutoff;
     float heightScale;
-
-    bool hasEmissiveMap;
-    bool hasHeightMap;
-    bool hasAOMap;
-    bool hasORM;
+    uint flags;
 };
 
 uniform Material material;

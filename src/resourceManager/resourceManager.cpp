@@ -51,7 +51,7 @@ void ResourceManager::uploadModelsToGPU() {
 					continue;
 				}
 
-				id = texture::load(path.c_str(), material.flag);
+				id = texture::load(path.c_str(), material.flags);
 				idByPath.emplace(path, id);
 			}
 		}
@@ -219,7 +219,7 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 			}
 		}
 
-		materialLoadCtx.materials[req.materialID] = {.flag = flag, .alphaCutoff = alphaCutoff};
+		materialLoadCtx.materials[req.materialID] = {.flags = flag, .alphaCutoff = alphaCutoff};
 	}
 
 	auto& material = materialLoadCtx.materials[req.materialID];
