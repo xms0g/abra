@@ -29,7 +29,7 @@ void main() {
     // also store the per-fragment normals into the gbuffer
     gNormal.rgb = normal(fs_in.TBN, texCoord, true);
     // and the diffuse per-fragment color
-    gAlbedo.rgb = pow(albedoSample.rgb, vec3(2.2));
+    gAlbedo.rgb = albedoSample.rgb;
     // Occulusion - Roughness - Metallic
     vec3 orm = texture(material.texture_roughnessMetallic, texCoord).rgb;
     float ao = 1.0;
@@ -42,7 +42,7 @@ void main() {
     // Emissive
     vec3 emissive = vec3(0.0);
     if ((material.flags & HAS_EMISSIVE_MAP) != 0) {
-        emissive = pow(texture(material.texture_emissive, texCoord).rgb, vec3(2.2));
+        emissive = texture(material.texture_emissive, texCoord).rgb;
     }
 
     gPosition.w = emissive.r;

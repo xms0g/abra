@@ -126,7 +126,7 @@ Models::Cube::Cube(
 
 	if (diffuseTexture) {
 		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + diffuseTexture).c_str(), 1),
+			texture::load(fs::path(ASSET_DIR + diffuseTexture).c_str(), 1, true),
 			ALBEDO,
 			diffuseTexture
 		);
@@ -134,21 +134,21 @@ Models::Cube::Cube(
 
 	if (specularTexture) {
 		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + specularTexture).c_str(), 1),
+			texture::load(fs::path(ASSET_DIR + specularTexture).c_str(), 1, false),
 			SPECULAR,
 			specularTexture);
 	}
 
 	if (normalTexture) {
 		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + normalTexture).c_str(), 1),
+			texture::load(fs::path(ASSET_DIR + normalTexture).c_str(), 1, false),
 			NORMAL,
 			normalTexture);
 	}
 
 	if (heightTexture) {
 		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + heightTexture).c_str(), 1),
+			texture::load(fs::path(ASSET_DIR + heightTexture).c_str(), 1, false),
 			HEIGHT,
 			heightTexture);
 	}

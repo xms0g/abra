@@ -29,34 +29,27 @@ uint32_t texture::generate(const int32_t width, const int32_t height, const floa
 	return textureID;
 }
 
-uint32_t texture::load(const char* path, const uint32_t flag) {
+uint32_t texture::load(const char* path, const uint32_t flags, const bool isSRGB) {
 	uint32_t textureID;
 
 	int32_t width, height, channel;
-	unsigned char* data = stbi_load(path, &width, &height, &channel, 0);
+	unsigned char* data = stbi_load(path, &width, &height, &channel, 4);
 
 	if (!data) {
 		std::cerr << "Texture failed to load at path: " << path << std::endl;
 		exit(1);
 	}
 
-	GLenum format{0};
-	if (channel == 1) {
-		format = GL_RED;
-	} else if (channel == 3) {
-		format = GL_RGB;
-	} else if (channel == 4) {
-		format = GL_RGBA;
-	}
+	const uint32_t internalFormat = isSRGB ? GL_SRGB8_ALPHA8 : GL_RGBA8;
 
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, flag & BLEND ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, flag & BLEND ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, flags & BLEND ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, flags & BLEND ? GL_CLAMP_TO_EDGE : GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 

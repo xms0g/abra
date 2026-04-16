@@ -51,7 +51,7 @@ void ResourceManager::uploadModelsToGPU() {
 					continue;
 				}
 
-				id = texture::load(path.c_str(), material.flags);
+				id = texture::load(path.c_str(), material.flags, type == ALBEDO || type == EMISSION);
 				idByPath.emplace(path, id);
 			}
 		}

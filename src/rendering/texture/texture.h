@@ -21,7 +21,7 @@ struct Texture {
 namespace texture {
 uint32_t generate(int32_t width, int32_t height, const float* data);
 
-uint32_t load(const char* path, uint32_t flag);
+uint32_t load(const char* path, uint32_t flags, bool isSRGB);
 
 uint32_t loadCubemap(const std::vector<std::string>& faces);
 

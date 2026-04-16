@@ -119,7 +119,7 @@ Models::Sphere::Sphere(
 	std::vector<Texture> textures;
 	if (albedo) {
 		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + albedo).c_str(), 1),
+			texture::load(fs::path(ASSET_DIR + albedo).c_str(), 1, true),
 			ALBEDO,
 			albedo
 		);
@@ -127,14 +127,14 @@ Models::Sphere::Sphere(
 
 	if (normal) {
 		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + normal).c_str(), 1),
+			texture::load(fs::path(ASSET_DIR + normal).c_str(), 1, false),
 			NORMAL,
 			normal);
 	}
 
 	if (roughnessMetallic) {
 		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + roughnessMetallic).c_str(), 1),
+			texture::load(fs::path(ASSET_DIR + roughnessMetallic).c_str(), 1, false),
 			ROUGHNESS_METALLIC,
 			roughnessMetallic);
 	}
