@@ -40,6 +40,7 @@ private:
 		MaterialMap materials;
 		std::vector<uint32_t> materialsToLoad;
 		std::string baseDir;
+		std::string roughMetalPath;
 	};
 
 	struct TextureLoadRequest {

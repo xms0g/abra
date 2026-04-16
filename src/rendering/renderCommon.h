@@ -25,7 +25,7 @@ void drawMesh(const Mesh& mesh);
 
 void drawQuad(uint32_t sceneTexture, uint32_t VAO);
 
-void bindTextures(const std::vector<Texture>& textures, const Shader& shader);
+void bindTextures(const Material& material, const Shader& shader);
 
 void bindShadowMaps(const RenderContext& ctx);
 }

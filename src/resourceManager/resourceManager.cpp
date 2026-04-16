@@ -51,7 +51,10 @@ void ResourceManager::uploadModelsToGPU() {
 					continue;
 				}
 
-				id = texture::load(path.c_str(), material.flags, type == ALBEDO || type == EMISSION);
+				id = texture::load(
+					path.c_str(),
+					material.flags,
+					type == aiTextureType_DIFFUSE || type == aiTextureType_EMISSIVE);
 				idByPath.emplace(path, id);
 			}
 		}
@@ -184,6 +187,7 @@ void ResourceManager::processMaterials(const aiScene* scene, MaterialLoadContext
 				.type = type,
 				.materialID = matID
 			};
+
 			loadMaterialTextures(req, materialLoadCtx);
 		}
 	}
@@ -191,17 +195,17 @@ void ResourceManager::processMaterials(const aiScene* scene, MaterialLoadContext
 
 void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& materialLoadCtx) const {
 	if (!materialLoadCtx.materials.contains(req.materialID)) {
-		uint32_t flag{0};
+		uint32_t flags{0};
 
 		if (int twoSided{0};
 			req.mat->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
-			flag |= twoSided != 0 ? TWOSIDED : 0;
+			flags |= twoSided != 0 ? TWOSIDED : 0;
 		}
 
 		if (float matPBR{0.0f};
 			req.mat->Get(AI_MATKEY_METALLIC_FACTOR, matPBR) == AI_SUCCESS ||
 			req.mat->Get(AI_MATKEY_ROUGHNESS_FACTOR, matPBR) == AI_SUCCESS) {
-			flag |= (matPBR > 0.0f) ? PBR : 0;
+			flags |= (matPBR > 0.0f) ? PBR : 0;
 		}
 
 		// Only supports glTF
@@ -210,16 +214,16 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 		if (aiString alphaMode;
 			req.mat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode) == AI_SUCCESS) {
 			if (std::strcmp(alphaMode.C_Str(), "OPAQUE") == 0) {
-				flag |= OPAQUE | CASTSHADOW;
+				flags |= OPAQUE | CASTSHADOW;
 			} else if (std::strcmp(alphaMode.C_Str(), "MASK") == 0) {
-				flag |= OPAQUE | CASTSHADOW;
+				flags |= OPAQUE | CASTSHADOW;
 				req.mat->Get(AI_MATKEY_GLTF_ALPHACUTOFF, alphaCutoff);
 			} else if (std::strcmp(alphaMode.C_Str(), "BLEND") == 0) {
-				flag |= BLEND;
+				flags |= BLEND;
 			}
 		}
 
-		materialLoadCtx.materials[req.materialID] = {.flags = flag, .alphaCutoff = alphaCutoff};
+		materialLoadCtx.materials[req.materialID] = {.flags = flags, .alphaCutoff = alphaCutoff};
 	}
 
 	auto& material = materialLoadCtx.materials[req.materialID];
@@ -232,6 +236,26 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 
 		if (material.hasTexture(path, req.type))
 			break;
+
+		switch (req.type) {
+			case aiTextureType_HEIGHT:
+				material.flags |= HAS_HEIGHT_MAP;
+				break;
+			case aiTextureType_EMISSIVE:
+				material.flags |= HAS_EMISSIVE_MAP;
+				break;
+			case aiTextureType_UNKNOWN:
+				materialLoadCtx.roughMetalPath = path;
+				break;
+			case aiTextureType_LIGHTMAP: {
+				if (materialLoadCtx.roughMetalPath == path) {
+					material.flags |= HAS_ORM;
+				} else {
+					material.flags |= HAS_AO_MAP;
+				}
+				break;
+			}
+		}
 
 		material.textures.emplace_back(0, req.type, std::move(path));
 	}

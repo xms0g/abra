@@ -62,6 +62,8 @@ void ShadowPass::directionalShadowPass(const RenderContext& ctx) const {
 }
 
 void ShadowPass::omnidirectionalShadowPass(const RenderContext& ctx) const {
+	if (ctx.light.pointLights->empty()) return;
+
 	omnidirShadowPass->depthMap().bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
@@ -82,6 +84,8 @@ void ShadowPass::omnidirectionalShadowPass(const RenderContext& ctx) const {
 }
 
 void ShadowPass::perspectiveShadowPass(const RenderContext& ctx) const {
+	if (ctx.light.spotLights->empty()) return;
+
 	persShadowPass->depthMap().bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);

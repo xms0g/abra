@@ -14,6 +14,8 @@
 #include "../ECS/components/mesh.hpp"
 #include "../ECS/components/transform.hpp"
 
+static bool isCullingEnabled = true;
+
 void RenderCommon::forward(const std::vector<RenderableObject>& objects) {
 	const Material* lastMaterial = nullptr;
 	const Shader* lastShader = nullptr;
@@ -28,8 +30,12 @@ void RenderCommon::forward(const std::vector<RenderableObject>& objects) {
 		setupTransform(*entity, *lastShader);
 
 		if (lastMaterial != material) {
+			if (material->textures.empty()) {
+				shader->setVec3("material.color", material->color);
+			}
+
 			setupMaterial(*entity, *material, *lastShader);
-			bindTextures(material->textures, *lastShader);
+			bindTextures(*material, *lastShader);
 			lastMaterial = material;
 		}
 
@@ -46,7 +52,7 @@ void RenderCommon::instanced(const std::vector<InstanceGroup>& objects) {
 
 		for (const auto& mesh: *meshes) {
 			setupMaterial(entity, *material, *shader);
-			bindTextures(material->textures, *shader);
+			bindTextures(*material, *shader);
 
 			mesh.bind();
 			glDrawElementsInstanced(
@@ -64,6 +70,7 @@ void RenderCommon::setupTransform(const EntityCore& entity, const Shader& shader
 		entity.transform->position,
 		entity.transform->rotation,
 		entity.transform->scale);
+
 	const glm::mat3 normal = math::normalMatrix(model);
 
 	shader.setMat4("model", model);
@@ -71,17 +78,20 @@ void RenderCommon::setupTransform(const EntityCore& entity, const Shader& shader
 }
 
 void RenderCommon::setupMaterial(const EntityCore& entity, const Material& material, const Shader& shader) {
-	shader.setFloat("material.heightScale", entity.material->heightScale);
-	shader.setFloat("material.alphaCutoff", material.alphaCutoff);
-
-	if (material.textures.empty()) {
-		shader.setVec3("material.color", material.color);
+	if (material.flags & HAS_HEIGHT_MAP) {
+		shader.setFloat("material.heightScale", entity.material->heightScale);
 	}
 
-	if (material.flags & TWOSIDED) {
+	if (material.alphaCutoff != 0.0f) {
+		shader.setFloat("material.alphaCutoff", material.alphaCutoff);
+	}
+
+	if (material.flags & TWOSIDED && isCullingEnabled) {
 		glDisable(GL_CULL_FACE);
-	} else {
+		isCullingEnabled = false;
+	} else if (!(material.flags & TWOSIDED) && !isCullingEnabled) {
 		glEnable(GL_CULL_FACE);
+		isCullingEnabled = true;
 	}
 }
 
@@ -105,38 +115,18 @@ void RenderCommon::drawQuad(const uint32_t sceneTexture, const uint32_t VAO) {
 }
 
 
-void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shader& shader) {
-	uint32_t flags{0};
-	uint32_t roughMetalID{0};
+void RenderCommon::bindTextures(const Material& material, const Shader& shader) {
+	static uint32_t matFlagCache{0};
 
-	for (size_t i = 0; i < textures.size(); ++i) {
-		switch (textures[i].type) {
-			case HEIGHT:
-				flags |= HAS_HEIGHT_MAP;
-				break;
-			case EMISSION:
-				flags |= HAS_EMISSIVE_MAP;
-				break;
-			case ROUGHNESS_METALLIC:
-				roughMetalID = textures[i].id;
-				break;
-			case AO: {
-				if (roughMetalID == textures[i].id) {
-					flags |= HAS_ORM;
-					continue;
-				}
-
-				flags |= HAS_AO_MAP;
-				break;
-			}
-			default: break;
-		}
-
+	for (size_t i = 0; i < material.textures.size(); ++i) {
 		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, textures[i].id);
+		glBindTexture(GL_TEXTURE_2D, material.textures[i].id);
 	}
 
-	shader.setUint("material.flags", flags);
+	if (matFlagCache != material.flags) {
+		matFlagCache = material.flags;
+		shader.setUint("material.flags", material.flags);
+	}
 }
 
 void RenderCommon::bindShadowMaps(const RenderContext& ctx) {
