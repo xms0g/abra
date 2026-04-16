@@ -35,8 +35,6 @@ void RenderCommon::forward(const std::vector<RenderableObject>& objects) {
 
 		drawMesh(*mesh);
 	}
-	if (lastMaterial)
-		unbindTextures(lastMaterial->textures);
 }
 
 void RenderCommon::instanced(const std::vector<InstanceGroup>& objects) {
@@ -57,8 +55,6 @@ void RenderCommon::instanced(const std::vector<InstanceGroup>& objects) {
 				GL_UNSIGNED_INT,
 				nullptr,
 				static_cast<int32_t>(count));
-
-			unbindTextures(material->textures);
 		}
 	}
 }
@@ -141,13 +137,6 @@ void RenderCommon::bindTextures(const std::vector<Texture>& textures, const Shad
 	}
 
 	shader.setUint("material.flags", flags);
-}
-
-void RenderCommon::unbindTextures(const std::vector<Texture>& textures) {
-	for (size_t i = 0; i < textures.size(); ++i) {
-		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
 }
 
 void RenderCommon::bindShadowMaps(const RenderContext& ctx) {

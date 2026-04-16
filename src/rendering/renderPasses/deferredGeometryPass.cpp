@@ -63,7 +63,5 @@ void DeferredGeometryPass::execute(const RenderContext& ctx) {
 		RenderCommon::drawMesh(*mesh);
 	}
 
-	if (lastMaterial)
-		RenderCommon::unbindTextures(lastMaterial->textures);
 	mGBuffer->unbind();
 }
