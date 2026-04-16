@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "frustum.h"
 #include "../rendering/mesh/mesh.h"
+#include "../rendering/mesh/vertex.hpp"
 
 bool math::Sphere::isOnFrustum(const Frustum& camFrustum, const glm::mat4& model) const {
 	const glm::vec3 globalScale = {

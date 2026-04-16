@@ -2,11 +2,12 @@
 #include <iostream>
 #include <assimp/GltfMaterial.h>
 #include "image/stb_image.h"
-#include "../rendering/texture/texture.h"
-#include "../rendering/mesh/mesh.h"
 #include "../io/filesystem.hpp"
 #include "../config/config.hpp"
 #include "../rendering/material/material.hpp"
+#include "../rendering/mesh/mesh.h"
+#include "../rendering/mesh/vertex.hpp"
+#include "../rendering/texture/texture.h"
 
 ResourceManager& ResourceManager::instance() {
 	static ResourceManager instance;

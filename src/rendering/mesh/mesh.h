@@ -1,12 +1,18 @@
 #pragma once
 #include <vector>
 #include <memory>
-#include "vertexArray.h"
-#include "../buffers/vertexBuffer.h"
+#include "glm/glm.hpp"
+
+class VertexBuffer;
+class VertexArray;
+struct Vertex;
+class IndexBuffer;
 
 class Mesh {
 public:
 	Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices);
+
+	~Mesh();
 
 	Mesh(const Mesh&) = delete;
 

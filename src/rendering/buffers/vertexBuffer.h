@@ -1,38 +1,12 @@
 #pragma once
 #include <vector>
-#include "glm/glm.hpp"
 #include "buffer.hpp"
-
-struct Vertex {
-#define MAX_BONE_INFLUENCE 4
-	// position
-	glm::vec3 position;
-	// normal
-	glm::vec3 normal;
-	// texCoords
-	glm::vec2 texcoord;
-	// tangent
-	glm::vec3 tangent;
-	// bitangent
-	glm::vec3 bitangent;
-	//bone indexes which will influence this vertex
-	int32_t boneIDs[MAX_BONE_INFLUENCE];
-	//weights from each bone
-	float weights[MAX_BONE_INFLUENCE];
-};
 
 class VertexBuffer : public Buffer {
 public:
 	explicit VertexBuffer(BufferUsage usage);
 
 	void setData(const void* data, uint32_t size, uint32_t offset) const;
-};
-
-class IndexBuffer : public Buffer {
-public:
-	explicit IndexBuffer(BufferUsage usage);
-
-	void setData(const void* data, uint32_t size) const;
 };
 
 struct VertexAttribute {
@@ -57,31 +31,64 @@ public:
 	void addPadding(int32_t bytes);
 
 	template<typename T>
-	void push(uint32_t index, int32_t size, bool normalized = false) {
-		// This will be specialized below
-		static_assert(false, "Type not supported in VertexLayout");
-	}
+	void push(uint32_t index, int32_t size, bool normalized = false);
 
 	template<typename T>
-	void pushMatrix(const uint32_t startIndex, const uint32_t divisor = 1) {
-		static_assert(false, "Type not supported in VertexLayout");
-	}
+	void pushVector(uint32_t index, bool normalized = false);
 
-	// Specialization for Float
-	template<>
-	void push<float>(uint32_t index, int32_t size, bool normalized);
-
-	// Specialization for Int (Used for Bone IDs)
-	template<>
-	void push<int>(uint32_t index, int32_t size, bool normalized);
-
-	template<>
-	void pushMatrix<glm::mat4>(uint32_t startIndex, uint32_t divisor);
-
-	template<>
-	void pushMatrix<glm::mat3>(uint32_t startIndex, uint32_t divisor);
+	template<typename T>
+	void pushMatrix(uint32_t index, uint32_t divisor = 1);
 
 private:
 	std::vector<VertexAttribute> mAttributes;
 	int32_t mStride;
 };
+
+template<typename T>
+void VertexLayout::push(const uint32_t index, const int32_t size, const bool normalized) {
+	mAttributes.push_back(
+		{
+			std::is_same_v<T, float> ? GL_FLOAT : GL_INT,
+			index,
+			size,
+			normalized,
+			mStride
+		});
+
+	mStride += size * sizeof(T);
+}
+
+template<typename T>
+void VertexLayout::pushVector(const uint32_t index, const bool normalized) {
+	mAttributes.push_back(
+		{
+			std::is_same_v<typename T::value_type, float> ? GL_FLOAT : GL_INT,
+			index,
+			T::length(),
+			normalized,
+			mStride
+		});
+
+	mStride += sizeof(T);
+}
+
+template<typename T>
+void VertexLayout::pushMatrix(const uint32_t index, const uint32_t divisor) {
+	using ColumnType = T::col_type;
+
+	constexpr uint32_t numCols = T::length();
+	constexpr int componentsPerCol = ColumnType::length();
+
+	for (uint32_t i = 0; i < numCols; ++i) {
+		mAttributes.push_back(
+			{
+				std::is_same_v<typename T::value_type, float> ? GL_FLOAT : GL_INT,
+				index + i,
+				componentsPerCol,
+				false,
+				mStride,
+				divisor
+			});
+		mStride += sizeof(ColumnType);
+	}
+}

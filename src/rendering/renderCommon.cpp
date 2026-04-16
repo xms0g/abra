@@ -4,6 +4,7 @@
 #include "material/material.hpp"
 #include "texture/texture.h"
 #include "mesh/mesh.h"
+#include "mesh/vertex.hpp"
 #include "renderContext/renderContext.hpp"
 #include "renderContext/renderableObject.hpp"
 #include "renderContext/instanceGroup.hpp"

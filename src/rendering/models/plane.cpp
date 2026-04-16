@@ -1,5 +1,6 @@
 #include "plane.h"
 #include "../mesh/mesh.h"
+#include "../mesh/vertex.hpp"
 #include "../texture/texture.h"
 #include "../material/material.hpp"
 #include "../../config/config.hpp"

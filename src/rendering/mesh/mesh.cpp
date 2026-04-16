@@ -1,5 +1,9 @@
 #include "mesh.h"
 #include "glad/glad.h"
+#include "vertexArray.h"
+#include "vertex.hpp"
+#include "../buffers/vertexBuffer.h"
+#include "../buffers/indexBuffer.h"
 
 Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
 	: mVertices(std::move(vertices)),
@@ -12,6 +16,8 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
 		mMax = glm::max(mMax, vertex.position);
 	}
 }
+
+Mesh::~Mesh() = default;
 
 Mesh::Mesh(Mesh&& other) noexcept {
 	mVertices = std::move(other.mVertices);
@@ -65,7 +71,7 @@ void Mesh::enableInstanceAttributes(const size_t offset) const {
 
 	instancingLayout.pushMatrix<glm::mat4>(7, 1); // Model Matrix (slots 7-10)
 	instancingLayout.pushMatrix<glm::mat3>(11, 1); // Normal Matrix (slots 11-13)
-	instancingLayout.addPadding(12); // padding
+	instancingLayout.addPadding(sizeof(glm::vec3)); // padding
 
 
 	for (const auto& [type, index, size, normalized, attrOffset, divisor]: instancingLayout.attributes()) {
@@ -92,13 +98,13 @@ void Mesh::uploadToGPU() {
 
 	// set the vertex attribute pointers
 	VertexLayout layout;
-	layout.push<float>(0, 3); // Position
-	layout.push<float>(1, 3); // Normal
-	layout.push<float>(2, 2); // TexCoords
-	layout.push<float>(3, 3); // Tangent
-	layout.push<float>(4, 3); // Bitangent
-	layout.push<int>(5, 4);	// Bone IDs (Integers!)
-	layout.push<float>(6, 4);	// Bone Weights
+	layout.pushVector<glm::vec3>(0);	// Position
+	layout.pushVector<glm::vec3>(1);	// Normal
+	layout.pushVector<glm::vec2>(2);	// TexCoords
+	layout.pushVector<glm::vec3>(3);	// Tangent
+	layout.pushVector<glm::vec3>(4);	// Bitangent
+	layout.push<int>(5, 4);		// Bone IDs (Integers!)
+	layout.push<float>(6, 4);		// Bone Weights
 
 	for (const auto& [type, index, size, normalized, offset, divisor]: layout.attributes()) {
 		const auto pointer = reinterpret_cast<void*>(offset);
