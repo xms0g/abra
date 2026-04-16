@@ -50,9 +50,11 @@ public:
 	VertexLayout() : mStride(0) {
 	}
 
-	[[nodiscard]] const std::vector<VertexAttribute>& getAttributes() const { return mAttributes; }
+	[[nodiscard]] const std::vector<VertexAttribute>& attributes() const;
 
-	[[nodiscard]] int32_t getStride() const { return mStride; }
+	[[nodiscard]] int32_t stride() const;
+
+	void addPadding(int32_t bytes);
 
 	template<typename T>
 	void push(uint32_t index, int32_t size, bool normalized = false) {

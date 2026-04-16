@@ -29,6 +29,18 @@ void IndexBuffer::setData(const void* data, const uint32_t size) const {
 	glBufferData(mTarget, size, data, mUsage);
 }
 
+const std::vector<VertexAttribute>& VertexLayout::attributes() const {
+	return mAttributes;
+}
+
+int32_t VertexLayout::stride() const {
+	return mStride;
+}
+
+void VertexLayout::addPadding(const int32_t bytes) {
+	mStride += bytes;
+}
+
 template<>
 void VertexLayout::push<float>(const uint32_t index, const int32_t size, const bool normalized) {
 	mAttributes.push_back({GL_FLOAT, index, size, normalized, mStride});

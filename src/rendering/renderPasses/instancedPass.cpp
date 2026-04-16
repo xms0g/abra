@@ -72,7 +72,7 @@ void InstancedPass::prepareInstanceBuffer(
 	for (const auto& [entity, transforms, matb] : groups) {
 		for (auto& mesh : *matb.meshes) {
 			mesh.bind();
-			mesh.enableInstanceAttributes(sizeof(InstanceData), currentOffset);
+			mesh.enableInstanceAttributes(currentOffset);
 		}
 		const size_t instanceCount = transforms->size() / 9;
 		currentOffset += static_cast<uint32_t>(instanceCount * sizeof(InstanceData));

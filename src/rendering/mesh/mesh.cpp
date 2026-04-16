@@ -60,15 +60,17 @@ void Mesh::unbind() const {
 	mVAO->unbind();
 }
 
-void Mesh::enableInstanceAttributes(const int32_t stride, const size_t offset) const {
+void Mesh::enableInstanceAttributes(const size_t offset) const {
 	VertexLayout instancingLayout;
 
 	instancingLayout.pushMatrix<glm::mat4>(7, 1); // Model Matrix (slots 7-10)
 	instancingLayout.pushMatrix<glm::mat3>(11, 1); // Normal Matrix (slots 11-13)
+	instancingLayout.addPadding(12); // padding
 
-	for (const auto& [type, index, size, normalized, attrOffset, divisor]: instancingLayout.getAttributes()) {
+
+	for (const auto& [type, index, size, normalized, attrOffset, divisor]: instancingLayout.attributes()) {
 		const auto finalPointer = reinterpret_cast<void*>(offset + attrOffset);
-		mVAO->setAttribute(index, size, type, normalized ? GL_TRUE : GL_FALSE, stride, finalPointer);
+		mVAO->setAttribute(index, size, type, normalized ? GL_TRUE : GL_FALSE, instancingLayout.stride(), finalPointer);
 		glVertexAttribDivisor(index, divisor);
 	}
 }
@@ -98,9 +100,9 @@ void Mesh::uploadToGPU() {
 	layout.push<int>(5, 4);	// Bone IDs (Integers!)
 	layout.push<float>(6, 4);	// Bone Weights
 
-	for (const auto& [type, index, size, normalized, offset, divisor]: layout.getAttributes()) {
+	for (const auto& [type, index, size, normalized, offset, divisor]: layout.attributes()) {
 		const auto pointer = reinterpret_cast<void*>(offset);
-		mVAO->setAttribute(index, size, type, normalized ? GL_TRUE : GL_FALSE, layout.getStride(), pointer);
+		mVAO->setAttribute(index, size, type, normalized ? GL_TRUE : GL_FALSE, layout.stride(), pointer);
 	}
 
 	mVAO->unbind();

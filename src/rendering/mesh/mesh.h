@@ -28,7 +28,7 @@ public:
 
 	void unbind() const;
 
-	void enableInstanceAttributes(int32_t stride, size_t offset) const;
+	void enableInstanceAttributes(size_t offset) const;
 
 	void uploadToGPU();
 
