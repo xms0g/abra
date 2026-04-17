@@ -24,9 +24,16 @@ float distributionGGX(vec3 N, vec3 H, float roughness) {
     return num / denom;
 }
 
-float geometrySchlickGGX(float NdotV, float roughness) {
-    float r = (roughness + 1.0);
-    float k = (r * r) / 8.0;
+float geometrySchlickGGX(float NdotV, float roughness, bool isIBL) {
+    float k;
+
+    if (isIBL) {
+        k = (roughness * roughness) / 2.0;
+    } else {
+        float r = (roughness + 1.0);
+        k = (r * r) / 8.0;
+    }
+
 
     float num = NdotV;
     float denom = NdotV * (1.0 - k) + k;
@@ -34,11 +41,11 @@ float geometrySchlickGGX(float NdotV, float roughness) {
     return num / denom;
 }
 
-float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
+float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness, bool isIBL) {
     float NdotV = max(dot(N, V), 0.0);
     float NdotL = max(dot(N, L), 0.0);
-    float ggx2 = geometrySchlickGGX(NdotV, roughness);
-    float ggx1 = geometrySchlickGGX(NdotL, roughness);
+    float ggx2 = geometrySchlickGGX(NdotV, roughness, isIBL);
+    float ggx1 = geometrySchlickGGX(NdotL, roughness, isIBL);
 
     return ggx1 * ggx2;
 }
@@ -48,7 +55,7 @@ vec3 brdf(vec3 lightPos, vec3 N, vec3 V, vec3 F0, vec3 worldPos, vec3 radiance, 
     vec3 H = normalize(V + L);
     // Cook-Torrance BRDF
     float NDF = distributionGGX(N, H, roughness);
-    float G = geometrySmith(N, V, L, roughness);
+        float G = geometrySmith(N, V, L, roughness, false);
     vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
     vec3 numerator = NDF * G * F;
