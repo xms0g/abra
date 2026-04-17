@@ -5,18 +5,19 @@
 
 void Input::process(Camera& camera, SDL_Window* window, const float dt, bool& isRunning) {
 	SDL_Event event;
-	SDL_PollEvent(&event);
 
+	while (SDL_PollEvent(&event)) {
 #ifdef DEBUG
-	ImGui_ImplSDL2_ProcessEvent(&event);
+		ImGui_ImplSDL2_ProcessEvent(&event);
 #endif
 
-	if (event.type == SDL_QUIT)
-		isRunning = false;
-	if (event.type == SDL_WINDOWEVENT &&
-		event.window.event == SDL_WINDOWEVENT_CLOSE &&
-		event.window.windowID == SDL_GetWindowID(window)) {
-		isRunning = false;
+		if (event.type == SDL_QUIT)
+			isRunning = false;
+		if (event.type == SDL_WINDOWEVENT &&
+		    event.window.event == SDL_WINDOWEVENT_CLOSE &&
+		    event.window.windowID == SDL_GetWindowID(window)) {
+			isRunning = false;
+		}
 	}
 
 	processKeyboard(camera, dt, isRunning);
@@ -48,22 +49,13 @@ void Input::processMouse(Camera& camera) {
 	const uint32_t buttons = SDL_GetRelativeMouseState(&dx, &dy);
 	const bool rmb = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
 
-	if (rmb && !prevRMB) {
+	ImGuiIO& io = ImGui::GetIO();
+	
+	if (rmb && !prevRMB && !io.WantCaptureMouse) {
 		freeLook = !freeLook;
 		SDL_SetRelativeMouseMode(freeLook ? SDL_TRUE : SDL_FALSE);
 	}
 	prevRMB = rmb;
-
-#ifdef DEBUG
-	ImGuiIO& io = ImGui::GetIO();
-	if (!freeLook) {
-		// Only feed ImGui when camera is NOT controlling mouse
-		int x, y;
-		SDL_GetMouseState(&x, &y);
-		io.MousePos = ImVec2(static_cast<float>(x), static_cast<float>(y));
-		io.MouseDown[1] = rmb;
-	}
-#endif
 
 	if (freeLook) {
 		camera.processMouseMovement(static_cast<float>(dx), static_cast<float>(-dy));
