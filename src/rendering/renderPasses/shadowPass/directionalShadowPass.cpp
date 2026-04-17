@@ -36,7 +36,9 @@ void DirectionalShadowPass::render(const RenderContext& ctx, const glm::vec4& di
 		ctx.shadow.directional.top,
 		ctx.shadow.directional.nearPlane,
 		ctx.shadow.directional.farPlane);
+
 	const glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+
 	mLightSpaceMatrix = lightProjection * lightView;
 
 	mDepthShader->activate();

@@ -62,14 +62,14 @@ void ShadowPass::directionalShadowPass(const RenderContext& ctx) const {
 }
 
 void ShadowPass::omnidirectionalShadowPass(const RenderContext& ctx) const {
-	if (ctx.light.pointLights->empty()) return;
+	const auto& lights = *ctx.light.pointLights;
+	if (lights.empty()) return;
 
 	omnidirShadowPass->depthMap().bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glViewport(0, 0, static_cast<int32_t>(ctx.shadow.width), static_cast<int32_t>(ctx.shadow.height));
 
-	const auto& lights = *ctx.light.pointLights;
 	for (int32_t i = 0; i < lights.size(); ++i) {
 		const auto& light = lights[i];
 		if (!light->castShadow)
@@ -84,7 +84,8 @@ void ShadowPass::omnidirectionalShadowPass(const RenderContext& ctx) const {
 }
 
 void ShadowPass::perspectiveShadowPass(const RenderContext& ctx) const {
-	if (ctx.light.spotLights->empty()) return;
+	const auto& lights = *ctx.light.spotLights;
+	if (lights.empty()) return;
 
 	persShadowPass->depthMap().bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -92,7 +93,6 @@ void ShadowPass::perspectiveShadowPass(const RenderContext& ctx) const {
 	glCullFace(GL_FRONT);
 	glViewport(0, 0, static_cast<int32_t>(ctx.shadow.width), static_cast<int32_t>(ctx.shadow.height));
 
-	const auto& lights = *ctx.light.spotLights;
 	for (int32_t i = 0; i < lights.size(); ++i) {
 		const auto& light = lights[i];
 		if (!light->castShadow)
