@@ -103,9 +103,9 @@ void RenderPipeline::configure(const Camera& camera) {
 			.withRenderBufferDepthMultisampled(MULTISAMPLED_COUNT, GL_DEPTH_COMPONENT24)
 #else
 # ifdef HDR
-			mSceneBuffer->withTextureFP(GL_RGBA)
+	mSceneBuffer->withTextureFP(GL_RGBA)
 # else
-			mSceneBuffer->withTexture(GL_RGBA)
+	mSceneBuffer->withTexture(GL_RGBA)
 # endif
 			.withTextureDepth(GL_DEPTH_COMPONENT24, false)
 #endif
@@ -305,11 +305,18 @@ void RenderPipeline::render() {
 void RenderPipeline::refreshCameraData() const {
 	mRenderCtx->camera.skyView = glm::mat4(glm::mat3(mRenderCtx->camera.self->viewMatrix()));
 
-	auto view = mRenderCtx->camera.self->viewMatrix();
-	auto viewPos = glm::vec4(mRenderCtx->camera.self->position(), 1.0);
+	struct PackedView {
+		glm::mat4 view;
+		glm::vec4 viewPos;
+	};
+
+	const PackedView packed = {
+		mRenderCtx->camera.self->viewMatrix(),
+		glm::vec4(mRenderCtx->camera.self->position(), 1.0)
+	};
+
 	mRenderCtx->camera.ubo.self->bind();
-	mRenderCtx->camera.ubo.self->setData(glm::value_ptr(view), sizeof(glm::mat4), 0);
-	mRenderCtx->camera.ubo.self->setData(glm::value_ptr(viewPos), sizeof(glm::vec4), sizeof(glm::mat4));
+	mRenderCtx->camera.ubo.self->setData(&packed, sizeof(PackedView), 0);
 	mRenderCtx->camera.ubo.self->unbind();
 }
 

@@ -2,24 +2,28 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "buffers/uniformBuffer.h"
 #include "renderContext/renderContext.hpp"
+#include "../config/config.hpp"
 #include "../ECS/registry.h"
 #include "../ECS/components/directionalLight.hpp"
 #include "../ECS/components/pointLight.hpp"
 #include "../ECS/components/spotLight.hpp"
 #include "../ECS/components/transform.hpp"
 
+struct alignas(16) PackedLights {
+	DirectionalLightComponent dirLights[MAX_DIRECTIONAL_LIGHTS];
+	PointLightComponent pointLights[MAX_POINT_LIGHTS];
+	SpotLightComponent spotLights[MAX_SPOT_LIGHTS];
+	glm::ivec4 lightCount;
+};
+
+static PackedLights lightsData;
+
 LightSystem::LightSystem(const RenderContext& ctx) {
 	RequireComponent<DirectionalLightComponent>(true);
 	RequireComponent<PointLightComponent>(true);
 	RequireComponent<SpotLightComponent>(true);
 
-	const uint32_t totalLightBufferSize =
-			ctx.light.maxDirLights * sizeof(DirectionalLightComponent) +
-			ctx.light.maxPointLights * sizeof(PointLightComponent) +
-			ctx.light.maxSpotLights * sizeof(SpotLightComponent) +
-			sizeof(glm::ivec4);
-
-	mUBO = std::make_unique<UniformBuffer>(DYNAMIC, totalLightBufferSize, ctx.light.ubo.binding);
+	mUBO = std::make_unique<UniformBuffer>(DYNAMIC, sizeof(PackedLights), ctx.light.ubo.binding);
 }
 
 const UniformBuffer& LightSystem::ubo() const {
@@ -68,26 +72,21 @@ void LightSystem::update(const RenderContext& ctx) {
 }
 
 void LightSystem::updateLightUBO(const RenderContext& ctx) const {
-	uint32_t offset = 0;
+	for (size_t i = 0; i < mDirLights.size(); ++i) {
+		lightsData.dirLights[i] = *mDirLights[i];
+	}
 
-	auto uploadDataToGPU = [this, &offset]<typename T>(T& lights, const uint32_t maxLightCount) -> size_t {
-		using lightType = std::remove_pointer_t<typename T::value_type>;
-		const size_t lightCount = std::min(lights.size(), static_cast<size_t>(maxLightCount));
+	for (size_t i = 0; i < mPointLights.size(); ++i) {
+		lightsData.pointLights[i] = *mPointLights[i];
+	}
 
-		for (size_t i = 0; i < lightCount; ++i) {
-			mUBO->setData(lights[i], sizeof(lightType), offset + i * sizeof(lightType));
-		}
-		offset += maxLightCount * sizeof(lightType);
-		return lightCount;
-	};
+	for (size_t i = 0; i < mSpotLights.size(); ++i) {
+		lightsData.spotLights[i] = *mSpotLights[i];
+	}
+
+	lightsData.lightCount = glm::ivec4(mDirLights.size(), mPointLights.size(), mSpotLights.size(), 0);
 
 	mUBO->bind();
-	const size_t dirCount = uploadDataToGPU(mDirLights, ctx.light.maxDirLights);
-	const size_t pointCount = uploadDataToGPU(mPointLights, ctx.light.maxPointLights);
-	const size_t spotCount = uploadDataToGPU(mSpotLights, ctx.light.maxSpotLights);
-
-	auto lightCount = glm::ivec4(dirCount, pointCount, spotCount, 0);
-
-	mUBO->setData(glm::value_ptr(lightCount), sizeof(glm::ivec4), offset);
+	mUBO->setData(&lightsData, sizeof(PackedLights), 0);
 	mUBO->unbind();
 }
