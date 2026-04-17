@@ -56,8 +56,12 @@ void OmnidirectionalShadowPass::render(
 	mDepthShader->setVec3("lightPos", position);
 	mDepthShader->setInt("cubeIndex", layer);
 
+	const EntityCore* lastEntity = nullptr;
 	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->shadowingObjects) {
-		RenderCommon::setupTransform(*entity, *mDepthShader);
+		if (lastEntity != entity) {
+			lastEntity = entity;
+			RenderCommon::setupTransform(*entity, *mDepthShader);
+		}
 		RenderCommon::drawMesh(*mesh);
 	}
 }
