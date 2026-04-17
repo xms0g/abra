@@ -47,7 +47,6 @@ void DirectionalShadowPass::render(const RenderContext& ctx, const glm::vec4& di
 	// render scene from light's point of view
 	mDepthMap->bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
 	glViewport(0, 0, static_cast<int32_t>(ctx.shadow.width), static_cast<int32_t>(ctx.shadow.height));
 
@@ -55,7 +54,6 @@ void DirectionalShadowPass::render(const RenderContext& ctx, const glm::vec4& di
 		RenderCommon::setupTransform(*entity, *mDepthShader);
 		RenderCommon::drawMesh(*mesh);
 	}
-	mDepthMap->unbind();
 	glCullFace(GL_BACK);
 	glViewport(0, 0, static_cast<int32_t>(ctx.screen.width), static_cast<int32_t>(ctx.screen.height));
 }

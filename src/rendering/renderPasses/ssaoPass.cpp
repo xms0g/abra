@@ -80,7 +80,6 @@ void SSAOPass::ssao(const RenderContext& ctx) const {
 	glBindVertexArray(mQuad->VAO());
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
-	mFBO->unbind();
 }
 
 void SSAOPass::blur() const {
@@ -92,5 +91,4 @@ void SSAOPass::blur() const {
 	glBindVertexArray(mQuad->VAO());
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
-	mBlurFBO->unbind();
 }

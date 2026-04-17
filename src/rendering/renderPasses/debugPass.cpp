@@ -38,5 +38,4 @@ void DebugPass::execute(const RenderContext& ctx) {
 		RenderCommon::setupTransform(*entity, *dbgShader);
 		RenderCommon::drawMesh(*mesh);
 	}
-	ctx.sceneBuffer->unbind();
 }

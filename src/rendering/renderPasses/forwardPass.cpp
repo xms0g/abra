@@ -27,5 +27,4 @@ void ForwardPass::execute(const RenderContext& ctx) {
 	}
 
 	RenderCommon::forward(ctx.renderQueue->opaqueObjects);
-	ctx.sceneBuffer->unbind();
 }

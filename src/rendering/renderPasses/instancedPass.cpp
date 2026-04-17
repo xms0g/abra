@@ -49,7 +49,6 @@ void InstancedPass::execute(const RenderContext& ctx) {
 	}
 
 	RenderCommon::instanced(ctx.renderQueue->opaqueInstancedGroups);
-	ctx.sceneBuffer->unbind();
 }
 
 void InstancedPass::prepareInstanceBuffer(

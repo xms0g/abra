@@ -66,6 +66,4 @@ void DeferredGeometryPass::execute(const RenderContext& ctx) {
 
 		RenderCommon::drawMesh(*mesh);
 	}
-
-	mGBuffer->unbind();
 }

@@ -37,5 +37,4 @@ void SkyboxPass::execute(const RenderContext& ctx) {
 	mesh.unbind();
 	glDepthFunc(GL_LESS);
 	glDepthMask(GL_TRUE);
-	ctx.sceneBuffer->unbind();
 }
