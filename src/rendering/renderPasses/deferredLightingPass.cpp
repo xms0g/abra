@@ -150,6 +150,7 @@ void DeferredLightingPass::createPrefilterMap(const RenderContext& ctx) {
 	prefilter.activate();
 	prefilter.setInt("environmentMap", 0);
 	prefilter.setMat4("projection", mCaptureProjection);
+	prefilter.setFloat("resolution", static_cast<float>(ctx.PBR.envMap.size));
 
 	mEnvMapBuffer->bindTexture(0);
 
