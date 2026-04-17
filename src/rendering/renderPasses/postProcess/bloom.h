@@ -29,7 +29,7 @@ private:
 		uint32_t vao,
 		const bool& toggle) const;
 
-	std::array<std::unique_ptr<FrameBuffer>, 2> mRenderTargets;
+	PingPongBuffer mPingPong;
 	std::unique_ptr<Shader> brightFilter;
 	std::unique_ptr<Shader> blur;
 	std::unique_ptr<Shader> combine;

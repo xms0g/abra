@@ -19,7 +19,7 @@ Bloom::Bloom(const std::string& name, const int width, const int height, const b
 	combine->setInt("screenTexture", 0);
 	combine->setInt("bloomBlur", 1);
 
-	for (auto& target: mRenderTargets) {
+	for (auto& target: mPingPong) {
 		target = std::make_unique<FrameBuffer>(width, height);
 #ifdef HDR
 		target->withTextureFP(GL_RGBA)
@@ -50,14 +50,14 @@ uint32_t Bloom::render(
 }
 
 uint32_t Bloom::brightFilterPass(const uint32_t sceneTexture, const uint32_t vao, bool& toggle) const {
-	mRenderTargets[toggle]->bind();
+	mPingPong[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	brightFilter->activate();
 
 	RenderCommon::drawQuad(sceneTexture, vao);
 
-	const uint32_t outTex = mRenderTargets[toggle]->texture();
+	const uint32_t outTex = mPingPong[toggle]->texture();
 	toggle = !toggle;
 	return outTex;
 }
@@ -67,7 +67,7 @@ uint32_t Bloom::blurPass(const uint32_t sceneTexture, const uint32_t vao, bool& 
 	uint32_t outTex = sceneTexture;
 
 	for (int i = 0; i < 10; i++) {
-		mRenderTargets[toggle]->bind();
+		mPingPong[toggle]->bind();
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		blur->activate();
@@ -76,7 +76,7 @@ uint32_t Bloom::blurPass(const uint32_t sceneTexture, const uint32_t vao, bool& 
 
 		RenderCommon::drawQuad(outTex, vao);
 
-		outTex = mRenderTargets[toggle]->texture();
+		outTex = mPingPong[toggle]->texture();
 		toggle = !toggle;
 	}
 
@@ -88,7 +88,7 @@ uint32_t Bloom::combinePass(
 	const uint32_t bloomBlur,
 	const uint32_t vao,
 	const bool& toggle) const {
-	mRenderTargets[toggle]->bind();
+	mPingPong[toggle]->bind();
 	combine->activate();
 	glDisable(GL_DEPTH_TEST);
 	glBindVertexArray(vao);
@@ -99,7 +99,7 @@ uint32_t Bloom::combinePass(
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 	glEnable(GL_DEPTH_TEST);
-	mRenderTargets[toggle]->unbind();
+	mPingPong[toggle]->unbind();
 
-	return mRenderTargets[toggle]->texture();
+	return mPingPong[toggle]->texture();
 }
