@@ -50,13 +50,8 @@ void DirectionalShadowPass::render(const RenderContext& ctx, const glm::vec4& di
 	glCullFace(GL_FRONT);
 	glViewport(0, 0, static_cast<int32_t>(ctx.shadow.width), static_cast<int32_t>(ctx.shadow.height));
 
-	const EntityCore* lastEntity = nullptr;
 	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->shadowingObjects) {
-		if (lastEntity != entity) {
-			lastEntity = entity;
-			RenderCommon::setupTransform(*entity, *mDepthShader);
-		}
-
+		RenderCommon::setupTransform(*entity, *mDepthShader);
 		RenderCommon::drawMesh(*mesh);
 	}
 	glCullFace(GL_BACK);

@@ -51,7 +51,6 @@ void DeferredGeometryPass::execute(const RenderContext& ctx) {
 	mShader->activate();
 
 	const Material* lastMaterial = nullptr;
-	const EntityCore* lastEntity = nullptr;
 	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->deferredObjects) {
 		if (lastMaterial != material) {
 			lastMaterial = material;
@@ -59,11 +58,7 @@ void DeferredGeometryPass::execute(const RenderContext& ctx) {
 			RenderCommon::bindTextures(*lastMaterial, *mShader);
 		}
 
-		if (lastEntity != entity) {
-			lastEntity = entity;
-			RenderCommon::setupTransform(*entity, *mShader);
-		}
-
+		RenderCommon::setupTransform(*entity, *mShader);
 		RenderCommon::drawMesh(*mesh);
 	}
 }

@@ -23,6 +23,7 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 				entity.transform->position,
 				entity.transform->rotation,
 				entity.transform->scale);
+
 			if (!entity.bv->isOnFrustum(*ctx.camera.frustum, model)) {
 				continue;
 			}

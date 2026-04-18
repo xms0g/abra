@@ -54,12 +54,8 @@ void PerspectiveShadowPass::render(
 	mDepthShader->setMat4("lightSpaceMatrix", mLightSpaceMatrix[layer]);
 
 	// render scene from light's point of view
-	const EntityCore* lastEntity = nullptr;
 	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->shadowingObjects) {
-		if (lastEntity != entity) {
-			lastEntity = entity;
-			RenderCommon::setupTransform(*entity, *mDepthShader);
-		}
+		RenderCommon::setupTransform(*entity, *mDepthShader);
 		RenderCommon::drawMesh(*mesh);
 	}
 }

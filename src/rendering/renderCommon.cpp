@@ -14,8 +14,6 @@
 #include "../ECS/components/mesh.hpp"
 #include "../ECS/components/transform.hpp"
 
-static bool isCullingEnabled = true;
-
 void RenderCommon::forward(const std::vector<RenderableObject>& objects) {
 	const Material* lastMaterial = nullptr;
 	const Shader* lastShader = nullptr;
@@ -66,6 +64,14 @@ void RenderCommon::instanced(const std::vector<InstanceGroup>& objects) {
 }
 
 void RenderCommon::setupTransform(const EntityCore& entity, const Shader& shader) {
+	static const EntityCore* lastEntity{nullptr};
+
+	if (lastEntity == &entity) {
+		return;
+	}
+
+	lastEntity = &entity;
+
 	const glm::mat4 model = math::modelMatrix(
 		entity.transform->position,
 		entity.transform->rotation,
@@ -78,6 +84,8 @@ void RenderCommon::setupTransform(const EntityCore& entity, const Shader& shader
 }
 
 void RenderCommon::setupMaterial(const EntityCore& entity, const Material& material, const Shader& shader) {
+	static bool isCullingEnabled{true};
+
 	if (material.flags & HAS_HEIGHT_MAP) {
 		shader.setFloat("material.heightScale", entity.material->heightScale);
 	}
