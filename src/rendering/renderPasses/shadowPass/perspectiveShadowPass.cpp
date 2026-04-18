@@ -8,7 +8,8 @@
 #include "../../renderContext/renderQueue.hpp"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderCommon.h"
-
+#include "../../mesh/mesh.h"
+#include "../../mesh/vertex.hpp"
 
 PerspectiveShadowPass::PerspectiveShadowPass(const RenderContext& ctx) {
 	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadow.width, ctx.shadow.height);
@@ -56,6 +57,6 @@ void PerspectiveShadowPass::render(
 	// render scene from light's point of view
 	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->shadowingObjects) {
 		RenderCommon::setupTransform(*entity, *mDepthShader);
-		RenderCommon::drawMesh(*mesh);
+		RenderCommon::drawMesh(mesh->vao(), mesh->vertices().size(), mesh->indices().size());
 	}
 }

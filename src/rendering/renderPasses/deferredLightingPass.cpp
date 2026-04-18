@@ -8,6 +8,8 @@
 #include "../texture/texture.h"
 #include "../../io/filesystem.hpp"
 #include "../../config/config.hpp"
+#include "../mesh/mesh.h"
+#include "../mesh/vertex.hpp"
 
 DeferredLightingPass::~DeferredLightingPass() = default;
 
@@ -109,7 +111,7 @@ void DeferredLightingPass::createEnvMap(const RenderContext& ctx) {
 		equirectangularToCube.setMat4("view", mCaptureViews[i]);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		RenderCommon::drawMesh(cubeMesh);
+		RenderCommon::drawMesh(cubeMesh.vao(), cubeMesh.vertices().size(), cubeMesh.indices().size());
 	}
 
 	mEnvMapBuffer->unbind();
@@ -137,7 +139,7 @@ void DeferredLightingPass::createIrradianceMap() {
 		irradianceConv.setMat4("view", mCaptureViews[i]);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		RenderCommon::drawMesh(cubeMesh);
+		RenderCommon::drawMesh(cubeMesh.vao(), cubeMesh.vertices().size(), cubeMesh.indices().size());
 	}
 
 	mIrradianceMapBuffer->unbind();
@@ -174,7 +176,7 @@ void DeferredLightingPass::createPrefilterMap(const RenderContext& ctx) {
 			prefilter.setMat4("view", mCaptureViews[j]);
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			RenderCommon::drawMesh(cubeMesh);
+			RenderCommon::drawMesh(cubeMesh.vao(), cubeMesh.vertices().size(), cubeMesh.indices().size());
 		}
 	}
 
@@ -193,4 +195,3 @@ void DeferredLightingPass::createBrdfLUT() const {
 	glBindVertexArray(0);
 	mBrdfLUTBuffer->unbind();
 }
-

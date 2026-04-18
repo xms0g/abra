@@ -7,6 +7,8 @@
 #include "../renderContext/renderQueue.hpp"
 #include "../renderContext/renderableObject.hpp"
 #include "../renderContext/entityData.hpp"
+#include "../mesh/mesh.h"
+#include "../mesh/vertex.hpp"
 #include "../../ECS/components/debug.hpp"
 
 DebugPass::~DebugPass() = default;
@@ -36,6 +38,6 @@ void DebugPass::execute(const RenderContext& ctx) {
 		dbgShader->activate();
 
 		RenderCommon::setupTransform(*entity, *dbgShader);
-		RenderCommon::drawMesh(*mesh);
+		RenderCommon::drawMesh(mesh->vao(), mesh->vertices().size(), mesh->indices().size());
 	}
 }

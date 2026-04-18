@@ -8,6 +8,8 @@
 #include "../../renderContext/renderContext.hpp"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderCommon.h"
+#include "../../mesh/mesh.h"
+#include "../../mesh/vertex.hpp"
 
 OmnidirectionalShadowPass::OmnidirectionalShadowPass(const RenderContext& ctx) {
 	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadow.width, ctx.shadow.height);
@@ -58,6 +60,6 @@ void OmnidirectionalShadowPass::render(
 
 	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->shadowingObjects) {
 		RenderCommon::setupTransform(*entity, *mDepthShader);
-		RenderCommon::drawMesh(*mesh);
+		RenderCommon::drawMesh(mesh->vao(), mesh->vertices().size(), mesh->indices().size());
 	}
 }
