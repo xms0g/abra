@@ -35,6 +35,7 @@
 #include "../ECS/components/mesh.hpp"
 #include "../ECS/components/instance.hpp"
 #include "../ECS/components/skybox.hpp"
+#include "../math/boundingVolume.h"
 
 RenderPipeline::RenderPipeline(Registry* registry) {
 	RequireComponent<MeshComponent>();
@@ -323,11 +324,17 @@ void RenderPipeline::refreshCameraData() const {
 
 void RenderPipeline::batchEntity(const Entity& entity) {
 	const auto& matComponent = entity.getComponent<MaterialComponent>();
+
 	const EntityCore entityCore{
 		&entity.getComponent<DebugComponent>(),
 		&entity.getComponent<TransformComponent>(),
 		&entity.getComponent<MaterialComponent>(),
-		entity.getComponent<BoundingVolumeComponent>().bv.get()
+		!entity.hasComponent<SkyboxComponent>()
+			? entity.getComponent<BoundingVolumeComponent>().bv->center()
+			: glm::vec3(0.0f),
+		!entity.hasComponent<SkyboxComponent>()
+			? entity.getComponent<BoundingVolumeComponent>().bv->extents()
+			: glm::vec3(0.0f),
 	};
 
 	if (entity.hasComponent<SkyboxComponent>()) {

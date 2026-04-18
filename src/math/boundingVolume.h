@@ -11,74 +11,90 @@ struct Frustum;
 
 class BoundingVolume {
 public:
+	BoundingVolume(const glm::vec3& min, const glm::vec3& max)
+		: mCenter{(max + min) * 0.5f}, mExtents{max.x - mCenter.x, max.y - mCenter.y, max.z - mCenter.z} {
+	}
+
+	BoundingVolume(const glm::vec3& inCenter, const float iI, const float iJ, const float iK)
+		: mCenter{inCenter}, mExtents{iI, iJ, iK} {
+	}
+
 	virtual ~BoundingVolume() = default;
 
-	[[nodiscard]] virtual bool isOnFrustum(const Frustum& camFrustum, const glm::mat4& model) const = 0;
+	[[nodiscard]]
+	glm::vec3 center() const {
+		return mCenter;
+	}
 
-	[[nodiscard]] virtual bool isMeshInFrustum(
-		const Frustum& camFrustum,
-		const glm::vec3& min,
-		const glm::vec3& max,
-		const glm::mat4& model) const = 0;
+	[[nodiscard]]
+	glm::vec3 extents() const {
+		return mExtents;
+	}
 
 protected:
-	[[nodiscard]] virtual bool isOnOrForwardPlane(const Plane& plane) const = 0;
+	[[nodiscard]]
+	virtual bool isOnOrForwardPlane(const Plane& plane) const = 0;
+
+	glm::vec3 mCenter{0.f};
+	glm::vec3 mExtents{0.f};
 };
 
 // Sphere
 class Sphere final : public BoundingVolume {
 public:
-	Sphere() = default;
-
-	Sphere(const glm::vec3& center, const float radius) : mCenter(center), mRadius(radius) {
+	Sphere(const glm::vec3& center, const float radius)
+		: BoundingVolume(center, 0.0f, 0.0f, 0.0f), mRadius(radius) {
 	}
 
 	~Sphere() override = default;
 
-	[[nodiscard]] bool isOnFrustum(const Frustum& camFrustum, const glm::mat4& model) const override;
+	[[nodiscard]]
+	bool isOnFrustum(const Frustum& camFrustum, const glm::mat4& model) const;
 
-	[[nodiscard]] bool isMeshInFrustum(
+	[[nodiscard]]
+	static bool isMeshInFrustum(
 		const Frustum& camFrustum,
 		const glm::vec3& min,
 		const glm::vec3& max,
-		const glm::mat4& model) const override;
+		const glm::mat4& model);
 
 protected:
-	[[nodiscard]] bool isOnOrForwardPlane(const Plane& plane) const override;
+	[[nodiscard]]
+	bool isOnOrForwardPlane(const Plane& plane) const override;
 
-	glm::vec3 mCenter{0.f, 0.f, 0.f};
 	float mRadius{0.f};
 };
 
 // AABB
 class AABB final : public BoundingVolume {
 public:
-	AABB() = default;
-
 	AABB(const glm::vec3& min, const glm::vec3& max)
-		: center{(max + min) * 0.5f},
-		  extents{max.x - center.x, max.y - center.y, max.z - center.z} {
+		: BoundingVolume(min, max) {
 	}
 
 	AABB(const glm::vec3& inCenter, const float iI, const float iJ, const float iK)
-		: center{inCenter}, extents{iI, iJ, iK} {
+		: BoundingVolume(inCenter, iI, iJ, iK) {
 	}
 
 	~AABB() override = default;
 
-	[[nodiscard]] bool isOnFrustum(const Frustum& camFrustum, const glm::mat4& model) const override;
+	[[nodiscard]]
+	static bool isOnFrustum(
+		const Frustum& camFrustum,
+		const glm::mat4& model,
+		const glm::vec3& center,
+		const glm::vec3& extents);
 
-	[[nodiscard]] bool isMeshInFrustum(
+	[[nodiscard]]
+	static bool isMeshInFrustum(
 		const Frustum& camFrustum,
 		const glm::vec3& min,
 		const glm::vec3& max,
-		const glm::mat4& model) const override;
+		const glm::mat4& model);
 
 protected:
-	[[nodiscard]] bool isOnOrForwardPlane(const Plane& plane) const override;
-
-	glm::vec3 center{0.f, 0.f, 0.f};
-	glm::vec3 extents{0.f, 0.f, 0.f};
+	[[nodiscard]]
+	bool isOnOrForwardPlane(const Plane& plane) const override;
 };
 
 Sphere generateSphereBV(const std::unordered_map<uint32_t, std::vector<Mesh> >& meshesByMatID);

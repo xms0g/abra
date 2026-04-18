@@ -33,7 +33,7 @@ bool math::Sphere::isMeshInFrustum(
 	const Frustum& camFrustum,
 	const glm::vec3& min,
 	const glm::vec3& max,
-	const glm::mat4& model) const {
+	const glm::mat4& model) {
 	return false;
 }
 
@@ -41,7 +41,11 @@ bool math::Sphere::isOnOrForwardPlane(const Plane& plane) const {
 	return plane.computeSignedDistanceToPlane(mCenter) > -mRadius;
 }
 
-bool math::AABB::isOnFrustum(const Frustum& camFrustum, const glm::mat4& model) const {
+bool math::AABB::isOnFrustum(
+	const Frustum& camFrustum,
+	const glm::mat4& model,
+	const glm::vec3& center,
+	const glm::vec3& extents) {
 	const glm::vec3 globalCenter{model * glm::vec4(center, 1.f)};
 	// Scaled orientation
 	const glm::vec3 right = model[0] * extents.x;
@@ -55,18 +59,18 @@ bool math::AABB::isOnFrustum(const Frustum& camFrustum, const glm::mat4& model) 
 	const AABB globalAABB{globalCenter, newIi, newIj, newIk};
 
 	return globalAABB.isOnOrForwardPlane(camFrustum.leftFace) &&
-	       globalAABB.isOnOrForwardPlane(camFrustum.rightFace) &&
-	       globalAABB.isOnOrForwardPlane(camFrustum.topFace) &&
-	       globalAABB.isOnOrForwardPlane(camFrustum.bottomFace) &&
-	       globalAABB.isOnOrForwardPlane(camFrustum.nearFace) &&
-	       globalAABB.isOnOrForwardPlane(camFrustum.farFace);
+		   globalAABB.isOnOrForwardPlane(camFrustum.rightFace) &&
+		   globalAABB.isOnOrForwardPlane(camFrustum.topFace) &&
+		   globalAABB.isOnOrForwardPlane(camFrustum.bottomFace) &&
+		   globalAABB.isOnOrForwardPlane(camFrustum.nearFace) &&
+		   globalAABB.isOnOrForwardPlane(camFrustum.farFace);
 }
 
 bool math::AABB::isMeshInFrustum(
 	const Frustum& camFrustum,
 	const glm::vec3& min,
 	const glm::vec3& max,
-	const glm::mat4& model) const {
+	const glm::mat4& model) {
 	// Define local corners
 	const glm::vec3 localCorners[8] = {
 		{min.x, min.y, min.z}, {max.x, min.y, min.z},
@@ -92,7 +96,7 @@ bool math::AABB::isMeshInFrustum(
 
 		for (const auto& corner: worldCorners) {
 			if (plane.computeSignedDistanceToPlane(corner) >= 0) {
-				inside++;
+				++inside;
 			}
 		}
 
@@ -105,11 +109,11 @@ bool math::AABB::isMeshInFrustum(
 }
 
 bool math::AABB::isOnOrForwardPlane(const Plane& plane) const {
-	const float r = extents.x * std::abs(plane.normal.x) +
-	                extents.y * std::abs(plane.normal.y) +
-	                extents.z * std::abs(plane.normal.z);
+	const float r = mExtents.x * std::abs(plane.normal.x) +
+	                mExtents.y * std::abs(plane.normal.y) +
+	                mExtents.z * std::abs(plane.normal.z);
 
-	return -r <= plane.computeSignedDistanceToPlane(center);
+	return -r <= plane.computeSignedDistanceToPlane(mCenter);
 }
 
 math::Sphere math::generateSphereBV(const std::unordered_map<uint32_t, std::vector<Mesh> >& meshesByMatID) {

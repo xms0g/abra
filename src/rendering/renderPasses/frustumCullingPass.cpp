@@ -24,13 +24,13 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 				entity.transform->rotation,
 				entity.transform->scale);
 
-			if (!entity.bv->isOnFrustum(*ctx.camera.frustum, model)) {
+			if (!math::AABB::isOnFrustum(*ctx.camera.frustum, model, entity.bvCenter, entity.bvExtents)) {
 				continue;
 			}
 
 			const auto& [material, shader, meshes] = matBatch;
 			for (const auto& mesh: *meshes) {
-				const bool isVisible = entity.bv->isMeshInFrustum(*ctx.camera.frustum, mesh.min(), mesh.max(), model);
+				const bool isVisible = math::AABB::isMeshInFrustum(*ctx.camera.frustum, mesh.min(), mesh.max(), model);
 
 				if (isVisible) {
 					outQueue.push_back({&entity, material, shader, &mesh});
