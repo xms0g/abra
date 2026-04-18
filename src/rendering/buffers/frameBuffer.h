@@ -6,7 +6,8 @@ class IFrameBuffer {
 public:
 	virtual ~IFrameBuffer() = default;
 
-	[[nodiscard]] virtual uint32_t texture(uint32_t index) const = 0;
+	[[nodiscard]]
+	virtual uint32_t texture(uint32_t index) const = 0;
 
 	virtual void bind() const = 0;
 
@@ -27,13 +28,17 @@ public:
 
 	~FrameBuffer() override;
 
-	[[nodiscard]] int32_t width() const;
+	[[nodiscard]]
+	int32_t width() const;
 
-	[[nodiscard]] int32_t height() const;
+	[[nodiscard]]
+	int32_t height() const;
 
-	[[nodiscard]] uint32_t texture(uint32_t index = 0) const override;
+	[[nodiscard]]
+	uint32_t texture(uint32_t index = 0) const override;
 
-	[[nodiscard]] const std::vector<std::pair<uint32_t, uint32_t>>& textures() const;
+	[[nodiscard]]
+	const std::vector<std::pair<uint32_t, uint32_t>>& textures() const;
 
 	void bind() const override;
 
@@ -90,9 +95,11 @@ public:
 
 	~CubemapBuffer() override;
 
-	[[nodiscard]] uint32_t texture(uint32_t index = 0) const override;
+	[[nodiscard]]
+	uint32_t texture(uint32_t index = 0) const override;
 
-	[[nodiscard]] uint32_t rbo() const;
+	[[nodiscard]]
+	uint32_t rbo() const;
 
 	void bind() const override;
 

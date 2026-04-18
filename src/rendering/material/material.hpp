@@ -27,7 +27,8 @@ struct Material {
 	float alphaCutoff;
 	std::vector<Texture> textures;
 
-	[[nodiscard]] bool hasTexture(const std::string_view p, uint32_t desiredType) const {
+	[[nodiscard]]
+	bool hasTexture(const std::string_view p, uint32_t desiredType) const {
 		return std::find_if(textures.begin(), textures.end(),
 		                    [p, desiredType](const Texture& tex) {
 			                    return tex.path == p && tex.type == desiredType;

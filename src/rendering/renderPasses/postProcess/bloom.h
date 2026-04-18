@@ -23,7 +23,8 @@ private:
 
 	uint32_t blurPass(uint32_t sceneTexture, uint32_t vao, bool& toggle) const;
 
-	[[nodiscard]] uint32_t combinePass(
+	[[nodiscard]]
+	uint32_t combinePass(
 		uint32_t sceneTexture,
 		uint32_t bloomBlur,
 		uint32_t vao,

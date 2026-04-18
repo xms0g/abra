@@ -15,9 +15,11 @@ public:
 
 	~ShadowPass() override;
 
-	[[nodiscard]] const UniformBuffer* ubo() const;
+	[[nodiscard]]
+	const UniformBuffer* ubo() const;
 
-	[[nodiscard]] const std::array<uint32_t, 3>& shadowMaps() const;
+	[[nodiscard]]
+	const std::array<uint32_t, 3>& shadowMaps() const;
 
 	void configure(const RenderContext& ctx) override;
 

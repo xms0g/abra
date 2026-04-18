@@ -25,7 +25,8 @@ public:
 
 	~RenderPipeline() override;
 
-	[[nodiscard]] PostProcessPass& postProcess() const;
+	[[nodiscard]]
+	PostProcessPass& postProcess() const;
 
 	void configure(const Camera& camera);
 

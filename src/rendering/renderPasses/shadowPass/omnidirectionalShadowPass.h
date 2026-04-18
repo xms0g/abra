@@ -13,9 +13,11 @@ public:
 
 	~OmnidirectionalShadowPass();
 
-	[[nodiscard]] uint32_t depthTexture() const;
+	[[nodiscard]]
+	uint32_t depthTexture() const;
 
-	[[nodiscard]] FrameBuffer& depthMap() const;
+	[[nodiscard]]
+	FrameBuffer& depthMap() const;
 
 	void render(const RenderContext& ctx, const glm::vec4& position, int32_t layer) const;
 

@@ -21,13 +21,17 @@ public:
 
 	Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
 
-	[[nodiscard]] glm::mat4 viewMatrix() const;
+	[[nodiscard]]
+	glm::mat4 viewMatrix() const;
 
-	[[nodiscard]] const glm::vec3& position() const;
+	[[nodiscard]]
+	const glm::vec3& position() const;
 
-	[[nodiscard]] const glm::vec3& front() const;
+	[[nodiscard]]
+	const glm::vec3& front() const;
 
-	[[nodiscard]] const math::Frustum& frustum() const;
+	[[nodiscard]]
+	const math::Frustum& frustum() const;
 
 	void update();
 

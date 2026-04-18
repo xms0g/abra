@@ -11,11 +11,14 @@ public:
 
 	void addEntityToSystem(const Entity& entity) { entities.emplace_back(entity); }
 
-	[[nodiscard]] const std::vector<Entity>& getSystemEntities() const { return entities; }
+	[[nodiscard]]
+	const std::vector<Entity>& getSystemEntities() const { return entities; }
 
-	[[nodiscard]] const Signature& getComponentSignature() const { return componentSignature; }
+	[[nodiscard]]
+	const Signature& getComponentSignature() const { return componentSignature; }
 
-	[[nodiscard]] bool useOrLogic() const { return mUseOrLogic; }
+	[[nodiscard]]
+	bool useOrLogic() const { return mUseOrLogic; }
 
 	template<typename T>
 	void RequireComponent(bool orLogic = false);

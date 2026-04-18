@@ -19,11 +19,14 @@ public:
 
 	static ResourceManager& instance();
 
-	[[nodiscard]] MeshMap* getMeshes(size_t entityID);
+	[[nodiscard]]
+	MeshMap* getMeshes(size_t entityID);
 
-	[[nodiscard]] const MaterialMap* getMaterial(size_t entityID) const;
+	[[nodiscard]]
+	const MaterialMap* getMaterial(size_t entityID) const;
 
-	[[nodiscard]] std::span<const char* const> getSkyboxTexture() const;
+	[[nodiscard]]
+	std::span<const char* const> getSkyboxTexture() const;
 
 	void asyncLoadModel(size_t entityID, const char* file);
 

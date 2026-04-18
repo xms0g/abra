@@ -22,13 +22,17 @@ public:
 
 	Mesh& operator=(Mesh&& other) noexcept;
 
-	[[nodiscard]] const std::vector<Vertex>& vertices() const;
+	[[nodiscard]]
+	const std::vector<Vertex>& vertices() const;
 
-	[[nodiscard]] const std::vector<uint32_t>& indices() const;
+	[[nodiscard]]
+	const std::vector<uint32_t>& indices() const;
 
-	[[nodiscard]] const glm::vec3& min() const;
+	[[nodiscard]]
+	const glm::vec3& min() const;
 
-	[[nodiscard]] const glm::vec3& max() const;
+	[[nodiscard]]
+	const glm::vec3& max() const;
 
 	void bind() const;
 

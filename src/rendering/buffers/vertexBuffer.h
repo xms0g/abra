@@ -24,9 +24,11 @@ public:
 	VertexLayout() : mStride(0) {
 	}
 
-	[[nodiscard]] const std::vector<VertexAttribute>& attributes() const;
+	[[nodiscard]]
+	const std::vector<VertexAttribute>& attributes() const;
 
-	[[nodiscard]] int32_t stride() const;
+	[[nodiscard]]
+	int32_t stride() const;
 
 	void addPadding(int32_t bytes);
 

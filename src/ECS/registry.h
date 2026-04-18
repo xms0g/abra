@@ -57,7 +57,8 @@ public:
 	}
 
 	template<typename T>
-	[[nodiscard]] bool hasSystem() const {
+	[[nodiscard]]
+	bool hasSystem() const {
 		return systems.contains(std::type_index{typeid(T)});
 	}
 
@@ -91,7 +92,8 @@ T& Entity::getComponent() const {
 }
 
 template<typename T>
-[[nodiscard]] bool Entity::hasComponent() const {
+[[nodiscard]]
+bool Entity::hasComponent() const {
 	return registry->hasComponent<T>(*this);
 }
 

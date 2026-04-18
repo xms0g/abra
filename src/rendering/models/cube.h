@@ -17,9 +17,11 @@ public:
 
 	~Cube();
 
-	[[nodiscard]] MeshMap* meshes();
+	[[nodiscard]]
+	MeshMap* meshes();
 
-	[[nodiscard]] const MaterialMap* material() const;
+	[[nodiscard]]
+	const MaterialMap* material() const;
 
 private:
 	MeshMap mMeshes;

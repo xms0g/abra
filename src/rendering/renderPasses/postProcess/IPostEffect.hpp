@@ -14,9 +14,11 @@ public:
 
 	virtual ~IPostEffect() = default;
 
-	[[nodiscard]] const std::string& name() const { return mName; }
+	[[nodiscard]]
+	const std::string& name() const { return mName; }
 
-	[[nodiscard]] bool& enabled() { return mEnabled; }
+	[[nodiscard]]
+	bool& enabled() { return mEnabled; }
 
 	virtual uint32_t render(
 		uint32_t sceneTexture,

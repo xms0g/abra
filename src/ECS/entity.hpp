@@ -12,8 +12,11 @@ public:
 
 	Entity(const Entity& other) = default;
 
-	[[nodiscard]] size_t id() const { return mID; }
-	[[nodiscard]] const char* name() const { return mName.c_str(); }
+	[[nodiscard]]
+	size_t id() const { return mID; }
+
+	[[nodiscard]]
+	const char* name() const { return mName.c_str(); }
 
 	class Registry* registry{};
 
@@ -24,7 +27,8 @@ public:
 	T& getComponent() const;
 
 	template<typename T>
-	[[nodiscard]] bool hasComponent() const;
+	[[nodiscard]]
+	bool hasComponent() const;
 
 private:
 	size_t mID{};

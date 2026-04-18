@@ -17,9 +17,11 @@ class SSAOPass final : public IRenderPass {
 public:
 	~SSAOPass() override;
 
-	[[nodiscard]] const FrameBuffer* blurFBO() const;
+	[[nodiscard]]
+	const FrameBuffer* blurFBO() const;
 
-	[[nodiscard]] const UniformBuffer* ubo() const;
+	[[nodiscard]]
+	const UniformBuffer* ubo() const;
 
 	void configure(const RenderContext& ctx) override;
 

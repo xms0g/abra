@@ -9,7 +9,8 @@ class DeferredGeometryPass final : public IRenderPass {
 public:
 	~DeferredGeometryPass() override;
 
-	[[nodiscard]] const FrameBuffer* gBuffer() const;
+	[[nodiscard]]
+	const FrameBuffer* gBuffer() const;
 
 	void configure(const RenderContext& ctx) override;
 

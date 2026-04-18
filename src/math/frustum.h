@@ -10,7 +10,8 @@ struct Plane {
 
 	Plane(const glm::vec3& p1, const glm::vec3& norm);
 
-	[[nodiscard]] float computeSignedDistanceToPlane(const glm::vec3& point) const;
+	[[nodiscard]]
+	float computeSignedDistanceToPlane(const glm::vec3& point) const;
 };
 
 struct Frustum {

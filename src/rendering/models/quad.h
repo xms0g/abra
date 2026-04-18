@@ -9,7 +9,8 @@ public:
 
 	virtual ~IQuad();
 
-	[[nodiscard]] uint32_t VAO() const { return mVAO; }
+	[[nodiscard]]
+	uint32_t VAO() const { return mVAO; }
 
 protected:
 	uint32_t mVAO{0}, mVBO{0};
@@ -29,7 +30,8 @@ public:
 
 	~Quad() override = default;
 
-	[[nodiscard]] const Shader& shader() const;
+	[[nodiscard]]
+	const Shader& shader() const;
 
 private:
 	std::unique_ptr<Shader> mShader;
