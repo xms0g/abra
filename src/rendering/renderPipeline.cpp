@@ -19,7 +19,6 @@
 #include "renderPasses/debugPass.h"
 #include "renderPasses/forwardPass.h"
 #include "renderPasses/instancedPass.h"
-#include "renderPasses/beginScenePass.h"
 #include "renderPasses/frustumCullingPass.h"
 #include "renderPasses/skyboxPass.h"
 #include "renderPasses/resolvePass.h"
@@ -123,7 +122,6 @@ void RenderPipeline::configure(const Camera& camera) {
 
 	mRenderPasses.push_back(std::make_shared<FrustumCullingPass>());
 	mRenderPasses.push_back(mShadowPass);
-	mRenderPasses.push_back(std::make_shared<BeginScenePass>());
 
 	if (!mRenderQueue.deferredGroups.empty()) {
 		mDeferredGeometryPass = std::make_shared<DeferredGeometryPass>();
@@ -288,6 +286,9 @@ void RenderPipeline::render() {
 	sortEntities();
 
 	mLightSystem->update(*mRenderCtx);
+
+	mSceneBuffer->bind();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for (const auto& pass: mRenderPasses) {
 		pass->execute(*mRenderCtx);
