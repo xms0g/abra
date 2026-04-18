@@ -67,7 +67,6 @@ void ShadowPass::omnidirectionalShadowPass(const RenderContext& ctx) const {
 
 	omnidirShadowPass->depthMap().bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
 	glViewport(0, 0, static_cast<int32_t>(ctx.shadow.width), static_cast<int32_t>(ctx.shadow.height));
 
 	for (int32_t i = 0; i < lights.size(); ++i) {
@@ -89,7 +88,6 @@ void ShadowPass::perspectiveShadowPass(const RenderContext& ctx) const {
 
 	persShadowPass->depthMap().bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
 	glViewport(0, 0, static_cast<int32_t>(ctx.shadow.width), static_cast<int32_t>(ctx.shadow.height));
 

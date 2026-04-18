@@ -78,6 +78,7 @@ void DeferredLightingPass::execute(const RenderContext& ctx) {
 	ctx.gBuffer.self->bindTexture(3, ctx.gBuffer.ormTextureIdx);
 
 	ctx.ssao.buffer->bindTexture(ctx.ssao.textureSlot);
+
 	mIrradianceMapBuffer->bindTexture(ctx.PBR.irradianceMap.textureSlot);
 	mPrefilterMapBuffer->bindTexture(ctx.PBR.prefilterMap.textureSlot);
 	mBrdfLUTBuffer->bindTexture(ctx.PBR.brdfLUT.textureSlot);
