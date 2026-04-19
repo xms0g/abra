@@ -10,9 +10,7 @@
 #include "renderContext/instanceGroup.hpp"
 #include "renderContext/entityData.hpp"
 #include "../math/matrix.h"
-#include "../ECS/components/material.hpp"
 #include "../ECS/components/mesh.hpp"
-#include "../ECS/components/transform.hpp"
 
 void RenderCommon::forward(const std::vector<RenderableObject>& objects) {
 	const Material* lastMaterial = nullptr;
@@ -72,11 +70,7 @@ void RenderCommon::setupTransform(const EntityCore& entity, const Shader& shader
 
 	lastEntity = &entity;
 
-	const glm::mat4 model = math::modelMatrix(
-		entity.transform->position,
-		entity.transform->rotation,
-		entity.transform->scale);
-
+	const glm::mat4 model = math::modelMatrix(entity.position, entity.rotation, entity.scale);
 	const glm::mat3 normal = math::normalMatrix(model);
 
 	shader.setMat4("model", model);
@@ -87,7 +81,7 @@ void RenderCommon::setupMaterial(const EntityCore& entity, const Material& mater
 	static bool isCullingEnabled{true};
 
 	if (material.flags & HAS_HEIGHT_MAP) {
-		shader.setFloat("material.heightScale", entity.material->heightScale);
+		shader.setFloat("material.heightScale", entity.heightScale);
 	}
 
 	if (material.alphaCutoff != 0.0f) {

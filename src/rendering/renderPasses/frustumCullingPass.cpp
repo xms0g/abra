@@ -5,7 +5,6 @@
 #include "../renderContext/renderGroup.hpp"
 #include "../renderContext/renderableObject.hpp"
 #include "../../ECS/registry.h"
-#include "../../ECS/components/transform.hpp"
 #include "../../math/boundingVolume.h"
 #include "../../math/matrix.h"
 
@@ -19,10 +18,7 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 		outQueue.clear();
 
 		for (const auto& [entity, matBatch]: groups) {
-			const glm::mat4 model = math::modelMatrix(
-				entity.transform->position,
-				entity.transform->rotation,
-				entity.transform->scale);
+			const glm::mat4 model = math::modelMatrix(entity.position, entity.rotation, entity.scale);
 
 			if (!math::AABB::isOnFrustum(*ctx.camera.frustum, model, entity.bvCenter, entity.bvExtents)) {
 				continue;

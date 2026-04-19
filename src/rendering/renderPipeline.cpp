@@ -327,8 +327,10 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 
 	const EntityCore entityCore{
 		&entity.getComponent<DebugComponent>(),
-		&entity.getComponent<TransformComponent>(),
-		&entity.getComponent<MaterialComponent>(),
+		entity.getComponent<TransformComponent>().position,
+		entity.getComponent<TransformComponent>().rotation,
+		entity.getComponent<TransformComponent>().scale,
+		entity.getComponent<MaterialComponent>().heightScale,
 		!entity.hasComponent<SkyboxComponent>()
 			? entity.getComponent<BoundingVolumeComponent>().bv->center()
 			: glm::vec3(0.0f),
@@ -408,8 +410,8 @@ void RenderPipeline::sortEntities() {
 			batch.begin(),
 			batch.end(),
 			[&camPos, &transparent](const RenderGroup& a, const RenderGroup& b) {
-				const float da = glm::length2(camPos - a.entity.transform->position);
-				const float db = glm::length2(camPos - b.entity.transform->position);
+				const float da = glm::length2(camPos - a.entity.position);
+				const float db = glm::length2(camPos - b.entity.position);
 
 				if (transparent)
 					return da > db;
