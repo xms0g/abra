@@ -5,14 +5,11 @@
 #include "../buffers/frameBuffer.h"
 #include "../buffers/uniformBuffer.h"
 #include "../material/material.hpp"
-#include "../mesh/mesh.h"
-#include "../mesh/vertex.hpp"
 #include "../renderContext/renderQueue.hpp"
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderableObject.hpp"
 #include "../../ECS/components/bv.hpp"
 #include "../../ECS/entity.hpp"
-
 
 DeferredGeometryPass::~DeferredGeometryPass() = default;
 
@@ -62,6 +59,6 @@ void DeferredGeometryPass::execute(const RenderContext& ctx) {
 		}
 
 		RenderCommon::setupTransform(*entity, *mShader);
-		RenderCommon::drawMesh(mesh->vao(), mesh->vertices().size(), mesh->indices().size());
+		RenderCommon::drawMesh(*mesh);
 	}
 }

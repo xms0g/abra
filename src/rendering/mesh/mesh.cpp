@@ -58,10 +58,6 @@ const glm::vec3& Mesh::max() const {
 	return mMax;
 }
 
-uint32_t Mesh::vao() const {
-	return mVAO->id();
-}
-
 void Mesh::bind() const {
 	mVAO->bind();
 }

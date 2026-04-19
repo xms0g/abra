@@ -1,8 +1,6 @@
 #include "directionalShadowPass.h"
 #include "glad/glad.h"
 #include "glm/gtc/type_ptr.hpp"
-#include "../../mesh/mesh.h"
-#include "../../mesh/vertex.hpp"
 #include "../../shader.h"
 #include "../../renderContext/renderContext.hpp"
 #include "../../renderContext/renderableObject.hpp"
@@ -54,7 +52,7 @@ void DirectionalShadowPass::render(const RenderContext& ctx, const glm::vec4& di
 
 	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->shadowingObjects) {
 		RenderCommon::setupTransform(*entity, *mDepthShader);
-		RenderCommon::drawMesh(mesh->vao(), mesh->vertices().size(), mesh->indices().size());
+		RenderCommon::drawMesh(*mesh);
 	}
 	glCullFace(GL_BACK);
 	glViewport(0, 0, static_cast<int32_t>(ctx.screen.width), static_cast<int32_t>(ctx.screen.height));

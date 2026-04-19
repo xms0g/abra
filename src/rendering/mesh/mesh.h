@@ -34,9 +34,6 @@ public:
 	[[nodiscard]]
 	const glm::vec3& max() const;
 
-	[[nodiscard]]
-	uint32_t vao() const;
-
 	void bind() const;
 
 	void unbind() const;

@@ -1,6 +1,7 @@
 #pragma once
 
 struct DebugComponent;
+
 struct MaterialComponent;
 struct TransformComponent;
 
@@ -8,6 +9,6 @@ struct EntityCore {
 	const DebugComponent* debug{};
 	const TransformComponent* transform{};
 	const MaterialComponent* material{};
-	glm::vec3 bvCenter{0.f};
-	glm::vec3 bvExtents{0.f};
+	glm::vec3 bvCenter{0.f, 0.f, 0.f};
+	glm::vec3 bvExtents{0.f, 0.f, 0.f};
 };

@@ -37,7 +37,7 @@ void RenderCommon::forward(const std::vector<RenderableObject>& objects) {
 			lastMaterial = material;
 		}
 
-		drawMesh(mesh->vao(), mesh->vertices().size(), mesh->indices().size());
+		drawMesh(*mesh);
 	}
 }
 
@@ -103,19 +103,18 @@ void RenderCommon::setupMaterial(const EntityCore& entity, const Material& mater
 	}
 }
 
-void RenderCommon::drawMesh(const uint32_t vao, const uint32_t vertexCount, const uint32_t indexCount) {
-	glBindVertexArray(vao);
-
-	if (indexCount) {
-		glDrawElements(GL_TRIANGLES, static_cast<int32_t>(indexCount), GL_UNSIGNED_INT, nullptr);
+void RenderCommon::drawMesh(const Mesh& mesh) {
+	mesh.bind();
+	if (!mesh.indices().empty()) {
+		glDrawElements(GL_TRIANGLES, static_cast<int32_t>(mesh.indices().size()), GL_UNSIGNED_INT, nullptr);
 	} else {
-		glDrawArrays(GL_TRIANGLES, 0, static_cast<int32_t>(vertexCount));
+		glDrawArrays(GL_TRIANGLES, 0, static_cast<int32_t>(mesh.vertices().size()));
 	}
 }
 
-void RenderCommon::drawQuad(const uint32_t sceneTexture, const uint32_t vao) {
+void RenderCommon::drawQuad(const uint32_t sceneTexture, const uint32_t VAO) {
 	glDisable(GL_DEPTH_TEST);
-	glBindVertexArray(vao);
+	glBindVertexArray(VAO);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, sceneTexture);
 	glDrawArrays(GL_TRIANGLES, 0, 6);

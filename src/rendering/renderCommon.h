@@ -21,9 +21,9 @@ void setupTransform(const EntityCore& entity, const Shader& shader);
 
 void setupMaterial(const EntityCore& entity, const Material& material, const Shader& shader);
 
-void drawMesh(uint32_t vao, uint32_t vertexCount = 0, uint32_t indexCount = 0);
+void drawMesh(const Mesh& mesh);
 
-void drawQuad(uint32_t sceneTexture, uint32_t vao);
+void drawQuad(uint32_t sceneTexture, uint32_t VAO);
 
 void bindTextures(const Material& material, const Shader& shader);
 
