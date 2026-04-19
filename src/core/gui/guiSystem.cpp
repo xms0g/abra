@@ -40,13 +40,8 @@ void GuiSystem::render(const std::vector<std::shared_ptr<IPostEffect>>& effects)
 		if (Ui::beginEntity(entity.name())) {
 			GuiPanels::renderTransformPanel(entity);
 			GuiPanels::renderDebugViewsPanel(entity);
-			Ui::endEntity();
-		}
-
-		if (entity.hasComponent<DirectionalLightComponent>() ||
-			entity.hasComponent<PointLightComponent>() ||
-			entity.hasComponent<SpotLightComponent>()) {
 			GuiPanels::renderLightPanel(entity);
+			Ui::endEntity();
 		}
 	}
 
