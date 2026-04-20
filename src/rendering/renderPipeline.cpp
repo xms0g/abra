@@ -66,12 +66,12 @@ RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLCon
 	registry->addSystem<LightSystem>(*mRenderCtx);
 	mLightSystem = &registry->getSystem<LightSystem>();
 
-	opaque = std::make_unique<Shader>("object.vert", "opaque.frag");
-	blend = std::make_unique<Shader>("object.vert", "blend.frag");
-	unlit = std::make_unique<Shader>("unlit.vert", "unlit.frag");
-	instancedOpaque = std::make_unique<Shader>("instanced.vert", "opaque.frag");
-	instancedBlend = std::make_unique<Shader>("instanced.vert", "blend.frag");
-	skybox = std::make_unique<Shader>("skybox.vert", "skybox.frag");
+	mShaders.emplace_back(std::make_unique<Shader>("object.vert", "opaque.frag"));
+	mShaders.emplace_back(std::make_unique<Shader>("object.vert", "blend.frag"));
+	mShaders.emplace_back(std::make_unique<Shader>("unlit.vert", "unlit.frag"));
+	mShaders.emplace_back(std::make_unique<Shader>("instanced.vert", "opaque.frag"));
+	mShaders.emplace_back(std::make_unique<Shader>("instanced.vert", "blend.frag"));
+	mShaders.emplace_back(std::make_unique<Shader>("skybox.vert", "skybox.frag"));
 
 	GuiBackend::init(window, context, "#version 410");
 }
@@ -252,12 +252,7 @@ void RenderPipeline::configure(const Camera& camera) {
 	}
 
 	// Configure shaders
-	const std::vector<Shader*> shaders = {
-		opaque.get(), blend.get(), unlit.get(),
-		instancedOpaque.get(), instancedBlend.get(), skybox.get()
-	};
-
-	for (const auto& shader: shaders) {
+	for (const auto& shader: mShaders) {
 		mRenderCtx->camera.ubo.self->configure(
 			shader->id(),
 			mRenderCtx->camera.ubo.binding,
@@ -350,7 +345,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 	if (entity.hasComponent<SkyboxComponent>()) {
 		const auto& material = matComponent.materials->at(0);
 		auto& meshes = entity.getComponent<MeshComponent>().meshes->at(0);
-		const MaterialBatch matBatch{&material, skybox.get(), &meshes};
+		const MaterialBatch matBatch{&material, mShaders[5].get(), &meshes};
 		const RenderGroup group{entityCore, matBatch};
 		mRenderQueue.skybox.push_back(group);
 		return;
@@ -363,9 +358,9 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		if (matComponent.renderFlag & INSTANCED_PASS) {
 			// Set shader
 			if (material.flags & OPAQUE) {
-				matBatch.shader = instancedOpaque.get();
+				matBatch.shader = mShaders[3].get();
 			} else if (material.flags & BLEND) {
-				matBatch.shader = instancedBlend.get();
+				matBatch.shader = mShaders[4].get();
 			}
 
 			const auto& instComponent = entity.getComponent<InstanceComponent>();
@@ -382,12 +377,12 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		// Set shader
 		if (material.flags & OPAQUE) {
 			if (material.flags & UNLIT) {
-				matBatch.shader = unlit.get();
+				matBatch.shader = mShaders[2].get();
 			} else {
-				matBatch.shader = opaque.get();
+				matBatch.shader = mShaders[0].get();
 			}
 		} else if (material.flags & BLEND) {
-			matBatch.shader = blend.get();
+			matBatch.shader = mShaders[1].get();
 		}
 
 		const RenderGroup group{entityCore, matBatch};
