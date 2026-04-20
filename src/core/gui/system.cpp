@@ -1,5 +1,6 @@
-#include "guiSystem.h"
-#include "guiPanels.h"
+#include "system.h"
+#include "panels.h"
+#include "ui.h"
 #include "../../ECS/registry.h"
 #include "../../ECS/components/debug.hpp"
 #include "../../ECS/components/directionalLight.hpp"
@@ -8,34 +9,27 @@
 #include "../../ECS/components/transform.hpp"
 #include "../../ECS/components/instance.hpp"
 
-GuiSystem::GuiSystem(SDL_Window* window, const SDL_GLContext context) {
+GuiSystem::GuiSystem() {
 	RequireComponent<TransformComponent>(true);
 	RequireComponent<PointLightComponent>(true);
 	RequireComponent<SpotLightComponent>(true);
 	RequireComponent<DirectionalLightComponent>(true);
 	RequireComponent<DebugComponent>(true);
-	// Initialize the ImGui context
-	GuiBackend::init(window, context, "#version 410");
 }
 
-GuiSystem::~GuiSystem() {
-	// Clean up ImGui
-	GuiBackend::shutdown();
-}
+GuiSystem::~GuiSystem() = default;
 
 void GuiSystem::update(const float dt) {
 	updateFpsCounter(dt);
 }
 
-void GuiSystem::render(const std::vector<std::shared_ptr<IPostEffect>>& effects) const {
-	// Start the Dear ImGui frame
-	GuiBackend::newFrame();
-
+void GuiSystem::render(const std::vector<std::unique_ptr<IPostEffect>>& effects) const {
 	GuiPanels::renderGraphicsInfoPanel(mFPS);
 	GuiPanels::renderPostProcessPanel(effects);
 
 	for (const auto& entity: getSystemEntities()) {
-		if (entity.hasComponent<InstanceComponent>()) continue;
+		if (entity.hasComponent<InstanceComponent>())
+			continue;
 
 		if (Ui::beginEntity(entity.name())) {
 			GuiPanels::renderTransformPanel(entity);
@@ -44,9 +38,6 @@ void GuiSystem::render(const std::vector<std::shared_ptr<IPostEffect>>& effects)
 			Ui::endEntity();
 		}
 	}
-
-	//Render ImGui
-	GuiBackend::renderFrame();
 }
 
 void GuiSystem::updateFpsCounter(const float dt) {

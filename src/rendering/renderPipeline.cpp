@@ -24,6 +24,7 @@
 #include "renderPasses/resolvePass.h"
 #include "renderPasses/postProcess/postProcessPass.h"
 #include "renderPasses/shadowPass/shadowPass.h"
+#include "gui/backend.h"
 #include "material/material.hpp"
 #include "../config/config.hpp"
 #include "../ECS/registry.h"
@@ -37,7 +38,7 @@
 #include "../ECS/components/skybox.hpp"
 #include "../math/boundingVolume.h"
 
-RenderPipeline::RenderPipeline(Registry* registry) {
+RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLContext context) {
 	RequireComponent<MeshComponent>();
 	RequireComponent<TransformComponent>();
 	// glad: load all OpenGL function pointers
@@ -71,9 +72,13 @@ RenderPipeline::RenderPipeline(Registry* registry) {
 	instancedOpaque = std::make_unique<Shader>("instanced.vert", "opaque.frag");
 	instancedBlend = std::make_unique<Shader>("instanced.vert", "blend.frag");
 	skybox = std::make_unique<Shader>("skybox.vert", "skybox.frag");
+
+	GuiBackend::init(window, context, "#version 410");
 }
 
-RenderPipeline::~RenderPipeline() = default;
+RenderPipeline::~RenderPipeline() {
+	GuiBackend::shutdown();
+}
 
 PostProcessPass& RenderPipeline::postProcess() const { return *mPostProcessPass; }
 
@@ -283,6 +288,7 @@ void RenderPipeline::batchEntities() {
 }
 
 void RenderPipeline::render() {
+	GuiBackend::newFrame();
 	refreshCameraData();
 	sortEntities();
 
@@ -302,6 +308,10 @@ void RenderPipeline::render() {
 		static_cast<int32_t>(mRenderCtx->screen.width),
 		static_cast<int32_t>(mRenderCtx->screen.height));
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void RenderPipeline::drawGui() {
+	GuiBackend::renderFrame();
 }
 
 void RenderPipeline::refreshCameraData() const {

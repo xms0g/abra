@@ -7,9 +7,7 @@ void Input::process(Camera& camera, SDL_Window* window, const float dt, bool& is
 	SDL_Event event;
 
 	while (SDL_PollEvent(&event)) {
-#ifdef DEBUG
 		ImGui_ImplSDL2_ProcessEvent(&event);
-#endif
 
 		if (event.type == SDL_QUIT)
 			isRunning = false;

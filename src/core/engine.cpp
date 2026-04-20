@@ -4,7 +4,7 @@
 #include "input.h"
 #include "camera.h"
 #include "window.h"
-#include "gui/guiSystem.h"
+#include "gui/system.h"
 #include "../ECS/registry.h"
 #include "../rendering/renderPipeline.h"
 #include "../rendering/renderPasses/postProcess/postProcessPass.h"
@@ -19,10 +19,10 @@ void Engine::init(Registry* registry) {
 	mWindow = std::make_unique<Window>();
 	mWindow->init("Abra");
 
-	registry->addSystem<GuiSystem>(mWindow->nativeHandle(), mWindow->glContext());
+	registry->addSystem<GuiSystem>();
 	mGuiSystem = &registry->getSystem<GuiSystem>();
 
-	registry->addSystem<RenderPipeline>(mRegistry);
+	registry->addSystem<RenderPipeline>(mRegistry, mWindow->nativeHandle(), mWindow->glContext());
 	mRenderPipeline = &registry->getSystem<RenderPipeline>();
 
 	mCamera = std::make_unique<Camera>(glm::vec3(0.0f, 2.0f, 5.0f));
@@ -42,12 +42,12 @@ void Engine::run() {
 		mMillisecsPreviousFrame = SDL_GetTicks();
 
 		mInput->process(*mCamera, mWindow->nativeHandle(), mDeltaTime, isRunning);
+		mGuiSystem->update(mDeltaTime);
 
 		mRenderPipeline->render();
-#ifdef DEBUG
-		mGuiSystem->update(mDeltaTime);
 		mGuiSystem->render(mRenderPipeline->postProcess().effects());
-#endif
+		mRenderPipeline->drawGui();
+
 		// SDL swap buffers
 		mWindow->swapBuffer();
 	}

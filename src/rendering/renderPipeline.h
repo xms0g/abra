@@ -18,10 +18,13 @@ class Registry;
 class LightSystem;
 class SkyboxSystem;
 class PostProcessPass;
+class SDL_Window;
+
+typedef void* SDL_GLContext;
 
 class RenderPipeline final : public System {
 public:
-	explicit RenderPipeline(Registry* registry);
+	explicit RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLContext context);
 
 	~RenderPipeline() override;
 
@@ -33,6 +36,8 @@ public:
 	void batchEntities();
 
 	void render();
+
+	void drawGui();
 
 private:
 	void refreshCameraData() const;

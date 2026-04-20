@@ -1,7 +1,7 @@
-#include "guiPanels.h"
-#include "guiBackend.h"
+#include "panels.h"
 #include "glad/glad.h"
 #include "imgui/imgui.h"
+#include "ui.h"
 #include "../../ECS/registry.h"
 #include "../../ECS/components/transform.hpp"
 #include "../../ECS/components/debug.hpp"
@@ -77,7 +77,6 @@ void GuiPanels::renderDirLight(const Entity& entity) {
 	Ui::colorField4("Diffuse", dir.diffuse, 0.01f, 100);
 	Ui::colorField4("Specular", dir.specular, 0.01f, 100);
 	Ui::sliderFloat("Intensity", &dir.intensity, 100.0, 1.0, 30.0);
-
 }
 
 void GuiPanels::renderSpotLight(const Entity& entity) {
@@ -104,15 +103,15 @@ void GuiPanels::renderPointLight(const Entity& entity) {
 	ImGui::Checkbox("Cast Shadow", &plc.castShadow);
 }
 
-void GuiPanels::renderPostProcessPanel(const std::vector<std::shared_ptr<IPostEffect> >& effects) {
+void GuiPanels::renderPostProcessPanel(const std::vector<std::unique_ptr<IPostEffect> >& effects) {
 	if (ImGui::Begin("Post-Processing")) {
 		for (auto& effect: effects) {
 			ImGui::Checkbox(effect->name().c_str(), &effect->enabled());
 
 			if (effect->name() == "Tone Mapping") {
-				Ui::sliderFloat("Exposure", &std::dynamic_pointer_cast<ToneMapping>(effect)->exposure(), 100.0f);
+				Ui::sliderFloat("Exposure", &dynamic_cast<ToneMapping*>(effect.get())->exposure(), 100.0f);
 			} else if (effect->name() == "Chromatic Aberration") {
-				Ui::sliderFloat("Intensity", &std::dynamic_pointer_cast<CA>(effect)->intensity(), 100.0f, 0.01f, 0.1f);
+				Ui::sliderFloat("Intensity", &dynamic_cast<CA*>(effect.get())->intensity(), 100.0f, 0.01f, 0.1f);
 			}
 		}
 	}

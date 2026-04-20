@@ -19,6 +19,6 @@ void renderSpotLight(const Entity& entity);
 
 void renderPointLight(const Entity& entity);
 
-void renderPostProcessPanel(const std::vector<std::shared_ptr<IPostEffect>>& effects);
+void renderPostProcessPanel(const std::vector<std::unique_ptr<IPostEffect>>& effects);
 
 }

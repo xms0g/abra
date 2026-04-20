@@ -1,18 +1,17 @@
 #pragma once
-#include "guiBackend.h"
 #include "../../ECS/system.hpp"
 
 struct IPostEffect;
 
 class GuiSystem final : public System {
 public:
-	GuiSystem(SDL_Window* window, SDL_GLContext context);
+	GuiSystem();
 
 	~GuiSystem() override;
 
 	void update(float dt);
 
-	void render(const std::vector<std::shared_ptr<IPostEffect>>& effects) const;
+	void render(const std::vector<std::unique_ptr<IPostEffect>>& effects) const;
 
 private:
 	void updateFpsCounter(float dt);
