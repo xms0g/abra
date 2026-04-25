@@ -12,7 +12,7 @@ public:
 		bool unlit = false,
 		const char* albedo = nullptr,
 		const char* normal = nullptr,
-		const char* roughnessMetallic = nullptr);
+		const char* orm = nullptr);
 
 	~Sphere();
 

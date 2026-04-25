@@ -11,7 +11,7 @@ Models::Sphere::Sphere(
 	bool unlit,
 	const char* albedo,
 	const char* normal,
-	const char* roughnessMetallic) {
+	const char* orm) {
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec2> uv;
@@ -116,6 +116,7 @@ Models::Sphere::Sphere(
 	mMeshes[0].emplace_back(vertices, indices);
 	mMeshes.at(0).at(0).uploadToGPU();
 
+	uint32_t flag{0};
 	std::vector<Texture> textures;
 	if (albedo) {
 		textures.emplace_back(
@@ -132,22 +133,20 @@ Models::Sphere::Sphere(
 			normal);
 	}
 
-	if (roughnessMetallic) {
+	if (orm) {
 		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + roughnessMetallic).c_str(), 1, false),
+			texture::load(fs::path(ASSET_DIR + orm).c_str(), 1, false),
 			ROUGHNESS_METALLIC,
-			roughnessMetallic);
+			orm);
+		flag |= PBR;
+		flag |= HAS_ORM;
 	}
 
-	uint32_t flag{0};
 	if (unlit) {
 		flag |= UNLIT;
 	} else {
 		flag |= CASTSHADOW;
 	}
-
-	if (roughnessMetallic)
-		flag |= PBR;
 
 	mMaterial[0] = {flag, color, 0.0f, textures};
 }
