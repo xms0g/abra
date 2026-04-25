@@ -37,6 +37,10 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 				}
 			}
 		}
+
+		std::ranges::sort(outQueue, [](const auto& a, const auto& b) {
+			return a.material < b.material;
+		});
 	};
 
 	cullItems(ctx.renderQueue->opaqueGroups, ctx.renderQueue->opaqueObjects);
