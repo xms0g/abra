@@ -105,7 +105,7 @@ void RenderCommon::setupMaterial(const EntityCore& entity, const Material& mater
 
 void RenderCommon::drawMesh(const Mesh& mesh) {
 	mesh.bind();
-	if (!mesh.indices().empty()) {
+	if (!mesh.indices().empty()) [[likely]] {
 		glDrawElements(GL_TRIANGLES, static_cast<int32_t>(mesh.indices().size()), GL_UNSIGNED_INT, nullptr);
 	} else {
 		glDrawArrays(GL_TRIANGLES, 0, static_cast<int32_t>(mesh.vertices().size()));
