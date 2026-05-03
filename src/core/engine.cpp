@@ -5,6 +5,7 @@
 #include "camera.h"
 #include "window.h"
 #include "gui/system.h"
+#include "../event/eventBus.hpp"
 #include "../ECS/registry.h"
 #include "../rendering/renderPipeline.h"
 #include "../rendering/renderPasses/postProcess/postProcessPass.h"
@@ -27,6 +28,9 @@ void Engine::init(Registry* registry) {
 
 	mCamera = std::make_unique<Camera>(glm::vec3(0.0f, 2.0f, 5.0f));
 	mInput = std::make_unique<Input>();
+	mEventBus = std::make_unique<EventBus>();
+
+	mCamera->subscribeToEvents(*mEventBus);
 }
 
 void Engine::configure() const {
@@ -41,7 +45,8 @@ void Engine::run() {
 		mDeltaTime = static_cast<float>(SDL_GetTicks() - mMillisecsPreviousFrame) / 1000.0f;
 		mMillisecsPreviousFrame = SDL_GetTicks();
 
-		mInput->process(*mCamera, mWindow->nativeHandle(), mDeltaTime, isRunning);
+		mInput->process(*mEventBus, mWindow->nativeHandle(), mDeltaTime, isRunning);
+		mCamera->update();
 		mGuiSystem->update(mDeltaTime);
 
 		mRenderPipeline->render();

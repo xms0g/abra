@@ -1,16 +1,16 @@
 #pragma once
 
-class Camera;
+class EventBus;
 class SDL_Window;
 
 class Input {
 public:
     Input() = default;
 
-    void process(Camera& camera, SDL_Window* window, float dt, bool& isRunning);
+    void process(EventBus& eventBus, SDL_Window* window, float dt, bool& isRunning);
 
 private:
-    void processKeyboard(Camera& camera, float dt, bool& isRunning);
+    void processKeyboard(EventBus& eventBus, float dt, bool& isRunning);
 
-    void processMouse(Camera& camera);
+    void processMouse(EventBus& eventBus);
 };

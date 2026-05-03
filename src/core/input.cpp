@@ -2,8 +2,11 @@
 #include <SDL.h>
 #include "imgui/imgui_impl_sdl.h"
 #include "camera.h"
+#include "../event/eventBus.hpp"
+#include "../event/events/keyPressedEvent.hpp"
+#include "../event/events/mouseEvent.hpp"
 
-void Input::process(Camera& camera, SDL_Window* window, const float dt, bool& isRunning) {
+void Input::process(EventBus& eventBus, SDL_Window* window, const float dt, bool& isRunning) {
 	SDL_Event event;
 
 	while (SDL_PollEvent(&event)) {
@@ -18,28 +21,27 @@ void Input::process(Camera& camera, SDL_Window* window, const float dt, bool& is
 		}
 	}
 
-	processKeyboard(camera, dt, isRunning);
-	processMouse(camera);
-	camera.update();
+	processKeyboard(eventBus, dt, isRunning);
+	processMouse(eventBus);
 }
 
-void Input::processKeyboard(Camera& camera, const float dt, bool& isRunning) {
+void Input::processKeyboard(EventBus& eventBus, const float dt, bool& isRunning) {
 	const auto* keyState = SDL_GetKeyboardState(nullptr);
 
 	if (keyState[SDL_SCANCODE_ESCAPE]) {
 		isRunning = false;
 	} else if (keyState[SDL_SCANCODE_W]) {
-		camera.processKeyboard(FORWARD, dt);
+		eventBus.emitEvent<KeyPressedEvent>(FORWARD, dt);
 	} else if (keyState[SDL_SCANCODE_S]) {
-		camera.processKeyboard(BACKWARD, dt);
+		eventBus.emitEvent<KeyPressedEvent>(BACKWARD, dt);
 	} else if (keyState[SDL_SCANCODE_A]) {
-		camera.processKeyboard(LEFT, dt);
+		eventBus.emitEvent<KeyPressedEvent>(LEFT, dt);
 	} else if (keyState[SDL_SCANCODE_D]) {
-		camera.processKeyboard(RIGHT, dt);
+		eventBus.emitEvent<KeyPressedEvent>(RIGHT, dt);
 	}
 }
 
-void Input::processMouse(Camera& camera) {
+void Input::processMouse(EventBus& eventBus) {
 	int dx, dy;
 	static bool freeLook{false};
 	static bool prevRMB{false};
@@ -48,7 +50,7 @@ void Input::processMouse(Camera& camera) {
 	const bool rmb = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
 
 	ImGuiIO& io = ImGui::GetIO();
-	
+
 	if (rmb && !prevRMB && !io.WantCaptureMouse) {
 		freeLook = !freeLook;
 		SDL_SetRelativeMouseMode(freeLook ? SDL_TRUE : SDL_FALSE);
@@ -56,6 +58,6 @@ void Input::processMouse(Camera& camera) {
 	prevRMB = rmb;
 
 	if (freeLook) {
-		camera.processMouseMovement(static_cast<float>(dx), static_cast<float>(-dy));
+		eventBus.emitEvent<MouseEvent>(static_cast<float>(dx), static_cast<float>(-dy));
 	}
 }

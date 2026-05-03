@@ -7,6 +7,7 @@ class Window;
 class Registry;
 class Input;
 class Camera;
+class EventBus;
 
 class Engine {
 public:
@@ -32,4 +33,5 @@ private:
 	std::unique_ptr<Window> mWindow;
 	std::unique_ptr<Camera> mCamera;
 	std::unique_ptr<Input> mInput;
+	std::unique_ptr<EventBus> mEventBus;
 };

@@ -4,6 +4,10 @@
 #include "../math/frustum.h"
 #include "../config/config.hpp"
 
+struct MouseEvent;
+struct KeyPressedEvent;
+class EventBus;
+
 enum CameraMovement {
 	FORWARD,
 	BACKWARD,
@@ -35,9 +39,11 @@ public:
 
 	void update();
 
-	void processKeyboard(CameraMovement direction, float deltaTime);
+	void processKeyboard(KeyPressedEvent& event);
 
-	void processMouseMovement(float xoffset, float yoffset);
+	void processMouseMovement(MouseEvent& event);
+
+	void subscribeToEvents(EventBus& eventBus);
 
 private:
 	void generateFrustum();

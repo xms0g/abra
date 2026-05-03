@@ -1,5 +1,8 @@
 #include "camera.h"
 #include "glm/gtc/matrix_transform.hpp"
+#include "../event/eventBus.hpp"
+#include "../event/events/keyPressedEvent.hpp"
+#include "../event/events/mouseEvent.hpp"
 
 Camera::Camera(
 	const glm::vec3& position,
@@ -61,19 +64,22 @@ void Camera::update() {
 	generateFrustum();
 }
 
-void Camera::processKeyboard(const CameraMovement direction, const float deltaTime) {
-	const float velocity = mMovementSpeed * deltaTime;
-	if (direction == FORWARD)
+void Camera::processKeyboard(KeyPressedEvent& event) {
+	const float velocity = mMovementSpeed * event.deltaTime;
+	if (event.direction == FORWARD)
 		mPosition += mFront * velocity;
-	if (direction == BACKWARD)
+	if (event.direction == BACKWARD)
 		mPosition -= mFront * velocity;
-	if (direction == LEFT)
+	if (event.direction == LEFT)
 		mPosition -= mRight * velocity;
-	if (direction == RIGHT)
+	if (event.direction == RIGHT)
 		mPosition += mRight * velocity;
 }
 
-void Camera::processMouseMovement(float xoffset, float yoffset) {
+void Camera::processMouseMovement(MouseEvent& event) {
+	float xoffset = event.x;
+	float yoffset = event.y;
+
 	xoffset *= mMouseSensitivity;
 	yoffset *= mMouseSensitivity;
 
@@ -85,6 +91,11 @@ void Camera::processMouseMovement(float xoffset, float yoffset) {
 		mPitch = 89.0f;
 	if (mPitch < -89.0f)
 		mPitch = -89.0f;
+}
+
+void Camera::subscribeToEvents(EventBus& eventBus) {
+	eventBus.subscribeToEvent<Camera, KeyPressedEvent>(this, &Camera::processKeyboard);
+	eventBus.subscribeToEvent<Camera, MouseEvent>(this, &Camera::processMouseMovement);
 }
 
 void Camera::generateFrustum() {
