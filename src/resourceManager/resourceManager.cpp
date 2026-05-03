@@ -223,7 +223,7 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 			}
 		}
 
-		materialLoadCtx.materials[req.materialID] = {.flags = flags, .alphaCutoff = alphaCutoff};
+		materialLoadCtx.materials[req.materialID] = {.id = req.materialID, .flags = flags, .alphaCutoff = alphaCutoff};
 	}
 
 	auto& material = materialLoadCtx.materials[req.materialID];

@@ -22,6 +22,7 @@ class Shader;
 class Mesh;
 
 struct Material {
+	uint32_t id;
 	uint32_t flags;
 	glm::vec3 color;
 	float alphaCutoff;

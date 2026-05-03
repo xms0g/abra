@@ -161,7 +161,7 @@ Models::Cube::Cube(
 	}
 
 	flag |= OPAQUE;
-	mMaterial[0] = {flag, color, 0.0f, textures};
+	mMaterial[0] = {0,flag, color, 0.0f, textures};
 }
 
 Models::Cube::~Cube() = default;

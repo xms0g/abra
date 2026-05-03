@@ -39,7 +39,7 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 		}
 
 		std::ranges::sort(outQueue, [](const auto& a, const auto& b) {
-			return a.material < b.material;
+			return a.material->id < b.material->id;
 		});
 	};
 

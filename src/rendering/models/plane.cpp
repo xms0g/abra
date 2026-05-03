@@ -105,7 +105,7 @@ Models::Plane::Plane(
 			heightTexture);
 	}
 
-	mMaterial[0] = {OPAQUE | CASTSHADOW, color, 0.0f, textures};
+	mMaterial[0] = {0, OPAQUE | CASTSHADOW, color, 0.0f, textures};
 }
 
 Models::Plane::~Plane() = default;

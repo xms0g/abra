@@ -148,7 +148,7 @@ Models::Sphere::Sphere(
 		flag |= CASTSHADOW;
 	}
 
-	mMaterial[0] = {flag, color, 0.0f, textures};
+	mMaterial[0] = {0, flag, color, 0.0f, textures};
 }
 
 Models::Sphere::~Sphere() = default;
