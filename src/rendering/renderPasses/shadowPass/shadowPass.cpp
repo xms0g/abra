@@ -30,7 +30,7 @@ const std::array<uint32_t, 3>& ShadowPass::shadowMaps() const {
 	return mShadowMaps;
 }
 
-void ShadowPass::configure(const RenderContext& ctx) {
+void ShadowPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	dirShadowPass = std::make_unique<DirectionalShadowPass>(ctx);
 	omnidirShadowPass = std::make_unique<OmnidirectionalShadowPass>(ctx);
 	persShadowPass = std::make_unique<PerspectiveShadowPass>(ctx);

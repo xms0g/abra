@@ -18,14 +18,12 @@ class PostProcessPass final : public IRenderPass {
 public:
 	~PostProcessPass() override;
 
-	void configure(const RenderContext& ctx) override;
+	void configure(const RenderContext& ctx, EventBus& eventBus) override;
 
 	void execute(const RenderContext& ctx) override;
 
-	void subscribeToEvents(EventBus& eventBus);
-
 private:
-	void onGuiPanelUpdate(const GuiPostProcessEvent& event);
+	void onGuiUpdate(const GuiPostProcessEvent& event);
 
 	PingPongBuffer mPingPong;
 	std::unique_ptr<Models::Quad> mQuad;

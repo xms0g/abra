@@ -19,7 +19,7 @@
 
 PostProcessPass::~PostProcessPass() = default;
 
-void PostProcessPass::configure(const RenderContext& ctx) {
+void PostProcessPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mQuad = std::make_unique<Models::Quad>();
 
 	mEffects.emplace_back(std::make_unique<Bloom>("Bloom", ctx.screen.width, ctx.screen.height, false));
@@ -44,6 +44,9 @@ void PostProcessPass::configure(const RenderContext& ctx) {
 #endif
 				.checkStatus();
 	}
+
+	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessEvent>(this, &PostProcessPass::onGuiUpdate);
+
 }
 
 void PostProcessPass::execute(const RenderContext& ctx) {
@@ -61,11 +64,7 @@ void PostProcessPass::execute(const RenderContext& ctx) {
 	RenderCommon::drawQuad(inputTex, mQuad->VAO());
 }
 
-void PostProcessPass::subscribeToEvents(EventBus& eventBus) {
-	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessEvent>(this, &PostProcessPass::onGuiPanelUpdate);
-}
-
-void PostProcessPass::onGuiPanelUpdate(const GuiPostProcessEvent& event) {
+void PostProcessPass::onGuiUpdate(const GuiPostProcessEvent& event) {
 	for (const auto& effect: mEffects) {
 		if (effect->name() == event.name) {
 			effect->updateFromEvent(event);

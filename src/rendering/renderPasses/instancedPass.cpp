@@ -20,7 +20,7 @@ InstancedPass::InstancedPass() = default;
 
 InstancedPass::~InstancedPass() = default;
 
-void InstancedPass::configure(const RenderContext& ctx) {
+void InstancedPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	if (!ctx.renderQueue->opaqueInstancedGroups.empty()) {
 		prepareInstanceBuffer(ctx.renderQueue->opaqueInstancedGroups, mOpaqueVBO);
 		uploadInstanceData(ctx.renderQueue->opaqueInstancedGroups, *mOpaqueVBO);

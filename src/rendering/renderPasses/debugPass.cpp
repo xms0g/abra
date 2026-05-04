@@ -11,7 +11,7 @@
 
 DebugPass::~DebugPass() = default;
 
-void DebugPass::configure(const RenderContext& ctx) {
+void DebugPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mDebugShaders = {
 		nullptr, // for None
 		std::make_shared<Shader>("debug/normal.vert", "debug/normal.frag", "debug/normal.geom"),

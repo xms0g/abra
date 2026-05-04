@@ -11,7 +11,7 @@
 
 DeferredLightingPass::~DeferredLightingPass() = default;
 
-void DeferredLightingPass::configure(const RenderContext& ctx) {
+void DeferredLightingPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 	glDisable(GL_CULL_FACE);

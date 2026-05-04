@@ -18,7 +18,7 @@ const UniformBuffer* SSAOPass::ubo() const {
 	return mUBO.get();
 }
 
-void SSAOPass::configure(const RenderContext& ctx) {
+void SSAOPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mQuad = std::make_unique<Models::SingleQuad>();
 	mFBO = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
 	mFBO->withTextureFP(GL_RED)

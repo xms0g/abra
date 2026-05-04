@@ -21,7 +21,7 @@ public:
 	[[nodiscard]]
 	const std::array<uint32_t, 3>& shadowMaps() const;
 
-	void configure(const RenderContext& ctx) override;
+	void configure(const RenderContext& ctx, EventBus& eventBus) override;
 
 	void execute(const RenderContext& ctx) override;
 

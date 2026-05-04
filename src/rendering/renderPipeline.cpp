@@ -125,7 +125,6 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mShadowPass = std::make_shared<ShadowPass>();
 
 	mPostProcessPass = std::make_shared<PostProcessPass>();
-	mPostProcessPass->subscribeToEvents(eventBus);
 
 	mRenderPasses.push_back(std::make_shared<FrustumCullingPass>());
 	mRenderPasses.push_back(mShadowPass);
@@ -244,7 +243,7 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 
 	// Configure render passes
 	for (const auto& pass: mRenderPasses) {
-		pass->configure(*mRenderCtx);
+		pass->configure(*mRenderCtx, eventBus);
 	}
 
 	if (mDeferredGeometryPass) {

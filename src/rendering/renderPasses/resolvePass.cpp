@@ -5,7 +5,7 @@
 
 ResolvePass::~ResolvePass() = default;
 
-void ResolvePass::configure(const RenderContext& ctx) {
+void ResolvePass::configure(const RenderContext& ctx, EventBus& eventBus) {
 }
 
 void ResolvePass::execute(const RenderContext& ctx) {

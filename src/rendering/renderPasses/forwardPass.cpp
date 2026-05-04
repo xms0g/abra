@@ -7,7 +7,7 @@
 
 ForwardPass::~ForwardPass() = default;
 
-void ForwardPass::configure(const RenderContext& ctx) {
+void ForwardPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 }
 
 void ForwardPass::execute(const RenderContext& ctx) {

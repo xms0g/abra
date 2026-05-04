@@ -12,7 +12,7 @@ public:
 
 	~InstancedPass() override;
 
-	void configure(const RenderContext& ctx) override;
+	void configure(const RenderContext& ctx, EventBus& eventBus) override;
 
 	void execute(const RenderContext& ctx) override;
 

@@ -9,7 +9,6 @@
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderableObject.hpp"
 #include "../../ECS/components/bv.hpp"
-#include "../../ECS/entity.hpp"
 
 DeferredGeometryPass::~DeferredGeometryPass() = default;
 
@@ -17,7 +16,7 @@ const FrameBuffer* DeferredGeometryPass::gBuffer() const {
 	return mGBuffer.get();
 }
 
-void DeferredGeometryPass::configure(const RenderContext& ctx) {
+void DeferredGeometryPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mGBuffer = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
 	mGBuffer->withTextureFP(GL_RGBA)	// position
 			.withTextureFP(GL_RGBA)		// normal
