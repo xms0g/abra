@@ -1,7 +1,6 @@
 #include "input.h"
 #include <SDL.h>
 #include "imgui/imgui_impl_sdl.h"
-#include "camera.h"
 #include "../event/eventBus.hpp"
 #include "../event/events/keyPressedEvent.hpp"
 #include "../event/events/mouseEvent.hpp"
@@ -31,13 +30,13 @@ void Input::processKeyboard(EventBus& eventBus, const float dt, bool& isRunning)
 	if (keyState[SDL_SCANCODE_ESCAPE]) {
 		isRunning = false;
 	} else if (keyState[SDL_SCANCODE_W]) {
-		eventBus.emitEvent<KeyPressedEvent>(FORWARD, dt);
+		eventBus.emitEvent<KeyPressedEvent>(SDL_SCANCODE_W, dt);
 	} else if (keyState[SDL_SCANCODE_S]) {
-		eventBus.emitEvent<KeyPressedEvent>(BACKWARD, dt);
+		eventBus.emitEvent<KeyPressedEvent>(SDL_SCANCODE_S, dt);
 	} else if (keyState[SDL_SCANCODE_A]) {
-		eventBus.emitEvent<KeyPressedEvent>(LEFT, dt);
+		eventBus.emitEvent<KeyPressedEvent>(SDL_SCANCODE_A, dt);
 	} else if (keyState[SDL_SCANCODE_D]) {
-		eventBus.emitEvent<KeyPressedEvent>(RIGHT, dt);
+		eventBus.emitEvent<KeyPressedEvent>(SDL_SCANCODE_D, dt);
 	}
 }
 
