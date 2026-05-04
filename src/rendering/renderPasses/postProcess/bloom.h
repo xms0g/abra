@@ -1,12 +1,12 @@
 #pragma once
 #include <memory>
 #include <array>
-#include "IPostEffect.hpp"
+#include "basePostEffect.hpp"
 
 class Shader;
 class FrameBuffer;
 
-class Bloom final : public IPostEffect {
+class Bloom final : public BasePostEffect {
 public:
 	Bloom(const std::string& name, int width, int height, bool enabled = false);
 

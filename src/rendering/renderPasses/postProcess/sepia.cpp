@@ -4,7 +4,7 @@
 #include "../../renderCommon.h"
 #include "../../buffers/frameBuffer.h"
 
-Sepia::Sepia(const std::string& name, const bool enabled) : IPostEffect(name, enabled) {
+Sepia::Sepia(const std::string& name, const bool enabled) : BasePostEffect(name, enabled) {
 	shader = std::make_unique<Shader>("models/quad.vert", "post-processing/sepia.frag");
 	shader->activate();
 	shader->setInt("screenTexture", 0);

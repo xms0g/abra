@@ -1,9 +1,9 @@
 #pragma once
 
 template<typename T>
-class IWindow {
+class BaseWindow {
 public:
-	virtual ~IWindow() = default;
+	virtual ~BaseWindow() = default;
 
 	void init(
 		const char* title = "Test Window",

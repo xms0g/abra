@@ -1,11 +1,11 @@
 #pragma once
 #include <memory>
-#include "IPostEffect.hpp"
+#include "basePostEffect.hpp"
 
 class FrameBuffer;
 class Shader;
 
-class Grayscale final : public IPostEffect {
+class Grayscale final : public BasePostEffect {
 public:
 	explicit Grayscale(const std::string& name, bool enabled = false);
 

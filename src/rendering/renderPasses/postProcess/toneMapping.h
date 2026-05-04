@@ -1,11 +1,11 @@
 #pragma once
 #include <memory>
-#include "IPostEffect.hpp"
+#include "basePostEffect.hpp"
 
 class FrameBuffer;
 class Shader;
 
-class ToneMapping final : public IPostEffect {
+class ToneMapping final : public BasePostEffect {
 public:
 	explicit ToneMapping(const std::string& name, bool enabled = false);
 

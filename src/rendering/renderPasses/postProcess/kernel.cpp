@@ -5,7 +5,7 @@
 #include "../../buffers/frameBuffer.h"
 
 Kernel::Kernel(const std::string& name, const float* kernel, const bool enabled)
-	: IPostEffect(name, enabled),
+	: BasePostEffect(name, enabled),
 	  mKernel(kernel) {
 	shader = std::make_unique<Shader>("models/quad.vert", "post-processing/kernel.frag");
 	shader->activate();

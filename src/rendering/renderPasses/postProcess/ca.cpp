@@ -4,7 +4,7 @@
 #include "../../renderCommon.h"
 #include "../../buffers/frameBuffer.h"
 
-CA::CA(const std::string& name, const bool enabled) : IPostEffect(name, enabled) {
+CA::CA(const std::string& name, const bool enabled) : BasePostEffect(name, enabled) {
 	shader = std::make_unique<Shader>("models/quad.vert", "post-processing/ca.frag");
 	shader->activate();
 	shader->setInt("screenTexture", 0);
@@ -29,6 +29,6 @@ uint32_t CA::render(
 }
 
 void CA::updateFromEvent(const GuiPostProcessPanelEvent& event) {
-	IPostEffect::updateFromEvent(event);
+	BasePostEffect::updateFromEvent(event);
 	mIntensity = event.intensity;
 }

@@ -29,12 +29,12 @@ public:
 	~EventCallBack() override = default;
 
 private:
-	TOwner* ownerInstance;
-	CallBackFunction callBackFunction;
-
 	void call(Event& e) override {
 		std::invoke(callBackFunction, ownerInstance, static_cast<TEvent&>(e));
 	}
+
+	TOwner* ownerInstance;
+	CallBackFunction callBackFunction;
 };
 
 class EventBus {

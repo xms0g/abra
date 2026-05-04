@@ -2,7 +2,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "../event/eventBus.hpp"
 #include "../event/events/keyPressedEvent.hpp"
-#include "../event/events/mouseEvent.hpp"
+#include "../event/events/mouseMovementEvent.hpp"
 
 Camera::Camera(
 	const glm::vec3& position,
@@ -76,7 +76,7 @@ void Camera::processKeyboard(const KeyPressedEvent& event) {
 		mPosition += mRight * velocity;
 }
 
-void Camera::processMouseMovement(const MouseEvent& event) {
+void Camera::processMouseMovement(const MouseMovementEvent& event) {
 	float xoffset = event.x;
 	float yoffset = event.y;
 
@@ -95,7 +95,7 @@ void Camera::processMouseMovement(const MouseEvent& event) {
 
 void Camera::subscribeToEvents(EventBus& eventBus) {
 	eventBus.subscribeToEvent<Camera, KeyPressedEvent>(this, &Camera::processKeyboard);
-	eventBus.subscribeToEvent<Camera, MouseEvent>(this, &Camera::processMouseMovement);
+	eventBus.subscribeToEvent<Camera, MouseMovementEvent>(this, &Camera::processMouseMovement);
 }
 
 void Camera::generateFrustum() {

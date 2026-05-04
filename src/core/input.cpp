@@ -3,7 +3,7 @@
 #include "imgui/imgui_impl_sdl.h"
 #include "../event/eventBus.hpp"
 #include "../event/events/keyPressedEvent.hpp"
-#include "../event/events/mouseEvent.hpp"
+#include "../event/events/mouseMovementEvent.hpp"
 
 void Input::process(EventBus& eventBus, SDL_Window* window, const float dt, bool& isRunning) {
 	SDL_Event event;
@@ -62,6 +62,6 @@ void Input::processMouse(EventBus& eventBus) {
 	prevRMB = rmb;
 
 	if (freeLook) {
-		eventBus.emitEvent<MouseEvent>(static_cast<float>(dx), static_cast<float>(-dy));
+		eventBus.emitEvent<MouseMovementEvent>(static_cast<float>(dx), static_cast<float>(-dy));
 	}
 }

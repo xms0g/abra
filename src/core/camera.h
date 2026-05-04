@@ -4,7 +4,7 @@
 #include "../math/frustum.h"
 #include "../config/config.hpp"
 
-struct MouseEvent;
+struct MouseMovementEvent;
 struct KeyPressedEvent;
 class EventBus;
 
@@ -41,7 +41,7 @@ public:
 
 	void processKeyboard(const KeyPressedEvent& event);
 
-	void processMouseMovement(const MouseEvent& event);
+	void processMouseMovement(const MouseMovementEvent& event);
 
 	void subscribeToEvents(EventBus& eventBus);
 

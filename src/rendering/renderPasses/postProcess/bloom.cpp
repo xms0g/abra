@@ -5,7 +5,7 @@
 #include "../../buffers/frameBuffer.h"
 
 Bloom::Bloom(const std::string& name, const int width, const int height, const bool enabled)
-	: IPostEffect(name, enabled) {
+	: BasePostEffect(name, enabled) {
 	brightFilter = std::make_unique<Shader>("models/quad.vert", "post-processing/bloom/brightFilter.frag");
 	brightFilter->activate();
 	brightFilter->setInt("screenTexture", 0);

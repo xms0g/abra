@@ -6,14 +6,14 @@
 class FrameBuffer;
 using PingPongBuffer = std::array<std::unique_ptr<FrameBuffer>, 2>;
 
-class IPostEffect {
+class BasePostEffect {
 public:
-	IPostEffect() = default;
+	BasePostEffect() = default;
 
-	IPostEffect(std::string n, const bool e) : mName(std::move(n)), mEnabled(e) {
+	BasePostEffect(std::string n, const bool e) : mName(std::move(n)), mEnabled(e) {
 	}
 
-	virtual ~IPostEffect() = default;
+	virtual ~BasePostEffect() = default;
 
 	[[nodiscard]]
 	const std::string& name() const { return mName; }

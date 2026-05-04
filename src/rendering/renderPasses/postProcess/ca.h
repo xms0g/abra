@@ -1,11 +1,11 @@
 #pragma once
 #include <memory>
-#include "IPostEffect.hpp"
+#include "basePostEffect.hpp"
 
 class FrameBuffer;
 class Shader;
 
-class CA final : public IPostEffect {
+class CA final : public BasePostEffect {
 public:
 	explicit CA(const std::string& name, bool enabled = false);
 

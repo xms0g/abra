@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
 #include <SDL.h>
-#include "IWindow.hpp"
+#include "baseWindow.hpp"
 
-class Window final : public IWindow<SDL_Window> {
+class Window final : public BaseWindow<SDL_Window> {
 public:
     Window() = default;
 

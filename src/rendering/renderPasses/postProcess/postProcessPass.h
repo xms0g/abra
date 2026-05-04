@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "IPostEffect.hpp"
+#include "basePostEffect.hpp"
 #include "../IRenderPass.hpp"
 
 struct GuiPostProcessPanelEvent;
@@ -29,5 +29,5 @@ private:
 
 	PingPongBuffer mPingPong;
 	std::unique_ptr<Models::Quad> mQuad;
-	std::vector<std::unique_ptr<IPostEffect> > mEffects;
+	std::vector<std::unique_ptr<BasePostEffect> > mEffects;
 };

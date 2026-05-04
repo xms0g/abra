@@ -1,11 +1,11 @@
 #pragma once
 #include <memory>
-#include "IPostEffect.hpp"
+#include "basePostEffect.hpp"
 
 class FrameBuffer;
 class Shader;
 
-class Sepia final : public IPostEffect {
+class Sepia final : public BasePostEffect {
 public:
 	explicit Sepia(const std::string& name, bool enabled = false);
 

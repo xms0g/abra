@@ -1,11 +1,11 @@
 #pragma once
 #include <memory>
-#include "IPostEffect.hpp"
+#include "basePostEffect.hpp"
 
 class FrameBuffer;
 class Shader;
 
-class Kernel final : public IPostEffect {
+class Kernel final : public BasePostEffect {
 public:
 	explicit Kernel(const std::string& name, const float* kernel, bool enabled = false);
 
