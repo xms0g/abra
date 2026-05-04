@@ -14,7 +14,7 @@
 struct Effect {
 	const char* name;
 	bool enabled;
-	float exposure{0.0f};
+	float exposure{1.1f};
 	float intensity{0.0f};
 };
 

@@ -1,7 +1,7 @@
 #pragma once
 #include <list>
 #include <typeindex>
-#include <map>
+#include <unordered_map>
 #include "event.hpp"
 
 class IEventCallBack {
@@ -62,5 +62,5 @@ public:
 
 private:
 	using HandlerList = std::list<std::unique_ptr<IEventCallBack> >;
-	std::map<std::type_index, std::unique_ptr<HandlerList> > subscribers;
+	std::unordered_map<std::type_index, std::unique_ptr<HandlerList> > subscribers;
 };
