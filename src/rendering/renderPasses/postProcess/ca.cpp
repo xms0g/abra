@@ -28,6 +28,7 @@ uint32_t CA::render(
 	return texture;
 }
 
-void CA::intensity(const float intensity) {
-	mIntensity = intensity;
+void CA::updateFromEvent(const GuiPostProcessPanelEvent& event) {
+	IPostEffect::updateFromEvent(event);
+	mIntensity = event.intensity;
 }

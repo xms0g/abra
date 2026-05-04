@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <string>
+#include "../../../event/events/guiPostProcessPanelEvent.hpp"
 
 class FrameBuffer;
 using PingPongBuffer = std::array<std::unique_ptr<FrameBuffer>, 2>;
@@ -27,6 +28,10 @@ public:
 		uint32_t vao,
 		bool& toggle,
 		PingPongBuffer& pingPong) const = 0;
+
+	virtual void updateFromEvent(const GuiPostProcessPanelEvent& event) {
+		this->enabled(event.enabled);
+	}
 
 private:
 	std::string mName;

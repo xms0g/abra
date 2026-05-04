@@ -15,7 +15,7 @@ public:
 		bool& toggle,
 		PingPongBuffer& pingPong) const override;
 
-	void intensity(float intensity);
+	void updateFromEvent(const GuiPostProcessPanelEvent& event) override;
 
 private:
 	float mIntensity{};

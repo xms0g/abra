@@ -72,13 +72,7 @@ void PostProcessPass::subscribeToEvents(EventBus& eventBus) {
 void PostProcessPass::onGuiPanelUpdate(GuiPostProcessPanelEvent& event) {
 	for (const auto& effect: mEffects) {
 		if (effect->name() == event.name) {
-			effect->enabled(event.enabled);
-
-			if (effect->name() == "Tone Mapping") {
-				dynamic_cast<ToneMapping*>(effect.get())->exposure(event.exposure);
-			} else if (effect->name() == "Chromatic Aberration") {
-				dynamic_cast<CA*>(effect.get())->intensity(event.intensity);
-			}
+			effect->updateFromEvent(event);
 		}
 	}
 }

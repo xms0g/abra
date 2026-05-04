@@ -30,6 +30,7 @@ uint32_t ToneMapping::render(
 	return texture;
 }
 
-void ToneMapping::exposure(const float exposure) {
-	mExposure = exposure;
+void ToneMapping::updateFromEvent(const GuiPostProcessPanelEvent& event) {
+	IPostEffect::updateFromEvent(event);
+	mExposure = event.exposure;
 }
