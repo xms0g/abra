@@ -9,6 +9,7 @@
 #include "../../ECS/components/pointLight.hpp"
 #include "../../ECS/components/spotLight.hpp"
 #include "../../event/eventBus.hpp"
+#include "../../event/events/guiDebugEvent.hpp"
 #include "../../event/events/guiPostProcessEvent.hpp"
 
 struct Effect {
@@ -59,18 +60,17 @@ void GuiPanels::renderTransformPanel(const Entity& entity) {
 	ImGui::PopID();
 }
 
-void GuiPanels::renderDebugViewsPanel(const Entity& entity) {
+void GuiPanels::renderDebugViewsPanel(const Entity& entity, EventBus& eventBus) {
 	if (!entity.hasComponent<DebugComponent>()) return;
-
-	auto& db = entity.getComponent<DebugComponent>();
 
 	ImGui::PushID(static_cast<int>(entity.id()));
 	if (ImGui::TreeNodeEx("Debug Views", ImGuiTreeNodeFlags_DefaultOpen)) {
 		static constexpr const char* modes[] = {"None", "Normals", "Wireframe"};
-		int currentMode = db.mode;
+		static int currentMode = None;
+
 		ImGui::Text("Mode"); ImGui::SameLine(70);
 		if (ImGui::Combo("##mode", &currentMode, modes, IM_ARRAYSIZE(modes))) {
-			db.mode = static_cast<DebugMode>(currentMode);
+			eventBus.emitEvent<GuiDebugEvent>(entity.id(), static_cast<DebugMode>(currentMode));
 		}
 		ImGui::TreePop();
 	}

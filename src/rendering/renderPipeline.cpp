@@ -331,15 +331,15 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 	const auto& matComponent = entity.getComponent<MaterialComponent>();
 
 	const EntityCore entityCore{
-		&entity.getComponent<DebugComponent>(),
-		&entity.getComponent<TransformComponent>(),
-		&entity.getComponent<MaterialComponent>(),
-		!entity.hasComponent<SkyboxComponent>()
-			? entity.getComponent<BoundingVolumeComponent>().bv->center()
-			: glm::vec3(0.0f),
-		!entity.hasComponent<SkyboxComponent>()
-			? entity.getComponent<BoundingVolumeComponent>().bv->extents()
-			: glm::vec3(0.0f),
+		.id = entity.id(),
+		.transform = &entity.getComponent<TransformComponent>(),
+		.material = &entity.getComponent<MaterialComponent>(),
+		.bvCenter = !entity.hasComponent<SkyboxComponent>()
+			            ? entity.getComponent<BoundingVolumeComponent>().bv->center()
+			            : glm::vec3(0.0f),
+		.bvExtents = !entity.hasComponent<SkyboxComponent>()
+			             ? entity.getComponent<BoundingVolumeComponent>().bv->extents()
+			             : glm::vec3(0.0f),
 	};
 
 	if (entity.hasComponent<SkyboxComponent>()) {

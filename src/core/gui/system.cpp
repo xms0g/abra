@@ -34,7 +34,7 @@ void GuiSystem::render(EventBus& eventBus) const {
 
 		if (Ui::beginEntity(entity.name())) {
 			GuiPanels::renderTransformPanel(entity);
-			GuiPanels::renderDebugViewsPanel(entity);
+			GuiPanels::renderDebugViewsPanel(entity, eventBus);
 			GuiPanels::renderLightPanel(entity);
 			Ui::endEntity();
 		}

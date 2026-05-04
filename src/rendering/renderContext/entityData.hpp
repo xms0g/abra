@@ -6,7 +6,7 @@ struct MaterialComponent;
 struct TransformComponent;
 
 struct EntityCore {
-	const DebugComponent* debug{};
+	size_t id;
 	const TransformComponent* transform{};
 	const MaterialComponent* material{};
 	glm::vec3 bvCenter{0.f, 0.f, 0.f};

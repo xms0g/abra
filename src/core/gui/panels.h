@@ -9,7 +9,7 @@ void renderGraphicsInfoPanel(uint32_t fps);
 
 void renderTransformPanel(const Entity& entity);
 
-void renderDebugViewsPanel(const Entity& entity);
+void renderDebugViewsPanel(const Entity& entity, EventBus& eventBus);
 
 void renderLightPanel(const Entity& entity);
 
