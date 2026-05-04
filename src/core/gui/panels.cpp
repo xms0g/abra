@@ -66,7 +66,7 @@ void GuiPanels::renderDebugViewsPanel(const Entity& entity) {
 
 	ImGui::PushID(static_cast<int>(entity.id()));
 	if (ImGui::TreeNodeEx("Debug Views", ImGuiTreeNodeFlags_DefaultOpen)) {
-		const char* modes[] = {"None", "Normals", "Wireframe"};
+		static const char* modes[] = {"None", "Normals", "Wireframe"};
 		int currentMode = db.mode;
 		ImGui::Text("Mode");
 		ImGui::SameLine(70);
@@ -127,16 +127,27 @@ void GuiPanels::renderPointLight(const Entity& entity) {
 
 void GuiPanels::renderPostProcessPanel(EventBus& eventBus) {
 	if (ImGui::Begin("Post-Processing")) {
-		for (auto& [name, enabled, exposure, intensity]: effects) {
-			ImGui::Checkbox(name, &enabled);
+		for (uint32_t i = 0; i < effects.size(); ++i) {
+			bool changed{false};
 
-			if (std::string_view(name) == "Tone Mapping") {
-				Ui::sliderFloat("Exposure", &exposure, 100.0f);
-			} else if (std::string_view(name) == "Chromatic Aberration") {
-				Ui::sliderFloat("Intensity", &intensity, 100.0f, 0.01f, 0.1f);
+			auto& [name, enabled, exposure, intensity] = effects[i];
+			if (ImGui::Checkbox(name, &enabled)) {
+				changed = true;
 			}
 
-			eventBus.emitEvent<GuiPostProcessPanelEvent>(name, enabled, exposure, intensity);
+			if (i == 1) {
+				if (Ui::sliderFloat("Exposure", &exposure, 100.0f)) {
+					changed = true;
+				}
+			} else if (i == 7) {
+				if (Ui::sliderFloat("Intensity", &intensity, 100.0f, 0.01f, 0.1f)) {
+					changed = true;
+				}
+			}
+
+			if (changed) {
+				eventBus.emitEvent<GuiPostProcessPanelEvent>(name, enabled, exposure, intensity);
+			}
 		}
 	}
 	ImGui::End();

@@ -12,6 +12,6 @@ void dragFloat3(const char* label, glm::vec3& value, float speed = 0.01f, float 
 
 void dragFloat4(const char* label, glm::vec4& value, float speed = 0.01f, float sameLineOffset = 100.0f);
 
-void sliderFloat(const char* label, float* value, float sameLineOffset = 100.0f, float min = 0.0f, float max = 10.0f);
+bool sliderFloat(const char* label, float* value, float sameLineOffset = 100.0f, float min = 0.0f, float max = 10.0f);
 }
 
