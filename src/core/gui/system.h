@@ -1,7 +1,7 @@
 #pragma once
 #include "../../ECS/system.hpp"
 
-struct IPostEffect;
+class EventBus;
 
 class GuiSystem final : public System {
 public:
@@ -11,7 +11,7 @@ public:
 
 	void update(float dt);
 
-	void render(const std::vector<std::unique_ptr<IPostEffect>>& effects) const;
+	void render(EventBus& eventBus) const;
 
 private:
 	void updateFpsCounter(float dt);

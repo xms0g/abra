@@ -15,7 +15,7 @@ public:
 		bool& toggle,
 		PingPongBuffer& pingPong) const override;
 
-	float& intensity() { return mIntensity; }
+	void intensity(float intensity);
 
 private:
 	float mIntensity{};

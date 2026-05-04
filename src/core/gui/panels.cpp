@@ -8,8 +8,30 @@
 #include "../../ECS/components/directionalLight.hpp"
 #include "../../ECS/components/pointLight.hpp"
 #include "../../ECS/components/spotLight.hpp"
-#include "../../rendering/renderPasses/postProcess/ca.h"
-#include "../../rendering/renderPasses/postProcess/toneMapping.h"
+#include "../../event/eventBus.hpp"
+#include "../../event/events/guiPostProcessPanelEvent.hpp"
+
+struct Effect {
+	const char* name;
+	bool enabled;
+	float exposure{0.0f};
+	float intensity{0.0f};
+};
+
+static std::array<Effect, 10> effects = {
+	{
+		{"Bloom", false},
+		{"Tone Mapping", false},
+		{"Grayscale", false},
+		{"Sepia", false},
+		{"Blur", false},
+		{"Edge Detection", false},
+		{"Sharpen", false},
+		{"Chromatic Aberration", false},
+		{"Gamma Correction", true},
+		{"FXAA", false}
+	}
+};
 
 void GuiPanels::renderGraphicsInfoPanel(const uint32_t fps) {
 	if (ImGui::Begin("Graphics")) {
@@ -103,16 +125,18 @@ void GuiPanels::renderPointLight(const Entity& entity) {
 	ImGui::Checkbox("Cast Shadow", &plc.castShadow);
 }
 
-void GuiPanels::renderPostProcessPanel(const std::vector<std::unique_ptr<IPostEffect> >& effects) {
+void GuiPanels::renderPostProcessPanel(EventBus& eventBus) {
 	if (ImGui::Begin("Post-Processing")) {
-		for (auto& effect: effects) {
-			ImGui::Checkbox(effect->name().c_str(), &effect->enabled());
+		for (auto& [name, enabled, exposure, intensity]: effects) {
+			ImGui::Checkbox(name, &enabled);
 
-			if (effect->name() == "Tone Mapping") {
-				Ui::sliderFloat("Exposure", &dynamic_cast<ToneMapping*>(effect.get())->exposure(), 100.0f);
-			} else if (effect->name() == "Chromatic Aberration") {
-				Ui::sliderFloat("Intensity", &dynamic_cast<CA*>(effect.get())->intensity(), 100.0f, 0.01f, 0.1f);
+			if (std::string_view(name) == "Tone Mapping") {
+				Ui::sliderFloat("Exposure", &exposure, 100.0f);
+			} else if (std::string_view(name) == "Chromatic Aberration") {
+				Ui::sliderFloat("Intensity", &intensity, 100.0f, 0.01f, 0.1f);
 			}
+
+			eventBus.emitEvent<GuiPostProcessPanelEvent>(name, enabled, exposure, intensity);
 		}
 	}
 	ImGui::End();

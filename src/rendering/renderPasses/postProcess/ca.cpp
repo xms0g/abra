@@ -27,3 +27,7 @@ uint32_t CA::render(
 	toggle = !toggle;
 	return texture;
 }
+
+void CA::intensity(const float intensity) {
+	mIntensity = intensity;
+}

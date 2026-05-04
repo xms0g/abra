@@ -18,7 +18,9 @@ public:
 	const std::string& name() const { return mName; }
 
 	[[nodiscard]]
-	bool& enabled() { return mEnabled; }
+	bool enabled() const { return mEnabled; }
+
+	void enabled(const bool e) { mEnabled = e; }
 
 	virtual uint32_t render(
 		uint32_t sceneTexture,

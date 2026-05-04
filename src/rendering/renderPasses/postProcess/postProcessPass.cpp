@@ -14,6 +14,8 @@
 #include "../../buffers/frameBuffer.h"
 #include "../../models/quad.h"
 #include "../../renderContext/renderContext.hpp"
+#include "../../../event/eventBus.hpp"
+#include "../../../event/events/guiPostProcessPanelEvent.hpp"
 
 PostProcessPass::~PostProcessPass() = default;
 
@@ -61,4 +63,22 @@ void PostProcessPass::execute(const RenderContext& ctx) {
 
 	mQuad->shader().activate();
 	RenderCommon::drawQuad(inputTex, mQuad->VAO());
+}
+
+void PostProcessPass::subscribeToEvents(EventBus& eventBus) {
+	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessPanelEvent>(this, &PostProcessPass::onGuiPanelUpdate);
+}
+
+void PostProcessPass::onGuiPanelUpdate(GuiPostProcessPanelEvent& event) {
+	for (const auto& effect: mEffects) {
+		if (effect->name() == event.name) {
+			effect->enabled(event.enabled);
+
+			if (effect->name() == "Tone Mapping") {
+				dynamic_cast<ToneMapping*>(effect.get())->exposure(event.exposure);
+			} else if (effect->name() == "Chromatic Aberration") {
+				dynamic_cast<CA*>(effect.get())->intensity(event.intensity);
+			}
+		}
+	}
 }

@@ -1,7 +1,7 @@
 #pragma once
-#include <vector>
+#include <cstdint>
 
-class IPostEffect;
+class EventBus;
 class Entity;
 
 namespace  GuiPanels {
@@ -19,6 +19,6 @@ void renderSpotLight(const Entity& entity);
 
 void renderPointLight(const Entity& entity);
 
-void renderPostProcessPanel(const std::vector<std::unique_ptr<IPostEffect>>& effects);
+void renderPostProcessPanel(EventBus& eventBus);
 
 }

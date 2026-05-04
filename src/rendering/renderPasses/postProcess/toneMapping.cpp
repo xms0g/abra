@@ -11,10 +11,6 @@ ToneMapping::ToneMapping(const std::string& name, const bool enabled)
 	shader->setInt("screenTexture", 0);
 }
 
-float& ToneMapping::exposure() {
-	return mExposure;
-}
-
 uint32_t ToneMapping::render(
 	const uint32_t sceneTexture,
 	const uint32_t vao,
@@ -32,4 +28,8 @@ uint32_t ToneMapping::render(
 	pingPong[toggle]->unbind();
 	toggle = !toggle;
 	return texture;
+}
+
+void ToneMapping::exposure(const float exposure) {
+	mExposure = exposure;
 }

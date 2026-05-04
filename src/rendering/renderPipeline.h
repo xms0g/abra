@@ -4,6 +4,7 @@
 #include "renderContext/renderQueue.hpp"
 #include "../ECS/system.hpp"
 
+class EventBus;
 class SSAOPass;
 struct RenderContext;
 class Shader;
@@ -31,7 +32,7 @@ public:
 	[[nodiscard]]
 	PostProcessPass& postProcess() const;
 
-	void configure(const Camera& camera);
+	void configure(const Camera& camera, EventBus& eventBus);
 
 	void batchEntities();
 

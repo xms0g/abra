@@ -37,6 +37,7 @@
 #include "../ECS/components/instance.hpp"
 #include "../ECS/components/skybox.hpp"
 #include "../math/boundingVolume.h"
+#include "../event/eventBus.hpp"
 
 RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLContext context) {
 	RequireComponent<MeshComponent>();
@@ -82,7 +83,7 @@ RenderPipeline::~RenderPipeline() {
 
 PostProcessPass& RenderPipeline::postProcess() const { return *mPostProcessPass; }
 
-void RenderPipeline::configure(const Camera& camera) {
+void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	// Create framebuffers
 	mSceneBuffer = std::make_unique<FrameBuffer>(SCR_WIDTH, SCR_HEIGHT);
 #ifdef MSAA
@@ -124,7 +125,9 @@ void RenderPipeline::configure(const Camera& camera) {
 		mRenderCtx->camera.ubo.binding);
 	// Create render passes
 	mShadowPass = std::make_shared<ShadowPass>();
+
 	mPostProcessPass = std::make_shared<PostProcessPass>();
+	mPostProcessPass->subscribeToEvents(eventBus);
 
 	mRenderPasses.push_back(std::make_shared<FrustumCullingPass>());
 	mRenderPasses.push_back(mShadowPass);

@@ -8,6 +8,7 @@
 #include "../../ECS/components/spotLight.hpp"
 #include "../../ECS/components/transform.hpp"
 #include "../../ECS/components/instance.hpp"
+#include "../../event/eventBus.hpp"
 
 GuiSystem::GuiSystem() {
 	RequireComponent<TransformComponent>(true);
@@ -23,9 +24,9 @@ void GuiSystem::update(const float dt) {
 	updateFpsCounter(dt);
 }
 
-void GuiSystem::render(const std::vector<std::unique_ptr<IPostEffect>>& effects) const {
+void GuiSystem::render(EventBus& eventBus) const {
 	GuiPanels::renderGraphicsInfoPanel(mFPS);
-	GuiPanels::renderPostProcessPanel(effects);
+	GuiPanels::renderPostProcessPanel(eventBus);
 
 	for (const auto& entity: getSystemEntities()) {
 		if (entity.hasComponent<InstanceComponent>())

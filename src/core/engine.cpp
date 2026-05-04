@@ -8,7 +8,6 @@
 #include "../event/eventBus.hpp"
 #include "../ECS/registry.h"
 #include "../rendering/renderPipeline.h"
-#include "../rendering/renderPasses/postProcess/postProcessPass.h"
 
 Engine::Engine() = default;
 
@@ -35,7 +34,7 @@ void Engine::init(Registry* registry) {
 
 void Engine::configure() const {
 	mRenderPipeline->batchEntities();
-	mRenderPipeline->configure(*mCamera);
+	mRenderPipeline->configure(*mCamera, *mEventBus);
 }
 
 void Engine::run() {
@@ -50,7 +49,7 @@ void Engine::run() {
 		mGuiSystem->update(mDeltaTime);
 
 		mRenderPipeline->render();
-		mGuiSystem->render(mRenderPipeline->postProcess().effects());
+		mGuiSystem->render(*mEventBus);
 		mRenderPipeline->drawGui();
 
 		// SDL swap buffers
