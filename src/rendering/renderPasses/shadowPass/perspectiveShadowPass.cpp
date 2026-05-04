@@ -3,7 +3,8 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "../../shader.h"
-#include "../../renderContext/renderableObject.hpp"
+#include "../../mesh/mesh.h"
+#include "../../renderContext/renderGroup.hpp"
 #include "../../renderContext/renderContext.hpp"
 #include "../../renderContext/renderQueue.hpp"
 #include "../../buffers/frameBuffer.h"
@@ -53,9 +54,13 @@ void PerspectiveShadowPass::render(
 	mDepthShader->activate();
 	mDepthShader->setMat4("lightSpaceMatrix", mLightSpaceMatrix[layer]);
 
-	// render scene from light's point of view
-	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->shadowingObjects) {
-		RenderCommon::setupTransform(*entity, *mDepthShader);
-		RenderCommon::drawMesh(*mesh);
+	for (const auto& [entity, matBatch]: ctx.renderQueue->shadowGroups) {
+		RenderCommon::setupTransform(entity, *mDepthShader);
+
+		const auto& [material, shader, meshes] = matBatch;
+
+		for (const auto& mesh: *meshes) {
+			RenderCommon::drawMesh(mesh);
+		}
 	}
 }

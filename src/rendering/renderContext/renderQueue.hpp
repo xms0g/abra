@@ -22,5 +22,4 @@ struct RenderQueue {
 	std::vector<RenderableObject> opaqueObjects;
 	std::vector<RenderableObject> blendObjects;
 	std::vector<RenderableObject> dbgObjects;
-	std::vector<RenderableObject> shadowingObjects;
 };
