@@ -28,12 +28,11 @@ void Engine::init(Registry* registry) {
 	mCamera = std::make_unique<Camera>(glm::vec3(0.0f, 2.0f, 5.0f));
 	mInput = std::make_unique<Input>();
 	mEventBus = std::make_unique<EventBus>();
-
-	mCamera->subscribeToEvents(*mEventBus);
 }
 
 void Engine::configure() const {
 	mRenderPipeline->batchEntities();
+	mCamera->configure(*mEventBus);
 	mRenderPipeline->configure(*mCamera, *mEventBus);
 }
 

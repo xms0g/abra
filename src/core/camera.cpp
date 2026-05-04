@@ -16,7 +16,6 @@ Camera::Camera(
 	  mPitch(pitch),
 	  mMovementSpeed(SPEED),
 	  mMouseSensitivity(SENSITIVITY) {
-	update();
 }
 
 Camera::Camera(
@@ -30,7 +29,6 @@ Camera::Camera(
 	  mPitch(pitch),
 	  mMovementSpeed(SPEED),
 	  mMouseSensitivity(SENSITIVITY) {
-	update();
 }
 
 glm::mat4 Camera::viewMatrix() const {
@@ -47,6 +45,12 @@ const glm::vec3& Camera::front() const {
 
 const math::Frustum& Camera::frustum() const {
 	return mFrustum;
+}
+
+void Camera::configure(EventBus& eventBus) {
+	update();
+	eventBus.subscribeToEvent<Camera, KeyPressedEvent>(this, &Camera::processKeyboard);
+	eventBus.subscribeToEvent<Camera, MouseMovementEvent>(this, &Camera::processMouseMovement);
 }
 
 void Camera::update() {
@@ -91,11 +95,6 @@ void Camera::processMouseMovement(const MouseMovementEvent& event) {
 		mPitch = 89.0f;
 	if (mPitch < -89.0f)
 		mPitch = -89.0f;
-}
-
-void Camera::subscribeToEvents(EventBus& eventBus) {
-	eventBus.subscribeToEvent<Camera, KeyPressedEvent>(this, &Camera::processKeyboard);
-	eventBus.subscribeToEvent<Camera, MouseMovementEvent>(this, &Camera::processMouseMovement);
 }
 
 void Camera::generateFrustum() {

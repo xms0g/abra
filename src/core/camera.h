@@ -37,13 +37,13 @@ public:
 	[[nodiscard]]
 	const math::Frustum& frustum() const;
 
+	void configure(EventBus& eventBus);
+
 	void update();
 
 	void processKeyboard(const KeyPressedEvent& event);
 
 	void processMouseMovement(const MouseMovementEvent& event);
-
-	void subscribeToEvents(EventBus& eventBus);
 
 private:
 	void generateFrustum();
