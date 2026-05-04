@@ -4,7 +4,7 @@
 #include "basePostEffect.hpp"
 #include "../IRenderPass.hpp"
 
-struct GuiPostProcessPanelEvent;
+struct GuiPostProcessEvent;
 class EventBus;
 struct RenderContext;
 
@@ -25,7 +25,7 @@ public:
 	void subscribeToEvents(EventBus& eventBus);
 
 private:
-	void onGuiPanelUpdate(const GuiPostProcessPanelEvent& event);
+	void onGuiPanelUpdate(const GuiPostProcessEvent& event);
 
 	PingPongBuffer mPingPong;
 	std::unique_ptr<Models::Quad> mQuad;

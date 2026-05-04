@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include <string>
-#include "../../../event/events/guiPostProcessPanelEvent.hpp"
+#include "../../../event/events/guiPostProcessEvent.hpp"
 
 class FrameBuffer;
 using PingPongBuffer = std::array<std::unique_ptr<FrameBuffer>, 2>;
@@ -29,7 +29,7 @@ public:
 		bool& toggle,
 		PingPongBuffer& pingPong) const = 0;
 
-	virtual void updateFromEvent(const GuiPostProcessPanelEvent& event) {
+	virtual void updateFromEvent(const GuiPostProcessEvent& event) {
 		this->enabled(event.enabled);
 	}
 

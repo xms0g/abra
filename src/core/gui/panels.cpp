@@ -9,7 +9,7 @@
 #include "../../ECS/components/pointLight.hpp"
 #include "../../ECS/components/spotLight.hpp"
 #include "../../event/eventBus.hpp"
-#include "../../event/events/guiPostProcessPanelEvent.hpp"
+#include "../../event/events/guiPostProcessEvent.hpp"
 
 struct Effect {
 	const char* name;
@@ -66,10 +66,9 @@ void GuiPanels::renderDebugViewsPanel(const Entity& entity) {
 
 	ImGui::PushID(static_cast<int>(entity.id()));
 	if (ImGui::TreeNodeEx("Debug Views", ImGuiTreeNodeFlags_DefaultOpen)) {
-		static const char* modes[] = {"None", "Normals", "Wireframe"};
+		static constexpr const char* modes[] = {"None", "Normals", "Wireframe"};
 		int currentMode = db.mode;
-		ImGui::Text("Mode");
-		ImGui::SameLine(70);
+		ImGui::Text("Mode"); ImGui::SameLine(70);
 		if (ImGui::Combo("##mode", &currentMode, modes, IM_ARRAYSIZE(modes))) {
 			db.mode = static_cast<DebugMode>(currentMode);
 		}
@@ -146,7 +145,7 @@ void GuiPanels::renderPostProcessPanel(EventBus& eventBus) {
 			}
 
 			if (changed) {
-				eventBus.emitEvent<GuiPostProcessPanelEvent>(name, enabled, exposure, intensity);
+				eventBus.emitEvent<GuiPostProcessEvent>(name, enabled, exposure, intensity);
 			}
 		}
 	}

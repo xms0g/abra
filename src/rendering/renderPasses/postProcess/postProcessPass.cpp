@@ -15,7 +15,7 @@
 #include "../../models/quad.h"
 #include "../../renderContext/renderContext.hpp"
 #include "../../../event/eventBus.hpp"
-#include "../../../event/events/guiPostProcessPanelEvent.hpp"
+#include "../../../event/events/guiPostProcessEvent.hpp"
 
 PostProcessPass::~PostProcessPass() = default;
 
@@ -62,10 +62,10 @@ void PostProcessPass::execute(const RenderContext& ctx) {
 }
 
 void PostProcessPass::subscribeToEvents(EventBus& eventBus) {
-	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessPanelEvent>(this, &PostProcessPass::onGuiPanelUpdate);
+	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessEvent>(this, &PostProcessPass::onGuiPanelUpdate);
 }
 
-void PostProcessPass::onGuiPanelUpdate(const GuiPostProcessPanelEvent& event) {
+void PostProcessPass::onGuiPanelUpdate(const GuiPostProcessEvent& event) {
 	for (const auto& effect: mEffects) {
 		if (effect->name() == event.name) {
 			effect->updateFromEvent(event);

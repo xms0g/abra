@@ -28,7 +28,7 @@ uint32_t CA::render(
 	return texture;
 }
 
-void CA::updateFromEvent(const GuiPostProcessPanelEvent& event) {
+void CA::updateFromEvent(const GuiPostProcessEvent& event) {
 	BasePostEffect::updateFromEvent(event);
 	mIntensity = event.intensity;
 }
