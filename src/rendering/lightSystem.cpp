@@ -42,7 +42,7 @@ const std::vector<SpotLightComponent*>& LightSystem::spotLights() const {
 	return mSpotLights;
 }
 
-void LightSystem::update(const RenderContext& ctx) {
+void LightSystem::update() {
 	mDirLights.clear();
 	mPointLights.clear();
 	mSpotLights.clear();
@@ -68,10 +68,10 @@ void LightSystem::update(const RenderContext& ctx) {
 		}
 	}
 
-	updateLightUBO(ctx);
+	updateLightUBO();
 }
 
-void LightSystem::updateLightUBO(const RenderContext& ctx) const {
+void LightSystem::updateLightUBO() const {
 	for (size_t i = 0; i < mDirLights.size(); ++i) {
 		lightsData.dirLights[i] = *mDirLights[i];
 	}

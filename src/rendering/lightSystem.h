@@ -23,10 +23,10 @@ public:
 	[[nodiscard]]
 	const std::vector<SpotLightComponent*>& spotLights() const;
 
-	void update(const RenderContext& ctx);
+	void update();
 
 private:
-	void updateLightUBO(const RenderContext& ctx) const;
+	void updateLightUBO() const;
 
 	std::unique_ptr<UniformBuffer> mUBO;
 	std::vector<DirectionalLightComponent*> mDirLights;
