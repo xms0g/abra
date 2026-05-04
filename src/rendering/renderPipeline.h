@@ -29,9 +29,6 @@ public:
 
 	~RenderPipeline() override;
 
-	[[nodiscard]]
-	PostProcessPass& postProcess() const;
-
 	void configure(const Camera& camera, EventBus& eventBus);
 
 	void batchEntities();

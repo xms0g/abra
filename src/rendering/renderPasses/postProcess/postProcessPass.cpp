@@ -19,10 +19,6 @@
 
 PostProcessPass::~PostProcessPass() = default;
 
-std::vector<std::unique_ptr<IPostEffect> >& PostProcessPass::effects() {
-	return mEffects;
-}
-
 void PostProcessPass::configure(const RenderContext& ctx) {
 	mQuad = std::make_unique<Models::Quad>();
 
@@ -69,7 +65,7 @@ void PostProcessPass::subscribeToEvents(EventBus& eventBus) {
 	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessPanelEvent>(this, &PostProcessPass::onGuiPanelUpdate);
 }
 
-void PostProcessPass::onGuiPanelUpdate(GuiPostProcessPanelEvent& event) {
+void PostProcessPass::onGuiPanelUpdate(const GuiPostProcessPanelEvent& event) {
 	for (const auto& effect: mEffects) {
 		if (effect->name() == event.name) {
 			effect->updateFromEvent(event);

@@ -64,7 +64,7 @@ void Camera::update() {
 	generateFrustum();
 }
 
-void Camera::processKeyboard(KeyPressedEvent& event) {
+void Camera::processKeyboard(const KeyPressedEvent& event) {
 	const float velocity = mMovementSpeed * event.deltaTime;
 	if (event.direction == FORWARD)
 		mPosition += mFront * velocity;
@@ -76,7 +76,7 @@ void Camera::processKeyboard(KeyPressedEvent& event) {
 		mPosition += mRight * velocity;
 }
 
-void Camera::processMouseMovement(MouseEvent& event) {
+void Camera::processMouseMovement(const MouseEvent& event) {
 	float xoffset = event.x;
 	float yoffset = event.y;
 

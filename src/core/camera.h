@@ -39,9 +39,9 @@ public:
 
 	void update();
 
-	void processKeyboard(KeyPressedEvent& event);
+	void processKeyboard(const KeyPressedEvent& event);
 
-	void processMouseMovement(MouseEvent& event);
+	void processMouseMovement(const MouseEvent& event);
 
 	void subscribeToEvents(EventBus& eventBus);
 

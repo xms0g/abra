@@ -19,7 +19,7 @@ private:
 template<typename TOwner, typename TEvent>
 class EventCallBack : public IEventCallBack {
 public:
-	typedef void (TOwner::* CallBackFunction)(TEvent&);
+	typedef void (TOwner::* CallBackFunction)(const TEvent&);
 
 	EventCallBack(TOwner* ownerInstance, const CallBackFunction callBackFunction)
 		: ownerInstance(ownerInstance),
@@ -40,7 +40,7 @@ private:
 class EventBus {
 public:
 	template<typename TOwner, typename TEvent>
-	void subscribeToEvent(TOwner* ownerInstance, void (TOwner::* CallBackFunction)(TEvent&)) {
+	void subscribeToEvent(TOwner* ownerInstance, void (TOwner::* CallBackFunction)(const TEvent&)) {
 		if (!subscribers[typeid(TEvent)].get()) {
 			subscribers[typeid(TEvent)] = std::make_unique<HandlerList>();
 		}

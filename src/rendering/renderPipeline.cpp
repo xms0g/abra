@@ -81,8 +81,6 @@ RenderPipeline::~RenderPipeline() {
 	GuiBackend::shutdown();
 }
 
-PostProcessPass& RenderPipeline::postProcess() const { return *mPostProcessPass; }
-
 void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	// Create framebuffers
 	mSceneBuffer = std::make_unique<FrameBuffer>(SCR_WIDTH, SCR_HEIGHT);
