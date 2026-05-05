@@ -31,7 +31,6 @@ void DebugPass::execute(const RenderContext& ctx) {
 
 	for (const auto& [entityID, material, shader, mesh]: ctx.renderQueue->dbgObjects) {
 		const uint32_t mode = ctx.renderQueue->entityDebugModes.at(entityID);
-		auto& [epos, erot, escale] = ctx.renderQueue->entityTransforms.at(entityID);
 
 		if (mode == None)
 			continue;
@@ -39,7 +38,9 @@ void DebugPass::execute(const RenderContext& ctx) {
 		const auto& dbgShader = mDebugShaders.at(mode);
 		dbgShader->activate();
 
-		RenderCommon::setupTransform(epos, erot, escale, *dbgShader);
+		auto& [ePos, eRot, eScale] = ctx.renderQueue->entityTransforms.at(entityID);
+
+		RenderCommon::setupTransform(ePos, eRot, eScale, *dbgShader);
 		RenderCommon::drawMesh(*mesh);
 	}
 }

@@ -40,9 +40,9 @@ void RenderCommon::forward(const RenderContext& ctx, const std::vector<Renderabl
 
 		if (lastEntityID != entityID) {
 			lastEntityID = entityID;
-			auto& [position, rotation, scale] = ctx.renderQueue->entityTransforms.at(entityID);
+			auto& [ePos, eRot, eScale] = ctx.renderQueue->entityTransforms.at(entityID);
 
-			setupTransform(position, rotation, scale, *lastShader);
+			setupTransform(ePos, eRot, eScale, *lastShader);
 		}
 
 		drawMesh(*mesh);

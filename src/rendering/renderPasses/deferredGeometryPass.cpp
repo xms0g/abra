@@ -63,9 +63,9 @@ void DeferredGeometryPass::execute(const RenderContext& ctx) {
 
 		if (lastEntityID != entityID) {
 			lastEntityID = entityID;
-			auto& [position, rotation, scale] = ctx.renderQueue->entityTransforms.at(entityID);
+			auto& [ePos, eRot, eScale] = ctx.renderQueue->entityTransforms.at(entityID);
 
-			RenderCommon::setupTransform(position, rotation, scale, *mShader);
+			RenderCommon::setupTransform(ePos, eRot, eScale, *mShader);
 		}
 
 		RenderCommon::drawMesh(*mesh);
