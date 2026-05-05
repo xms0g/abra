@@ -129,24 +129,18 @@ void GuiPanels::renderPointLight(const Entity& entity) {
 void GuiPanels::renderPostProcessPanel(EventBus& eventBus) {
 	if (ImGui::Begin("Post-Processing")) {
 		for (uint32_t i = 0; i < effects.size(); ++i) {
-			bool changed{false};
-
 			auto& [name, enabled, exposure, intensity] = effects[i];
-			if (ImGui::Checkbox(name, &enabled)) {
-				changed = true;
-			}
+			bool isDirty{false};
+
+			isDirty |= ImGui::Checkbox(name, &enabled);
 
 			if (i == 1) {
-				if (Ui::sliderFloat("Exposure", &exposure, 100.0f)) {
-					changed = true;
-				}
+				isDirty |= Ui::sliderFloat("Exposure", &exposure, 100.0f);
 			} else if (i == 7) {
-				if (Ui::sliderFloat("Intensity", &intensity, 100.0f, 0.01f, 0.1f)) {
-					changed = true;
-				}
+				isDirty |= Ui::sliderFloat("Intensity", &intensity, 100.0f, 0.01f, 0.1f);
 			}
 
-			if (changed) {
+			if (isDirty) {
 				eventBus.emitEvent<GuiPostProcessEvent>(name, enabled, exposure, intensity);
 			}
 		}
