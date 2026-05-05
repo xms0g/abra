@@ -25,26 +25,19 @@ void DebugPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 			continue;
 		ctx.camera.ubo.self->configure(shader->id(), ctx.camera.ubo.binding, ctx.camera.ubo.blockName);
 	}
-
-	eventBus.subscribeToEvent<DebugPass, GuiDebugEvent>(this, &DebugPass::onGuiUpdate);
 }
 
 void DebugPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
 
 	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->dbgObjects) {
-		if (entity->id != mUpdatedID || mDebugMode == None)
+		if (entity->debugMode == None)
 			continue;
 
-		const auto& dbgShader = mDebugShaders.at(mDebugMode);
+		const auto& dbgShader = mDebugShaders.at(entity->debugMode);
 		dbgShader->activate();
 
 		RenderCommon::setupTransform(*entity, *dbgShader);
 		RenderCommon::drawMesh(*mesh);
 	}
-}
-
-void DebugPass::onGuiUpdate(const GuiDebugEvent& event) {
-	mUpdatedID = event.entityID;
-	mDebugMode = event.mode;
 }

@@ -2,6 +2,7 @@
 #include "glad/glad.h"
 #include "imgui/imgui.h"
 #include "ui.h"
+#include "entityState.hpp"
 #include "../../ECS/registry.h"
 #include "../../ECS/components/transform.hpp"
 #include "../../ECS/components/debug.hpp"
@@ -60,16 +61,17 @@ void GuiPanels::renderTransformPanel(const Entity& entity) {
 	ImGui::PopID();
 }
 
-void GuiPanels::renderDebugViewsPanel(const Entity& entity, EventBus& eventBus) {
+void GuiPanels::renderDebugViewsPanel(const Entity& entity, EventBus& eventBus, std::vector<EntityState>& entityStates) {
 	if (!entity.hasComponent<DebugComponent>()) return;
-
 	ImGui::PushID(static_cast<int>(entity.id()));
 	if (ImGui::TreeNodeEx("Debug Views", ImGuiTreeNodeFlags_DefaultOpen)) {
 		static constexpr const char* modes[] = {"None", "Normals", "Wireframe"};
-		static int currentMode = None;
+		auto& [id, debugMode] = entityStates[entity.id()];
+		int currentMode = debugMode;
 
 		ImGui::Text("Mode"); ImGui::SameLine(70);
 		if (ImGui::Combo("##mode", &currentMode, modes, IM_ARRAYSIZE(modes))) {
+			debugMode = currentMode;
 			eventBus.emitEvent<GuiDebugEvent>(entity.id(), static_cast<DebugMode>(currentMode));
 		}
 		ImGui::TreePop();

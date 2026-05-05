@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
+#include <vector>
 
+struct EntityState;
 class EventBus;
 class Entity;
 
@@ -9,7 +11,7 @@ void renderGraphicsInfoPanel(uint32_t fps);
 
 void renderTransformPanel(const Entity& entity);
 
-void renderDebugViewsPanel(const Entity& entity, EventBus& eventBus);
+void renderDebugViewsPanel(const Entity& entity, EventBus& eventBus, std::vector<EntityState>& entityStates);
 
 void renderLightPanel(const Entity& entity);
 

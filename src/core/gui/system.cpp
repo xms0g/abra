@@ -1,6 +1,7 @@
 #include "system.h"
 #include "panels.h"
 #include "ui.h"
+#include "entityState.hpp"
 #include "../../ECS/registry.h"
 #include "../../ECS/components/debug.hpp"
 #include "../../ECS/components/directionalLight.hpp"
@@ -24,7 +25,13 @@ void GuiSystem::update(const float dt) {
 	updateFpsCounter(dt);
 }
 
-void GuiSystem::render(EventBus& eventBus) const {
+void GuiSystem::configure() {
+	for (const auto& entity: getSystemEntities()) {
+		mEntityStates.emplace_back(entity.id(),0);
+	}
+}
+
+void GuiSystem::render(EventBus& eventBus) {
 	GuiPanels::renderGraphicsInfoPanel(mFPS);
 	GuiPanels::renderPostProcessPanel(eventBus);
 
@@ -34,7 +41,7 @@ void GuiSystem::render(EventBus& eventBus) const {
 
 		if (Ui::beginEntity(entity.name())) {
 			GuiPanels::renderTransformPanel(entity);
-			GuiPanels::renderDebugViewsPanel(entity, eventBus);
+			GuiPanels::renderDebugViewsPanel(entity, eventBus, mEntityStates);
 			GuiPanels::renderLightPanel(entity);
 			Ui::endEntity();
 		}

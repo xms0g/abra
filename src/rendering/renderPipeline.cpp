@@ -24,6 +24,7 @@
 #include "renderPasses/resolvePass.h"
 #include "renderPasses/postProcess/postProcessPass.h"
 #include "renderPasses/shadowPass/shadowPass.h"
+#include "renderPasses/syncStatePass.h"
 #include "gui/backend.h"
 #include "material/material.hpp"
 #include "../config/config.hpp"
@@ -124,9 +125,8 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	// Create render passes
 	mShadowPass = std::make_shared<ShadowPass>();
 
-	mPostProcessPass = std::make_shared<PostProcessPass>();
-
-	mRenderPasses.push_back(std::make_shared<FrustumCullingPass>());
+	mRenderPasses.emplace_back(std::make_shared<SyncStatePass>());
+	mRenderPasses.emplace_back(std::make_shared<FrustumCullingPass>());
 	mRenderPasses.push_back(mShadowPass);
 
 	if (!mRenderQueue.deferredGroups.empty()) {
@@ -140,23 +140,23 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	}
 
 	if (!mRenderQueue.opaqueGroups.empty() || !mRenderQueue.blendGroups.empty()) {
-		mRenderPasses.push_back(std::make_shared<ForwardPass>());
+		mRenderPasses.emplace_back(std::make_shared<ForwardPass>());
 	}
 
 	if (!mRenderQueue.debugGroups.empty()) {
-		mRenderPasses.push_back(std::make_shared<DebugPass>());
+		mRenderPasses.emplace_back(std::make_shared<DebugPass>());
 	}
 
 	if (!mRenderQueue.opaqueInstancedGroups.empty() || !mRenderQueue.blendInstancedGroups.empty()) {
-		mRenderPasses.push_back(std::make_shared<InstancedPass>());
+		mRenderPasses.emplace_back(std::make_shared<InstancedPass>());
 	}
 
-	mRenderPasses.push_back(std::make_shared<SkyboxPass>());
+	mRenderPasses.emplace_back(std::make_shared<SkyboxPass>());
 #ifdef MSAA
-	mRenderPasses.push_back(std::make_shared<ResolvePass>());
+	mRenderPasses.emplace_back(std::make_shared<ResolvePass>());
 	mRenderCtx->intermediateBuffer = mIntermediateBuffer.get();
 #endif
-	mRenderPasses.push_back(mPostProcessPass);
+	mRenderPasses.emplace_back(std::make_shared<PostProcessPass>());
 
 	mRenderCtx->sceneBuffer = mSceneBuffer.get();
 	mRenderCtx->camera.self = &camera;
