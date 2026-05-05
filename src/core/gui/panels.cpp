@@ -12,6 +12,7 @@
 #include "../../event/eventBus.hpp"
 #include "../../event/events/guiDebugEvent.hpp"
 #include "../../event/events/guiPostProcessEvent.hpp"
+#include "../../event/events/guiTransformEvent.hpp"
 
 struct Effect {
 	const char* name;
@@ -46,16 +47,23 @@ void GuiPanels::renderGraphicsInfoPanel(const uint32_t fps) {
 	ImGui::End();
 }
 
-void GuiPanels::renderTransformPanel(const Entity& entity) {
+void GuiPanels::renderTransformPanel(const Entity& entity, EventBus& eventBus, std::vector<EntityState>& entityStates) {
 	if (!entity.hasComponent<TransformComponent>()) return;
-
-	auto& tc = entity.getComponent<TransformComponent>();
 
 	ImGui::PushID(static_cast<int>(entity.id()));
 	if (ImGui::TreeNodeEx("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
-		Ui::dragFloat3("Position", tc.position);
-		Ui::dragFloat3("Rotation", tc.rotation, 1.0f);
-		Ui::dragFloat3("Scale", tc.scale);
+		auto& [id, debugMode, transform] = entityStates[entity.id()];
+
+		bool isDirty{false};
+
+		isDirty |= Ui::dragFloat3("Position", transform.position);
+		isDirty |= Ui::dragFloat3("Rotation", transform.rotation, 1.0f);
+		isDirty |= Ui::dragFloat3("Scale", transform.scale);
+
+		if (isDirty) {
+			eventBus.emitEvent<GuiTransformEvent>(entity.id(), transform.position, transform.rotation, transform.scale);
+		}
+
 		ImGui::TreePop();
 	}
 	ImGui::PopID();
@@ -66,7 +74,7 @@ void GuiPanels::renderDebugViewsPanel(const Entity& entity, EventBus& eventBus, 
 	ImGui::PushID(static_cast<int>(entity.id()));
 	if (ImGui::TreeNodeEx("Debug Views", ImGuiTreeNodeFlags_DefaultOpen)) {
 		static constexpr const char* modes[] = {"None", "Normals", "Wireframe"};
-		auto& [id, debugMode] = entityStates[entity.id()];
+		auto& [id, debugMode, transform] = entityStates[entity.id()];
 		int currentMode = debugMode;
 
 		ImGui::Text("Mode"); ImGui::SameLine(70);

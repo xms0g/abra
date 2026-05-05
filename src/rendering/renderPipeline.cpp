@@ -330,23 +330,27 @@ void RenderPipeline::refreshCameraData() const {
 void RenderPipeline::batchEntity(const Entity& entity) {
 	const auto& matComponent = entity.getComponent<MaterialComponent>();
 
-	const EntityCore entityCore{
-		.id = entity.id(),
-		.transform = &entity.getComponent<TransformComponent>(),
-		.material = &entity.getComponent<MaterialComponent>(),
-		.bvCenter = !entity.hasComponent<SkyboxComponent>()
-			            ? entity.getComponent<BoundingVolumeComponent>().bv->center()
-			            : glm::vec3(0.0f),
-		.bvExtents = !entity.hasComponent<SkyboxComponent>()
-			             ? entity.getComponent<BoundingVolumeComponent>().bv->extents()
-			             : glm::vec3(0.0f),
-	};
+	mRenderQueue.entityTransforms.emplace_back(
+		entity.getComponent<TransformComponent>().position,
+		entity.getComponent<TransformComponent>().rotation,
+		entity.getComponent<TransformComponent>().scale);
+
+	mRenderQueue.entityBVs.emplace_back(
+		!entity.hasComponent<SkyboxComponent>()
+			? entity.getComponent<BoundingVolumeComponent>().bv->center()
+			: glm::vec3(0.0f),
+		!entity.hasComponent<SkyboxComponent>()
+			? entity.getComponent<BoundingVolumeComponent>().bv->extents()
+			: glm::vec3(0.0f));
+
+	mRenderQueue.entityDebugModes.emplace_back(0);
+	mRenderQueue.entityHeightScales.emplace_back(entity.getComponent<MaterialComponent>().heightScale);
 
 	if (entity.hasComponent<SkyboxComponent>()) {
 		const auto& material = matComponent.materials->at(0);
 		auto& meshes = entity.getComponent<MeshComponent>().meshes->at(0);
 		const MaterialBatch matBatch{&material, mShaders[5].get(), &meshes};
-		const RenderGroup group{entityCore, matBatch};
+		const RenderGroup group{entity.id(), matBatch};
 		mRenderQueue.skybox.push_back(group);
 		return;
 	}
@@ -364,7 +368,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			}
 
 			const auto& instComponent = entity.getComponent<InstanceComponent>();
-			InstanceGroup instance{entityCore, instComponent.transforms, matBatch};
+			InstanceGroup instance{entity.id(), instComponent.transforms, matBatch};
 
 			if (material.flags & OPAQUE) {
 				mRenderQueue.opaqueInstancedGroups.push_back(instance);
@@ -385,7 +389,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			matBatch.shader = mShaders[1].get();
 		}
 
-		const RenderGroup group{entityCore, matBatch};
+		const RenderGroup group{entity.id(), matBatch};
 
 		if (entity.hasComponent<DebugComponent>()) {
 			mRenderQueue.debugGroups.push_back(group);
@@ -412,9 +416,12 @@ void RenderPipeline::sortEntities() {
 		std::sort(
 			batch.begin(),
 			batch.end(),
-			[&camPos, &transparent](const RenderGroup& a, const RenderGroup& b) {
-				const float da = glm::length2(camPos - a.entity.transform->position);
-				const float db = glm::length2(camPos - b.entity.transform->position);
+			[&camPos, &transparent, this](const RenderGroup& a, const RenderGroup& b) {
+				const auto aTransform = mRenderQueue.entityTransforms.at(a.entityID);
+				const auto bTransform = mRenderQueue.entityTransforms.at(b.entityID);
+
+				const float da = glm::length2(camPos - aTransform.position);
+				const float db = glm::length2(camPos - bTransform.position);
 
 				if (transparent)
 					return da > db;

@@ -9,7 +9,7 @@ class Entity;
 namespace  GuiPanels {
 void renderGraphicsInfoPanel(uint32_t fps);
 
-void renderTransformPanel(const Entity& entity);
+void renderTransformPanel(const Entity& entity, EventBus& eventBus, std::vector<EntityState>& entityStates);
 
 void renderDebugViewsPanel(const Entity& entity, EventBus& eventBus, std::vector<EntityState>& entityStates);
 

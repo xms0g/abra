@@ -6,7 +6,6 @@
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderQueue.hpp"
 #include "../renderContext/renderableObject.hpp"
-#include "../renderContext/entityData.hpp"
 #include "../../ECS/components/debug.hpp"
 #include "../../event/eventBus.hpp"
 #include "../../event/events/guiDebugEvent.hpp"
@@ -30,14 +29,17 @@ void DebugPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 void DebugPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
 
-	for (const auto& [entity, material, shader, mesh]: ctx.renderQueue->dbgObjects) {
-		if (entity->debugMode == None)
+	for (const auto& [entityID, material, shader, mesh]: ctx.renderQueue->dbgObjects) {
+		const uint32_t mode = ctx.renderQueue->entityDebugModes.at(entityID);
+		auto& [epos, erot, escale] = ctx.renderQueue->entityTransforms.at(entityID);
+
+		if (mode == None)
 			continue;
 
-		const auto& dbgShader = mDebugShaders.at(entity->debugMode);
+		const auto& dbgShader = mDebugShaders.at(mode);
 		dbgShader->activate();
 
-		RenderCommon::setupTransform(*entity, *dbgShader);
+		RenderCommon::setupTransform(epos, erot, escale, *dbgShader);
 		RenderCommon::drawMesh(*mesh);
 	}
 }

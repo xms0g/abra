@@ -1,10 +1,9 @@
 #pragma once
 #include <vector>
-#include "entityData.hpp"
 #include "../material/material.hpp"
 
 struct InstanceGroup {
-	EntityCore entity;
+	size_t entityID;
 	const std::vector<float>* transforms{}; // ptr to P,R,S data
 	MaterialBatch matBatch;
 };

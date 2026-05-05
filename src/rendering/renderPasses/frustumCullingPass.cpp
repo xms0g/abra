@@ -5,7 +5,6 @@
 #include "../renderContext/renderGroup.hpp"
 #include "../renderContext/renderableObject.hpp"
 #include "../../ECS/registry.h"
-#include "../../ECS/components/transform.hpp"
 #include "../../math/boundingVolume.h"
 #include "../../math/matrix.h"
 
@@ -18,13 +17,16 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 	auto cullItems = [&](const std::vector<RenderGroup>& groups, std::vector<RenderableObject>& outQueue) -> void {
 		outQueue.clear();
 
-		for (const auto& [entity, matBatch]: groups) {
-			const glm::mat4 model = math::modelMatrix(
-				entity.transform->position,
-				entity.transform->rotation,
-				entity.transform->scale);
+		for (const auto& [entityID, matBatch]: groups) {
+			auto& [position, rotation, scale] = ctx.renderQueue->entityTransforms.at(entityID);
+			auto& [center, extents] = ctx.renderQueue->entityBVs.at(entityID);
 
-			if (!math::AABB::isOnFrustum(*ctx.camera.frustum, model, entity.bvCenter, entity.bvExtents)) {
+			const glm::mat4 model = math::modelMatrix(
+				position,
+				rotation,
+				scale);
+
+			if (!math::AABB::isOnFrustum(*ctx.camera.frustum, model, center, extents)) {
 				continue;
 			}
 
@@ -33,7 +35,7 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 				const bool isVisible = math::AABB::isMeshInFrustum(*ctx.camera.frustum, mesh.min(), mesh.max(), model);
 
 				if (isVisible) {
-					outQueue.push_back({&entity, material, shader, &mesh});
+					outQueue.push_back({entityID, material, shader, &mesh});
 				}
 			}
 		}

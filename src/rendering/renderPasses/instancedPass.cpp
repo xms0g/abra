@@ -42,13 +42,13 @@ void InstancedPass::execute(const RenderContext& ctx) {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		RenderCommon::instanced(ctx.renderQueue->blendInstancedGroups);
+		RenderCommon::instanced(ctx, ctx.renderQueue->blendInstancedGroups);
 
 		glDepthMask(GL_TRUE);
 		glDisable(GL_BLEND);
 	}
 
-	RenderCommon::instanced(ctx.renderQueue->opaqueInstancedGroups);
+	RenderCommon::instanced(ctx, ctx.renderQueue->opaqueInstancedGroups);
 }
 
 void InstancedPass::prepareInstanceBuffer(

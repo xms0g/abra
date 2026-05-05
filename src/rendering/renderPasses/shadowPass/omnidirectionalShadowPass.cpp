@@ -57,8 +57,10 @@ void OmnidirectionalShadowPass::render(
 	mDepthShader->setVec3("lightPos", position);
 	mDepthShader->setInt("cubeIndex", layer);
 
-	for (const auto& [entity, matBatch]: ctx.renderQueue->shadowGroups) {
-		RenderCommon::setupTransform(entity, *mDepthShader);
+	for (const auto& [entityID, matBatch]: ctx.renderQueue->shadowGroups) {
+		auto& [epos, erot, escale] = ctx.renderQueue->entityTransforms.at(entityID);
+
+		RenderCommon::setupTransform(epos, erot, escale, *mDepthShader);
 
 		const auto& [material, shader, meshes] = matBatch;
 

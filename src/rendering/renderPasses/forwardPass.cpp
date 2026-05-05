@@ -20,11 +20,11 @@ void ForwardPass::execute(const RenderContext& ctx) {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		RenderCommon::forward(ctx.renderQueue->blendObjects);
+		RenderCommon::forward(ctx, ctx.renderQueue->blendObjects);
 
 		glDepthMask(GL_TRUE);
 		glDisable(GL_BLEND);
 	}
 
-	RenderCommon::forward(ctx.renderQueue->opaqueObjects);
+	RenderCommon::forward(ctx, ctx.renderQueue->opaqueObjects);
 }

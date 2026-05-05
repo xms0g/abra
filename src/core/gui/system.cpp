@@ -27,7 +27,12 @@ void GuiSystem::update(const float dt) {
 
 void GuiSystem::configure() {
 	for (const auto& entity: getSystemEntities()) {
-		mEntityStates.emplace_back(entity.id(),0);
+		const auto& transform = entity.getComponent<TransformComponent>();
+		mEntityStates.push_back({
+			entity.id(),
+			0,
+			{transform.position, transform.rotation, transform.scale}
+		});
 	}
 }
 
@@ -40,7 +45,7 @@ void GuiSystem::render(EventBus& eventBus) {
 			continue;
 
 		if (Ui::beginEntity(entity.name())) {
-			GuiPanels::renderTransformPanel(entity);
+			GuiPanels::renderTransformPanel(entity, eventBus, mEntityStates);
 			GuiPanels::renderDebugViewsPanel(entity, eventBus, mEntityStates);
 			GuiPanels::renderLightPanel(entity);
 			Ui::endEntity();
@@ -60,4 +65,3 @@ void GuiSystem::updateFpsCounter(const float dt) {
 		mCurrentFrameCount = 0;
 	}
 }
-

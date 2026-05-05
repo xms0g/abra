@@ -7,32 +7,35 @@
 #include "mesh/vertex.hpp"
 #include "renderContext/renderContext.hpp"
 #include "renderContext/renderableObject.hpp"
+#include "renderContext/renderQueue.hpp"
 #include "renderContext/instanceGroup.hpp"
-#include "renderContext/entityData.hpp"
 #include "../math/matrix.h"
 #include "../ECS/components/material.hpp"
 #include "../ECS/components/mesh.hpp"
-#include "../ECS/components/transform.hpp"
 
-void RenderCommon::forward(const std::vector<RenderableObject>& objects) {
+void RenderCommon::forward(const RenderContext& ctx, const std::vector<RenderableObject>& objects) {
 	const Material* lastMaterial = nullptr;
 	const Shader* lastShader = nullptr;
 
-	for (const auto& [entity, material, shader, mesh]: objects) {
+	for (const auto& [entityID, material, shader, mesh]: objects) {
 		if (lastShader != shader) {
 			lastShader = shader;
 			lastShader->activate();
 			lastMaterial = nullptr;
 		}
 
-		setupTransform(*entity, *lastShader);
+		auto& [position, rotation, scale] = ctx.renderQueue->entityTransforms.at(entityID);
+
+		setupTransform(position, rotation, scale, *lastShader);
 
 		if (lastMaterial != material) {
 			if (material->textures.empty()) {
 				shader->setVec3("material.color", material->color);
 			}
 
-			setupMaterial(*entity, *material, *lastShader);
+			const float heightScale = ctx.renderQueue->entityHeightScales.at(entityID);
+
+			setupMaterial(*material, *lastShader, heightScale);
 			bindTextures(*material, *lastShader);
 			lastMaterial = material;
 		}
@@ -41,17 +44,18 @@ void RenderCommon::forward(const std::vector<RenderableObject>& objects) {
 	}
 }
 
-void RenderCommon::instanced(const std::vector<InstanceGroup>& objects) {
-	for (const auto& [entity, transforms, matBatch]: objects) {
+void RenderCommon::instanced(const RenderContext& ctx, const std::vector<InstanceGroup>& objects) {
+	for (const auto& [entityID, transforms, matBatch]: objects) {
 		const size_t count = transforms->size() / 9;
 
 		const auto& [material, shader, meshes] = matBatch;
 		shader->activate();
 
-		for (const auto& mesh: *meshes) {
-			setupMaterial(entity, *material, *shader);
-			bindTextures(*material, *shader);
+		const float heightScale = ctx.renderQueue->entityHeightScales.at(entityID);
+		setupMaterial(*material, *shader, heightScale);
+		bindTextures(*material, *shader);
 
+		for (const auto& mesh: *meshes) {
 			mesh.bind();
 			glDrawElementsInstanced(
 				GL_TRIANGLES,
@@ -63,31 +67,23 @@ void RenderCommon::instanced(const std::vector<InstanceGroup>& objects) {
 	}
 }
 
-void RenderCommon::setupTransform(const EntityCore& entity, const Shader& shader) {
-	static const EntityCore* lastEntity{nullptr};
-
-	if (lastEntity == &entity) {
-		return;
-	}
-
-	lastEntity = &entity;
-
-	const glm::mat4 model = math::modelMatrix(
-		entity.transform->position,
-		entity.transform->rotation,
-		entity.transform->scale);
-
+void RenderCommon::setupTransform(
+	const glm::vec3& position,
+	const glm::vec3& rotation,
+	const glm::vec3& scale,
+	const Shader& shader) {
+	const glm::mat4 model = math::modelMatrix(position, rotation, scale);
 	const glm::mat3 normal = math::normalMatrix(model);
 
 	shader.setMat4("model", model);
 	shader.setMat3("normalMatrix", normal);
 }
 
-void RenderCommon::setupMaterial(const EntityCore& entity, const Material& material, const Shader& shader) {
+void RenderCommon::setupMaterial(const Material& material, const Shader& shader, const float heightScale) {
 	static bool isCullingEnabled{true};
 
 	if (material.flags & HAS_HEIGHT_MAP) {
-		shader.setFloat("material.heightScale", entity.material->heightScale);
+		shader.setFloat("material.heightScale", heightScale);
 	}
 
 	if (material.alphaCutoff != 0.0f) {

@@ -51,8 +51,10 @@ void DirectionalShadowPass::render(const RenderContext& ctx, const glm::vec4& di
 	glCullFace(GL_FRONT);
 	glViewport(0, 0, static_cast<int32_t>(ctx.shadow.width), static_cast<int32_t>(ctx.shadow.height));
 
-	for (const auto& [entity, matBatch]: ctx.renderQueue->shadowGroups) {
-		RenderCommon::setupTransform(entity, *mDepthShader);
+	for (const auto& [entityID, matBatch]: ctx.renderQueue->shadowGroups) {
+		auto& [epos, erot, escale] = ctx.renderQueue->entityTransforms.at(entityID);
+
+		RenderCommon::setupTransform(epos, erot, escale, *mDepthShader);
 
 		const auto& [material, shader, meshes] = matBatch;
 

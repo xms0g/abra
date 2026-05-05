@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <vector>
+#include "glm/glm.hpp"
 
 struct InstanceGroup;
 struct RenderableObject;
@@ -13,13 +14,17 @@ class Shader;
 class Entity;
 
 namespace RenderCommon {
-void forward(const std::vector<RenderableObject>& objects);
+void forward(const RenderContext& ctx, const std::vector<RenderableObject>& objects);
 
-void instanced(const std::vector<InstanceGroup>& objects);
+void instanced(const RenderContext& ctx, const std::vector<InstanceGroup>& objects);
 
-void setupTransform(const EntityCore& entity, const Shader& shader);
+void setupTransform(
+	const glm::vec3& position,
+	const glm::vec3& rotation,
+	const glm::vec3& scale,
+	const Shader& shader);
 
-void setupMaterial(const EntityCore& entity, const Material& material, const Shader& shader);
+void setupMaterial(const Material& material, const Shader& shader, float heightScale);
 
 void drawMesh(const Mesh& mesh);
 
