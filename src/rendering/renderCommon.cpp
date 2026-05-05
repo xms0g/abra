@@ -14,19 +14,17 @@
 #include "../ECS/components/mesh.hpp"
 
 void RenderCommon::forward(const RenderContext& ctx, const std::vector<RenderableObject>& objects) {
-	const Material* lastMaterial = nullptr;
-	const Shader* lastShader = nullptr;
+	const Material* lastMaterial{nullptr};
+	const Shader* lastShader{nullptr};
+	size_t lastEntityID{0};
 
 	for (const auto& [entityID, material, shader, mesh]: objects) {
 		if (lastShader != shader) {
 			lastShader = shader;
 			lastShader->activate();
 			lastMaterial = nullptr;
+			lastEntityID = 0;
 		}
-
-		auto& [position, rotation, scale] = ctx.renderQueue->entityTransforms.at(entityID);
-
-		setupTransform(position, rotation, scale, *lastShader);
 
 		if (lastMaterial != material) {
 			if (material->textures.empty()) {
@@ -38,6 +36,13 @@ void RenderCommon::forward(const RenderContext& ctx, const std::vector<Renderabl
 			setupMaterial(*material, *lastShader, heightScale);
 			bindTextures(*material, *lastShader);
 			lastMaterial = material;
+		}
+
+		if (lastEntityID != entityID) {
+			lastEntityID = entityID;
+			auto& [position, rotation, scale] = ctx.renderQueue->entityTransforms.at(entityID);
+
+			setupTransform(position, rotation, scale, *lastShader);
 		}
 
 		drawMesh(*mesh);

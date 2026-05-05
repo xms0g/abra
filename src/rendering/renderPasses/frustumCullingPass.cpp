@@ -21,10 +21,7 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 			auto& [position, rotation, scale] = ctx.renderQueue->entityTransforms.at(entityID);
 			auto& [center, extents] = ctx.renderQueue->entityBVs.at(entityID);
 
-			const glm::mat4 model = math::modelMatrix(
-				position,
-				rotation,
-				scale);
+			const glm::mat4 model = math::modelMatrix(position, rotation, scale);
 
 			if (!math::AABB::isOnFrustum(*ctx.camera.frustum, model, center, extents)) {
 				continue;
