@@ -83,6 +83,9 @@ void LightSystem::updateLightUBO() const {
 
 void LightSystem::onGuiUpdate(const GuiLightEvent& event) {
 	for (auto& entity: getSystemEntities()) {
+		if (entity.id() != event.entityID)
+			continue;
+
 		if (entity.hasComponent<DirectionalLightComponent>()) {
 			mDirLights.clear();
 			auto& light = entity.getComponent<DirectionalLightComponent>();
