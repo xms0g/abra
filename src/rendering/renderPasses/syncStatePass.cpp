@@ -1,7 +1,6 @@
 #include "syncStatePass.h"
 #include "../renderContext/renderQueue.hpp"
 #include "../renderContext/renderContext.hpp"
-#include "../renderContext/renderGroup.hpp"
 #include "../../event/eventBus.hpp"
 #include "../../event/events/guiDebugEvent.hpp"
 #include "../../event/events/guiTransformEvent.hpp"
@@ -19,26 +18,15 @@ void SyncStatePass::execute(const RenderContext& ctx) {
 }
 
 void SyncStatePass::syncDebugState(const RenderContext& ctx) const {
-	for (auto& [entityID, matBatch]: ctx.renderQueue->debugGroups) {
-		if (entityID != mEntityID)
-			continue;
-
-		uint32_t& mode = ctx.renderQueue->entityDebugModes.at(entityID);
-		mode = mDebugMode;
-	}
+	uint32_t& mode = ctx.renderQueue->entityDebugModes.at(mEntityID);
+	mode = mDebugMode;
 }
 
 void SyncStatePass::syncTransformState(const RenderContext& ctx) const {
-	for (auto& [entityID, matBatch]: ctx.renderQueue->deferredGroups) {
-		if (entityID != mEntityID)
-			continue;
-
-		auto& [position, rotation, scale] = ctx.renderQueue->entityTransforms.at(entityID);
-		position = transform.position;
-		rotation = transform.rotation;
-		scale = transform.scale;
-		break;
-	}
+	auto& [position, rotation, scale] = ctx.renderQueue->entityTransforms.at(mEntityID);
+	position = transform.position;
+	rotation = transform.rotation;
+	scale = transform.scale;
 }
 
 void SyncStatePass::onDebugUpdate(const GuiDebugEvent& event) {

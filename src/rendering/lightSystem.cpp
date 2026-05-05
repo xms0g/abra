@@ -7,7 +7,8 @@
 #include "../ECS/components/directionalLight.hpp"
 #include "../ECS/components/pointLight.hpp"
 #include "../ECS/components/spotLight.hpp"
-#include "../ECS/components/transform.hpp"
+#include "../event/eventBus.hpp"
+#include "../event/events/guiLightEvent.hpp"
 
 struct alignas(16) PackedLights {
 	DirectionalLightComponent dirLights[MAX_DIRECTIONAL_LIGHTS];
@@ -18,12 +19,30 @@ struct alignas(16) PackedLights {
 
 static PackedLights lightsData;
 
-LightSystem::LightSystem(const RenderContext& ctx) {
+LightSystem::LightSystem() {
 	RequireComponent<DirectionalLightComponent>(true);
 	RequireComponent<PointLightComponent>(true);
 	RequireComponent<SpotLightComponent>(true);
+}
+
+void LightSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
+	eventBus.subscribeToEvent<LightSystem, GuiLightEvent>(this, &LightSystem::onGuiUpdate);
+
+	for (auto& entity: getSystemEntities()) {
+		if (entity.hasComponent<DirectionalLightComponent>()) {
+			auto& light = entity.getComponent<DirectionalLightComponent>();
+			mDirLights.push_back(&light);
+		} else if (entity.hasComponent<PointLightComponent>()) {
+			auto& light = entity.getComponent<PointLightComponent>();
+			mPointLights.push_back(&light);
+		} else if (entity.hasComponent<SpotLightComponent>()) {
+			auto& light = entity.getComponent<SpotLightComponent>();
+			mSpotLights.push_back(&light);
+		}
+	}
 
 	mUBO = std::make_unique<UniformBuffer>(DYNAMIC, sizeof(PackedLights), ctx.light.ubo.binding);
+	updateLightUBO();
 }
 
 const UniformBuffer& LightSystem::ubo() const {
@@ -40,35 +59,6 @@ const std::vector<DirectionalLightComponent*>& LightSystem::dirLights() const {
 
 const std::vector<SpotLightComponent*>& LightSystem::spotLights() const {
 	return mSpotLights;
-}
-
-void LightSystem::update() {
-	mDirLights.clear();
-	mPointLights.clear();
-	mSpotLights.clear();
-
-	for (auto& entity: getSystemEntities()) {
-		TransformComponent tc;
-
-		if (entity.hasComponent<TransformComponent>()) {
-			tc = entity.getComponent<TransformComponent>();
-		}
-
-		if (entity.hasComponent<DirectionalLightComponent>()) {
-			auto& light = entity.getComponent<DirectionalLightComponent>();
-			mDirLights.push_back(&light);
-		} else if (entity.hasComponent<PointLightComponent>()) {
-			auto& light = entity.getComponent<PointLightComponent>();
-			light.position = glm::vec4(tc.position, 1.0f);
-			mPointLights.push_back(&light);
-		} else if (entity.hasComponent<SpotLightComponent>()) {
-			auto& light = entity.getComponent<SpotLightComponent>();
-			light.position = glm::vec4(tc.position, 1.0f);
-			mSpotLights.push_back(&light);
-		}
-	}
-
-	updateLightUBO();
 }
 
 void LightSystem::updateLightUBO() const {
@@ -89,4 +79,53 @@ void LightSystem::updateLightUBO() const {
 	mUBO->bind();
 	mUBO->setData(&lightsData, sizeof(PackedLights), 0);
 	mUBO->unbind();
+}
+
+void LightSystem::onGuiUpdate(const GuiLightEvent& event) {
+	for (auto& entity: getSystemEntities()) {
+		if (entity.hasComponent<DirectionalLightComponent>()) {
+			mDirLights.clear();
+			auto& light = entity.getComponent<DirectionalLightComponent>();
+
+			light.direction = event.direction;
+			light.ambient = event.ambient;
+			light.diffuse = event.diffuse;
+			light.specular = event.specular;
+			light.intensity = event.intensity;
+
+			mDirLights.push_back(&light);
+		} else if (entity.hasComponent<PointLightComponent>()) {
+			mPointLights.clear();
+
+			auto& light = entity.getComponent<PointLightComponent>();
+
+			light.position = event.position;
+			light.ambient = event.ambient;
+			light.diffuse = event.diffuse;
+			light.specular = event.specular;
+			light.attenuation = event.attenuation;
+			light.intensity = event.intensity;
+			light.castShadow = event.castShadow;
+
+			mPointLights.push_back(&light);
+		} else if (entity.hasComponent<SpotLightComponent>()) {
+			mSpotLights.clear();
+
+			auto& light = entity.getComponent<SpotLightComponent>();
+
+			light.position = event.position;
+			light.direction = event.direction;
+			light.ambient = event.ambient;
+			light.diffuse = event.diffuse;
+			light.specular = event.specular;
+			light.attenuation = event.attenuation;
+			light.cutOff = event.cutOff;
+			light.intensity = event.intensity;
+			light.castShadow = event.castShadow;
+
+			mSpotLights.push_back(&light);
+		}
+	}
+
+	updateLightUBO();
 }

@@ -13,13 +13,13 @@ void renderTransformPanel(const Entity& entity, EventBus& eventBus, std::vector<
 
 void renderDebugViewsPanel(const Entity& entity, EventBus& eventBus, std::vector<EntityState>& entityStates);
 
-void renderLightPanel(const Entity& entity);
+void renderLightPanel(const Entity& entity, EventBus& eventBus, std::vector<EntityState>& entityStates);
 
-void renderDirLight(const Entity& entity);
+void renderDirLight(const Entity& entity, EventBus& eventBus, EntityState& entityState);
 
-void renderSpotLight(const Entity& entity);
+void renderSpotLight(const Entity& entity, EventBus& eventBus, EntityState& entityState);
 
-void renderPointLight(const Entity& entity);
+void renderPointLight(const Entity& entity, EventBus& eventBus, EntityState& entityState);
 
 void renderPostProcessPanel(EventBus& eventBus);
 

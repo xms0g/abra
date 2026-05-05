@@ -1,6 +1,8 @@
 #pragma once
 #include "../ECS/system.hpp"
 
+struct GuiLightEvent;
+class EventBus;
 struct RenderContext;
 class UniformBuffer;
 struct PointLightComponent;
@@ -9,7 +11,9 @@ struct SpotLightComponent;
 
 class LightSystem final : public System {
 public:
-	explicit LightSystem(const RenderContext& ctx);
+	LightSystem();
+
+	void configure(const RenderContext& ctx, EventBus& eventBus);
 
 	[[nodiscard]]
 	const UniformBuffer& ubo() const;
@@ -23,10 +27,10 @@ public:
 	[[nodiscard]]
 	const std::vector<SpotLightComponent*>& spotLights() const;
 
-	void update();
-
 private:
 	void updateLightUBO() const;
+
+	void onGuiUpdate(const GuiLightEvent& event);
 
 	std::unique_ptr<UniformBuffer> mUBO;
 	std::vector<DirectionalLightComponent*> mDirLights;

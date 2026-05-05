@@ -65,7 +65,7 @@ RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLCon
 	mRenderCtx->light.maxSpotLights = MAX_SPOT_LIGHTS;
 	mRenderCtx->light.ubo.binding = LIGHT_UBO_BINDING;
 
-	registry->addSystem<LightSystem>(*mRenderCtx);
+	registry->addSystem<LightSystem>();
 	mLightSystem = &registry->getSystem<LightSystem>();
 
 	mShaders.emplace_back(std::make_unique<Shader>("object.vert", "opaque.frag"));
@@ -83,6 +83,8 @@ RenderPipeline::~RenderPipeline() {
 }
 
 void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
+	mLightSystem->configure(*mRenderCtx, eventBus);
+
 	// Create framebuffers
 	mSceneBuffer = std::make_unique<FrameBuffer>(SCR_WIDTH, SCR_HEIGHT);
 #ifdef MSAA
@@ -286,8 +288,6 @@ void RenderPipeline::render() {
 	GuiBackend::newFrame();
 	refreshCameraData();
 	sortEntities();
-
-	mLightSystem->update();
 
 	mSceneBuffer->bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
