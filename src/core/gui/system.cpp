@@ -66,7 +66,17 @@ void GuiSystem::configure() {
 			0,
 			false,
 			{transform.position, transform.rotation, transform.scale},
-			{direction, glm::vec4(transform.position, 1.0f), ambient, diffuse, specular, attenuation, cutOff, castShadow, intensity}
+			{
+				direction,
+				glm::vec4(transform.position, 1.0f),
+				ambient,
+				diffuse,
+				specular,
+				attenuation,
+				cutOff,
+				castShadow,
+				intensity
+			}
 		});
 	}
 }

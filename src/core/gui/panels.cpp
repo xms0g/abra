@@ -19,22 +19,7 @@ struct Effect {
 	const char* name;
 	bool enabled;
 	float exposure{1.1f};
-	float intensity{0.0f};
-};
-
-static std::array<Effect, 10> effects = {
-	{
-		{"Bloom", false},
-		{"Tone Mapping", false},
-		{"Grayscale", false},
-		{"Sepia", false},
-		{"Blur", false},
-		{"Edge Detection", false},
-		{"Sharpen", false},
-		{"Chromatic Aberration", false},
-		{"Gamma Correction", true},
-		{"FXAA", false}
-	}
+	float intensity{0.01f};
 };
 
 void GuiPanels::renderGraphicsInfoPanel(const uint32_t fps) {
@@ -72,15 +57,14 @@ void GuiPanels::renderTransformPanel(const Entity& entity, EventBus& eventBus, s
 	ImGui::PopID();
 }
 
-void GuiPanels::renderDebugViewsPanel(const Entity& entity, EventBus& eventBus,
-                                      std::vector<EntityState>& entityStates) {
+void GuiPanels::renderDebugViewsPanel(const Entity& entity, EventBus& eventBus, std::vector<EntityState>& entityStates) {
 	if (!entity.hasComponent<DebugComponent>()) return;
 
 	ImGui::PushID(static_cast<int>(entity.id()));
 	if (ImGui::TreeNodeEx("Debug Views", ImGuiTreeNodeFlags_DefaultOpen)) {
 		static constexpr const char* modes[] = {"None", "Normals", "Wireframe"};
 		auto& [id, debugMode, alreadyDirty, transform, light] = entityStates[entity.id()];
-		int currentMode = debugMode;
+		auto currentMode = static_cast<int32_t>(debugMode);
 
 		ImGui::Text("Mode");
 		ImGui::SameLine(70);
@@ -185,6 +169,21 @@ void GuiPanels::renderPointLight(const Entity& entity, EventBus& eventBus, Entit
 }
 
 void GuiPanels::renderPostProcessPanel(EventBus& eventBus) {
+	static std::array<Effect, 10> effects = {
+		{
+			{"Bloom", false},
+			{"Tone Mapping", false},
+			{"Grayscale", false},
+			{"Sepia", false},
+			{"Blur", false},
+			{"Edge Detection", false},
+			{"Sharpen", false},
+			{"Chromatic Aberration", false},
+			{"Gamma Correction", true},
+			{"FXAA", false}
+		}
+	};
+
 	if (ImGui::Begin("Post-Processing")) {
 		for (uint32_t i = 0; i < effects.size(); ++i) {
 			auto& [name, enabled, exposure, intensity] = effects[i];

@@ -6,7 +6,7 @@ struct EntityState;
 class EventBus;
 class Entity;
 
-namespace  GuiPanels {
+namespace GuiPanels {
 void renderGraphicsInfoPanel(uint32_t fps);
 
 void renderTransformPanel(const Entity& entity, EventBus& eventBus, std::vector<EntityState>& entityStates);
@@ -22,5 +22,4 @@ void renderSpotLight(const Entity& entity, EventBus& eventBus, EntityState& enti
 void renderPointLight(const Entity& entity, EventBus& eventBus, EntityState& entityState);
 
 void renderPostProcessPanel(EventBus& eventBus);
-
 }
