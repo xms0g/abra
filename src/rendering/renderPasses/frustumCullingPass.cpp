@@ -24,18 +24,18 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 				continue;
 			}
 
-			const auto& [material, shader, meshes] = matBatch;
+			const auto& [matIndex, shader, meshes] = matBatch;
 			for (const auto& mesh: *meshes) {
 				const bool isVisible = math::AABB::isMeshInFrustum(*ctx.camera.frustum, mesh.min(), mesh.max(), eModel);
 
 				if (isVisible) {
-					outQueue.push_back({entityID, eModel, eNormal, material, shader, &mesh});
+					outQueue.push_back({entityID, eModel, eNormal, matIndex, shader, &mesh});
 				}
 			}
 		}
 
 		std::ranges::sort(outQueue, [](const auto& a, const auto& b) {
-			return a.material->id < b.material->id;
+			return a.materialIndex < b.materialIndex;
 		});
 	};
 

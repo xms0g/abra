@@ -280,8 +280,10 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 }
 
 void RenderPipeline::batchEntities() {
+	uint32_t materialIndex{0};
+
 	for (const auto& entity: getSystemEntities()) {
-		batchEntity(entity);
+		batchEntity(entity, materialIndex);
 	}
 }
 
@@ -328,7 +330,7 @@ void RenderPipeline::refreshCameraData() const {
 	mRenderCtx->camera.ubo.self->unbind();
 }
 
-void RenderPipeline::batchEntity(const Entity& entity) {
+void RenderPipeline::batchEntity(const Entity& entity, uint32_t& materialIndex) {
 	const auto& matComponent = entity.getComponent<MaterialComponent>();
 
 	auto pos = entity.getComponent<TransformComponent>().position;
@@ -352,8 +354,15 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 
 	if (entity.hasComponent<SkyboxComponent>()) {
 		const auto& material = matComponent.materials->at(0);
+
+		mRenderQueue.matFlags.emplace_back(material.flags);
+		mRenderQueue.matAlphaCutoffs.emplace_back(material.alphaCutoff);
+
+		std::vector<uint32_t> textures{material.textures[0].id};
+		mRenderQueue.matTextures.push_back(textures);
+
 		auto& meshes = entity.getComponent<MeshComponent>().meshes->at(0);
-		const MaterialBatch matBatch{&material, mShaders[5].get(), &meshes};
+		const MaterialBatch matBatch{materialIndex++, mShaders[5].get(), &meshes};
 		const RenderGroup group{entity.id(), matBatch};
 		mRenderQueue.skybox.push_back(group);
 		return;
@@ -361,7 +370,16 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 
 	for (auto& [matID, meshes]: *entity.getComponent<MeshComponent>().meshes) {
 		const auto& material = matComponent.materials->at(matID);
-		MaterialBatch matBatch{&material, nullptr, &meshes};
+		MaterialBatch matBatch{materialIndex++, nullptr, &meshes};
+
+		mRenderQueue.matFlags.emplace_back(material.flags);
+		mRenderQueue.matAlphaCutoffs.emplace_back(material.alphaCutoff);
+
+		std::vector<uint32_t> textures;
+		for (const auto& texture: material.textures) {
+			textures.push_back(texture.id);
+		}
+		mRenderQueue.matTextures.push_back(textures);
 
 		if (matComponent.renderFlag & INSTANCED_PASS) {
 			// Set shader

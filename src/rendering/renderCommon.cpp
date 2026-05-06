@@ -12,26 +12,31 @@
 #include "../ECS/components/mesh.hpp"
 
 void RenderCommon::forward(const RenderContext& ctx, const std::vector<RenderableObject>& objects) {
-	const Material* lastMaterial{nullptr};
+	uint32_t lastMaterial{0};
 	const Shader* lastShader{nullptr};
 
-	for (const auto& [entityID, model, normal, material, shader, mesh]: objects) {
+	for (const auto& [entityID, model, normal, materialIdx, shader, mesh]: objects) {
 		if (lastShader != shader) {
 			lastShader = shader;
 			lastShader->activate();
-			lastMaterial = nullptr;
+			lastMaterial = 0;
 		}
 
-		if (lastMaterial != material) {
-			if (material->textures.empty()) {
-				shader->setVec3("material.color", material->color);
-			}
+		if (lastMaterial != materialIdx) {
+			lastMaterial = materialIdx;
 
 			const float heightScale = ctx.renderQueue->entityHeightScales.at(entityID);
+			const float alphaCutoff = ctx.renderQueue->matAlphaCutoffs.at(materialIdx);
+			const uint32_t flags = ctx.renderQueue->matFlags.at(materialIdx);
+			const std::vector<uint32_t>& textures = ctx.renderQueue->matTextures.at(materialIdx);
 
-			setupMaterial(*material, *lastShader, heightScale);
-			bindTextures(*material, *lastShader);
-			lastMaterial = material;
+			// if (textures.empty()) {
+			// 	shader->setVec3("material.color", materialIdx->color);
+			// }
+
+			setupMaterial(flags, alphaCutoff, heightScale, *lastShader);
+			bindTextures(flags, textures, *lastShader);
+
 		}
 
 		setupTransform(entityID, model, normal, *lastShader);
@@ -43,12 +48,16 @@ void RenderCommon::instanced(const RenderContext& ctx, const std::vector<Instanc
 	for (const auto& [entityID, transforms, matBatch]: objects) {
 		const size_t count = transforms->size() / 9;
 
-		const auto& [material, shader, meshes] = matBatch;
+		const auto& [materialIdx, shader, meshes] = matBatch;
 		shader->activate();
 
 		const float heightScale = ctx.renderQueue->entityHeightScales.at(entityID);
-		setupMaterial(*material, *shader, heightScale);
-		bindTextures(*material, *shader);
+		const float alphaCutoff = ctx.renderQueue->matAlphaCutoffs.at(materialIdx);
+		const uint32_t flags = ctx.renderQueue->matFlags.at(materialIdx);
+		const std::vector<uint32_t>& textures = ctx.renderQueue->matTextures.at(materialIdx);
+
+		setupMaterial(flags, alphaCutoff, heightScale, *shader);
+		bindTextures(flags, textures, *shader);
 
 		for (const auto& mesh: *meshes) {
 			mesh.bind();
@@ -76,21 +85,21 @@ void RenderCommon::setupTransform(
 	}
 }
 
-void RenderCommon::setupMaterial(const Material& material, const Shader& shader, const float heightScale) {
+void RenderCommon::setupMaterial(const uint32_t flags, const float alphaCutoff, const float heightScale, const Shader& shader) {
 	static bool isCullingEnabled{true};
 
-	if (material.flags & HAS_HEIGHT_MAP) {
+	if (flags & HAS_HEIGHT_MAP) {
 		shader.setFloat("material.heightScale", heightScale);
 	}
 
-	if (material.alphaCutoff != 0.0f) {
-		shader.setFloat("material.alphaCutoff", material.alphaCutoff);
+	if (alphaCutoff != 0.0f) {
+		shader.setFloat("material.alphaCutoff", alphaCutoff);
 	}
 
-	if (material.flags & TWOSIDED && isCullingEnabled) {
+	if (flags & TWOSIDED && isCullingEnabled) {
 		glDisable(GL_CULL_FACE);
 		isCullingEnabled = false;
-	} else if (!(material.flags & TWOSIDED) && !isCullingEnabled) {
+	} else if (!(flags & TWOSIDED) && !isCullingEnabled) {
 		glEnable(GL_CULL_FACE);
 		isCullingEnabled = true;
 	}
@@ -116,17 +125,17 @@ void RenderCommon::drawQuad(const uint32_t sceneTexture, const uint32_t VAO) {
 }
 
 
-void RenderCommon::bindTextures(const Material& material, const Shader& shader) {
+void RenderCommon::bindTextures(const uint32_t flags, const std::vector<uint32_t>& textures, const Shader& shader) {
 	static uint32_t matFlagCache{0};
 
-	for (size_t i = 0; i < material.textures.size(); ++i) {
+	for (size_t i = 0; i < textures.size(); ++i) {
 		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, material.textures[i].id);
+		glBindTexture(GL_TEXTURE_2D, textures[i]);
 	}
 
-	if (matFlagCache != material.flags) {
-		matFlagCache = material.flags;
-		shader.setUint("material.flags", material.flags);
+	if (matFlagCache != flags) {
+		matFlagCache = flags;
+		shader.setUint("material.flags", flags);
 	}
 }
 

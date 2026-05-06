@@ -19,16 +19,17 @@ void SkyboxPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 
 void SkyboxPass::execute(const RenderContext& ctx) {
 	const auto& [entity, matb] = ctx.renderQueue->skybox.front();
-	const Mesh& mesh = matb.meshes->front();
-	const Texture& tex = matb.material->textures.front();
+	const auto [materialIdx, shader, meshes] = matb;
+	const Mesh& mesh = meshes->front();
+	const uint32_t tex = ctx.renderQueue->matTextures.at(materialIdx).front();
 
 	ctx.sceneBuffer->bind();
-	matb.shader->activate();
-	matb.shader->setMat4("skyView", ctx.camera.skyView);
+	shader->activate();
+	shader->setMat4("skyView", ctx.camera.skyView);
 
 	glActiveTexture(GL_TEXTURE0); // active proper texture unit before binding
 	// and finally bind the texture
-	glBindTexture(GL_TEXTURE_CUBE_MAP, ctx.PBR.envMap.binding != 0 ? ctx.PBR.envMap.binding : tex.id);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, ctx.PBR.envMap.binding != 0 ? ctx.PBR.envMap.binding : tex);
 	// Draw
 	glDepthMask(GL_FALSE);
 	glDepthFunc(GL_LEQUAL);

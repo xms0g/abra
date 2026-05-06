@@ -20,13 +20,13 @@ void instanced(const RenderContext& ctx, const std::vector<InstanceGroup>& objec
 
 void setupTransform(size_t entityID, const glm::mat4& model, const glm::mat3& normal, const Shader& shader);
 
-void setupMaterial(const Material& material, const Shader& shader, float heightScale);
+void setupMaterial(uint32_t flags, float alphaCutoff, float heightScale, const Shader& shader);
 
 void drawMesh(const Mesh& mesh);
 
 void drawQuad(uint32_t sceneTexture, uint32_t VAO);
 
-void bindTextures(const Material& material, const Shader& shader);
+void bindTextures(uint32_t flags, const std::vector<uint32_t>& textures, const Shader& shader);
 
 void bindShadowMaps(const RenderContext& ctx);
 }

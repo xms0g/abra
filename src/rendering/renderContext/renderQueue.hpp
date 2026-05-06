@@ -42,4 +42,7 @@ struct RenderQueue {
 	std::vector<BV> entityBVs;
 	std::vector<uint32_t> entityDebugModes;
 	std::vector<float> entityHeightScales;
+	std::vector<float> matAlphaCutoffs;
+	std::vector<uint32_t> matFlags;
+	std::vector<std::vector<uint32_t>> matTextures;
 };

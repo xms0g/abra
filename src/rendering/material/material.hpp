@@ -37,7 +37,7 @@ struct Material {
 };
 
 struct MaterialBatch {
-	const Material* material{};
+	uint32_t index{};
 	const Shader* shader{};
 	std::vector<Mesh>* meshes{};
 };
