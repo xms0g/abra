@@ -22,7 +22,6 @@ struct RenderQueue {
 	std::vector<RenderableObject> opaqueObjects;
 	std::vector<RenderableObject> blendObjects;
 	std::vector<RenderableObject> dbgObjects;
-	std::vector<RenderableObject> shadowedObjects;
 
 	struct {
 		std::vector<glm::vec3> positions;

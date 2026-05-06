@@ -4,7 +4,7 @@
 #include "../../mesh/mesh.h"
 #include "../../shader.h"
 #include "../../renderContext/renderContext.hpp"
-#include "../../renderContext/renderableObject.hpp"
+#include "../../renderContext/renderGroup.hpp"
 #include "../../renderContext/renderQueue.hpp"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderCommon.h"
@@ -51,16 +51,21 @@ void DirectionalShadowPass::render(const RenderContext& ctx, const glm::vec4& di
 	glCullFace(GL_FRONT);
 	glViewport(0, 0, static_cast<int32_t>(ctx.shadow.width), static_cast<int32_t>(ctx.shadow.height));
 
-	for (const auto& [entityID, matIdx, meshIdx, shader]: ctx.renderQueue->shadowedObjects) {
+	for (const auto& [entityID, matBatch]: ctx.renderQueue->shadowGroups) {
 		const auto& model = ctx.renderQueue->entity.models[entityID];
 		const auto& normal = ctx.renderQueue->entity.normals[entityID];
+
 		RenderCommon::setupTransform(entityID, model, normal, *mDepthShader);
 
-		const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
-		const size_t vertexCount = ctx.renderQueue->mesh.vertexCounts[meshIdx];
-		const size_t indexCount = ctx.renderQueue->mesh.indexCounts[meshIdx];
+		const auto& [matIdx, shader, meshes] = matBatch;
 
-		RenderCommon::drawMesh(vao, vertexCount, indexCount);
+		for (const auto& meshIdx: meshes) {
+			const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
+			const size_t vertexCount = ctx.renderQueue->mesh.vertexCounts[meshIdx];
+			const size_t indexCount = ctx.renderQueue->mesh.indexCounts[meshIdx];
+
+			RenderCommon::drawMesh(vao, vertexCount, indexCount);
+		}
 	}
 	glCullFace(GL_BACK);
 	glViewport(0, 0, static_cast<int32_t>(ctx.screen.width), static_cast<int32_t>(ctx.screen.height));

@@ -3,8 +3,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "../../shader.h"
-#include "../../mesh/mesh.h"
-#include "../../renderContext/renderableObject.hpp"
+#include "../../renderContext/renderGroup.hpp"
 #include "../../renderContext/renderQueue.hpp"
 #include "../../renderContext/renderContext.hpp"
 #include "../../buffers/frameBuffer.h"
@@ -57,15 +56,20 @@ void OmnidirectionalShadowPass::render(
 	mDepthShader->setVec3("lightPos", position);
 	mDepthShader->setInt("cubeIndex", layer);
 
-	for (const auto& [entityID, matIdx, meshIdx, shader]: ctx.renderQueue->shadowedObjects) {
+	for (const auto& [entityID, matBatch]: ctx.renderQueue->shadowGroups) {
 		const auto& model = ctx.renderQueue->entity.models[entityID];
 		const auto& normal = ctx.renderQueue->entity.normals[entityID];
+
 		RenderCommon::setupTransform(entityID, model, normal, *mDepthShader);
 
-		const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
-		const size_t vertexCount = ctx.renderQueue->mesh.vertexCounts[meshIdx];
-		const size_t indexCount = ctx.renderQueue->mesh.indexCounts[meshIdx];
+		const auto& [matIdx, shader, meshes] = matBatch;
 
-		RenderCommon::drawMesh(vao, vertexCount, indexCount);
+		for (const auto& meshIdx: meshes) {
+			const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
+			const size_t vertexCount = ctx.renderQueue->mesh.vertexCounts[meshIdx];
+			const size_t indexCount = ctx.renderQueue->mesh.indexCounts[meshIdx];
+
+			RenderCommon::drawMesh(vao, vertexCount, indexCount);
+		}
 	}
 }
