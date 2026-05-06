@@ -16,16 +16,19 @@ public:
 	void execute(const RenderContext& ctx) override;
 
 private:
-	void syncDebugState(const RenderContext& ctx) const;
+	void syncDebugState(const RenderContext& ctx);
 
-	void syncTransformState(const RenderContext& ctx) const;
+	void syncTransformState(const RenderContext& ctx);
 
 	void onDebugUpdate(const GuiDebugEvent& event);
 
 	void onTransformUpdate(const GuiTransformEvent& event);
 
 	size_t mEntityID{0};
-	uint32_t mDebugMode{0};
+	struct {
+		uint32_t mode{0};
+		bool isDirty{false};
+	} debug;
 
 	struct {
 		glm::vec3 position{0.0f};
@@ -33,5 +36,6 @@ private:
 		glm::vec3 scale{0.0f};
 		glm::mat4 model{1.0f};
 		glm::mat3 normal{1.0f};
+		bool isDirty{false};
 	} transform;
 };
