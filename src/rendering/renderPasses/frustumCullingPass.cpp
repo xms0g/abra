@@ -18,10 +18,11 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 		outQueue.clear();
 
 		for (const auto& [entityID, matBatch]: groups) {
-			auto& [position, rotation, scale] = ctx.renderQueue->entityTransforms.at(entityID);
+			auto& [ePos, eRot, eScale] = ctx.renderQueue->entityTransforms.at(entityID);
 			auto& [center, extents] = ctx.renderQueue->entityBVs.at(entityID);
 
-			const glm::mat4 model = math::modelMatrix(position, rotation, scale);
+			const glm::mat4 model = math::modelMatrix(ePos, eRot, eScale);
+			const glm::mat3 normal = math::normalMatrix(model);
 
 			if (!math::AABB::isOnFrustum(*ctx.camera.frustum, model, center, extents)) {
 				continue;
@@ -32,7 +33,7 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 				const bool isVisible = math::AABB::isMeshInFrustum(*ctx.camera.frustum, mesh.min(), mesh.max(), model);
 
 				if (isVisible) {
-					outQueue.push_back({entityID, material, shader, &mesh});
+					outQueue.push_back({entityID, model, normal, material, shader, &mesh});
 				}
 			}
 		}
@@ -46,4 +47,5 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 	cullItems(ctx.renderQueue->deferredGroups, ctx.renderQueue->deferredObjects);
 	cullItems(ctx.renderQueue->blendGroups, ctx.renderQueue->blendObjects);
 	cullItems(ctx.renderQueue->debugGroups, ctx.renderQueue->dbgObjects);
+	cullItems(ctx.renderQueue->shadowGroups, ctx.renderQueue->shadowedObjects);
 }

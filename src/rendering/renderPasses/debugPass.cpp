@@ -29,7 +29,7 @@ void DebugPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 void DebugPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
 
-	for (const auto& [entityID, material, shader, mesh]: ctx.renderQueue->dbgObjects) {
+	for (const auto& [entityID, model, normal, material, shader, mesh]: ctx.renderQueue->dbgObjects) {
 		const uint32_t mode = ctx.renderQueue->entityDebugModes.at(entityID);
 
 		if (mode == None)
@@ -38,9 +38,7 @@ void DebugPass::execute(const RenderContext& ctx) {
 		const auto& dbgShader = mDebugShaders.at(mode);
 		dbgShader->activate();
 
-		auto& [ePos, eRot, eScale] = ctx.renderQueue->entityTransforms.at(entityID);
-
-		RenderCommon::setupTransform(ePos, eRot, eScale, *dbgShader);
+		RenderCommon::setupTransform(entityID, model, normal, *dbgShader);
 		RenderCommon::drawMesh(*mesh);
 	}
 }

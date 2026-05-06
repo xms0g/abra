@@ -4,7 +4,7 @@
 #include "../../mesh/mesh.h"
 #include "../../shader.h"
 #include "../../renderContext/renderContext.hpp"
-#include "../../renderContext/renderGroup.hpp"
+#include "../../renderContext/renderableObject.hpp"
 #include "../../renderContext/renderQueue.hpp"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderCommon.h"
@@ -51,16 +51,9 @@ void DirectionalShadowPass::render(const RenderContext& ctx, const glm::vec4& di
 	glCullFace(GL_FRONT);
 	glViewport(0, 0, static_cast<int32_t>(ctx.shadow.width), static_cast<int32_t>(ctx.shadow.height));
 
-	for (const auto& [entityID, matBatch]: ctx.renderQueue->shadowGroups) {
-		auto& [ePos, eRot, eScale] = ctx.renderQueue->entityTransforms.at(entityID);
-
-		RenderCommon::setupTransform(ePos, eRot, eScale, *mDepthShader);
-
-		const auto& [material, shader, meshes] = matBatch;
-
-		for (const auto& mesh: *meshes) {
-			RenderCommon::drawMesh(mesh);
-		}
+	for (const auto& [entityID, model, normal, material, shader, mesh]: ctx.renderQueue->shadowedObjects) {
+		RenderCommon::setupTransform(entityID, model, normal, *mDepthShader);
+		RenderCommon::drawMesh(*mesh);
 	}
 	glCullFace(GL_BACK);
 	glViewport(0, 0, static_cast<int32_t>(ctx.screen.width), static_cast<int32_t>(ctx.screen.height));

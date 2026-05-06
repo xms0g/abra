@@ -16,14 +16,12 @@
 void RenderCommon::forward(const RenderContext& ctx, const std::vector<RenderableObject>& objects) {
 	const Material* lastMaterial{nullptr};
 	const Shader* lastShader{nullptr};
-	size_t lastEntityID{0};
 
-	for (const auto& [entityID, material, shader, mesh]: objects) {
+	for (const auto& [entityID, model, normal, material, shader, mesh]: objects) {
 		if (lastShader != shader) {
 			lastShader = shader;
 			lastShader->activate();
 			lastMaterial = nullptr;
-			lastEntityID = 0;
 		}
 
 		if (lastMaterial != material) {
@@ -38,13 +36,7 @@ void RenderCommon::forward(const RenderContext& ctx, const std::vector<Renderabl
 			lastMaterial = material;
 		}
 
-		if (lastEntityID != entityID) {
-			lastEntityID = entityID;
-			auto& [ePos, eRot, eScale] = ctx.renderQueue->entityTransforms.at(entityID);
-
-			setupTransform(ePos, eRot, eScale, *lastShader);
-		}
-
+		setupTransform(entityID, model, normal, *lastShader);
 		drawMesh(*mesh);
 	}
 }
@@ -73,15 +65,17 @@ void RenderCommon::instanced(const RenderContext& ctx, const std::vector<Instanc
 }
 
 void RenderCommon::setupTransform(
-	const glm::vec3& position,
-	const glm::vec3& rotation,
-	const glm::vec3& scale,
+	const size_t entityID,
+	const glm::mat4& model,
+	const glm::mat3& normal,
 	const Shader& shader) {
-	const glm::mat4 model = math::modelMatrix(position, rotation, scale);
-	const glm::mat3 normal = math::normalMatrix(model);
+	static size_t lastEntityID{0};
 
-	shader.setMat4("model", model);
-	shader.setMat3("normalMatrix", normal);
+	if (lastEntityID != entityID) {
+		lastEntityID = entityID;
+		shader.setMat4("model", model);
+		shader.setMat3("normalMatrix", normal);
+	}
 }
 
 void RenderCommon::setupMaterial(const Material& material, const Shader& shader, const float heightScale) {
