@@ -65,9 +65,6 @@ void PostProcessPass::execute(const RenderContext& ctx) {
 }
 
 void PostProcessPass::onGuiUpdate(const GuiPostProcessEvent& event) {
-	for (const auto& effect: mEffects) {
-		if (effect->name() == event.name) {
-			effect->updateFromEvent(event);
-		}
-	}
+	const auto& effect = mEffects[event.id];
+	effect->updateFromEvent(event);
 }

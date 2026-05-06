@@ -198,7 +198,7 @@ void GuiPanels::renderPostProcessPanel(EventBus& eventBus) {
 			}
 
 			if (isDirty) {
-				eventBus.emitEvent<GuiPostProcessEvent>(name, enabled, exposure, intensity);
+				eventBus.emitEvent<GuiPostProcessEvent>(i, enabled, exposure, intensity);
 			}
 		}
 	}
