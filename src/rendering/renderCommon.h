@@ -22,9 +22,9 @@ void setupTransform(size_t entityID, const glm::mat4& model, const glm::mat3& no
 
 void setupMaterial(uint32_t flags, float alphaCutoff, float heightScale, const Shader& shader);
 
-void drawMesh(const Mesh& mesh);
+void drawMesh(uint32_t vao, size_t vertexCount, size_t indexCount);
 
-void drawQuad(uint32_t sceneTexture, uint32_t VAO);
+void drawQuad(uint32_t sceneTexture, uint32_t vao);
 
 void bindTextures(uint32_t flags, const std::vector<uint32_t>& textures, const Shader& shader);
 

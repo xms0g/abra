@@ -10,6 +10,6 @@ struct RenderableObject {
 	glm::mat4 model;
 	glm::mat3 normal;
 	uint32_t materialIndex;
+	uint32_t meshIndex;
 	const Shader* shader;
-	const Mesh* mesh; // Pointer to the ONE specific visible mesh
 };

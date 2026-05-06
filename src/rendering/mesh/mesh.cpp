@@ -42,6 +42,10 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept {
 	return *this;
 }
 
+const VertexArray& Mesh::vao() const {
+	return *mVAO;
+}
+
 const std::vector<Vertex>& Mesh::vertices() const {
 	return mVertices;
 }
@@ -66,7 +70,9 @@ void Mesh::unbind() const {
 	mVAO->unbind();
 }
 
-void Mesh::enableInstanceAttributes(const size_t offset) const {
+void Mesh::enableInstanceAttributes(const uint32_t vao, const size_t offset) {
+	glBindVertexArray(vao);
+
 	VertexLayout instancingLayout;
 
 	instancingLayout.pushMatrix<glm::mat4>(7, 1); // Model Matrix (slots 7-10)
@@ -75,7 +81,8 @@ void Mesh::enableInstanceAttributes(const size_t offset) const {
 
 	for (const auto& [type, index, size, normalized, attrOffset, divisor]: instancingLayout.attributes()) {
 		const auto finalPointer = reinterpret_cast<void*>(offset + attrOffset);
-		mVAO->setAttribute(index, size, type, normalized ? GL_TRUE : GL_FALSE, instancingLayout.stride(), finalPointer);
+		glEnableVertexAttribArray(index);
+		glVertexAttribPointer(index, size, type, normalized ? GL_TRUE : GL_FALSE, instancingLayout.stride(), finalPointer);
 		glVertexAttribDivisor(index, divisor);
 	}
 }

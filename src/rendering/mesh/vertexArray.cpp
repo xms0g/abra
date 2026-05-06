@@ -9,6 +9,10 @@ VertexArray::~VertexArray() {
 	glDeleteVertexArrays(1, &mID);
 }
 
+uint32_t VertexArray::id() const {
+	return mID;
+}
+
 void VertexArray::bind() const {
 	glBindVertexArray(mID);
 }

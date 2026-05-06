@@ -20,8 +20,9 @@ void SkyboxPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 void SkyboxPass::execute(const RenderContext& ctx) {
 	const auto& [entity, matb] = ctx.renderQueue->skybox.front();
 	const auto [materialIdx, shader, meshes] = matb;
-	const Mesh& mesh = meshes->front();
-	const uint32_t tex = ctx.renderQueue->matTextures.at(materialIdx).front();
+	const uint32_t meshIdx = meshes.front();
+	const uint32_t vao = ctx.renderQueue->meshVaos[meshIdx];
+	const uint32_t tex = ctx.renderQueue->matTextures[materialIdx].front();
 
 	ctx.sceneBuffer->bind();
 	shader->activate();
@@ -33,9 +34,8 @@ void SkyboxPass::execute(const RenderContext& ctx) {
 	// Draw
 	glDepthMask(GL_FALSE);
 	glDepthFunc(GL_LEQUAL);
-	mesh.bind();
+	glBindVertexArray(vao);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
-	mesh.unbind();
 	glDepthFunc(GL_LESS);
 	glDepthMask(GL_TRUE);
 }

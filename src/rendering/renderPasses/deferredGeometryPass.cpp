@@ -18,13 +18,13 @@ const FrameBuffer* DeferredGeometryPass::gBuffer() const {
 
 void DeferredGeometryPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mGBuffer = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
-	mGBuffer->withTextureFP(GL_RGBA)	// position
-			.withTextureFP(GL_RGBA)		// normal
+	mGBuffer->withTextureFP(GL_RGBA) // position
+			.withTextureFP(GL_RGBA) // normal
 #ifdef HDR
 			.withTextureFP(GL_RGBA)
 #else
-			.withTexture(GL_RGBA)		// albedo
-			.withTexture(GL_RGBA)		// orm
+			.withTexture(GL_RGBA) // albedo
+			.withTexture(GL_RGBA) // orm
 			// Emissive placed into alpha channels in position, normal, albedo
 #endif
 			.configureAttachments()
@@ -49,21 +49,25 @@ void DeferredGeometryPass::execute(const RenderContext& ctx) {
 
 	mShader->activate();
 
-	 uint32_t lastMaterial{0};
+	uint32_t lastMaterial{0};
 
-	for (const auto& [entityID, model, normal, materialIdx, shader, mesh]: ctx.renderQueue->deferredObjects) {
+	for (const auto& [entityID, model, normal, materialIdx, meshIdx, shader]: ctx.renderQueue->deferredObjects) {
 		if (lastMaterial != materialIdx) {
 			lastMaterial = materialIdx;
-			const float heightScale = ctx.renderQueue->entityHeightScales.at(entityID);
-			const float alphaCutoff = ctx.renderQueue->matAlphaCutoffs.at(materialIdx);
-			const uint32_t flags = ctx.renderQueue->matFlags.at(materialIdx);
-			const std::vector<uint32_t>& textures = ctx.renderQueue->matTextures.at(materialIdx);
+			const float heightScale = ctx.renderQueue->entityHeightScales[entityID];
+			const float alphaCutoff = ctx.renderQueue->matAlphaCutoffs[materialIdx];
+			const uint32_t flags = ctx.renderQueue->matFlags[materialIdx];
+			const std::vector<uint32_t>& textures = ctx.renderQueue->matTextures[materialIdx];
 
 			RenderCommon::setupMaterial(flags, alphaCutoff, heightScale, *mShader);
 			RenderCommon::bindTextures(flags, textures, *mShader);
 		}
 
 		RenderCommon::setupTransform(entityID, model, normal, *mShader);
-		RenderCommon::drawMesh(*mesh);
+
+		const uint32_t vao = ctx.renderQueue->meshVaos[meshIdx];
+		const size_t vertexCount = ctx.renderQueue->meshVertexCounts[meshIdx];
+		const size_t indexCount = ctx.renderQueue->meshIndexCounts[meshIdx];
+		RenderCommon::drawMesh(vao, vertexCount, indexCount);
 	}
 }

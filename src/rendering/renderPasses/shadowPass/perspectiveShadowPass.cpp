@@ -53,8 +53,13 @@ void PerspectiveShadowPass::render(
 	mDepthShader->activate();
 	mDepthShader->setMat4("lightSpaceMatrix", mLightSpaceMatrix[layer]);
 
-	for (const auto& [entityID, model, normal, material, shader, mesh]: ctx.renderQueue->shadowedObjects) {
+	for (const auto& [entityID, model, normal, matIdx, meshIdx, shader]: ctx.renderQueue->shadowedObjects) {
 		RenderCommon::setupTransform(entityID, model, normal, *mDepthShader);
-		RenderCommon::drawMesh(*mesh);
+
+		const uint32_t vao = ctx.renderQueue->meshVaos[meshIdx];
+		const size_t vertexCount = ctx.renderQueue->meshVertexCounts[meshIdx];
+		const size_t indexCount = ctx.renderQueue->meshIndexCounts[meshIdx];
+
+		RenderCommon::drawMesh(vao, vertexCount, indexCount);
 	}
 }

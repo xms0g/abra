@@ -7,6 +7,8 @@
 #include "lightSystem.h"
 #include "buffers/frameBuffer.h"
 #include "buffers/uniformBuffer.h"
+#include "mesh/mesh.h"
+#include "mesh/vertex.hpp"
 #include "renderContext/renderContext.hpp"
 #include "renderContext/renderFlags.hpp"
 #include "renderContext/renderGroup.hpp"
@@ -40,6 +42,7 @@
 #include "../math/boundingVolume.h"
 #include "../event/eventBus.hpp"
 #include "../math/matrix.h"
+#include "mesh/vertexArray.h"
 
 RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLContext context) {
 	RequireComponent<MeshComponent>();
@@ -280,10 +283,10 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 }
 
 void RenderPipeline::batchEntities() {
-	uint32_t materialIndex{0};
+	uint32_t materialIndex{0}, meshIndex{0};
 
 	for (const auto& entity: getSystemEntities()) {
-		batchEntity(entity, materialIndex);
+		batchEntity(entity, materialIndex, meshIndex);
 	}
 }
 
@@ -330,7 +333,7 @@ void RenderPipeline::refreshCameraData() const {
 	mRenderCtx->camera.ubo.self->unbind();
 }
 
-void RenderPipeline::batchEntity(const Entity& entity, uint32_t& materialIndex) {
+void RenderPipeline::batchEntity(const Entity& entity, uint32_t& materialIndex, uint32_t& meshIndex) {
 	const auto& matComponent = entity.getComponent<MaterialComponent>();
 
 	auto pos = entity.getComponent<TransformComponent>().position;
@@ -363,15 +366,35 @@ void RenderPipeline::batchEntity(const Entity& entity, uint32_t& materialIndex) 
 		mRenderQueue.matTextures.push_back(textures);
 
 		auto& meshes = entity.getComponent<MeshComponent>().meshes->at(0);
-		const MaterialBatch matBatch{materialIndex++, mShaders[5].get(), &meshes};
+		mRenderQueue.meshVaos.push_back(meshes[0].vao().id());
+		mRenderQueue.meshVertexCounts.push_back(meshes[0].vertices().size());
+		mRenderQueue.meshIndexCounts.push_back(meshes[0].indices().size());
+		mRenderQueue.meshMaxCounts.push_back(meshes[0].max());
+		mRenderQueue.meshMinCounts.push_back(meshes[0].min());
+
+		std::vector<uint32_t> indices{meshIndex++};
+
+		const MaterialBatch matBatch{materialIndex++, mShaders[5].get(), indices};
 		const RenderGroup group{entity.id(), matBatch};
 		mRenderQueue.skybox.push_back(group);
 		return;
 	}
 
 	for (auto& [matID, meshes]: *entity.getComponent<MeshComponent>().meshes) {
+		std::vector<uint32_t> indices;
+
+		for (const auto& mesh: meshes) {
+			indices.push_back(meshIndex++);
+			mRenderQueue.meshVaos.push_back(mesh.vao().id());
+			mRenderQueue.meshVertexCounts.push_back(mesh.vertices().size());
+			mRenderQueue.meshIndexCounts.push_back(mesh.indices().size());
+			mRenderQueue.meshMaxCounts.push_back(mesh.max());
+			mRenderQueue.meshMinCounts.push_back(mesh.min());
+		}
+
+		MaterialBatch matBatch{materialIndex++, nullptr, indices};
+
 		const auto& material = matComponent.materials->at(matID);
-		MaterialBatch matBatch{materialIndex++, nullptr, &meshes};
 
 		mRenderQueue.matFlags.emplace_back(material.flags);
 		mRenderQueue.matAlphaCutoffs.emplace_back(material.alphaCutoff);

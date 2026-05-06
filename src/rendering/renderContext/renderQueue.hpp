@@ -42,8 +42,15 @@ struct RenderQueue {
 	std::vector<BV> entityBVs;
 	std::vector<uint32_t> entityDebugModes;
 	std::vector<float> entityHeightScales;
+
 	std::vector<float> matAlphaCutoffs;
 	std::vector<uint32_t> matFlags;
 	std::vector<std::vector<uint32_t>> matTextures;
 	std::vector<glm::vec3> matColors;
+
+	std::vector<uint32_t> meshVaos;
+	std::vector<glm::vec3> meshMinCounts;
+	std::vector<glm::vec3> meshMaxCounts;
+	std::vector<size_t> meshVertexCounts;
+	std::vector<size_t> meshIndexCounts;
 };

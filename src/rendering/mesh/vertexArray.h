@@ -7,6 +7,8 @@ public:
 
 	~VertexArray();
 
+	uint32_t id() const;
+
 	void bind() const;
 
 	void unbind() const;

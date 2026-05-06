@@ -17,19 +17,22 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 		outQueue.clear();
 
 		for (const auto& [entityID, matBatch]: groups) {
-			auto& [ePos, eRot, eScale, eModel, eNormal] = ctx.renderQueue->entityTransforms.at(entityID);
-			auto& [center, extents] = ctx.renderQueue->entityBVs.at(entityID);
+			auto& [ePos, eRot, eScale, eModel, eNormal] = ctx.renderQueue->entityTransforms[entityID];
+			auto& [center, extents] = ctx.renderQueue->entityBVs[entityID];
 
 			if (!math::AABB::isOnFrustum(*ctx.camera.frustum, eModel, center, extents)) {
 				continue;
 			}
 
-			const auto& [matIndex, shader, meshes] = matBatch;
-			for (const auto& mesh: *meshes) {
-				const bool isVisible = math::AABB::isMeshInFrustum(*ctx.camera.frustum, mesh.min(), mesh.max(), eModel);
+			const auto& [matIdx, shader, meshes] = matBatch;
+			for (const auto& meshIdx: meshes) {
+				const glm::vec3& max = ctx.renderQueue->meshMaxCounts[meshIdx];
+				const glm::vec3& min = ctx.renderQueue->meshMinCounts[meshIdx];
+
+				const bool isVisible = math::AABB::isMeshInFrustum(*ctx.camera.frustum, min, max, eModel);
 
 				if (isVisible) {
-					outQueue.push_back({entityID, eModel, eNormal, matIndex, shader, &mesh});
+					outQueue.push_back({entityID, eModel, eNormal, matIdx, meshIdx, shader});
 				}
 			}
 		}

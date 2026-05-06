@@ -22,12 +22,12 @@ InstancedPass::~InstancedPass() = default;
 
 void InstancedPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	if (!ctx.renderQueue->opaqueInstancedGroups.empty()) {
-		prepareInstanceBuffer(ctx.renderQueue->opaqueInstancedGroups, mOpaqueVBO);
+		prepareInstanceBuffer(ctx.renderQueue->opaqueInstancedGroups, ctx.renderQueue->meshVaos, mOpaqueVBO);
 		uploadInstanceData(ctx.renderQueue->opaqueInstancedGroups, *mOpaqueVBO);
 	}
 
 	if (!ctx.renderQueue->blendInstancedGroups.empty()) {
-		prepareInstanceBuffer(ctx.renderQueue->blendInstancedGroups, mBlendVBO);
+		prepareInstanceBuffer(ctx.renderQueue->blendInstancedGroups, ctx.renderQueue->meshVaos, mBlendVBO);
 		uploadInstanceData(ctx.renderQueue->blendInstancedGroups, *mBlendVBO);
 	}
 }
@@ -53,6 +53,7 @@ void InstancedPass::execute(const RenderContext& ctx) {
 
 void InstancedPass::prepareInstanceBuffer(
 	const std::vector<InstanceGroup>& groups,
+	const std::vector<uint32_t>& vaos,
 	std::unique_ptr<VertexBuffer>& vbo) {
 	vbo = std::make_unique<VertexBuffer>(DYNAMIC);
 
@@ -69,9 +70,9 @@ void InstancedPass::prepareInstanceBuffer(
 	// Setup attributes now that the buffer is allocated
 	uint32_t currentOffset = 0;
 	for (const auto& [entity, transforms, matb] : groups) {
-		for (auto& mesh : *matb.meshes) {
-			mesh.bind();
-			mesh.enableInstanceAttributes(currentOffset);
+		for (const auto meshIdx : matb.meshIndices) {
+			const uint32_t vao = vaos[meshIdx];
+			Mesh::enableInstanceAttributes(vao, currentOffset);
 		}
 		const size_t instanceCount = transforms->size() / 9;
 		currentOffset += static_cast<uint32_t>(instanceCount * sizeof(InstanceData));

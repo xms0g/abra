@@ -22,6 +22,8 @@ public:
 
 	Mesh& operator=(Mesh&& other) noexcept;
 
+	const VertexArray& vao() const;
+
 	[[nodiscard]]
 	const std::vector<Vertex>& vertices() const;
 
@@ -38,7 +40,7 @@ public:
 
 	void unbind() const;
 
-	void enableInstanceAttributes(size_t offset) const;
+	static void enableInstanceAttributes(uint32_t vao, size_t offset);
 
 	void uploadToGPU();
 

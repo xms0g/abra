@@ -17,7 +17,10 @@ public:
 	void execute(const RenderContext& ctx) override;
 
 private:
-	void prepareInstanceBuffer(const std::vector<InstanceGroup>& groups, std::unique_ptr<VertexBuffer>& vbo);
+	void prepareInstanceBuffer(
+		const std::vector<InstanceGroup>& groups,
+		const std::vector<uint32_t>& vaos,
+		std::unique_ptr<VertexBuffer>& vbo);
 
 	void uploadInstanceData(const std::vector<InstanceGroup>& groups, const VertexBuffer& vbo);
 

@@ -2,9 +2,6 @@
 #include "glad/glad.h"
 #include "shader.h"
 #include "material/material.hpp"
-#include "texture/texture.h"
-#include "mesh/mesh.h"
-#include "mesh/vertex.hpp"
 #include "renderContext/renderContext.hpp"
 #include "renderContext/renderableObject.hpp"
 #include "renderContext/renderQueue.hpp"
@@ -15,7 +12,7 @@ void RenderCommon::forward(const RenderContext& ctx, const std::vector<Renderabl
 	uint32_t lastMaterial{0};
 	const Shader* lastShader{nullptr};
 
-	for (const auto& [entityID, model, normal, materialIdx, shader, mesh]: objects) {
+	for (const auto& [entityID, model, normal, materialIdx, meshIdx, shader]: objects) {
 		if (lastShader != shader) {
 			lastShader = shader;
 			lastShader->activate();
@@ -40,7 +37,12 @@ void RenderCommon::forward(const RenderContext& ctx, const std::vector<Renderabl
 		}
 
 		setupTransform(entityID, model, normal, *lastShader);
-		drawMesh(*mesh);
+
+		const uint32_t vao = ctx.renderQueue->meshVaos[meshIdx];
+		const size_t vertexCount = ctx.renderQueue->meshVertexCounts[meshIdx];
+		const size_t indexCount = ctx.renderQueue->meshIndexCounts[meshIdx];
+
+		drawMesh(vao, vertexCount, indexCount);
 	}
 }
 
@@ -51,19 +53,22 @@ void RenderCommon::instanced(const RenderContext& ctx, const std::vector<Instanc
 		const auto& [materialIdx, shader, meshes] = matBatch;
 		shader->activate();
 
-		const float heightScale = ctx.renderQueue->entityHeightScales.at(entityID);
-		const float alphaCutoff = ctx.renderQueue->matAlphaCutoffs.at(materialIdx);
-		const uint32_t flags = ctx.renderQueue->matFlags.at(materialIdx);
-		const std::vector<uint32_t>& textures = ctx.renderQueue->matTextures.at(materialIdx);
+		const float heightScale = ctx.renderQueue->entityHeightScales[entityID];
+		const float alphaCutoff = ctx.renderQueue->matAlphaCutoffs[materialIdx];
+		const uint32_t flags = ctx.renderQueue->matFlags[materialIdx];
+		const std::vector<uint32_t>& textures = ctx.renderQueue->matTextures[materialIdx];
 
 		setupMaterial(flags, alphaCutoff, heightScale, *shader);
 		bindTextures(flags, textures, *shader);
 
-		for (const auto& mesh: *meshes) {
-			mesh.bind();
+		for (const auto& meshIdx: meshes) {
+			const uint32_t vao = ctx.renderQueue->meshVaos[meshIdx];
+			const size_t indexCount = ctx.renderQueue->meshIndexCounts[meshIdx];
+
+			glBindVertexArray(vao);
 			glDrawElementsInstanced(
 				GL_TRIANGLES,
-				static_cast<int32_t>(mesh.indices().size()),
+				static_cast<int32_t>(indexCount),
 				GL_UNSIGNED_INT,
 				nullptr,
 				static_cast<int32_t>(count));
@@ -105,18 +110,19 @@ void RenderCommon::setupMaterial(const uint32_t flags, const float alphaCutoff, 
 	}
 }
 
-void RenderCommon::drawMesh(const Mesh& mesh) {
-	mesh.bind();
-	if (!mesh.indices().empty()) [[likely]] {
-		glDrawElements(GL_TRIANGLES, static_cast<int32_t>(mesh.indices().size()), GL_UNSIGNED_INT, nullptr);
+void RenderCommon::drawMesh(uint32_t vao, const size_t vertexCount, const size_t indexCount) {
+	glBindVertexArray(vao);
+
+	if (indexCount > 0) [[likely]] {
+		glDrawElements(GL_TRIANGLES, static_cast<int32_t>(indexCount), GL_UNSIGNED_INT, nullptr);
 	} else {
-		glDrawArrays(GL_TRIANGLES, 0, static_cast<int32_t>(mesh.vertices().size()));
+		glDrawArrays(GL_TRIANGLES, 0, static_cast<int32_t>(vertexCount));
 	}
 }
 
-void RenderCommon::drawQuad(const uint32_t sceneTexture, const uint32_t VAO) {
+void RenderCommon::drawQuad(const uint32_t sceneTexture, const uint32_t vao) {
 	glDisable(GL_DEPTH_TEST);
-	glBindVertexArray(VAO);
+	glBindVertexArray(vao);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, sceneTexture);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
