@@ -51,7 +51,7 @@ void DeferredGeometryPass::execute(const RenderContext& ctx) {
 
 	uint32_t lastMaterial{0};
 
-	for (const auto& [entityID, model, normal, materialIdx, meshIdx, shader]: ctx.renderQueue->deferredObjects) {
+	for (const auto& [entityID, materialIdx, meshIdx, shader]: ctx.renderQueue->deferredObjects) {
 		if (lastMaterial != materialIdx) {
 			lastMaterial = materialIdx;
 			const float heightScale = ctx.renderQueue->entity.heightScales[entityID];
@@ -63,6 +63,8 @@ void DeferredGeometryPass::execute(const RenderContext& ctx) {
 			RenderCommon::bindTextures(flags, textures, *mShader);
 		}
 
+		const auto& model = ctx.renderQueue->entity.models[entityID];
+		const auto& normal = ctx.renderQueue->entity.normals[entityID];
 		RenderCommon::setupTransform(entityID, model, normal, *mShader);
 
 		const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];

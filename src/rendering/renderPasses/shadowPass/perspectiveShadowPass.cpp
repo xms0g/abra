@@ -53,7 +53,9 @@ void PerspectiveShadowPass::render(
 	mDepthShader->activate();
 	mDepthShader->setMat4("lightSpaceMatrix", mLightSpaceMatrix[layer]);
 
-	for (const auto& [entityID, model, normal, matIdx, meshIdx, shader]: ctx.renderQueue->shadowedObjects) {
+	for (const auto& [entityID, matIdx, meshIdx, shader]: ctx.renderQueue->shadowedObjects) {
+		const auto& model = ctx.renderQueue->entity.models[entityID];
+		const auto& normal = ctx.renderQueue->entity.normals[entityID];
 		RenderCommon::setupTransform(entityID, model, normal, *mDepthShader);
 
 		const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];

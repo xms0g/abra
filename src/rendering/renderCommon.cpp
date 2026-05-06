@@ -12,7 +12,7 @@ void RenderCommon::forward(const RenderContext& ctx, const std::vector<Renderabl
 	uint32_t lastMaterial{0};
 	const Shader* lastShader{nullptr};
 
-	for (const auto& [entityID, model, normal, materialIdx, meshIdx, shader]: objects) {
+	for (const auto& [entityID, materialIdx, meshIdx, shader]: objects) {
 		if (lastShader != shader) {
 			lastShader = shader;
 			lastShader->activate();
@@ -36,6 +36,8 @@ void RenderCommon::forward(const RenderContext& ctx, const std::vector<Renderabl
 			bindTextures(flags, textures, *lastShader);
 		}
 
+		const auto& model = ctx.renderQueue->entity.models[entityID];
+		const auto& normal = ctx.renderQueue->entity.normals[entityID];
 		setupTransform(entityID, model, normal, *lastShader);
 
 		const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
