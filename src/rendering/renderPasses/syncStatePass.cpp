@@ -22,7 +22,7 @@ void SyncStatePass::syncDebugState(const RenderContext& ctx) {
 	if (!debug.isDirty)
 		return;
 
-	uint32_t& mode = ctx.renderQueue->entityDebugModes.at(mEntityID);
+	uint32_t& mode = ctx.renderQueue->entity.debugModes[mEntityID];
 	mode = debug.mode;
 	debug.isDirty = false;
 }
@@ -31,7 +31,12 @@ void SyncStatePass::syncTransformState(const RenderContext& ctx) {
 	if (!transform.isDirty)
 		return;
 
-	auto& [position, rotation, scale, model, normal] = ctx.renderQueue->entityTransforms.at(mEntityID);
+	auto& position = ctx.renderQueue->entity.positions[mEntityID];
+	auto& rotation = ctx.renderQueue->entity.rotations[mEntityID];
+	auto& scale = ctx.renderQueue->entity.scales[mEntityID];
+	auto& model = ctx.renderQueue->entity.models[mEntityID];
+	auto& normal = ctx.renderQueue->entity.normals[mEntityID];
+
 	position = transform.position;
 	rotation = transform.rotation;
 	scale = transform.scale;
@@ -41,6 +46,7 @@ void SyncStatePass::syncTransformState(const RenderContext& ctx) {
 }
 
 void SyncStatePass::onDebugUpdate(const GuiDebugEvent& event) {
+	debug.isDirty = true;
 	mEntityID = event.entityID;
 	debug.mode = event.mode;
 }

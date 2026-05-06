@@ -5,20 +5,6 @@
 struct InstanceGroup;
 struct RenderGroup;
 struct RenderableObject;
-class Entity;
-
-struct Transform {
-	glm::vec3 position;
-	glm::vec3 rotation;
-	glm::vec3 scale;
-	glm::mat4 model;
-	glm::mat3 normal;
-};
-
-struct BV {
-	glm::vec3 center;
-	glm::vec3 extents;
-};
 
 struct RenderQueue {
 	// Instance groups
@@ -38,19 +24,30 @@ struct RenderQueue {
 	std::vector<RenderableObject> dbgObjects;
 	std::vector<RenderableObject> shadowedObjects;
 
-	std::vector<Transform> entityTransforms;
-	std::vector<BV> entityBVs;
-	std::vector<uint32_t> entityDebugModes;
-	std::vector<float> entityHeightScales;
+	struct {
+		std::vector<glm::vec3> positions;
+		std::vector<glm::vec3> rotations;
+		std::vector<glm::vec3> scales;
+		std::vector<glm::mat4> models;
+		std::vector<glm::mat3> normals;
+		std::vector<glm::vec3> centers;
+		std::vector<glm::vec3> extents;
+		std::vector<uint32_t> debugModes;
+		std::vector<float> heightScales;
+	} entity;
 
-	std::vector<float> matAlphaCutoffs;
-	std::vector<uint32_t> matFlags;
-	std::vector<std::vector<uint32_t>> matTextures;
-	std::vector<glm::vec3> matColors;
+	struct {
+		std::vector<float> alphaCutoffs;
+		std::vector<uint32_t> flags;
+		std::vector<std::vector<uint32_t>> textures;
+		std::vector<glm::vec3> colors;
+	} material;
 
-	std::vector<uint32_t> meshVaos;
-	std::vector<glm::vec3> meshMinCounts;
-	std::vector<glm::vec3> meshMaxCounts;
-	std::vector<size_t> meshVertexCounts;
-	std::vector<size_t> meshIndexCounts;
+	struct {
+		std::vector<uint32_t> vaos;
+		std::vector<glm::vec3> minCounts;
+		std::vector<glm::vec3> maxCounts;
+		std::vector<size_t> vertexCounts;
+		std::vector<size_t> indexCounts;
+	} mesh;
 };

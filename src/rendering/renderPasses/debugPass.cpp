@@ -30,7 +30,7 @@ void DebugPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
 
 	for (const auto& [entityID, model, normal, matIdx, meshIdx, shader]: ctx.renderQueue->dbgObjects) {
-		const uint32_t mode = ctx.renderQueue->entityDebugModes[entityID];
+		const uint32_t mode = ctx.renderQueue->entity.debugModes[entityID];
 
 		if (mode == None)
 			continue;
@@ -40,9 +40,9 @@ void DebugPass::execute(const RenderContext& ctx) {
 
 		RenderCommon::setupTransform(entityID, model, normal, *dbgShader);
 
-		const uint32_t vao = ctx.renderQueue->meshVaos[meshIdx];
-		const size_t vertexCount = ctx.renderQueue->meshVertexCounts[meshIdx];
-		const size_t indexCount = ctx.renderQueue->meshIndexCounts[meshIdx];
+		const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
+		const size_t vertexCount = ctx.renderQueue->mesh.vertexCounts[meshIdx];
+		const size_t indexCount = ctx.renderQueue->mesh.indexCounts[meshIdx];
 
 		RenderCommon::drawMesh(vao, vertexCount, indexCount);
 	}

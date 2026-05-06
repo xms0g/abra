@@ -22,12 +22,12 @@ InstancedPass::~InstancedPass() = default;
 
 void InstancedPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	if (!ctx.renderQueue->opaqueInstancedGroups.empty()) {
-		prepareInstanceBuffer(ctx.renderQueue->opaqueInstancedGroups, ctx.renderQueue->meshVaos, mOpaqueVBO);
+		prepareInstanceBuffer(ctx.renderQueue->opaqueInstancedGroups, ctx.renderQueue->mesh.vaos, mOpaqueVBO);
 		uploadInstanceData(ctx.renderQueue->opaqueInstancedGroups, *mOpaqueVBO);
 	}
 
 	if (!ctx.renderQueue->blendInstancedGroups.empty()) {
-		prepareInstanceBuffer(ctx.renderQueue->blendInstancedGroups, ctx.renderQueue->meshVaos, mBlendVBO);
+		prepareInstanceBuffer(ctx.renderQueue->blendInstancedGroups, ctx.renderQueue->mesh.vaos, mBlendVBO);
 		uploadInstanceData(ctx.renderQueue->blendInstancedGroups, *mBlendVBO);
 	}
 }

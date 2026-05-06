@@ -21,8 +21,8 @@ void SkyboxPass::execute(const RenderContext& ctx) {
 	const auto& [entity, matb] = ctx.renderQueue->skybox.front();
 	const auto [materialIdx, shader, meshes] = matb;
 	const uint32_t meshIdx = meshes.front();
-	const uint32_t vao = ctx.renderQueue->meshVaos[meshIdx];
-	const uint32_t tex = ctx.renderQueue->matTextures[materialIdx].front();
+	const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
+	const uint32_t tex = ctx.renderQueue->material.textures[materialIdx].front();
 
 	ctx.sceneBuffer->bind();
 	shader->activate();

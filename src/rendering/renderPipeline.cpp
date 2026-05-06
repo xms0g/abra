@@ -342,35 +342,42 @@ void RenderPipeline::batchEntity(const Entity& entity, uint32_t& materialIndex, 
 	auto modelMat = math::modelMatrix(pos, rot, scale);
 	auto normalMat = math::normalMatrix(modelMat);
 
-	mRenderQueue.entityTransforms.emplace_back(pos, rot, scale, modelMat, normalMat);
+	mRenderQueue.entity.positions.push_back(pos);
+	mRenderQueue.entity.rotations.push_back(rot);
+	mRenderQueue.entity.scales.push_back(scale);
+	mRenderQueue.entity.models.push_back(modelMat);
+	mRenderQueue.entity.normals.push_back(normalMat);
 
-	mRenderQueue.entityBVs.emplace_back(
+	mRenderQueue.entity.centers.push_back(
 		!entity.hasComponent<SkyboxComponent>()
 			? entity.getComponent<BoundingVolumeComponent>().bv->center()
-			: glm::vec3(0.0f),
+			: glm::vec3(0.0f)
+	);
+	mRenderQueue.entity.extents.push_back(
 		!entity.hasComponent<SkyboxComponent>()
 			? entity.getComponent<BoundingVolumeComponent>().bv->extents()
-			: glm::vec3(0.0f));
+			: glm::vec3(0.0f)
+	);
 
-	mRenderQueue.entityDebugModes.emplace_back(0);
-	mRenderQueue.entityHeightScales.emplace_back(entity.getComponent<MaterialComponent>().heightScale);
+	mRenderQueue.entity.debugModes.emplace_back(0);
+	mRenderQueue.entity.heightScales.emplace_back(entity.getComponent<MaterialComponent>().heightScale);
 
 	if (entity.hasComponent<SkyboxComponent>()) {
 		const auto& material = matComponent.materials->at(0);
 
-		mRenderQueue.matFlags.emplace_back(material.flags);
-		mRenderQueue.matAlphaCutoffs.emplace_back(material.alphaCutoff);
-		mRenderQueue.matColors.emplace_back(0.0f);
+		mRenderQueue.material.flags.emplace_back(material.flags);
+		mRenderQueue.material.alphaCutoffs.emplace_back(material.alphaCutoff);
+		mRenderQueue.material.colors.emplace_back(0.0f);
 
 		std::vector<uint32_t> textures{material.textures[0].id};
-		mRenderQueue.matTextures.push_back(textures);
+		mRenderQueue.material.textures.push_back(textures);
 
 		auto& meshes = entity.getComponent<MeshComponent>().meshes->at(0);
-		mRenderQueue.meshVaos.push_back(meshes[0].vao().id());
-		mRenderQueue.meshVertexCounts.push_back(meshes[0].vertices().size());
-		mRenderQueue.meshIndexCounts.push_back(meshes[0].indices().size());
-		mRenderQueue.meshMaxCounts.push_back(meshes[0].max());
-		mRenderQueue.meshMinCounts.push_back(meshes[0].min());
+		mRenderQueue.mesh.vaos.push_back(meshes[0].vao().id());
+		mRenderQueue.mesh.vertexCounts.push_back(meshes[0].vertices().size());
+		mRenderQueue.mesh.indexCounts.push_back(meshes[0].indices().size());
+		mRenderQueue.mesh.maxCounts.push_back(meshes[0].max());
+		mRenderQueue.mesh.minCounts.push_back(meshes[0].min());
 
 		std::vector<uint32_t> indices{meshIndex++};
 
@@ -385,26 +392,26 @@ void RenderPipeline::batchEntity(const Entity& entity, uint32_t& materialIndex, 
 
 		for (const auto& mesh: meshes) {
 			indices.push_back(meshIndex++);
-			mRenderQueue.meshVaos.push_back(mesh.vao().id());
-			mRenderQueue.meshVertexCounts.push_back(mesh.vertices().size());
-			mRenderQueue.meshIndexCounts.push_back(mesh.indices().size());
-			mRenderQueue.meshMaxCounts.push_back(mesh.max());
-			mRenderQueue.meshMinCounts.push_back(mesh.min());
+			mRenderQueue.mesh.vaos.push_back(mesh.vao().id());
+			mRenderQueue.mesh.vertexCounts.push_back(mesh.vertices().size());
+			mRenderQueue.mesh.indexCounts.push_back(mesh.indices().size());
+			mRenderQueue.mesh.maxCounts.push_back(mesh.max());
+			mRenderQueue.mesh.minCounts.push_back(mesh.min());
 		}
 
 		MaterialBatch matBatch{materialIndex++, nullptr, indices};
 
 		const auto& material = matComponent.materials->at(matID);
 
-		mRenderQueue.matFlags.emplace_back(material.flags);
-		mRenderQueue.matAlphaCutoffs.emplace_back(material.alphaCutoff);
-		mRenderQueue.matColors.emplace_back(material.color);
+		mRenderQueue.material.flags.emplace_back(material.flags);
+		mRenderQueue.material.alphaCutoffs.emplace_back(material.alphaCutoff);
+		mRenderQueue.material.colors.emplace_back(material.color);
 
 		std::vector<uint32_t> textures;
 		for (const auto& texture: material.textures) {
 			textures.push_back(texture.id);
 		}
-		mRenderQueue.matTextures.push_back(textures);
+		mRenderQueue.material.textures.push_back(textures);
 
 		if (matComponent.renderFlag & INSTANCED_PASS) {
 			// Set shader
@@ -464,11 +471,11 @@ void RenderPipeline::sortEntities() {
 			batch.begin(),
 			batch.end(),
 			[&camPos, &transparent, this](const RenderGroup& a, const RenderGroup& b) {
-				const auto aTransform = mRenderQueue.entityTransforms.at(a.entityID);
-				const auto bTransform = mRenderQueue.entityTransforms.at(b.entityID);
+				const auto aPos = mRenderQueue.entity.positions[a.entityID];
+				const auto bPos = mRenderQueue.entity.positions[b.entityID];
 
-				const float da = glm::length2(camPos - aTransform.position);
-				const float db = glm::length2(camPos - bTransform.position);
+				const float da = glm::length2(camPos - aPos);
+				const float db = glm::length2(camPos - bPos);
 
 				if (transparent)
 					return da > db;

@@ -54,9 +54,9 @@ void DirectionalShadowPass::render(const RenderContext& ctx, const glm::vec4& di
 	for (const auto& [entityID, model, normal, matIdx, meshIdx, shader]: ctx.renderQueue->shadowedObjects) {
 		RenderCommon::setupTransform(entityID, model, normal, *mDepthShader);
 
-		const uint32_t vao = ctx.renderQueue->meshVaos[meshIdx];
-		const size_t vertexCount = ctx.renderQueue->meshVertexCounts[meshIdx];
-		const size_t indexCount = ctx.renderQueue->meshIndexCounts[meshIdx];
+		const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
+		const size_t vertexCount = ctx.renderQueue->mesh.vertexCounts[meshIdx];
+		const size_t indexCount = ctx.renderQueue->mesh.indexCounts[meshIdx];
 
 		RenderCommon::drawMesh(vao, vertexCount, indexCount);
 	}

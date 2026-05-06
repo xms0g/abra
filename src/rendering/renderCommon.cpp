@@ -22,11 +22,11 @@ void RenderCommon::forward(const RenderContext& ctx, const std::vector<Renderabl
 		if (lastMaterial != materialIdx) {
 			lastMaterial = materialIdx;
 
-			const float heightScale = ctx.renderQueue->entityHeightScales.at(entityID);
-			const float alphaCutoff = ctx.renderQueue->matAlphaCutoffs.at(materialIdx);
-			const uint32_t flags = ctx.renderQueue->matFlags.at(materialIdx);
-			const std::vector<uint32_t>& textures = ctx.renderQueue->matTextures.at(materialIdx);
-			const glm::vec3& color = ctx.renderQueue->matColors.at(materialIdx);
+			const float heightScale = ctx.renderQueue->entity.heightScales[entityID];
+			const float alphaCutoff = ctx.renderQueue->material.alphaCutoffs[materialIdx];
+			const uint32_t flags = ctx.renderQueue->material.flags[materialIdx];
+			const std::vector<uint32_t>& textures = ctx.renderQueue->material.textures[materialIdx];
+			const glm::vec3& color = ctx.renderQueue->material.colors[materialIdx];
 
 			if (textures.empty()) {
 				shader->setVec3("material.color", color);
@@ -38,9 +38,9 @@ void RenderCommon::forward(const RenderContext& ctx, const std::vector<Renderabl
 
 		setupTransform(entityID, model, normal, *lastShader);
 
-		const uint32_t vao = ctx.renderQueue->meshVaos[meshIdx];
-		const size_t vertexCount = ctx.renderQueue->meshVertexCounts[meshIdx];
-		const size_t indexCount = ctx.renderQueue->meshIndexCounts[meshIdx];
+		const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
+		const size_t vertexCount = ctx.renderQueue->mesh.vertexCounts[meshIdx];
+		const size_t indexCount = ctx.renderQueue->mesh.indexCounts[meshIdx];
 
 		drawMesh(vao, vertexCount, indexCount);
 	}
@@ -53,17 +53,17 @@ void RenderCommon::instanced(const RenderContext& ctx, const std::vector<Instanc
 		const auto& [materialIdx, shader, meshes] = matBatch;
 		shader->activate();
 
-		const float heightScale = ctx.renderQueue->entityHeightScales[entityID];
-		const float alphaCutoff = ctx.renderQueue->matAlphaCutoffs[materialIdx];
-		const uint32_t flags = ctx.renderQueue->matFlags[materialIdx];
-		const std::vector<uint32_t>& textures = ctx.renderQueue->matTextures[materialIdx];
+		const float heightScale = ctx.renderQueue->entity.heightScales[entityID];
+		const float alphaCutoff = ctx.renderQueue->material.alphaCutoffs[materialIdx];
+		const uint32_t flags = ctx.renderQueue->material.flags[materialIdx];
+		const std::vector<uint32_t>& textures = ctx.renderQueue->material.textures[materialIdx];
 
 		setupMaterial(flags, alphaCutoff, heightScale, *shader);
 		bindTextures(flags, textures, *shader);
 
 		for (const auto& meshIdx: meshes) {
-			const uint32_t vao = ctx.renderQueue->meshVaos[meshIdx];
-			const size_t indexCount = ctx.renderQueue->meshIndexCounts[meshIdx];
+			const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
+			const size_t indexCount = ctx.renderQueue->mesh.indexCounts[meshIdx];
 
 			glBindVertexArray(vao);
 			glDrawElementsInstanced(
