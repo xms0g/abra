@@ -29,14 +29,14 @@ void RenderCommon::forward(const RenderContext& ctx, const std::vector<Renderabl
 			const float alphaCutoff = ctx.renderQueue->matAlphaCutoffs.at(materialIdx);
 			const uint32_t flags = ctx.renderQueue->matFlags.at(materialIdx);
 			const std::vector<uint32_t>& textures = ctx.renderQueue->matTextures.at(materialIdx);
+			const glm::vec3& color = ctx.renderQueue->matColors.at(materialIdx);
 
-			// if (textures.empty()) {
-			// 	shader->setVec3("material.color", materialIdx->color);
-			// }
+			if (textures.empty()) {
+				shader->setVec3("material.color", color);
+			}
 
 			setupMaterial(flags, alphaCutoff, heightScale, *lastShader);
 			bindTextures(flags, textures, *lastShader);
-
 		}
 
 		setupTransform(entityID, model, normal, *lastShader);

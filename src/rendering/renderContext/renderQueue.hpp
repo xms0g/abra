@@ -45,4 +45,5 @@ struct RenderQueue {
 	std::vector<float> matAlphaCutoffs;
 	std::vector<uint32_t> matFlags;
 	std::vector<std::vector<uint32_t>> matTextures;
+	std::vector<glm::vec3> matColors;
 };

@@ -357,6 +357,7 @@ void RenderPipeline::batchEntity(const Entity& entity, uint32_t& materialIndex) 
 
 		mRenderQueue.matFlags.emplace_back(material.flags);
 		mRenderQueue.matAlphaCutoffs.emplace_back(material.alphaCutoff);
+		mRenderQueue.matColors.emplace_back(0.0f);
 
 		std::vector<uint32_t> textures{material.textures[0].id};
 		mRenderQueue.matTextures.push_back(textures);
@@ -374,6 +375,7 @@ void RenderPipeline::batchEntity(const Entity& entity, uint32_t& materialIndex) 
 
 		mRenderQueue.matFlags.emplace_back(material.flags);
 		mRenderQueue.matAlphaCutoffs.emplace_back(material.alphaCutoff);
+		mRenderQueue.matColors.emplace_back(material.color);
 
 		std::vector<uint32_t> textures;
 		for (const auto& texture: material.textures) {
