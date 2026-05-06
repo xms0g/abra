@@ -1,6 +1,7 @@
 #include "syncStatePass.h"
 #include "../renderContext/renderQueue.hpp"
 #include "../renderContext/renderContext.hpp"
+#include "../../math/matrix.h"
 #include "../../event/eventBus.hpp"
 #include "../../event/events/guiDebugEvent.hpp"
 #include "../../event/events/guiTransformEvent.hpp"
@@ -23,10 +24,12 @@ void SyncStatePass::syncDebugState(const RenderContext& ctx) const {
 }
 
 void SyncStatePass::syncTransformState(const RenderContext& ctx) const {
-	auto& [position, rotation, scale] = ctx.renderQueue->entityTransforms.at(mEntityID);
+	auto& [position, rotation, scale, model, normal] = ctx.renderQueue->entityTransforms.at(mEntityID);
 	position = transform.position;
 	rotation = transform.rotation;
 	scale = transform.scale;
+	model = transform.model;
+	normal = transform.normal;
 }
 
 void SyncStatePass::onDebugUpdate(const GuiDebugEvent& event) {
@@ -39,4 +42,6 @@ void SyncStatePass::onTransformUpdate(const GuiTransformEvent& event) {
 	transform.position = event.position;
 	transform.rotation = event.rotation;
 	transform.scale = event.scale;
+	transform.model = math::modelMatrix(event.position, event.rotation, event.scale);
+	transform.normal = math::normalMatrix(transform.model);
 }

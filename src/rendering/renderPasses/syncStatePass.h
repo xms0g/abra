@@ -31,5 +31,7 @@ private:
 		glm::vec3 position{0.0f};
 		glm::vec3 rotation{0.0f};
 		glm::vec3 scale{0.0f};
+		glm::mat4 model{1.0f};
+		glm::mat3 normal{1.0f};
 	} transform;
 };

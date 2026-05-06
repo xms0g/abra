@@ -6,7 +6,6 @@
 #include "../renderContext/renderableObject.hpp"
 #include "../../ECS/registry.h"
 #include "../../math/boundingVolume.h"
-#include "../../math/matrix.h"
 
 FrustumCullingPass::~FrustumCullingPass() = default;
 
@@ -18,22 +17,19 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 		outQueue.clear();
 
 		for (const auto& [entityID, matBatch]: groups) {
-			auto& [ePos, eRot, eScale] = ctx.renderQueue->entityTransforms.at(entityID);
+			auto& [ePos, eRot, eScale, eModel, eNormal] = ctx.renderQueue->entityTransforms.at(entityID);
 			auto& [center, extents] = ctx.renderQueue->entityBVs.at(entityID);
 
-			const glm::mat4 model = math::modelMatrix(ePos, eRot, eScale);
-			const glm::mat3 normal = math::normalMatrix(model);
-
-			if (!math::AABB::isOnFrustum(*ctx.camera.frustum, model, center, extents)) {
+			if (!math::AABB::isOnFrustum(*ctx.camera.frustum, eModel, center, extents)) {
 				continue;
 			}
 
 			const auto& [material, shader, meshes] = matBatch;
 			for (const auto& mesh: *meshes) {
-				const bool isVisible = math::AABB::isMeshInFrustum(*ctx.camera.frustum, mesh.min(), mesh.max(), model);
+				const bool isVisible = math::AABB::isMeshInFrustum(*ctx.camera.frustum, mesh.min(), mesh.max(), eModel);
 
 				if (isVisible) {
-					outQueue.push_back({entityID, model, normal, material, shader, &mesh});
+					outQueue.push_back({entityID, eModel, eNormal, material, shader, &mesh});
 				}
 			}
 		}

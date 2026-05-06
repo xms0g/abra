@@ -39,6 +39,7 @@
 #include "../ECS/components/skybox.hpp"
 #include "../math/boundingVolume.h"
 #include "../event/eventBus.hpp"
+#include "../math/matrix.h"
 
 RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLContext context) {
 	RequireComponent<MeshComponent>();
@@ -330,10 +331,13 @@ void RenderPipeline::refreshCameraData() const {
 void RenderPipeline::batchEntity(const Entity& entity) {
 	const auto& matComponent = entity.getComponent<MaterialComponent>();
 
-	mRenderQueue.entityTransforms.emplace_back(
-		entity.getComponent<TransformComponent>().position,
-		entity.getComponent<TransformComponent>().rotation,
-		entity.getComponent<TransformComponent>().scale);
+	auto pos = entity.getComponent<TransformComponent>().position;
+	auto rot = entity.getComponent<TransformComponent>().rotation;
+	auto scale = entity.getComponent<TransformComponent>().scale;
+	auto modelMat = math::modelMatrix(pos, rot, scale);
+	auto normalMat = math::normalMatrix(modelMat);
+
+	mRenderQueue.entityTransforms.emplace_back(pos, rot, scale, modelMat, normalMat);
 
 	mRenderQueue.entityBVs.emplace_back(
 		!entity.hasComponent<SkyboxComponent>()

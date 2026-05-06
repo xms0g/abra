@@ -9,8 +9,6 @@
 #include "renderContext/renderableObject.hpp"
 #include "renderContext/renderQueue.hpp"
 #include "renderContext/instanceGroup.hpp"
-#include "../math/matrix.h"
-#include "../ECS/components/material.hpp"
 #include "../ECS/components/mesh.hpp"
 
 void RenderCommon::forward(const RenderContext& ctx, const std::vector<RenderableObject>& objects) {
