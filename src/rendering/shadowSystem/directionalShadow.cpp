@@ -1,15 +1,15 @@
-#include "directionalShadowPass.h"
+#include "directionalShadow.h"
 #include "glad/glad.h"
 #include "glm/gtc/type_ptr.hpp"
-#include "../../mesh/mesh.h"
-#include "../../shader.h"
-#include "../../renderContext/renderContext.hpp"
-#include "../../renderContext/renderGroup.hpp"
-#include "../../renderContext/renderQueue.hpp"
-#include "../../buffers/frameBuffer.h"
-#include "../../renderCommon.h"
+#include "../mesh/mesh.h"
+#include "../shader.h"
+#include "../renderContext/renderContext.hpp"
+#include "../renderContext/renderGroup.hpp"
+#include "../renderContext/renderQueue.hpp"
+#include "../buffers/frameBuffer.h"
+#include "../renderCommon.h"
 
-DirectionalShadowPass::DirectionalShadowPass(const RenderContext& ctx) {
+DirectionalShadow::DirectionalShadow(const RenderContext& ctx) {
 	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadow.width, ctx.shadow.height);
 	mDepthMap->withTextureDepth(GL_DEPTH_COMPONENT24, true)
 			.checkStatus();
@@ -18,17 +18,17 @@ DirectionalShadowPass::DirectionalShadowPass(const RenderContext& ctx) {
 	mDepthShader = std::make_unique<Shader>("depth/depth.vert", "depth/depth.frag");
 }
 
-DirectionalShadowPass::~DirectionalShadowPass() = default;
+DirectionalShadow::~DirectionalShadow() = default;
 
-uint32_t DirectionalShadowPass::depthTexture() const {
+uint32_t DirectionalShadow::depthTexture() const {
 	return mDepthMap->texture();
 }
 
-glm::mat4 DirectionalShadowPass::lightSpaceMatrix() const {
+glm::mat4 DirectionalShadow::lightSpaceMatrix() const {
 	return mLightSpaceMatrix;
 }
 
-void DirectionalShadowPass::render(const RenderContext& ctx, const glm::vec4& direction) {
+void DirectionalShadow::render(const RenderContext& ctx, const glm::vec4& direction) {
 	const glm::vec3 lightPos = -glm::vec3(direction) * ctx.shadow.directional.height;
 	const glm::mat4 lightProjection = glm::ortho(
 		ctx.shadow.directional.left,

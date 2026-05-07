@@ -6,11 +6,11 @@ struct RenderContext;
 class Shader;
 class FrameBuffer;
 
-class OmnidirectionalShadowPass {
+class OmnidirectionalShadow {
 public:
-	explicit OmnidirectionalShadowPass(const RenderContext& ctx);
+	explicit OmnidirectionalShadow(const RenderContext& ctx);
 
-	~OmnidirectionalShadowPass();
+	~OmnidirectionalShadow();
 
 	[[nodiscard]]
 	uint32_t depthTexture() const;

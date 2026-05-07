@@ -9,6 +9,7 @@
 #include "buffers/uniformBuffer.h"
 #include "mesh/mesh.h"
 #include "mesh/vertex.hpp"
+#include "shadowSystem/shadowSystem.h"
 #include "renderContext/renderContext.hpp"
 #include "renderContext/renderFlags.hpp"
 #include "renderContext/renderGroup.hpp"
@@ -25,10 +26,10 @@
 #include "renderPasses/skyboxPass.h"
 #include "renderPasses/resolvePass.h"
 #include "renderPasses/postProcess/postProcessPass.h"
-#include "renderPasses/shadowPass/shadowPass.h"
 #include "renderPasses/syncStatePass.h"
 #include "gui/backend.h"
 #include "material/material.hpp"
+#include "mesh/vertexArray.h"
 #include "../config/config.hpp"
 #include "../ECS/registry.h"
 #include "../core/camera.h"
@@ -42,7 +43,6 @@
 #include "../math/boundingVolume.h"
 #include "../event/eventBus.hpp"
 #include "../math/matrix.h"
-#include "mesh/vertexArray.h"
 
 RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLContext context) {
 	RequireComponent<MeshComponent>();
@@ -71,6 +71,8 @@ RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLCon
 
 	registry->addSystem<LightSystem>();
 	mLightSystem = &registry->getSystem<LightSystem>();
+
+	mShadowSystem = std::make_unique<ShadowSystem>();
 
 	mShaders.emplace_back(std::make_unique<Shader>("object.vert", "opaque.frag"));
 	mShaders.emplace_back(std::make_unique<Shader>("object.vert", "blend.frag"));
@@ -129,11 +131,8 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 		3 * sizeof(glm::mat4) + sizeof(glm::vec4),
 		mRenderCtx->camera.ubo.binding);
 	// Create render passes
-	mShadowPass = std::make_shared<ShadowPass>();
-
 	mRenderPasses.emplace_back(std::make_shared<SyncStatePass>());
 	mRenderPasses.emplace_back(std::make_shared<FrustumCullingPass>());
-	mRenderPasses.push_back(mShadowPass);
 
 	if (!mRenderQueue.deferredGroups.empty()) {
 		mDeferredGeometryPass = std::make_shared<DeferredGeometryPass>();
@@ -188,10 +187,10 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mRenderCtx->light.dirLights = &mLightSystem->dirLights();
 	mRenderCtx->light.pointLights = &mLightSystem->pointLights();
 	mRenderCtx->light.spotLights = &mLightSystem->spotLights();
-	mRenderCtx->shadow.ubo.self = mShadowPass->ubo();
+	mRenderCtx->shadow.ubo.self = mShadowSystem->ubo();
 	mRenderCtx->shadow.ubo.binding = SHADOW_UBO_BINDING;
 	mRenderCtx->shadow.ubo.blockName = SHADOW_UBO_BLOCK_NAME;
-	mRenderCtx->shadow.textures = &mShadowPass->shadowMaps();
+	mRenderCtx->shadow.textures = &mShadowSystem->shadowMaps();
 	mRenderCtx->shadow.textureSlot = SHADOWMAP_TEXTURE_SLOT;
 	mRenderCtx->shadow.width = SHADOWMAP_WIDTH;
 	mRenderCtx->shadow.height = SHADOWMAP_HEIGHT;
@@ -248,6 +247,8 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mRenderCtx->camera.ubo.self->unbind();
 
 	// Configure render passes
+	mShadowSystem->configure(*mRenderCtx, eventBus);
+
 	for (const auto& pass: mRenderPasses) {
 		pass->configure(*mRenderCtx, eventBus);
 	}

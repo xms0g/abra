@@ -8,7 +8,7 @@ class EventBus;
 class SSAOPass;
 struct RenderContext;
 class Shader;
-class ShadowPass;
+class ShadowSystem;
 class DeferredLightingPass;
 class DeferredGeometryPass;
 class IRenderPass;
@@ -45,6 +45,7 @@ private:
 	void sortEntities();
 	// Systems
 	LightSystem* mLightSystem{};
+	std::unique_ptr<ShadowSystem> mShadowSystem;
 	//Shaders
 	std::vector<std::unique_ptr<Shader>> mShaders;
 	// Frame Buffers
@@ -57,7 +58,6 @@ private:
 	// Render context
 	std::unique_ptr<RenderContext> mRenderCtx;
 	// Render passes
-	std::shared_ptr<ShadowPass> mShadowPass;
 	std::shared_ptr<DeferredGeometryPass> mDeferredGeometryPass;
 	std::shared_ptr<DeferredLightingPass> mDeferredLightingPass;
 	std::shared_ptr<SSAOPass> mSSAOPass;

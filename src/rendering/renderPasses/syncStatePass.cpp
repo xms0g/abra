@@ -5,10 +5,12 @@
 #include "../../event/eventBus.hpp"
 #include "../../event/events/guiDebugEvent.hpp"
 #include "../../event/events/guiTransformEvent.hpp"
+#include "../../event/events/updateShadowMapEvent.hpp"
 
 SyncStatePass::~SyncStatePass() = default;
 
 void SyncStatePass::configure(const RenderContext& ctx, EventBus& eventBus) {
+	mEventBus = &eventBus;
 	eventBus.subscribeToEvent<SyncStatePass, GuiDebugEvent>(this, &SyncStatePass::onDebugUpdate);
 	eventBus.subscribeToEvent<SyncStatePass, GuiTransformEvent>(this, &SyncStatePass::onTransformUpdate);
 }
@@ -43,6 +45,8 @@ void SyncStatePass::syncTransformState(const RenderContext& ctx) {
 	model = transform.model;
 	normal = transform.normal;
 	transform.isDirty = false;
+
+	mEventBus->emitEvent<UpdateShadowMapEvent>();
 }
 
 void SyncStatePass::onDebugUpdate(const GuiDebugEvent& event) {

@@ -1,17 +1,17 @@
 #pragma once
 #include <memory>
 #include "glm/glm.hpp"
-#include "../../../config/config.hpp"
+#include "../../config/config.hpp"
 
 struct RenderContext;
 class Shader;
 class FrameBuffer;
 
-class PerspectiveShadowPass {
+class PerspectiveShadow {
 public:
-	explicit PerspectiveShadowPass(const RenderContext& ctx);
+	explicit PerspectiveShadow(const RenderContext& ctx);
 
-	~PerspectiveShadowPass();
+	~PerspectiveShadow();
 
 	[[nodiscard]]
 	uint32_t depthTexture() const;

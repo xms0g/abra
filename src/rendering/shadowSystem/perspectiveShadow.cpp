@@ -1,15 +1,15 @@
-#include "perspectiveShadowPass.h"
+#include "perspectiveShadow.h"
 #include "glad/glad.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "../../shader.h"
-#include "../../renderContext/renderGroup.hpp"
-#include "../../renderContext/renderContext.hpp"
-#include "../../renderContext/renderQueue.hpp"
-#include "../../buffers/frameBuffer.h"
-#include "../../renderCommon.h"
+#include "../shader.h"
+#include "../renderContext/renderGroup.hpp"
+#include "../renderContext/renderContext.hpp"
+#include "../renderContext/renderQueue.hpp"
+#include "../buffers/frameBuffer.h"
+#include "../renderCommon.h"
 
-PerspectiveShadowPass::PerspectiveShadowPass(const RenderContext& ctx) {
+PerspectiveShadow::PerspectiveShadow(const RenderContext& ctx) {
 	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadow.width, ctx.shadow.height);
 	mDepthMap->withTextureDepthArray(ctx.shadow.perspective.maxLights, GL_DEPTH_COMPONENT24, true)
 			.checkStatus();
@@ -18,21 +18,21 @@ PerspectiveShadowPass::PerspectiveShadowPass(const RenderContext& ctx) {
 	mDepthShader = std::make_unique<Shader>("depth/depth.vert", "depth/depth.frag");
 }
 
-PerspectiveShadowPass::~PerspectiveShadowPass() = default;
+PerspectiveShadow::~PerspectiveShadow() = default;
 
-uint32_t PerspectiveShadowPass::depthTexture() const {
+uint32_t PerspectiveShadow::depthTexture() const {
 	return mDepthMap->texture();
 }
 
-FrameBuffer& PerspectiveShadowPass::depthMap() const {
+FrameBuffer& PerspectiveShadow::depthMap() const {
 	return *mDepthMap;
 }
 
-glm::mat4 PerspectiveShadowPass::lightSpaceMatrix(const int layer) const {
+glm::mat4 PerspectiveShadow::lightSpaceMatrix(const int layer) const {
 	return mLightSpaceMatrix[layer];
 }
 
-void PerspectiveShadowPass::render(
+void PerspectiveShadow::render(
 	const RenderContext& ctx,
 	const glm::vec4& direction,
 	const glm::vec4& position,

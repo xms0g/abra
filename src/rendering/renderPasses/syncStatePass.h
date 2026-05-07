@@ -24,6 +24,8 @@ private:
 
 	void onTransformUpdate(const GuiTransformEvent& event);
 
+	EventBus* mEventBus{nullptr};
+
 	size_t mEntityID{0};
 	struct {
 		uint32_t mode{0};

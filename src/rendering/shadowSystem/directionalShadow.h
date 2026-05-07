@@ -6,11 +6,11 @@ struct RenderContext;
 class Shader;
 class FrameBuffer;
 
-class DirectionalShadowPass {
+class DirectionalShadow {
 public:
-	explicit DirectionalShadowPass(const RenderContext& ctx);
+	explicit DirectionalShadow(const RenderContext& ctx);
 
-	~DirectionalShadowPass();
+	~DirectionalShadow();
 
 	[[nodiscard]]
 	uint32_t depthTexture() const;

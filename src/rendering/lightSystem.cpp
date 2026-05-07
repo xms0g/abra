@@ -9,6 +9,7 @@
 #include "../ECS/components/spotLight.hpp"
 #include "../event/eventBus.hpp"
 #include "../event/events/guiLightEvent.hpp"
+#include "../event/events/updateShadowMapEvent.hpp"
 
 struct alignas(16) PackedLights {
 	DirectionalLightComponent dirLights[MAX_DIRECTIONAL_LIGHTS];
@@ -26,6 +27,7 @@ LightSystem::LightSystem() {
 }
 
 void LightSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
+	mEventBus = &eventBus;
 	eventBus.subscribeToEvent<LightSystem, GuiLightEvent>(this, &LightSystem::onGuiUpdate);
 
 	for (auto& entity: getSystemEntities()) {
@@ -131,4 +133,5 @@ void LightSystem::onGuiUpdate(const GuiLightEvent& event) {
 	}
 
 	updateLightUBO();
+	mEventBus->emitEvent<UpdateShadowMapEvent>();
 }

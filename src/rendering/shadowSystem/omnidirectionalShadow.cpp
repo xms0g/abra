@@ -1,15 +1,15 @@
-#include "omnidirectionalShadowPass.h"
+#include "omnidirectionalShadow.h"
 #include "glad/glad.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "../../shader.h"
-#include "../../renderContext/renderGroup.hpp"
-#include "../../renderContext/renderQueue.hpp"
-#include "../../renderContext/renderContext.hpp"
-#include "../../buffers/frameBuffer.h"
-#include "../../renderCommon.h"
+#include "../shader.h"
+#include "../renderContext/renderGroup.hpp"
+#include "../renderContext/renderQueue.hpp"
+#include "../renderContext/renderContext.hpp"
+#include "../buffers/frameBuffer.h"
+#include "../renderCommon.h"
 
-OmnidirectionalShadowPass::OmnidirectionalShadowPass(const RenderContext& ctx) {
+OmnidirectionalShadow::OmnidirectionalShadow(const RenderContext& ctx) {
 	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadow.width, ctx.shadow.height);
 	mDepthMap->withTextureCubemapDepthArray(ctx.shadow.omnidirectional.maxLights, GL_DEPTH_COMPONENT24, true)
 			.checkStatus();
@@ -21,17 +21,17 @@ OmnidirectionalShadowPass::OmnidirectionalShadowPass(const RenderContext& ctx) {
 		"depth/depthCubemap.geom");
 }
 
-OmnidirectionalShadowPass::~OmnidirectionalShadowPass() = default;
+OmnidirectionalShadow::~OmnidirectionalShadow() = default;
 
-uint32_t OmnidirectionalShadowPass::depthTexture() const {
+uint32_t OmnidirectionalShadow::depthTexture() const {
 	return mDepthMap->texture();
 }
 
-FrameBuffer& OmnidirectionalShadowPass::depthMap() const {
+FrameBuffer& OmnidirectionalShadow::depthMap() const {
 	return *mDepthMap;
 }
 
-void OmnidirectionalShadowPass::render(
+void OmnidirectionalShadow::render(
 	const RenderContext& ctx,
 	const glm::vec4& position,
 	const int32_t layer) const {
