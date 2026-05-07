@@ -135,14 +135,16 @@ void RenderCommon::drawQuad(const uint32_t sceneTexture, const uint32_t vao) {
 
 void RenderCommon::bindTextures(const uint32_t flags, const std::vector<uint32_t>& textures, const Shader& shader) {
 	static uint32_t matFlagCache{0};
+	static const Shader* lastShader{nullptr};
 
 	for (size_t i = 0; i < textures.size(); ++i) {
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, textures[i]);
 	}
 
-	if (matFlagCache != flags) {
+	if (matFlagCache != flags || lastShader != &shader) {
 		matFlagCache = flags;
+		lastShader = &shader;
 		shader.setUint("material.flags", flags);
 	}
 }
