@@ -283,10 +283,8 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 }
 
 void RenderPipeline::batchEntities() {
-	uint32_t materialIndex{0}, meshIndex{0};
-
 	for (const auto& entity: getSystemEntities()) {
-		batchEntity(entity, materialIndex, meshIndex);
+		batchEntity(entity);
 	}
 }
 
@@ -333,7 +331,9 @@ void RenderPipeline::refreshCameraData() const {
 	mRenderCtx->camera.ubo.self->unbind();
 }
 
-void RenderPipeline::batchEntity(const Entity& entity, uint32_t& materialIndex, uint32_t& meshIndex) {
+void RenderPipeline::batchEntity(const Entity& entity) {
+	static uint32_t materialIndex{0}, meshIndex{0};
+
 	const auto& matComponent = entity.getComponent<MaterialComponent>();
 
 	auto pos = entity.getComponent<TransformComponent>().position;
@@ -388,10 +388,10 @@ void RenderPipeline::batchEntity(const Entity& entity, uint32_t& materialIndex, 
 	}
 
 	for (auto& [matID, meshes]: *entity.getComponent<MeshComponent>().meshes) {
-		std::vector<uint32_t> indices;
+		std::vector<uint32_t> meshIndices;
 
 		for (const auto& mesh: meshes) {
-			indices.push_back(meshIndex++);
+			meshIndices.push_back(meshIndex++);
 			mRenderQueue.mesh.vaos.push_back(mesh.vao().id());
 			mRenderQueue.mesh.vertexCounts.push_back(mesh.vertices().size());
 			mRenderQueue.mesh.indexCounts.push_back(mesh.indices().size());
@@ -399,7 +399,7 @@ void RenderPipeline::batchEntity(const Entity& entity, uint32_t& materialIndex, 
 			mRenderQueue.mesh.minCounts.push_back(mesh.min());
 		}
 
-		MaterialBatch matBatch{materialIndex++, nullptr, indices};
+		MaterialBatch matBatch{materialIndex++, nullptr, meshIndices};
 
 		const auto& material = matComponent.materials->at(matID);
 

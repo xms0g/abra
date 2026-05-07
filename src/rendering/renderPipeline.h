@@ -40,7 +40,7 @@ public:
 private:
 	void refreshCameraData() const;
 
-	void batchEntity(const Entity& entity, uint32_t& materialIndex, uint32_t& meshIndex);
+	void batchEntity(const Entity& entity);
 
 	void sortEntities();
 	// Systems
