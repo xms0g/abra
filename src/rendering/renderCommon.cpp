@@ -112,7 +112,7 @@ void RenderCommon::setupMaterial(const uint32_t flags, const float alphaCutoff, 
 	}
 }
 
-void RenderCommon::drawMesh(uint32_t vao, const size_t vertexCount, const size_t indexCount) {
+void RenderCommon::drawMesh(const uint32_t vao, const size_t vertexCount, const size_t indexCount) {
 	glBindVertexArray(vao);
 
 	if (indexCount > 0) [[likely]] {
