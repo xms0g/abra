@@ -7,26 +7,49 @@
 
 void Input::process(EventBus& eventBus, SDL_Window* window, const float dt, bool& isRunning) {
 	SDL_Event event;
+	static bool freeLook{false};
 
 	while (SDL_PollEvent(&event)) {
 		ImGui_ImplSDL2_ProcessEvent(&event);
 
-		if (event.type == SDL_QUIT)
-			isRunning = false;
-		if (event.type == SDL_WINDOWEVENT &&
-		    event.window.event == SDL_WINDOWEVENT_CLOSE &&
-		    event.window.windowID == SDL_GetWindowID(window)) {
-			isRunning = false;
+		switch (event.type) {
+			case SDL_QUIT:
+				isRunning = false;
+				break;
+			case SDL_WINDOWEVENT:
+				switch (event.window.event) {
+					case SDL_WINDOWEVENT_CLOSE:
+						if (event.window.windowID == SDL_GetWindowID(window)) {
+							isRunning = false;
+						}
+						break;
+				}
+				break;
+			case SDL_MOUSEMOTION:
+				if (freeLook) {
+					eventBus.emitEvent<MouseMovementEvent>(
+						static_cast<float>(event.motion.xrel),
+						static_cast<float>(-event.motion.yrel)
+					);
+				}
+				break;
+			case SDL_MOUSEBUTTONDOWN:
+				switch (event.button.button) {
+					case SDL_BUTTON_RIGHT:
+						const ImGuiIO& io = ImGui::GetIO();
+						if (!io.WantCaptureMouse) {
+							freeLook = !freeLook;
+							SDL_SetRelativeMouseMode(freeLook ? SDL_TRUE : SDL_FALSE);
+						}
+						break;
+				}
+				break;
 		}
+
 	}
 
-	processKeyboard(eventBus, dt, isRunning);
-	processMouse(eventBus);
-}
-
-void Input::processKeyboard(EventBus& eventBus, const float dt, bool& isRunning) {
 	const auto* keyState = SDL_GetKeyboardState(nullptr);
-	uint32_t key;
+	uint32_t key{SDL_SCANCODE_UNKNOWN};
 
 	if (keyState[SDL_SCANCODE_ESCAPE]) {
 		isRunning = false;
@@ -38,30 +61,9 @@ void Input::processKeyboard(EventBus& eventBus, const float dt, bool& isRunning)
 		key = SDL_SCANCODE_A;
 	} else if (keyState[SDL_SCANCODE_D]) {
 		key = SDL_SCANCODE_D;
-	} else
-		return;
-
-	eventBus.emitEvent<KeyPressedEvent>(key, dt);
-}
-
-void Input::processMouse(EventBus& eventBus) {
-	int dx, dy;
-	static bool freeLook{false};
-	static bool prevRMB{false};
-
-	const uint32_t buttons = SDL_GetRelativeMouseState(&dx, &dy);
-	const bool rmb = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
-
-	const ImGuiIO& io = ImGui::GetIO();
-
-	if (rmb && !prevRMB && !io.WantCaptureMouse) {
-		freeLook = !freeLook;
-		SDL_SetRelativeMouseMode(freeLook ? SDL_TRUE : SDL_FALSE);
 	}
 
-	prevRMB = rmb;
-
-	if (freeLook) {
-		eventBus.emitEvent<MouseMovementEvent>(static_cast<float>(dx), static_cast<float>(-dy));
+	if (key != SDL_SCANCODE_UNKNOWN) {
+		eventBus.emitEvent<KeyPressedEvent>(key, dt);
 	}
 }
