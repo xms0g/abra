@@ -33,7 +33,7 @@ private:
 
 	void onGuiUpdate(const UpdateShadowMapEvent& event);
 
-	const RenderContext* mCtx;
+	const RenderContext* mCtx{};
 	std::array<uint32_t, 3> mShadowMaps{};
 	std::unique_ptr<UniformBuffer> mUBO;
 	std::unique_ptr<DirectionalShadow> mDirShadow;

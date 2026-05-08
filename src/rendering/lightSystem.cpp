@@ -14,8 +14,8 @@
 struct alignas(16) PackedLights {
 	DirectionalLightComponent dirLights[MAX_DIRECTIONAL_LIGHTS];
 	PointLightComponent pointLights[MAX_POINT_LIGHTS];
-	SpotLightComponent spotLights[MAX_SPOT_LIGHTS];
-	glm::ivec4 lightCount;
+	SpotLightComponent spotLights[MAX_SPOT_LIGHTS]{};
+	glm::ivec4 lightCount{};
 };
 
 static PackedLights lightsData;
