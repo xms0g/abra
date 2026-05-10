@@ -49,4 +49,6 @@ struct RenderQueue {
 		std::vector<size_t> vertexCounts;
 		std::vector<size_t> indexCounts;
 	} mesh;
+
+	std::array<uint32_t, 3> shadowMaps;
 };

@@ -151,11 +151,11 @@ void RenderCommon::bindTextures(const uint32_t flags, const std::vector<uint32_t
 
 void RenderCommon::bindShadowMaps(const RenderContext& ctx) {
 	glActiveTexture(GL_TEXTURE0 + ctx.shadow.textureSlot);
-	glBindTexture(GL_TEXTURE_2D, ctx.shadow.textures->at(0));
+	glBindTexture(GL_TEXTURE_2D, ctx.renderQueue->shadowMaps[0]);
 
 	glActiveTexture(GL_TEXTURE0 + ctx.shadow.textureSlot + 1);
-	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, ctx.shadow.textures->at(1));
+	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, ctx.renderQueue->shadowMaps[1]);
 
 	glActiveTexture(GL_TEXTURE0 + ctx.shadow.textureSlot + 2);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, ctx.shadow.textures->at(2));
+	glBindTexture(GL_TEXTURE_2D_ARRAY, ctx.renderQueue->shadowMaps[2]);
 }

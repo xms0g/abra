@@ -19,9 +19,6 @@ public:
 	[[nodiscard]]
 	const UniformBuffer* ubo() const;
 
-	[[nodiscard]]
-	const std::array<uint32_t, 3>& shadowMaps() const;
-
 	void configure(const RenderContext& ctx, EventBus& eventBus);
 
 private:
@@ -34,7 +31,6 @@ private:
 	void onGuiUpdate(const UpdateShadowMapEvent& event);
 
 	const RenderContext* mCtx{};
-	std::array<uint32_t, 3> mShadowMaps{};
 	std::unique_ptr<UniformBuffer> mUBO;
 	std::unique_ptr<DirectionalShadow> mDirShadow;
 	std::unique_ptr<OmnidirectionalShadow> mOmnidirShadow;

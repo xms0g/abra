@@ -30,7 +30,6 @@ struct RenderContext {
 		int32_t depthTextureIdx;
 	} gBuffer;
 
-
 	struct {
 		const FrameBuffer* buffer;
 		int32_t kernelSize;
@@ -78,7 +77,6 @@ struct RenderContext {
 	} screen;
 
 	struct {
-		const std::array<uint32_t, 3>* textures;
 		int32_t textureSlot;
 		uint32_t width, height;
 

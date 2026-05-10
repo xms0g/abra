@@ -12,6 +12,7 @@
 #include "../../config/config.hpp"
 #include "../../event/eventBus.hpp"
 #include "../../event/events/updateShadowMapEvent.hpp"
+#include "../renderContext/renderQueue.hpp"
 
 struct alignas(16) ShadowData {
 	glm::mat4 lightSpaceMatrix;
@@ -28,10 +29,6 @@ const UniformBuffer* ShadowSystem::ubo() const {
 	return mUBO.get();
 }
 
-const std::array<uint32_t, 3>& ShadowSystem::shadowMaps() const {
-	return mShadowMaps;
-}
-
 void ShadowSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mCtx = &ctx;
 	mDirShadow = std::make_unique<DirectionalShadow>(ctx);
@@ -40,7 +37,7 @@ void ShadowSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 
 	mUBO = std::make_unique<UniformBuffer>(DYNAMIC, sizeof(ShadowData), ctx.shadow.ubo.binding);
 
-	mShadowMaps = {
+	ctx.renderQueue->shadowMaps = {
 		mDirShadow->depthTexture(),
 		mOmnidirShadow->depthTexture(),
 		mPersShadow->depthTexture()

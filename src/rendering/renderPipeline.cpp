@@ -190,7 +190,6 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mRenderCtx->shadow.ubo.self = mShadowSystem->ubo();
 	mRenderCtx->shadow.ubo.binding = SHADOW_UBO_BINDING;
 	mRenderCtx->shadow.ubo.blockName = SHADOW_UBO_BLOCK_NAME;
-	mRenderCtx->shadow.textures = &mShadowSystem->shadowMaps();
 	mRenderCtx->shadow.textureSlot = SHADOWMAP_TEXTURE_SLOT;
 	mRenderCtx->shadow.width = SHADOWMAP_WIDTH;
 	mRenderCtx->shadow.height = SHADOWMAP_HEIGHT;
