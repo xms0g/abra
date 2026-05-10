@@ -3,7 +3,7 @@
 #include <vector>
 #include "glad/glad.h"
 
-void IFrameBuffer::checkStatus() {
+void BaseFrameBuffer::checkStatus() {
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 		throw std::runtime_error("ERROR::FRAMEBUFFER::NOT_COMPLETE!\n");
 	}
@@ -35,10 +35,6 @@ int32_t FrameBuffer::height() const {
 	return mHeight;
 }
 
-uint32_t FrameBuffer::texture(const uint32_t index) const {
-	return mTextures[index].first;
-}
-
 const std::vector<std::pair<uint32_t, uint32_t>>& FrameBuffer::textures() const {
 	return mTextures;
 }
@@ -58,13 +54,6 @@ void FrameBuffer::bindForDraw() const {
 
 void FrameBuffer::unbind() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void FrameBuffer::bindTexture(const uint32_t slot, const uint32_t textureIndex) const {
-	auto [id, type]= mTextures[textureIndex];
-
-	glActiveTexture(GL_TEXTURE0 + slot);
-	glBindTexture(type, id);
 }
 
 FrameBuffer& FrameBuffer::withTexture(const uint32_t format) {
@@ -360,6 +349,17 @@ FrameBuffer& FrameBuffer::configureAttachments() {
 	return *this;
 }
 
+uint32_t FrameBuffer::textureImpl(const uint32_t index) const {
+	return mTextures[index].first;
+}
+
+void FrameBuffer::bindTextureImpl(uint32_t slot, uint32_t textureIndex) const {
+	auto [id, type]= mTextures[textureIndex];
+
+	glActiveTexture(GL_TEXTURE0 + slot);
+	glBindTexture(type, id);
+}
+
 void FrameBuffer::setAttachment(const uint32_t textureID, const uint32_t target) {
 	const uint32_t attachment = GL_COLOR_ATTACHMENT0 + mTextures.size() - 1;
 	mAttachments.push_back(attachment);
@@ -448,10 +448,6 @@ CubemapBuffer::~CubemapBuffer() {
 	glDeleteTextures(1, &mCubemapID);
 }
 
-uint32_t CubemapBuffer::texture(uint32_t index) const {
-	return mCubemapID;
-}
-
 uint32_t CubemapBuffer::rbo() const {
 	return mRBO;
 }
@@ -476,7 +472,11 @@ void CubemapBuffer::bindFace(const uint32_t face, const int32_t mip) const {
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
 }
 
-void CubemapBuffer::bindTexture(const uint32_t slot, const uint32_t textureIndex) const {
+uint32_t CubemapBuffer::textureImpl(uint32_t index) const {
+	return mCubemapID;
+}
+
+void CubemapBuffer::bindTextureImpl(const uint32_t slot, uint32_t textureIndex) const {
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, mCubemapID);
 }

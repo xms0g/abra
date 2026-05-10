@@ -2,27 +2,35 @@
 #include <cstdint>
 #include <vector>
 
-class IFrameBuffer {
+class BaseFrameBuffer {
 public:
-	virtual ~IFrameBuffer() = default;
+	virtual ~BaseFrameBuffer() = default;
 
 	[[nodiscard]]
-	virtual uint32_t texture(uint32_t index) const = 0;
+	uint32_t texture(const uint32_t index = 0) const {
+		return textureImpl(index);
+	}
 
 	virtual void bind() const = 0;
 
 	virtual void unbind() const = 0;
 
-	virtual void bindTexture(uint32_t slot, uint32_t index) const = 0;
+	void bindTexture(const uint32_t slot, const uint32_t index = 0) const {
+		bindTextureImpl(slot, index);
+	}
 
 	void checkStatus();
 
 protected:
+	virtual uint32_t textureImpl(uint32_t index) const = 0;
+
+	virtual void bindTextureImpl(uint32_t slot, uint32_t index) const = 0;
+
 	uint32_t mFBO{0};
 	uint32_t mRBO{0};
 };
 
-class FrameBuffer final : public IFrameBuffer {
+class FrameBuffer final : public BaseFrameBuffer {
 public:
 	FrameBuffer(int32_t width, int32_t height);
 
@@ -35,10 +43,7 @@ public:
 	int32_t height() const;
 
 	[[nodiscard]]
-	uint32_t texture(uint32_t index = 0) const override;
-
-	[[nodiscard]]
-	const std::vector<std::pair<uint32_t, uint32_t>>& textures() const;
+	const std::vector<std::pair<uint32_t, uint32_t> >& textures() const;
 
 	void bind() const override;
 
@@ -47,8 +52,6 @@ public:
 	void bindForDraw() const;
 
 	void unbind() const override;
-
-	void bindTexture(uint32_t slot, uint32_t textureIndex = 0) const override;
 
 	FrameBuffer& withTexture(uint32_t format);
 
@@ -76,6 +79,12 @@ public:
 
 	FrameBuffer& configureAttachments();
 
+protected:
+	[[nodiscard]]
+	uint32_t textureImpl(uint32_t index) const override;
+
+	void bindTextureImpl(uint32_t slot, uint32_t textureIndex) const override;
+
 private:
 	void setAttachment(uint32_t textureID, uint32_t target);
 
@@ -85,18 +94,15 @@ private:
 
 	int32_t mWidth{0};
 	int32_t mHeight{0};
-	std::vector<std::pair<uint32_t, uint32_t>> mTextures;
+	std::vector<std::pair<uint32_t, uint32_t> > mTextures;
 	std::vector<uint32_t> mAttachments;
 };
 
-class CubemapBuffer final : public IFrameBuffer {
+class CubemapBuffer final : public BaseFrameBuffer {
 public:
 	CubemapBuffer(int32_t size, bool mipmap = false, bool prefilter = false);
 
 	~CubemapBuffer() override;
-
-	[[nodiscard]]
-	uint32_t texture(uint32_t index = 0) const override;
 
 	[[nodiscard]]
 	uint32_t rbo() const;
@@ -107,7 +113,11 @@ public:
 
 	void bindFace(uint32_t face, int32_t mip = 0) const;
 
-	void bindTexture(uint32_t slot, uint32_t textureIndex = 0) const override;
+protected:
+	[[nodiscard]]
+	uint32_t textureImpl(uint32_t index) const override;
+
+	void bindTextureImpl(uint32_t slot, uint32_t textureIndex) const override;
 
 private:
 	uint32_t mCubemapID{0};
