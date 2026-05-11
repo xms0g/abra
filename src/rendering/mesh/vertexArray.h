@@ -7,6 +7,7 @@ public:
 
 	~VertexArray();
 
+	[[nodiscard]]
 	uint32_t id() const;
 
 	void bind() const;

@@ -22,6 +22,7 @@ public:
 	void checkStatus();
 
 protected:
+	[[nodiscard]]
 	virtual uint32_t textureImpl(uint32_t index) const = 0;
 
 	virtual void bindTextureImpl(uint32_t slot, uint32_t index) const = 0;

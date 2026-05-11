@@ -22,6 +22,7 @@ public:
 
 	Mesh& operator=(Mesh&& other) noexcept;
 
+	[[nodiscard]]
 	const VertexArray& vao() const;
 
 	[[nodiscard]]
