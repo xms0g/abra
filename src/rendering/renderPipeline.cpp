@@ -4,12 +4,13 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/norm.hpp"
 #include "shader.h"
-#include "lightSystem.h"
+#include "systems/lightSystem.h"
+#include "systems/syncStateSystem.h"
+#include "systems/shadowSystem/shadowSystem.h"
 #include "buffers/frameBuffer.h"
 #include "buffers/uniformBuffer.h"
 #include "mesh/mesh.h"
 #include "mesh/vertex.hpp"
-#include "shadowSystem/shadowSystem.h"
 #include "renderContext/renderContext.hpp"
 #include "renderContext/renderFlags.hpp"
 #include "renderContext/renderGroup.hpp"
@@ -26,7 +27,6 @@
 #include "renderPasses/skyboxPass.h"
 #include "renderPasses/resolvePass.h"
 #include "renderPasses/postProcess/postProcessPass.h"
-#include "renderPasses/syncStatePass.h"
 #include "gui/backend.h"
 #include "material/material.hpp"
 #include "mesh/vertexArray.h"
@@ -73,6 +73,7 @@ RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLCon
 	mLightSystem = &registry->getSystem<LightSystem>();
 
 	mShadowSystem = std::make_unique<ShadowSystem>();
+	mSyncStatePass = std::make_unique<SyncStateSystem>();
 
 	mShaders.emplace_back(std::make_unique<Shader>("object.vert", "opaque.frag"));
 	mShaders.emplace_back(std::make_unique<Shader>("object.vert", "blend.frag"));
@@ -90,6 +91,7 @@ RenderPipeline::~RenderPipeline() {
 
 void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mLightSystem->configure(*mRenderCtx, eventBus);
+	mSyncStatePass->configure(*mRenderCtx, eventBus);
 
 	// Create framebuffers
 	mSceneBuffer = std::make_unique<FrameBuffer>(SCR_WIDTH, SCR_HEIGHT);
@@ -131,7 +133,6 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 		3 * sizeof(glm::mat4) + sizeof(glm::vec4),
 		mRenderCtx->camera.ubo.binding);
 	// Create render passes
-	mRenderPasses.emplace_back(std::make_shared<SyncStatePass>());
 	mRenderPasses.emplace_back(std::make_shared<FrustumCullingPass>());
 
 	if (!mRenderQueue.deferredGroups.empty()) {

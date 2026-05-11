@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include "glm/glm.hpp"
-#include "../../config/config.hpp"
+#include "../../../config/config.hpp"
 
 struct RenderContext;
 class Shader;

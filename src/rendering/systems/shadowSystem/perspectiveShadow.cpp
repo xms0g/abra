@@ -2,12 +2,12 @@
 #include "glad/glad.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "../shader.h"
-#include "../renderContext/renderGroup.hpp"
-#include "../renderContext/renderContext.hpp"
-#include "../renderContext/renderQueue.hpp"
-#include "../buffers/frameBuffer.h"
-#include "../renderCommon.h"
+#include "../../shader.h"
+#include "../../renderContext/renderGroup.hpp"
+#include "../../renderContext/renderContext.hpp"
+#include "../../renderContext/renderQueue.hpp"
+#include "../../buffers/frameBuffer.h"
+#include "../../renderCommon.h"
 
 PerspectiveShadow::PerspectiveShadow(const RenderContext& ctx) {
 	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadow.width, ctx.shadow.height);

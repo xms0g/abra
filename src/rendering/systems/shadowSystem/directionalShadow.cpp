@@ -1,13 +1,13 @@
 #include "directionalShadow.h"
 #include "glad/glad.h"
 #include "glm/gtc/type_ptr.hpp"
-#include "../mesh/mesh.h"
-#include "../shader.h"
-#include "../renderContext/renderContext.hpp"
-#include "../renderContext/renderGroup.hpp"
-#include "../renderContext/renderQueue.hpp"
-#include "../buffers/frameBuffer.h"
-#include "../renderCommon.h"
+#include "../../mesh/mesh.h"
+#include "../../shader.h"
+#include "../../renderContext/renderContext.hpp"
+#include "../../renderContext/renderGroup.hpp"
+#include "../../renderContext/renderQueue.hpp"
+#include "../../buffers/frameBuffer.h"
+#include "../../renderCommon.h"
 
 DirectionalShadow::DirectionalShadow(const RenderContext& ctx) {
 	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadow.width, ctx.shadow.height);
