@@ -116,7 +116,7 @@ Models::Sphere::Sphere(
 	mMeshes[0].emplace_back(vertices, indices);
 	mMeshes.at(0).at(0).uploadToGPU();
 
-	uint32_t flag{0};
+	uint32_t flags{0};
 	std::vector<Texture> textures;
 	if (albedo) {
 		textures.emplace_back(
@@ -138,17 +138,20 @@ Models::Sphere::Sphere(
 			texture::load(fs::path(ASSET_DIR + orm).c_str(), 1, false),
 			ROUGHNESS_METALLIC,
 			orm);
-		flag |= PBR;
-		flag |= HAS_ORM;
+		flags |= PBR;
+		flags |= HAS_ORM;
 	}
 
 	if (unlit) {
-		flag |= UNLIT;
+		flags |= UNLIT;
 	} else {
-		flag |= CASTSHADOW;
+		flags |= CASTSHADOW;
 	}
 
-	mMaterial[0] = {0, flag, color, 0.0f, textures};
+	if (color != glm::vec3(0.0f)) {
+		flags |= HAS_SOLID_COLOR;
+	}
+	mMaterial[0] = {0, flags, color, 0.0f, textures};
 }
 
 Models::Sphere::~Sphere() = default;

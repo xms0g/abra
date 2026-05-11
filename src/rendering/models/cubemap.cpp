@@ -68,7 +68,6 @@ Models::Cubemap::Cubemap(std::span<const char* const> faces) {
 		facesVec.emplace_back(fs::path(ASSET_DIR + face));
 	}
 
-
 	std::vector<Texture> textures;
 	textures.emplace_back(texture::loadCubemap(facesVec), ALBEDO,"skybox.jpg");
 	mMaterial[0] = {0, 0, glm::vec3(), 0.0f, textures};

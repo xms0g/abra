@@ -105,7 +105,13 @@ Models::Plane::Plane(
 			heightTexture);
 	}
 
-	mMaterial[0] = {0, OPAQUE | CASTSHADOW, color, 0.0f, textures};
+	uint32_t flags{0};
+
+	flags |= OPAQUE | CASTSHADOW;
+	if (color != glm::vec3(0.0f)) {
+		flags |= HAS_SOLID_COLOR;
+	}
+	mMaterial[0] = {0, flags, color, 0.0f, textures};
 }
 
 Models::Plane::~Plane() = default;

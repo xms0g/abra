@@ -74,32 +74,46 @@ void RenderCommon::setupMaterial(
 	const RenderContext& ctx,
 	const Shader& shader) {
 	static bool isCullingEnabled{true};
-	static uint32_t lastMaterial{0};
+	static uint32_t lastMaterialIdx{0};
+	static uint32_t lastMatFlags{0};
+	static const Shader* lastShader{nullptr};
 
-	if (lastMaterial == materialIdx) {
+	if (lastMaterialIdx == materialIdx) {
 		return;
 	}
 
-	lastMaterial = materialIdx;
+	lastMaterialIdx = materialIdx;
+	lastShader = &shader;
+
 	const uint32_t flags = ctx.renderQueue->material.flags[materialIdx];
-	const float alphaCutoff = ctx.renderQueue->material.alphaCutoffs[materialIdx];
+
+	if (lastMatFlags != flags || lastShader != &shader) {
+		lastMatFlags = flags;
+		lastShader = &shader;
+		shader.setUint("material.flags", flags);
+	}
 
 	if (flags & HAS_HEIGHT_MAP) {
 		const float heightScale = ctx.renderQueue->entity.heightScales[entityID];
 		shader.setFloat("material.heightScale", heightScale);
 	}
 
-	if (alphaCutoff != 0.0f) {
+	if (flags & ALPHACUTOFF) {
+		const float alphaCutoff = ctx.renderQueue->material.alphaCutoffs[materialIdx];
 		shader.setFloat("material.alphaCutoff", alphaCutoff);
 	}
 
-	const std::vector<uint32_t>& textures = ctx.renderQueue->material.textures[materialIdx];
-	if (textures.empty()) {
+	if (flags & HAS_SOLID_COLOR) {
 		const glm::vec3& color = ctx.renderQueue->material.colors[materialIdx];
 		shader.setVec3("material.color", color);
-	}
+	} else {
+		const std::vector<uint32_t>& textures = ctx.renderQueue->material.textures[materialIdx];
 
-	bindTextures(flags, textures, shader);
+		for (size_t i = 0; i < textures.size(); ++i) {
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, textures[i]);
+		}
+	}
 
 	if (flags & TWOSIDED && isCullingEnabled) {
 		glDisable(GL_CULL_FACE);
@@ -128,23 +142,6 @@ void RenderCommon::drawQuad(const uint32_t sceneTexture, const uint32_t vao) {
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 	glEnable(GL_DEPTH_TEST);
-}
-
-
-void RenderCommon::bindTextures(const uint32_t flags, const std::vector<uint32_t>& textures, const Shader& shader) {
-	static uint32_t matFlagCache{0};
-	static const Shader* lastShader{nullptr};
-
-	for (size_t i = 0; i < textures.size(); ++i) {
-		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, textures[i]);
-	}
-
-	if (matFlagCache != flags || lastShader != &shader) {
-		matFlagCache = flags;
-		lastShader = &shader;
-		shader.setUint("material.flags", flags);
-	}
 }
 
 void RenderCommon::bindShadowMaps(const RenderContext& ctx) {

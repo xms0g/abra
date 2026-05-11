@@ -1,7 +1,6 @@
 #pragma once
 #include <unordered_map>
 #include <vector>
-#include "glm/glm.hpp"
 
 struct InstanceGroup;
 struct RenderableObject;
@@ -25,8 +24,6 @@ void setupMaterial(size_t entityID, uint32_t materialIdx, const RenderContext& c
 void drawMesh(uint32_t vao, size_t vertexCount, size_t indexCount);
 
 void drawQuad(uint32_t sceneTexture, uint32_t vao);
-
-void bindTextures(uint32_t flags, const std::vector<uint32_t>& textures, const Shader& shader);
 
 void bindShadowMaps(const RenderContext& ctx);
 }

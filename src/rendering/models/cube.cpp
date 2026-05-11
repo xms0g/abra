@@ -161,6 +161,10 @@ Models::Cube::Cube(
 	}
 
 	flag |= OPAQUE;
+
+	if (color != glm::vec3(0.0f)) {
+		flag |= HAS_SOLID_COLOR;
+	}
 	mMaterial[0] = {0,flag, color, 0.0f, textures};
 }
 
