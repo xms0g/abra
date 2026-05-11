@@ -10,6 +10,7 @@
 
 void RenderCommon::forward(const RenderContext& ctx, const std::vector<RenderableObject>& objects) {
 	uint32_t lastMaterial{0};
+	size_t lastEntity{0};
 	const Shader* lastShader{nullptr};
 
 	for (const auto& [entityID, materialIdx, meshIdx, shader]: objects) {
@@ -36,9 +37,7 @@ void RenderCommon::forward(const RenderContext& ctx, const std::vector<Renderabl
 			bindTextures(flags, textures, *lastShader);
 		}
 
-		const auto& model = ctx.renderQueue->entity.models[entityID];
-		const auto& normal = ctx.renderQueue->entity.normals[entityID];
-		setupTransform(entityID, model, normal, *lastShader);
+		setupTransform(entityID, ctx, *lastShader);
 
 		const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
 		const size_t vertexCount = ctx.renderQueue->mesh.vertexCounts[meshIdx];
@@ -78,15 +77,15 @@ void RenderCommon::instanced(const RenderContext& ctx, const std::vector<Instanc
 	}
 }
 
-void RenderCommon::setupTransform(
-	const size_t entityID,
-	const glm::mat4& model,
-	const glm::mat3& normal,
-	const Shader& shader) {
+void RenderCommon::setupTransform(const size_t entityID, const RenderContext& ctx, const Shader& shader) {
 	static size_t lastEntityID{0};
 
 	if (lastEntityID != entityID) {
 		lastEntityID = entityID;
+
+		const auto& model = ctx.renderQueue->entity.models[entityID];
+		const auto& normal = ctx.renderQueue->entity.normals[entityID];
+
 		shader.setMat4("model", model);
 		shader.setMat3("normalMatrix", normal);
 	}

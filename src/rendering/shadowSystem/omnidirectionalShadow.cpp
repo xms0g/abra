@@ -57,10 +57,7 @@ void OmnidirectionalShadow::render(
 	mDepthShader->setInt("cubeIndex", layer);
 
 	for (const auto& [entityID, matBatch]: ctx.renderQueue->shadowGroups) {
-		const auto& model = ctx.renderQueue->entity.models[entityID];
-		const auto& normal = ctx.renderQueue->entity.normals[entityID];
-
-		RenderCommon::setupTransform(entityID, model, normal, *mDepthShader);
+		RenderCommon::setupTransform(entityID, ctx, *mDepthShader);
 
 		const auto& [matIdx, shader, meshes] = matBatch;
 

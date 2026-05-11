@@ -63,9 +63,7 @@ void DeferredGeometryPass::execute(const RenderContext& ctx) {
 			RenderCommon::bindTextures(flags, textures, *mShader);
 		}
 
-		const auto& model = ctx.renderQueue->entity.models[entityID];
-		const auto& normal = ctx.renderQueue->entity.normals[entityID];
-		RenderCommon::setupTransform(entityID, model, normal, *mShader);
+		RenderCommon::setupTransform(entityID, ctx, *mShader);
 
 		const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
 		const size_t vertexCount = ctx.renderQueue->mesh.vertexCounts[meshIdx];

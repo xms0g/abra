@@ -18,7 +18,7 @@ void forward(const RenderContext& ctx, const std::vector<RenderableObject>& obje
 
 void instanced(const RenderContext& ctx, const std::vector<InstanceGroup>& objects);
 
-void setupTransform(size_t entityID, const glm::mat4& model, const glm::mat3& normal, const Shader& shader);
+void setupTransform(size_t entityID, const RenderContext& ctx, const Shader& shader);
 
 void setupMaterial(uint32_t flags, float alphaCutoff, float heightScale, const Shader& shader);
 

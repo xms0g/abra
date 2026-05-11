@@ -52,10 +52,7 @@ void DirectionalShadow::render(const RenderContext& ctx, const glm::vec4& direct
 	glViewport(0, 0, static_cast<int32_t>(ctx.shadow.width), static_cast<int32_t>(ctx.shadow.height));
 
 	for (const auto& [entityID, matBatch]: ctx.renderQueue->shadowGroups) {
-		const auto& model = ctx.renderQueue->entity.models[entityID];
-		const auto& normal = ctx.renderQueue->entity.normals[entityID];
-
-		RenderCommon::setupTransform(entityID, model, normal, *mDepthShader);
+		RenderCommon::setupTransform(entityID, ctx, *mDepthShader);
 
 		const auto& [matIdx, shader, meshes] = matBatch;
 
