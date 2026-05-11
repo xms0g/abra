@@ -66,7 +66,7 @@ uint32_t Bloom::blurPass(const uint32_t sceneTexture, const uint32_t vao, bool& 
 	bool horizontal = true;
 	uint32_t outTex = sceneTexture;
 
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 10; ++i) {
 		mPingPong[toggle]->bind();
 		glClear(GL_COLOR_BUFFER_BIT);
 
