@@ -83,7 +83,6 @@ void RenderCommon::setupMaterial(
 	}
 
 	lastMaterialIdx = materialIdx;
-	lastShader = &shader;
 
 	const uint32_t flags = ctx.renderQueue->material.flags[materialIdx];
 
