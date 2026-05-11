@@ -49,20 +49,8 @@ void DeferredGeometryPass::execute(const RenderContext& ctx) {
 
 	mShader->activate();
 
-	uint32_t lastMaterial{0};
-
 	for (const auto& [entityID, materialIdx, meshIdx, shader]: ctx.renderQueue->deferredObjects) {
-		if (lastMaterial != materialIdx) {
-			lastMaterial = materialIdx;
-			const float heightScale = ctx.renderQueue->entity.heightScales[entityID];
-			const float alphaCutoff = ctx.renderQueue->material.alphaCutoffs[materialIdx];
-			const uint32_t flags = ctx.renderQueue->material.flags[materialIdx];
-			const std::vector<uint32_t>& textures = ctx.renderQueue->material.textures[materialIdx];
-
-			RenderCommon::setupMaterial(flags, alphaCutoff, heightScale, *mShader);
-			RenderCommon::bindTextures(flags, textures, *mShader);
-		}
-
+		RenderCommon::setupMaterial(entityID, materialIdx, ctx, *mShader);
 		RenderCommon::setupTransform(entityID, ctx, *mShader);
 
 		const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];

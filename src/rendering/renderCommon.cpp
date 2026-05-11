@@ -9,34 +9,15 @@
 #include "../ECS/components/mesh.hpp"
 
 void RenderCommon::forward(const RenderContext& ctx, const std::vector<RenderableObject>& objects) {
-	uint32_t lastMaterial{0};
-	size_t lastEntity{0};
 	const Shader* lastShader{nullptr};
 
 	for (const auto& [entityID, materialIdx, meshIdx, shader]: objects) {
 		if (lastShader != shader) {
 			lastShader = shader;
 			lastShader->activate();
-			lastMaterial = 0;
 		}
 
-		if (lastMaterial != materialIdx) {
-			lastMaterial = materialIdx;
-
-			const float heightScale = ctx.renderQueue->entity.heightScales[entityID];
-			const float alphaCutoff = ctx.renderQueue->material.alphaCutoffs[materialIdx];
-			const uint32_t flags = ctx.renderQueue->material.flags[materialIdx];
-			const std::vector<uint32_t>& textures = ctx.renderQueue->material.textures[materialIdx];
-			const glm::vec3& color = ctx.renderQueue->material.colors[materialIdx];
-
-			if (textures.empty()) {
-				shader->setVec3("material.color", color);
-			}
-
-			setupMaterial(flags, alphaCutoff, heightScale, *lastShader);
-			bindTextures(flags, textures, *lastShader);
-		}
-
+		setupMaterial(entityID, materialIdx, ctx, *lastShader);
 		setupTransform(entityID, ctx, *lastShader);
 
 		const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
@@ -54,13 +35,7 @@ void RenderCommon::instanced(const RenderContext& ctx, const std::vector<Instanc
 		const auto& [materialIdx, shader, meshes] = matBatch;
 		shader->activate();
 
-		const float heightScale = ctx.renderQueue->entity.heightScales[entityID];
-		const float alphaCutoff = ctx.renderQueue->material.alphaCutoffs[materialIdx];
-		const uint32_t flags = ctx.renderQueue->material.flags[materialIdx];
-		const std::vector<uint32_t>& textures = ctx.renderQueue->material.textures[materialIdx];
-
-		setupMaterial(flags, alphaCutoff, heightScale, *shader);
-		bindTextures(flags, textures, *shader);
+		setupMaterial(entityID, materialIdx, ctx, *shader);
 
 		for (const auto& meshIdx: meshes) {
 			const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
@@ -80,27 +55,51 @@ void RenderCommon::instanced(const RenderContext& ctx, const std::vector<Instanc
 void RenderCommon::setupTransform(const size_t entityID, const RenderContext& ctx, const Shader& shader) {
 	static size_t lastEntityID{0};
 
-	if (lastEntityID != entityID) {
-		lastEntityID = entityID;
-
-		const auto& model = ctx.renderQueue->entity.models[entityID];
-		const auto& normal = ctx.renderQueue->entity.normals[entityID];
-
-		shader.setMat4("model", model);
-		shader.setMat3("normalMatrix", normal);
+	if (lastEntityID == entityID) {
+		return;
 	}
+
+	lastEntityID = entityID;
+
+	const auto& model = ctx.renderQueue->entity.models[entityID];
+	const auto& normal = ctx.renderQueue->entity.normals[entityID];
+
+	shader.setMat4("model", model);
+	shader.setMat3("normalMatrix", normal);
 }
 
-void RenderCommon::setupMaterial(const uint32_t flags, const float alphaCutoff, const float heightScale, const Shader& shader) {
+void RenderCommon::setupMaterial(
+	const size_t entityID,
+	const uint32_t materialIdx,
+	const RenderContext& ctx,
+	const Shader& shader) {
 	static bool isCullingEnabled{true};
+	static uint32_t lastMaterial{0};
+
+	if (lastMaterial == materialIdx) {
+		return;
+	}
+
+	lastMaterial = materialIdx;
+	const uint32_t flags = ctx.renderQueue->material.flags[materialIdx];
+	const float alphaCutoff = ctx.renderQueue->material.alphaCutoffs[materialIdx];
 
 	if (flags & HAS_HEIGHT_MAP) {
+		const float heightScale = ctx.renderQueue->entity.heightScales[entityID];
 		shader.setFloat("material.heightScale", heightScale);
 	}
 
 	if (alphaCutoff != 0.0f) {
 		shader.setFloat("material.alphaCutoff", alphaCutoff);
 	}
+
+	const std::vector<uint32_t>& textures = ctx.renderQueue->material.textures[materialIdx];
+	if (textures.empty()) {
+		const glm::vec3& color = ctx.renderQueue->material.colors[materialIdx];
+		shader.setVec3("material.color", color);
+	}
+
+	bindTextures(flags, textures, shader);
 
 	if (flags & TWOSIDED && isCullingEnabled) {
 		glDisable(GL_CULL_FACE);

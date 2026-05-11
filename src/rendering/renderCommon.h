@@ -20,7 +20,7 @@ void instanced(const RenderContext& ctx, const std::vector<InstanceGroup>& objec
 
 void setupTransform(size_t entityID, const RenderContext& ctx, const Shader& shader);
 
-void setupMaterial(uint32_t flags, float alphaCutoff, float heightScale, const Shader& shader);
+void setupMaterial(size_t entityID, uint32_t materialIdx, const RenderContext& ctx, const Shader& shader);
 
 void drawMesh(uint32_t vao, size_t vertexCount, size_t indexCount);
 
