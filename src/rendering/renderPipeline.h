@@ -47,7 +47,7 @@ private:
 	// Systems
 	LightSystem* mLightSystem{};
 	std::unique_ptr<ShadowSystem> mShadowSystem;
-	std::unique_ptr<SyncStateSystem> mSyncStatePass;
+	std::unique_ptr<SyncStateSystem> mSyncStateSystem;
 	//Shaders
 	std::vector<std::unique_ptr<Shader>> mShaders;
 	// Frame Buffers

@@ -73,7 +73,7 @@ RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLCon
 	mLightSystem = &registry->getSystem<LightSystem>();
 
 	mShadowSystem = std::make_unique<ShadowSystem>();
-	mSyncStatePass = std::make_unique<SyncStateSystem>();
+	mSyncStateSystem = std::make_unique<SyncStateSystem>();
 
 	mShaders.emplace_back(std::make_unique<Shader>("object.vert", "opaque.frag"));
 	mShaders.emplace_back(std::make_unique<Shader>("object.vert", "blend.frag"));
@@ -91,7 +91,7 @@ RenderPipeline::~RenderPipeline() {
 
 void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mLightSystem->configure(*mRenderCtx, eventBus);
-	mSyncStatePass->configure(*mRenderCtx, eventBus);
+	mSyncStateSystem->configure(*mRenderCtx, eventBus);
 
 	// Create framebuffers
 	mSceneBuffer = std::make_unique<FrameBuffer>(SCR_WIDTH, SCR_HEIGHT);
