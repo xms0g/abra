@@ -24,10 +24,11 @@ class Shader;
 class Mesh;
 
 struct Material {
-	uint32_t id;
-	uint32_t flags;
+	uint32_t id{0};
+	uint32_t idx{0};
+	uint32_t flags{0};
 	glm::vec3 color{0.0f};
-	float alphaCutoff;
+	float alphaCutoff{0.0f};
 	std::vector<Texture> textures;
 
 	[[nodiscard]]

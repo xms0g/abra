@@ -335,7 +335,7 @@ void RenderPipeline::refreshCameraData() const {
 void RenderPipeline::batchEntity(const Entity& entity) {
 	static uint32_t materialIndex{0}, meshIndex{0};
 
-	const auto& matComponent = entity.getComponent<MaterialComponent>();
+	auto& matComponent = entity.getComponent<MaterialComponent>();
 
 	auto pos = entity.getComponent<TransformComponent>().position;
 	auto rot = entity.getComponent<TransformComponent>().rotation;
@@ -402,7 +402,8 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 
 		MaterialBatch matBatch{materialIndex++, nullptr, meshIndices};
 
-		const auto& material = matComponent.materials->at(matID);
+		auto& material = matComponent.materials->at(matID);
+		material.idx = matBatch.index;
 
 		mRenderQueue.material.flags.emplace_back(material.flags);
 		mRenderQueue.material.alphaCutoffs.emplace_back(material.alphaCutoff);

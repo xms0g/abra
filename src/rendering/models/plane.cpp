@@ -111,11 +111,15 @@ Models::Plane::Plane(
 	if (color != glm::vec3(0.0f)) {
 		flags |= HAS_SOLID_COLOR;
 	}
-	mMaterial[0] = {0, flags, color, 0.0f, textures};
+	mMaterial[0] = {.id = 0, .flags = flags, .color = color, .textures = textures};
 }
 
 Models::Plane::~Plane() = default;
 
-[[nodiscard]] MeshMap* Models::Plane::meshes() { return &mMeshes; }
+ MeshMap* Models::Plane::meshes() {
+	 return &mMeshes;
+ }
 
-[[nodiscard]] const MaterialMap* Models::Plane::material() const { return &mMaterial; }
+MaterialMap* Models::Plane::material() {
+	 return &mMaterial;
+ }

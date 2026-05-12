@@ -23,7 +23,7 @@ public:
 	MeshMap* getMeshes(size_t entityID);
 
 	[[nodiscard]]
-	const MaterialMap* getMaterial(size_t entityID) const;
+	MaterialMap* getMaterial(size_t entityID);
 
 	[[nodiscard]]
 	std::span<const char* const> getSkyboxTexture() const;

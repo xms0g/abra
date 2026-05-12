@@ -70,12 +70,16 @@ Models::Cubemap::Cubemap(std::span<const char* const> faces) {
 
 	std::vector<Texture> textures;
 	textures.emplace_back(texture::loadCubemap(facesVec), ALBEDO,"skybox.jpg");
-	mMaterial[0] = {0, 0, glm::vec3(), 0.0f, textures};
+	mMaterial[0] = {.textures = textures};
 }
 
 Models::Cubemap::~Cubemap() = default;
 
-[[nodiscard]] MeshMap* Models::Cubemap::meshes() { return &mMeshes; }
+MeshMap* Models::Cubemap::meshes() {
+	return &mMeshes;
+}
 
-[[nodiscard]] const MaterialMap* Models::Cubemap::material() const { return &mMaterial; }
+MaterialMap* Models::Cubemap::material() {
+	return &mMaterial;
+}
 

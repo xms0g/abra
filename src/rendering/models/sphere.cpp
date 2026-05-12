@@ -151,7 +151,7 @@ Models::Sphere::Sphere(
 	if (color != glm::vec3(0.0f)) {
 		flags |= HAS_SOLID_COLOR;
 	}
-	mMaterial[0] = {0, flags, color, 0.0f, textures};
+	mMaterial[0] = {.id = 0, .flags = flags, .color = color, .textures = textures};
 }
 
 Models::Sphere::~Sphere() = default;
@@ -160,6 +160,6 @@ MeshMap* Models::Sphere::meshes() {
 	return &mMeshes;
 }
 
-const MaterialMap* Models::Sphere::material() const {
+MaterialMap* Models::Sphere::material() {
 	return &mMaterial;
 }

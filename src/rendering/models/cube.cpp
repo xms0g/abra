@@ -15,40 +15,40 @@ Models::Cube::Cube(
 	const char* heightTexture) {
 	constexpr float v[] = {
 		// Back face (-Z)
-		-0.5f, -0.5f, -0.5f,  0,  0, -1, 0, 0,
-		 0.5f, -0.5f, -0.5f,  0,  0, -1, 1, 0,
-		 0.5f,  0.5f, -0.5f,  0,  0, -1, 1, 1,
-		-0.5f,  0.5f, -0.5f,  0,  0, -1, 0, 1,
+		-0.5f, -0.5f, -0.5f, 0, 0, -1, 0, 0,
+		0.5f, -0.5f, -0.5f, 0, 0, -1, 1, 0,
+		0.5f, 0.5f, -0.5f, 0, 0, -1, 1, 1,
+		-0.5f, 0.5f, -0.5f, 0, 0, -1, 0, 1,
 
 		// Front face (+Z)
-		-0.5f, -0.5f,  0.5f,  0,  0,  1, 0, 0,
-		 0.5f, -0.5f,  0.5f,  0,  0,  1, 1, 0,
-	 	 0.5f,  0.5f,  0.5f,  0,  0,  1, 1, 1,
-		-0.5f,  0.5f,  0.5f,  0,  0,  1, 0, 1,
+		-0.5f, -0.5f, 0.5f, 0, 0, 1, 0, 0,
+		0.5f, -0.5f, 0.5f, 0, 0, 1, 1, 0,
+		0.5f, 0.5f, 0.5f, 0, 0, 1, 1, 1,
+		-0.5f, 0.5f, 0.5f, 0, 0, 1, 0, 1,
 
 		// Left face (-X)
-		-0.5f, -0.5f, -0.5f, -1,  0,  0, 0, 0,
-		-0.5f,  0.5f, -0.5f, -1,  0,  0, 1, 0,
-		-0.5f,  0.5f,  0.5f, -1,  0,  0, 1, 1,
-		-0.5f, -0.5f,  0.5f, -1,  0,  0, 0, 1,
+		-0.5f, -0.5f, -0.5f, -1, 0, 0, 0, 0,
+		-0.5f, 0.5f, -0.5f, -1, 0, 0, 1, 0,
+		-0.5f, 0.5f, 0.5f, -1, 0, 0, 1, 1,
+		-0.5f, -0.5f, 0.5f, -1, 0, 0, 0, 1,
 
 		// Right face (+X)
-		 0.5f, -0.5f, -0.5f,  1,  0,  0, 0, 0,
-		 0.5f,  0.5f, -0.5f,  1,  0,  0, 1, 0,
-		 0.5f,  0.5f,  0.5f,  1,  0,  0, 1, 1,
-		 0.5f, -0.5f,  0.5f,  1,  0,  0, 0, 1,
+		0.5f, -0.5f, -0.5f, 1, 0, 0, 0, 0,
+		0.5f, 0.5f, -0.5f, 1, 0, 0, 1, 0,
+		0.5f, 0.5f, 0.5f, 1, 0, 0, 1, 1,
+		0.5f, -0.5f, 0.5f, 1, 0, 0, 0, 1,
 
 		// Bottom face (-Y)
-		-0.5f, -0.5f, -0.5f,  0, -1,  0, 0, 0,
-		 0.5f, -0.5f, -0.5f,  0, -1,  0, 1, 0,
-		 0.5f, -0.5f,  0.5f,  0, -1,  0, 1, 1,
-		-0.5f, -0.5f,  0.5f,  0, -1,  0, 0, 1,
+		-0.5f, -0.5f, -0.5f, 0, -1, 0, 0, 0,
+		0.5f, -0.5f, -0.5f, 0, -1, 0, 1, 0,
+		0.5f, -0.5f, 0.5f, 0, -1, 0, 1, 1,
+		-0.5f, -0.5f, 0.5f, 0, -1, 0, 0, 1,
 
 		// Top face (+Y)
-		-0.5f,  0.5f, -0.5f,  0,  1,  0, 0, 0,
-		 0.5f,  0.5f, -0.5f,  0,  1,  0, 1, 0,
-		 0.5f,  0.5f,  0.5f,  0,  1,  0, 1, 1,
-		-0.5f,  0.5f,  0.5f,  0,  1,  0, 0, 1
+		-0.5f, 0.5f, -0.5f, 0, 1, 0, 0, 0,
+		0.5f, 0.5f, -0.5f, 0, 1, 0, 1, 0,
+		0.5f, 0.5f, 0.5f, 0, 1, 0, 1, 1,
+		-0.5f, 0.5f, 0.5f, 0, 1, 0, 0, 1
 	};
 
 	std::vector<uint32_t> indices = {
@@ -153,23 +153,27 @@ Models::Cube::Cube(
 			heightTexture);
 	}
 
-	uint32_t flag{0};
+	uint32_t flags{0};
 	if (unlit) {
-		flag |= UNLIT;
+		flags |= UNLIT;
 	} else {
-		flag |= CASTSHADOW;
+		flags |= CASTSHADOW;
 	}
 
-	flag |= OPAQUE;
+	flags |= OPAQUE;
 
 	if (color != glm::vec3(0.0f)) {
-		flag |= HAS_SOLID_COLOR;
+		flags |= HAS_SOLID_COLOR;
 	}
-	mMaterial[0] = {0,flag, color, 0.0f, textures};
+	mMaterial[0] = {.id = 0, .flags = flags, .color = color, .textures = textures};
 }
 
 Models::Cube::~Cube() = default;
 
-[[nodiscard]] MeshMap* Models::Cube::meshes() { return &mMeshes; }
+MeshMap* Models::Cube::meshes() {
+	return &mMeshes;
+}
 
-[[nodiscard]] const MaterialMap* Models::Cube::material() const { return &mMaterial; }
+MaterialMap* Models::Cube::material() {
+	return &mMaterial;
+}

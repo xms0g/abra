@@ -15,7 +15,7 @@ public:
 	MeshMap* meshes();
 
 	[[nodiscard]]
-	const MaterialMap* material() const;
+	MaterialMap* material();
 
 private:
 	MeshMap mMeshes;

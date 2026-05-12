@@ -4,6 +4,7 @@
 struct GuiLightEvent : Event {
 	explicit GuiLightEvent(
 		const size_t id,
+		const uint32_t idx,
 		const glm::vec4& dir,
 		const glm::vec4& pos,
 		const glm::vec4& amb,
@@ -14,6 +15,7 @@ struct GuiLightEvent : Event {
 		const bool cast,
 		const float intens)
 		: entityID(id),
+		  matIdx(idx),
 		  direction(dir),
 		  position(pos),
 		  ambient(amb),
@@ -26,6 +28,7 @@ struct GuiLightEvent : Event {
 	}
 
 	size_t entityID;
+	uint32_t matIdx;
 	glm::vec4 direction{};
 	glm::vec4 position{};
 	glm::vec4 ambient{};

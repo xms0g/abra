@@ -7,6 +7,7 @@
 #include "../../ECS/components/transform.hpp"
 #include "../../ECS/components/debug.hpp"
 #include "../../ECS/components/directionalLight.hpp"
+#include "../../ECS/components/material.hpp"
 #include "../../ECS/components/pointLight.hpp"
 #include "../../ECS/components/spotLight.hpp"
 #include "../../event/eventBus.hpp"
@@ -14,6 +15,7 @@
 #include "../../event/events/guiPostProcessEvent.hpp"
 #include "../../event/events/guiTransformEvent.hpp"
 #include "../../event/events/guiLightEvent.hpp"
+#include "../../rendering/material/material.hpp"
 
 struct Effect {
 	const char* name;
@@ -102,8 +104,10 @@ void GuiPanels::renderDirLight(const Entity& entity, EventBus& eventBus, EntityS
 	isDirty |= Ui::sliderFloat("Intensity", &entityState.light.intensity, 100.0, 1.0, 30.0);
 
 	if (isDirty) {
+		uint32_t matIdx = entity.getComponent<MaterialComponent>().materials[0].at(0).idx;
 		eventBus.emitEvent<GuiLightEvent>(
 			entity.id(),
+			matIdx,
 			entityState.light.direction,
 			entityState.light.position,
 			entityState.light.ambient,
@@ -129,8 +133,10 @@ void GuiPanels::renderSpotLight(const Entity& entity, EventBus& eventBus, Entity
 	isDirty |= ImGui::Checkbox("Cast Shadow", &entityState.light.castShadow);
 
 	if (isDirty) {
+		uint32_t matIdx = entity.getComponent<MaterialComponent>().materials[0].at(0).idx;
 		eventBus.emitEvent<GuiLightEvent>(
 			entity.id(),
+			matIdx,
 			entityState.light.direction,
 			entityState.light.position,
 			entityState.light.ambient,
@@ -154,8 +160,10 @@ void GuiPanels::renderPointLight(const Entity& entity, EventBus& eventBus, Entit
 	isDirty |= ImGui::Checkbox("Cast Shadow", &entityState.light.castShadow);
 
 	if (isDirty) {
+		uint32_t matIdx = entity.getComponent<MaterialComponent>().materials[0].at(0).idx;
 		eventBus.emitEvent<GuiLightEvent>(
 			entity.id(),
+			matIdx,
 			entityState.light.direction,
 			entityState.light.position,
 			entityState.light.ambient,

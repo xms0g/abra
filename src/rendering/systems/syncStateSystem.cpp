@@ -4,6 +4,7 @@
 #include "../../math/matrix.h"
 #include "../../event/eventBus.hpp"
 #include "../../event/events/guiDebugEvent.hpp"
+#include "../../event/events/guiLightEvent.hpp"
 #include "../../event/events/guiTransformEvent.hpp"
 #include "../../event/events/updateShadowMapEvent.hpp"
 
@@ -14,6 +15,8 @@ void SyncStateSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mEventBus = &eventBus;
 	eventBus.subscribeToEvent<SyncStateSystem, GuiDebugEvent>(this, &SyncStateSystem::onDebugUpdate);
 	eventBus.subscribeToEvent<SyncStateSystem, GuiTransformEvent>(this, &SyncStateSystem::onTransformUpdate);
+	eventBus.subscribeToEvent<SyncStateSystem, GuiLightEvent>(this, &SyncStateSystem::onLightUpdate);
+
 }
 
 void SyncStateSystem::onDebugUpdate(const GuiDebugEvent& event) {
@@ -35,4 +38,9 @@ void SyncStateSystem::onTransformUpdate(const GuiTransformEvent& event) {
 	normal = math::normalMatrix(model);
 
 	mEventBus->emitEvent<UpdateShadowMapEvent>();
+}
+
+void SyncStateSystem::onLightUpdate(const GuiLightEvent& event) {
+	auto& color = mCtx->renderQueue->material.colors[event.matIdx];
+	color = event.diffuse;
 }

@@ -14,11 +14,11 @@ ResourceManager& ResourceManager::instance() {
 	return instance;
 }
 
-[[nodiscard]] MeshMap* ResourceManager::getMeshes(const size_t entityID) {
+MeshMap* ResourceManager::getMeshes(const size_t entityID) {
 	return &mMeshesByEntity.at(entityID);
 }
 
-[[nodiscard]] const MaterialMap* ResourceManager::getMaterial(const size_t entityID) const {
+MaterialMap* ResourceManager::getMaterial(const size_t entityID) {
 	return &mMaterialsByEntity.at(entityID);
 }
 
