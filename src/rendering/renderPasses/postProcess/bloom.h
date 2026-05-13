@@ -1,6 +1,5 @@
 #pragma once
 #include <memory>
-#include <array>
 #include "basePostEffect.hpp"
 
 class Shader;
@@ -17,6 +16,9 @@ public:
 		uint32_t vao,
 		bool& toggle,
 		PingPongBuffer& pingPong) const override;
+
+protected:
+	void updateFromEventImpl(const GuiPostProcessEvent& event) override;
 
 private:
 	uint32_t brightFilterPass(uint32_t sceneTexture, uint32_t vao, bool& toggle) const;

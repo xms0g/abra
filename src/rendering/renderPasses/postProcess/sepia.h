@@ -15,6 +15,9 @@ public:
 		bool& toggle,
 		PingPongBuffer& pingPong) const override;
 
+protected:
+	void updateFromEventImpl(const GuiPostProcessEvent& event) override;
+
 private:
 	std::unique_ptr<Shader> shader;
 };

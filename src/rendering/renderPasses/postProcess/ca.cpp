@@ -4,7 +4,8 @@
 #include "../../renderCommon.h"
 #include "../../buffers/frameBuffer.h"
 
-CA::CA(const std::string& name, const bool enabled) : BasePostEffect(name, enabled) {
+CA::CA(const std::string& name, const bool enabled)
+	: BasePostEffect(name, enabled) {
 	shader = std::make_unique<Shader>("models/quad.vert", "post-processing/ca.frag");
 	shader->activate();
 	shader->setInt("screenTexture", 0);
@@ -20,6 +21,7 @@ uint32_t CA::render(
 
 	shader->activate();
 	shader->setFloat("intensity", mIntensity);
+
 	RenderCommon::drawQuad(sceneTexture, vao);
 
 	const uint32_t texture = pingPong[toggle]->texture();
@@ -28,7 +30,6 @@ uint32_t CA::render(
 	return texture;
 }
 
-void CA::updateFromEvent(const GuiPostProcessEvent& event) {
-	BasePostEffect::updateFromEvent(event);
+void CA::updateFromEventImpl(const GuiPostProcessEvent& event) {
 	mIntensity = event.intensity;
 }

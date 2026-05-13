@@ -59,11 +59,11 @@ bool math::AABB::isOnFrustum(
 	const AABB globalAABB{globalCenter, newIi, newIj, newIk};
 
 	return globalAABB.isOnOrForwardPlane(camFrustum.leftFace) &&
-		   globalAABB.isOnOrForwardPlane(camFrustum.rightFace) &&
-		   globalAABB.isOnOrForwardPlane(camFrustum.topFace) &&
-		   globalAABB.isOnOrForwardPlane(camFrustum.bottomFace) &&
-		   globalAABB.isOnOrForwardPlane(camFrustum.nearFace) &&
-		   globalAABB.isOnOrForwardPlane(camFrustum.farFace);
+	       globalAABB.isOnOrForwardPlane(camFrustum.rightFace) &&
+	       globalAABB.isOnOrForwardPlane(camFrustum.topFace) &&
+	       globalAABB.isOnOrForwardPlane(camFrustum.bottomFace) &&
+	       globalAABB.isOnOrForwardPlane(camFrustum.nearFace) &&
+	       globalAABB.isOnOrForwardPlane(camFrustum.farFace);
 }
 
 bool math::AABB::isMeshInFrustum(

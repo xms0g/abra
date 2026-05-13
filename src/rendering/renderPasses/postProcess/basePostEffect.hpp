@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <array>
 #include <string>
 #include "../../../event/events/guiPostProcessEvent.hpp"
 
@@ -10,7 +11,8 @@ class BasePostEffect {
 public:
 	BasePostEffect() = default;
 
-	BasePostEffect(std::string n, const bool e) : mName(std::move(n)), mEnabled(e) {
+	BasePostEffect(std::string n, const bool e)
+		: mName(std::move(n)), mEnabled(e) {
 	}
 
 	virtual ~BasePostEffect() = default;
@@ -29,9 +31,13 @@ public:
 		bool& toggle,
 		PingPongBuffer& pingPong) const = 0;
 
-	virtual void updateFromEvent(const GuiPostProcessEvent& event) {
+	void updateFromEvent(const GuiPostProcessEvent& event) {
 		this->enabled(event.enabled);
+		updateFromEventImpl(event);
 	}
+
+protected:
+	virtual void updateFromEventImpl(const GuiPostProcessEvent& event) = 0;
 
 private:
 	std::string mName;

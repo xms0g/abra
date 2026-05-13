@@ -15,7 +15,8 @@ public:
 		bool& toggle,
 		PingPongBuffer& pingPong) const override;
 
-	void updateFromEvent(const GuiPostProcessEvent& event) override;
+protected:
+	void updateFromEventImpl(const GuiPostProcessEvent& event) override;
 
 private:
 	float mExposure{1.1f};

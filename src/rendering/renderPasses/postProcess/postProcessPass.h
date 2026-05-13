@@ -27,5 +27,5 @@ private:
 
 	PingPongBuffer mPingPong;
 	std::unique_ptr<Models::Quad> mQuad;
-	std::vector<std::unique_ptr<BasePostEffect> > mEffects;
+	std::vector<std::shared_ptr<BasePostEffect> > mEffects;
 };

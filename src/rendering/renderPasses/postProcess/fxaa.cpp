@@ -4,7 +4,8 @@
 #include "../../renderCommon.h"
 #include "../../buffers/frameBuffer.h"
 
-FXAA::FXAA(const std::string& name, const bool enabled) : BasePostEffect(name, enabled) {
+FXAA::FXAA(const std::string& name, const bool enabled)
+	: BasePostEffect(name, enabled) {
 	shader = std::make_unique<Shader>("models/quad.vert", "post-processing/fxaa.frag");
 	shader->activate();
 	shader->setInt("screenTexture", 0);
@@ -18,12 +19,19 @@ uint32_t FXAA::render(
 	pingPong[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	const int32_t width = pingPong[toggle]->width();
+	const int32_t height = pingPong[toggle]->height();
+
 	shader->activate();
-	shader->setVec2("resolution", glm::vec2(pingPong[toggle]->width(), pingPong[toggle]->height()));
+	shader->setVec2("resolution", glm::vec2(width, height));
+
 	RenderCommon::drawQuad(sceneTexture, vao);
 
 	const uint32_t texture = pingPong[toggle]->texture();
 	pingPong[toggle]->unbind();
 	toggle = !toggle;
 	return texture;
+}
+
+void FXAA::updateFromEventImpl(const GuiPostProcessEvent& event) {
 }

@@ -21,17 +21,18 @@ PostProcessPass::~PostProcessPass() = default;
 
 void PostProcessPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mQuad = std::make_unique<Models::Quad>();
-
-	mEffects.emplace_back(std::make_unique<Bloom>("Bloom", ctx.screen.width, ctx.screen.height, false));
-	mEffects.emplace_back(std::make_unique<ToneMapping>("Tone Mapping", false));
-	mEffects.emplace_back(std::make_unique<Grayscale>("Grayscale", false));
-	mEffects.emplace_back(std::make_unique<Sepia>("Sepia", false));
-	mEffects.emplace_back(std::make_unique<Kernel>("Blur", blurKernel, false));
-	mEffects.emplace_back(std::make_unique<Kernel>("Edge Detection", edgeKernel, false));
-	mEffects.emplace_back(std::make_unique<Kernel>("Sharpen", sharpenKernel, false));
-	mEffects.emplace_back(std::make_unique<CA>("Chromatic Aberration", false));
-	mEffects.emplace_back(std::make_unique<Gamma>("Gamma Correction", true));
-	mEffects.emplace_back(std::make_unique<FXAA>("FXAA", false));
+	mEffects = {
+		std::make_shared<Bloom>("Bloom", ctx.screen.width, ctx.screen.height, false),
+		std::make_shared<ToneMapping>("Tone Mapping", false),
+		std::make_shared<Grayscale>("Grayscale", false),
+		std::make_shared<Sepia>("Sepia", false),
+		std::make_shared<Kernel>("Blur", blurKernel, false),
+		std::make_shared<Kernel>("Edge Detection", edgeKernel, false),
+		std::make_shared<Kernel>("Sharpen", sharpenKernel, false),
+		std::make_shared<CA>("Chromatic Aberration", false),
+		std::make_shared<Gamma>("Gamma Correction", true),
+		std::make_shared<FXAA>("FXAA", false),
+	};
 
 	for (auto& target: mPingPong) {
 		target = std::make_unique<FrameBuffer>(

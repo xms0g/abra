@@ -49,6 +49,9 @@ uint32_t Bloom::render(
 	return inputTex;
 }
 
+void Bloom::updateFromEventImpl(const GuiPostProcessEvent& event) {
+}
+
 uint32_t Bloom::brightFilterPass(const uint32_t sceneTexture, const uint32_t vao, bool& toggle) const {
 	mPingPong[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -90,6 +93,7 @@ uint32_t Bloom::combinePass(
 	const bool& toggle) const {
 	mPingPong[toggle]->bind();
 	combine->activate();
+
 	glDisable(GL_DEPTH_TEST);
 	glBindVertexArray(vao);
 	glActiveTexture(GL_TEXTURE0);
@@ -99,6 +103,7 @@ uint32_t Bloom::combinePass(
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 	glEnable(GL_DEPTH_TEST);
+
 	mPingPong[toggle]->unbind();
 
 	return mPingPong[toggle]->texture();

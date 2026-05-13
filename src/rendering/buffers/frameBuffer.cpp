@@ -9,7 +9,9 @@ void BaseFrameBuffer::checkStatus() {
 	}
 }
 
-FrameBuffer::FrameBuffer(const int32_t width, const int32_t height) : mWidth(width), mHeight(height) {
+FrameBuffer::FrameBuffer(const int32_t width, const int32_t height)
+	: mWidth(width),
+	  mHeight(height) {
 	glGenFramebuffers(1, &mFBO);
 	bind();
 }
@@ -35,7 +37,7 @@ int32_t FrameBuffer::height() const {
 	return mHeight;
 }
 
-const std::vector<std::pair<uint32_t, uint32_t>>& FrameBuffer::textures() const {
+const std::vector<std::pair<uint32_t, uint32_t> >& FrameBuffer::textures() const {
 	return mTextures;
 }
 
@@ -198,7 +200,6 @@ FrameBuffer& FrameBuffer::withTextureDepthArray(
 	const int32_t layerCount,
 	const int32_t internalFormat,
 	const bool onlyForShadowMap) {
-
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextures.emplace_back(textureID, GL_TEXTURE_2D_ARRAY);
@@ -263,7 +264,6 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(
 	const int32_t layerCount,
 	const int32_t internalFormat,
 	const bool onlyForShadowMap) {
-
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextures.emplace_back(textureID, GL_TEXTURE_CUBE_MAP_ARRAY);
@@ -306,7 +306,8 @@ FrameBuffer& FrameBuffer::withRenderBufferDepth(const uint32_t internalFormat) {
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(const int32_t multisampledCount, const uint32_t internalFormat) {
+FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(const int32_t multisampledCount,
+                                                            const uint32_t internalFormat) {
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 
@@ -328,7 +329,8 @@ FrameBuffer& FrameBuffer::withRenderBufferDepthStencil(const int32_t internalFor
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withRenderBufferDepthStencilMultisampled(const int32_t multisampledCount, const int32_t internalFormat) {
+FrameBuffer& FrameBuffer::withRenderBufferDepthStencilMultisampled(const int32_t multisampledCount,
+                                                                   const int32_t internalFormat) {
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 
@@ -354,7 +356,7 @@ uint32_t FrameBuffer::textureImpl(const uint32_t index) const {
 }
 
 void FrameBuffer::bindTextureImpl(uint32_t slot, uint32_t textureIndex) const {
-	auto [id, type]= mTextures[textureIndex];
+	auto [id, type] = mTextures[textureIndex];
 
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(type, id);

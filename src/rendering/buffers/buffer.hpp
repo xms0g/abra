@@ -10,7 +10,8 @@ enum BufferUsage {
 class Buffer {
 public:
 	Buffer(const uint32_t target, const BufferUsage usage)
-		: mTarget(target), mUsage(usage) {
+		: mTarget(target),
+		  mUsage(usage) {
 		glGenBuffers(1, &mID);
 	}
 

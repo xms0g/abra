@@ -30,3 +30,6 @@ uint32_t Kernel::render(
 	toggle = !toggle;
 	return texture;
 }
+
+void Kernel::updateFromEventImpl(const GuiPostProcessEvent& event) {
+}

@@ -1,9 +1,7 @@
 #pragma once
+#include <cstdint>
 
-struct EntityCore;
-class Mesh;
 class Shader;
-struct Material;
 
 struct RenderableObject {
 	size_t entityID;
