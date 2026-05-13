@@ -11,7 +11,7 @@ struct alignas(16) PointLightComponent {
 	bool castShadow{};
 
 	glm::vec3 padding{};
-	float intensity;
+	float intensity{};
 
 	PointLightComponent() = default;
 

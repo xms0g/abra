@@ -51,7 +51,7 @@ vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 worldPos, vec4 fragPosLightSpa
         float attenuation = 1.0 / (light.attenuation.x + light.attenuation.y * distance + light.attenuation.z * (distance * distance));
         vec3 radiance = light.diffuse.rgb * light.intensity * attenuation;
 
-        float shadow = calculateOmnidirectionalShadow(worldPos, N, lightPos, viewPos.xyz, i);
+        float shadow = light.castShadow ? calculateOmnidirectionalShadow(worldPos, N, lightPos, viewPos.xyz, i) : 0.0;
 
         Lo += brdf(lightPos, N, V, F0, worldPos, radiance, albedo, metallic, roughness, ao) * (1.0 - shadow);
     }
@@ -70,7 +70,8 @@ vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 worldPos, vec4 fragPosLightSpa
         vec3 radiance = light.diffuse.rgb * light.intensity * intensity * attenuation;
 
         vec4 fragPosPersLightSpace = persLightSpaceMatrix[i] * vec4(worldPos, 1.0);
-        float shadow = calculatePerspectiveShadow(fragPosPersLightSpace, N, lightDir, i);
+
+        float shadow = light.castShadow ? calculatePerspectiveShadow(fragPosPersLightSpace, N, lightDir, i) : 0.0;
 
         Lo += brdf(lightPos, N, V, F0, worldPos, radiance, albedo, metallic, roughness, ao) * (1.0 - shadow);
     }
