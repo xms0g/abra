@@ -1,6 +1,7 @@
 #include "resourceManager.h"
 #include <iostream>
 #include <assimp/GltfMaterial.h>
+#include <assimp/postprocess.h>
 #include "image/stb_image.h"
 #include "../io/filesystem.hpp"
 #include "../config/config.hpp"

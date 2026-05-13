@@ -8,7 +8,6 @@
 #include "../renderContext/renderableObject.hpp"
 #include "../../ECS/components/debug.hpp"
 #include "../../event/eventBus.hpp"
-#include "../../event/events/guiDebugEvent.hpp"
 
 DebugPass::~DebugPass() = default;
 

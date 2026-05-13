@@ -5,7 +5,6 @@
 #include <unordered_set>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
-#include <assimp/postprocess.h>
 #include "../job/threadPool.h"
 #include "../rendering/types.hpp"
 

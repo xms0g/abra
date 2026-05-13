@@ -18,9 +18,8 @@ class UniformBuffer;
 class Camera;
 class Registry;
 class LightSystem;
-class SkyboxSystem;
 class PostProcessPass;
-class SDL_Window;
+struct SDL_Window;
 
 typedef void* SDL_GLContext;
 

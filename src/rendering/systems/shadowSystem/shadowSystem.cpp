@@ -4,6 +4,7 @@
 #include "omnidirectionalShadow.h"
 #include "perspectiveShadow.h"
 #include "../../renderContext/renderContext.hpp"
+#include "../../renderContext/renderQueue.hpp"
 #include "../../buffers/uniformBuffer.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../../ECS/components/directionalLight.hpp"
@@ -12,7 +13,6 @@
 #include "../../../config/config.hpp"
 #include "../../../event/eventBus.hpp"
 #include "../../../event/events/updateShadowMapEvent.hpp"
-#include "../../renderContext/renderQueue.hpp"
 
 struct alignas(16) ShadowData {
 	glm::mat4 lightSpaceMatrix;

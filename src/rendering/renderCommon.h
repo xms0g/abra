@@ -5,12 +5,9 @@
 struct InstanceGroup;
 struct RenderableObject;
 struct RenderContext;
-struct EntityCore;
 struct Material;
 struct Texture;
-class Mesh;
 class Shader;
-class Entity;
 
 namespace RenderCommon {
 void forward(const RenderContext& ctx, const std::vector<RenderableObject>& objects);
