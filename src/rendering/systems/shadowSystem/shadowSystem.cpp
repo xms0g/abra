@@ -82,7 +82,6 @@ void ShadowSystem::perspectiveShadowPass(const RenderContext& ctx) const {
 	if (lights.empty()) return;
 
 	mPersShadow->depthMap().bind();
-	glClear(GL_DEPTH_BUFFER_BIT);
 	glCullFace(GL_FRONT);
 	glViewport(0, 0, static_cast<int32_t>(ctx.shadow.width), static_cast<int32_t>(ctx.shadow.height));
 
@@ -90,13 +89,6 @@ void ShadowSystem::perspectiveShadowPass(const RenderContext& ctx) const {
 		const auto& light = lights[i];
 		if (!light->castShadow)
 			continue;
-
-		glFramebufferTextureLayer(
-			GL_FRAMEBUFFER,
-			GL_DEPTH_ATTACHMENT,
-			mPersShadow->depthMap().texture(),
-			0,
-			i);
 
 		mPersShadow->render(ctx, light->direction, light->position, light->outerCutOff, i);
 		gpuData.persLightSpaceMatrix[i] = mPersShadow->lightSpaceMatrix(i);
