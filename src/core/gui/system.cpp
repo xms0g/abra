@@ -29,9 +29,7 @@ void GuiSystem::configure() {
 	for (const auto& entity: getSystemEntities()) {
 		const auto& transform = entity.getComponent<TransformComponent>();
 		glm::vec3 direction{0.0f}, ambient{0.0f}, diffuse{0.0f}, specular{0.0f};
-		glm::vec3 attenuation{0.0f};
-		float cutOff{0.0f}, outerCutOff{0.0f};
-		float intensity{1.0f};
+		float kc{0.0f}, kl{0.0f}, kq{0.0f}, cutOff{0.0f}, outerCutOff{0.0f}, intensity{1.0f};
 		bool castShadow{false};
 
 		if (entity.hasComponent<DirectionalLightComponent>()) {
@@ -44,15 +42,19 @@ void GuiSystem::configure() {
 			ambient = entity.getComponent<PointLightComponent>().ambient;
 			diffuse = entity.getComponent<PointLightComponent>().diffuse;
 			specular = entity.getComponent<PointLightComponent>().specular;
+			kc = entity.getComponent<PointLightComponent>().constant;
+			kl = entity.getComponent<PointLightComponent>().linear;
+			kq = entity.getComponent<PointLightComponent>().quadratic;
 			intensity = entity.getComponent<PointLightComponent>().intensity;
-			attenuation = entity.getComponent<PointLightComponent>().attenuation;
 			castShadow = entity.getComponent<PointLightComponent>().castShadow;
 		} else if (entity.hasComponent<SpotLightComponent>()) {
 			direction = entity.getComponent<SpotLightComponent>().direction;
 			ambient = entity.getComponent<SpotLightComponent>().ambient;
 			diffuse = entity.getComponent<SpotLightComponent>().diffuse;
 			specular = entity.getComponent<SpotLightComponent>().specular;
-			attenuation = entity.getComponent<SpotLightComponent>().attenuation;
+			kc = entity.getComponent<SpotLightComponent>().constant;
+			kl = entity.getComponent<SpotLightComponent>().linear;
+			kq = entity.getComponent<SpotLightComponent>().quadratic;
 			cutOff = entity.getComponent<SpotLightComponent>().cutOff;
 			outerCutOff = entity.getComponent<SpotLightComponent>().outerCutOff;
 			intensity = entity.getComponent<SpotLightComponent>().intensity;
@@ -70,7 +72,9 @@ void GuiSystem::configure() {
 				ambient,
 				diffuse,
 				specular,
-				attenuation,
+				kc,
+				kl,
+				kq,
 				cutOff,
 				outerCutOff,
 				intensity,

@@ -7,7 +7,9 @@ struct SpotLightComponent {
 	glm::vec3 ambient;
 	glm::vec3 diffuse;
 	glm::vec3 specular;
-	glm::vec3 attenuation; // (Kc, Kl, kq)
+	float constant;
+	float linear;
+	float quadratic;
 	float cutOff;
 	float outerCutOff;
 	float intensity;
@@ -21,7 +23,9 @@ struct SpotLightComponent {
 		const glm::vec3 a,
 		const glm::vec3 dif,
 		const glm::vec3 s,
-		const glm::vec3 att,
+		const float kc,
+		const float kl,
+		const float kq,
 		const float co,
 		const float oc,
 		const float i,
@@ -31,7 +35,9 @@ struct SpotLightComponent {
 		  ambient(a),
 		  diffuse(dif),
 		  specular(s),
-		  attenuation(att),
+		  constant(kc),
+		  linear(kl),
+		  quadratic(kq),
 		  cutOff(co),
 		  outerCutOff(oc),
 		  intensity(i),

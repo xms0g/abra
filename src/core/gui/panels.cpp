@@ -116,7 +116,9 @@ void GuiPanels::renderDirLight(const Entity& entity, EventBus& eventBus, EntityS
 			entityState.light.ambient,
 			entityState.light.diffuse,
 			entityState.light.specular,
-			entityState.light.attenuation,
+			entityState.light.constant,
+			entityState.light.linear,
+			entityState.light.quadratic,
 			entityState.light.cutOff,
 			entityState.light.outerCutOff,
 			entityState.light.intensity,
@@ -131,7 +133,9 @@ void GuiPanels::renderPointLight(const Entity& entity, EventBus& eventBus, Entit
 	isDirty |= Ui::colorField3("Ambient", entityState.light.ambient, 0.01f, 100);
 	isDirty |= Ui::colorField3("Diffuse", entityState.light.diffuse, 0.01f, 100);
 	isDirty |= Ui::colorField3("Specular", entityState.light.specular, 0.01f, 100);
-	isDirty |= Ui::dragFloat3("Attenua", entityState.light.attenuation, 0.01f, 100);
+	isDirty |= Ui::dragFloat("Constant", &entityState.light.constant, 0.01f, 100);
+	isDirty |= Ui::dragFloat("Linear", &entityState.light.linear, 0.01f, 100);
+	isDirty |= Ui::dragFloat("Quadratic", &entityState.light.quadratic, 0.01f, 100);
 	isDirty |= Ui::sliderFloat("Intensity", &entityState.light.intensity, 100.0, 1.0, 30.0);
 	isDirty |= ImGui::Checkbox("Cast Shadow", &entityState.light.castShadow);
 
@@ -145,7 +149,9 @@ void GuiPanels::renderPointLight(const Entity& entity, EventBus& eventBus, Entit
 			entityState.light.ambient,
 			entityState.light.diffuse,
 			entityState.light.specular,
-			entityState.light.attenuation,
+			entityState.light.constant,
+			entityState.light.linear,
+			entityState.light.quadratic,
 			entityState.light.cutOff,
 			entityState.light.outerCutOff,
 			entityState.light.intensity,
@@ -160,8 +166,9 @@ void GuiPanels::renderSpotLight(const Entity& entity, EventBus& eventBus, Entity
 	isDirty |= Ui::colorField3("Ambient", entityState.light.ambient, 0.01f, 100);
 	isDirty |= Ui::colorField3("Diffuse", entityState.light.diffuse, 0.01f, 100);
 	isDirty |= Ui::colorField3("Specular", entityState.light.specular, 0.01f, 100);
-	isDirty |= Ui::dragFloat3("Attenua", entityState.light.attenuation, 0.01f, 100);
-	isDirty |= Ui::dragFloat("Cutoff", &entityState.light.cutOff, 0.01f, 100);
+	isDirty |= Ui::dragFloat("Constant", &entityState.light.constant, 0.01f, 100);
+	isDirty |= Ui::dragFloat("Linear", &entityState.light.linear, 0.01f, 100);
+	isDirty |= Ui::dragFloat("Quadratic", &entityState.light.quadratic, 0.01f, 100);	isDirty |= Ui::dragFloat("Cutoff", &entityState.light.cutOff, 0.01f, 100);
 	isDirty |= Ui::dragFloat("OuterCutoff", &entityState.light.outerCutOff, 0.01f, 100);
 	isDirty |= Ui::sliderFloat("Intensity", &entityState.light.intensity, 100.0, 1.0, 30.0);
 	isDirty |= ImGui::Checkbox("Cast Shadow", &entityState.light.castShadow);
@@ -176,7 +183,9 @@ void GuiPanels::renderSpotLight(const Entity& entity, EventBus& eventBus, Entity
 			entityState.light.ambient,
 			entityState.light.diffuse,
 			entityState.light.specular,
-			entityState.light.attenuation,
+			entityState.light.constant,
+			entityState.light.linear,
+			entityState.light.quadratic,
 			entityState.light.cutOff,
 			entityState.light.outerCutOff,
 			entityState.light.intensity,

@@ -19,7 +19,9 @@ struct EntityState {
 		glm::vec3 ambient{};
 		glm::vec3 diffuse{};
 		glm::vec3 specular{};
-		glm::vec3 attenuation; // (Kc, Kl, kq)
+		float constant;
+		float linear;
+		float quadratic;
 		float cutOff;
 		float outerCutOff;
 		float intensity{1.0f};

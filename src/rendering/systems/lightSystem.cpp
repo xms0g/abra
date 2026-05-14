@@ -45,7 +45,7 @@ struct alignas(16) PackedLights {
 	glm::ivec4 lightCount{};
 };
 
-static PackedLights lightsData;
+static PackedLights gpuData;
 
 LightSystem::LightSystem() {
 	RequireComponent<DirectionalLightComponent>(true);
@@ -92,36 +92,48 @@ const std::vector<SpotLightComponent*>& LightSystem::spotLights() const {
 
 void LightSystem::updateLightUBO() const {
 	for (size_t i = 0; i < mDirLights.size(); ++i) {
-		lightsData.dirLights[i].direction = glm::vec4(mDirLights[i]->direction, 0.0f);
-		lightsData.dirLights[i].ambient = glm::vec4(mDirLights[i]->ambient, 0.0f);
-		lightsData.dirLights[i].diffuse = glm::vec4(mDirLights[i]->diffuse, 0.0f);
-		lightsData.dirLights[i].specular = glm::vec4(mDirLights[i]->specular, 0.0f);
-		lightsData.dirLights[i].intensity = glm::vec4(mDirLights[i]->intensity, 0.0f, 0.0f, 0.0f);
+		gpuData.dirLights[i].direction = glm::vec4(mDirLights[i]->direction, 0.0f);
+		gpuData.dirLights[i].ambient = glm::vec4(mDirLights[i]->ambient, 0.0f);
+		gpuData.dirLights[i].diffuse = glm::vec4(mDirLights[i]->diffuse, 0.0f);
+		gpuData.dirLights[i].specular = glm::vec4(mDirLights[i]->specular, 0.0f);
+		gpuData.dirLights[i].intensity = glm::vec4(mDirLights[i]->intensity, 0.0f, 0.0f, 0.0f);
 	}
 
 	for (size_t i = 0; i < mPointLights.size(); ++i) {
-		lightsData.pointLights[i].position = glm::vec4(mPointLights[i]->position, 0.0f);
-		lightsData.pointLights[i].ambient = glm::vec4(mPointLights[i]->ambient, 0.0f);
-		lightsData.pointLights[i].diffuse = glm::vec4(mPointLights[i]->diffuse, 0.0f);
-		lightsData.pointLights[i].specular = glm::vec4(mPointLights[i]->specular, 0.0f);
-		lightsData.pointLights[i].attenuation = glm::vec4(mPointLights[i]->attenuation, static_cast<float>(mPointLights[i]->castShadow));
-		lightsData.pointLights[i].intensity = glm::vec4(mPointLights[i]->intensity, 0.0f, 0.0f, 0.0f);
+		gpuData.pointLights[i].position = glm::vec4(mPointLights[i]->position, 0.0f);
+		gpuData.pointLights[i].ambient = glm::vec4(mPointLights[i]->ambient, 0.0f);
+		gpuData.pointLights[i].diffuse = glm::vec4(mPointLights[i]->diffuse, 0.0f);
+		gpuData.pointLights[i].specular = glm::vec4(mPointLights[i]->specular, 0.0f);
+		gpuData.spotLights[i].attenuation = glm::vec4(
+			mSpotLights[i]->constant,
+			mSpotLights[i]->linear,
+			mSpotLights[i]->quadratic,
+			static_cast<float>(mSpotLights[i]->castShadow));
+		gpuData.pointLights[i].intensity = glm::vec4(mPointLights[i]->intensity, 0.0f, 0.0f, 0.0f);
 	}
 
 	for (size_t i = 0; i < mSpotLights.size(); ++i) {
-		lightsData.spotLights[i].direction = glm::vec4(mSpotLights[i]->direction, 0.0f);
-		lightsData.spotLights[i].position = glm::vec4(mSpotLights[i]->position, 0.0f);
-		lightsData.spotLights[i].ambient = glm::vec4(mSpotLights[i]->ambient, 0.0f);
-		lightsData.spotLights[i].diffuse = glm::vec4(mSpotLights[i]->diffuse, 0.0f);
-		lightsData.spotLights[i].specular = glm::vec4(mSpotLights[i]->specular, 0.0f);
-		lightsData.spotLights[i].attenuation = glm::vec4(mSpotLights[i]->attenuation, static_cast<float>(mSpotLights[i]->castShadow));
-		lightsData.spotLights[i].cutOff = glm::vec4(mSpotLights[i]->cutOff, mSpotLights[i]->outerCutOff, mSpotLights[i]->intensity, 0.0f);
+		gpuData.spotLights[i].direction = glm::vec4(mSpotLights[i]->direction, 0.0f);
+		gpuData.spotLights[i].position = glm::vec4(mSpotLights[i]->position, 0.0f);
+		gpuData.spotLights[i].ambient = glm::vec4(mSpotLights[i]->ambient, 0.0f);
+		gpuData.spotLights[i].diffuse = glm::vec4(mSpotLights[i]->diffuse, 0.0f);
+		gpuData.spotLights[i].specular = glm::vec4(mSpotLights[i]->specular, 0.0f);
+		gpuData.spotLights[i].attenuation = glm::vec4(
+			mSpotLights[i]->constant,
+			mSpotLights[i]->linear,
+			mSpotLights[i]->quadratic,
+			static_cast<float>(mSpotLights[i]->castShadow));
+		gpuData.spotLights[i].cutOff = glm::vec4(
+			mSpotLights[i]->cutOff,
+			mSpotLights[i]->outerCutOff,
+			mSpotLights[i]->intensity,
+			0.0f);
 	}
 
-	lightsData.lightCount = glm::ivec4(mDirLights.size(), mPointLights.size(), mSpotLights.size(), 0);
+	gpuData.lightCount = glm::ivec4(mDirLights.size(), mPointLights.size(), mSpotLights.size(), 0);
 
 	mUBO->bind();
-	mUBO->setData(&lightsData, sizeof(PackedLights), 0);
+	mUBO->setData(&gpuData, sizeof(PackedLights), 0);
 	mUBO->unbind();
 }
 
@@ -151,7 +163,9 @@ void LightSystem::onGuiUpdate(const GuiLightEvent& event) {
 			light.ambient = event.ambient;
 			light.diffuse = event.diffuse;
 			light.specular = event.specular;
-			light.attenuation = event.attenuation;
+			light.constant = event.constant;
+			light.linear = event.linear;
+			light.quadratic = event.quadratic;
 			light.intensity = event.intensity;
 			light.castShadow = event.castShadow;
 
@@ -164,7 +178,9 @@ void LightSystem::onGuiUpdate(const GuiLightEvent& event) {
 			light.ambient = event.ambient;
 			light.diffuse = event.diffuse;
 			light.specular = event.specular;
-			light.attenuation = event.attenuation;
+			light.constant = event.constant;
+			light.linear = event.linear;
+			light.quadratic = event.quadratic;
 			light.cutOff = event.cutOff;
 			light.outerCutOff = event.outerCutOff;
 			light.intensity = event.intensity;
