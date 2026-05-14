@@ -17,9 +17,9 @@
 struct alignas(16) ShadowData {
 	glm::mat4 lightSpaceMatrix;
 	glm::mat4 persLightSpaceMatrix[MAX_SPOT_LIGHTS];
-	glm::vec4 omniFarPlanes;
+	float omniFarPlanes[MAX_POINT_LIGHTS];
 };
-static ShadowData shadowData{};
+static ShadowData gpuData{};
 
 ShadowSystem::ShadowSystem() = default;
 
@@ -52,7 +52,7 @@ void ShadowSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 void ShadowSystem::directionalShadowPass(const RenderContext& ctx) const {
 	for (const auto& light: *ctx.light.dirLights) {
 		mDirShadow->render(ctx, light->direction);
-		shadowData.lightSpaceMatrix = mDirShadow->lightSpaceMatrix();
+		gpuData.lightSpaceMatrix = mDirShadow->lightSpaceMatrix();
 	}
 }
 
@@ -70,7 +70,7 @@ void ShadowSystem::omnidirectionalShadowPass(const RenderContext& ctx) const {
 			continue;
 
 		mOmnidirShadow->render(ctx, light->position, i);
-		shadowData.omniFarPlanes[i] = ctx.shadow.omnidirectional.farPlane;
+		gpuData.omniFarPlanes[i] = ctx.shadow.omnidirectional.farPlane;
 	}
 
 	mOmnidirShadow->depthMap().unbind();
@@ -99,7 +99,7 @@ void ShadowSystem::perspectiveShadowPass(const RenderContext& ctx) const {
 			i);
 
 		mPersShadow->render(ctx, light->direction, light->position, light->outerCutOff, i);
-		shadowData.persLightSpaceMatrix[i] = mPersShadow->lightSpaceMatrix(i);
+		gpuData.persLightSpaceMatrix[i] = mPersShadow->lightSpaceMatrix(i);
 	}
 	glCullFace(GL_BACK);
 	glViewport(0, 0, static_cast<int32_t>(ctx.screen.width), static_cast<int32_t>(ctx.screen.height));
@@ -112,6 +112,6 @@ void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
 	perspectiveShadowPass(*mCtx);
 
 	mUBO->bind();
-	mUBO->setData(&shadowData, sizeof(ShadowData), 0);
+	mUBO->setData(&gpuData, sizeof(ShadowData), 0);
 	mUBO->unbind();
 }

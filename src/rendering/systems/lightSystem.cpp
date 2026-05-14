@@ -104,11 +104,11 @@ void LightSystem::updateLightUBO() const {
 		gpuData.pointLights[i].ambient = glm::vec4(mPointLights[i]->ambient, 0.0f);
 		gpuData.pointLights[i].diffuse = glm::vec4(mPointLights[i]->diffuse, 0.0f);
 		gpuData.pointLights[i].specular = glm::vec4(mPointLights[i]->specular, 0.0f);
-		gpuData.spotLights[i].attenuation = glm::vec4(
-			mSpotLights[i]->constant,
-			mSpotLights[i]->linear,
-			mSpotLights[i]->quadratic,
-			static_cast<float>(mSpotLights[i]->castShadow));
+		gpuData.pointLights[i].attenuation = glm::vec4(
+			mPointLights[i]->constant,
+			mPointLights[i]->linear,
+			mPointLights[i]->quadratic,
+			static_cast<float>(mPointLights[i]->castShadow));
 		gpuData.pointLights[i].intensity = glm::vec4(mPointLights[i]->intensity, 0.0f, 0.0f, 0.0f);
 	}
 
