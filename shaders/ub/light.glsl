@@ -5,42 +5,29 @@
 
 struct DirectionalLight {
     vec4 direction;
-
     vec4 ambient;
     vec4 diffuse;
     vec4 specular;
-
-    vec3 padding;
-    float intensity;
+    vec4 intensity;
 };
 
 struct PointLight {
     vec4 position;
-
     vec4 ambient;
     vec4 diffuse;
     vec4 specular;
-    vec3 attenuation;
-
-    bool castShadow;
-
-    vec3 padding;
-    float intensity;
+    vec4 attenuation;
+    vec4 intensity;
 };
 
 struct SpotLight {
     vec4 position;
     vec4 direction;
-
     vec4 ambient;
     vec4 diffuse;
     vec4 specular;
-
-    vec3 attenuation;
-    bool castShadow;
-
-    vec3 cutOff;
-    float intensity;
+    vec4 attenuation;
+    vec4 cutOff;
 };
 
 layout (std140) uniform LightBlock

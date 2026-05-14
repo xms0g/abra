@@ -2,18 +2,32 @@
 #include "../event.hpp"
 
 struct GuiLightEvent : Event {
+	size_t entityID;
+	uint32_t matIdx;
+	glm::vec3 direction{};
+	glm::vec3 position{};
+	glm::vec3 ambient{};
+	glm::vec3 diffuse{};
+	glm::vec3 specular{};
+	glm::vec3 attenuation; // (Kc, Kl, kq)
+	float cutOff;
+	float outerCutOff;
+	float intensity;
+	bool castShadow;
+
 	explicit GuiLightEvent(
 		const size_t id,
 		const uint32_t idx,
-		const glm::vec4& dir,
-		const glm::vec4& pos,
-		const glm::vec4& amb,
-		const glm::vec4& dif,
-		const glm::vec4& spe,
+		const glm::vec3& dir,
+		const glm::vec3& pos,
+		const glm::vec3& amb,
+		const glm::vec3& dif,
+		const glm::vec3& spe,
 		const glm::vec3& att,
-		const glm::vec3& cut,
-		const bool cast,
-		const float intens)
+		const float co,
+		const float oc,
+		const float i,
+		bool cs)
 		: entityID(id),
 		  matIdx(idx),
 		  direction(dir),
@@ -22,20 +36,9 @@ struct GuiLightEvent : Event {
 		  diffuse(dif),
 		  specular(spe),
 		  attenuation(att),
-		  cutOff(cut),
-		  castShadow(cast),
-		  intensity(intens) {
+		  cutOff(co),
+		  outerCutOff(oc),
+		  intensity(i),
+		  castShadow(cs) {
 	}
-
-	size_t entityID;
-	uint32_t matIdx;
-	glm::vec4 direction{};
-	glm::vec4 position{};
-	glm::vec4 ambient{};
-	glm::vec4 diffuse{};
-	glm::vec4 specular{};
-	glm::vec3 attenuation; // (Kc, Kl, kq)
-	glm::vec3 cutOff; // (cutOff, outerCutOff, padding)
-	bool castShadow{};
-	float intensity{};
 };

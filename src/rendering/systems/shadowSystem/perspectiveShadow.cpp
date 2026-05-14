@@ -34,8 +34,8 @@ glm::mat4 PerspectiveShadow::lightSpaceMatrix(const int layer) const {
 
 void PerspectiveShadow::render(
 	const RenderContext& ctx,
-	const glm::vec4& direction,
-	const glm::vec4& position,
+	const glm::vec3& direction,
+	const glm::vec3& position,
 	const float fovy,
 	const uint32_t layer) {
 	const glm::mat4 lightProjection = glm::perspective(
@@ -44,9 +44,7 @@ void PerspectiveShadow::render(
 		ctx.shadow.perspective.nearPlane,
 		ctx.shadow.perspective.farPlane);
 
-	const auto dir = glm::vec3(direction);
-	const auto pos = glm::vec3(position);
-	const glm::mat4 lightView = glm::lookAt(pos, pos + dir, glm::vec3(0.0, 1.0, 0.0));
+	const glm::mat4 lightView = glm::lookAt(position, position + direction, glm::vec3(0.0, 1.0, 0.0));
 	mLightSpaceMatrix[layer] = lightProjection * lightView;
 
 	mDepthShader->activate();

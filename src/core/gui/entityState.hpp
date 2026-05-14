@@ -14,14 +14,15 @@ struct EntityState {
 	} transform;
 
 	struct {
-		glm::vec4 direction{};
-		glm::vec4 position{};
-		glm::vec4 ambient{};
-		glm::vec4 diffuse{};
-		glm::vec4 specular{};
+		glm::vec3 direction{};
+		glm::vec3 position{};
+		glm::vec3 ambient{};
+		glm::vec3 diffuse{};
+		glm::vec3 specular{};
 		glm::vec3 attenuation; // (Kc, Kl, kq)
-		glm::vec3 cutOff; // (cutOff, outerCutOff, padding)
-		bool castShadow{};
-		float intensity{};
+		float cutOff;
+		float outerCutOff;
+		float intensity{1.0f};
+		bool castShadow{false};
 	} light;
 };

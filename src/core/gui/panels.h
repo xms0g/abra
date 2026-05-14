@@ -17,9 +17,9 @@ void renderLightPanel(const Entity& entity, EventBus& eventBus, std::vector<Enti
 
 void renderDirLight(const Entity& entity, EventBus& eventBus, EntityState& entityState);
 
-void renderSpotLight(const Entity& entity, EventBus& eventBus, EntityState& entityState);
-
 void renderPointLight(const Entity& entity, EventBus& eventBus, EntityState& entityState);
+
+void renderSpotLight(const Entity& entity, EventBus& eventBus, EntityState& entityState);
 
 void renderPostProcessPanel(EventBus& eventBus);
 }

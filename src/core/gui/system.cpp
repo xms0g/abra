@@ -28,8 +28,9 @@ void GuiSystem::update(const float dt) {
 void GuiSystem::configure() {
 	for (const auto& entity: getSystemEntities()) {
 		const auto& transform = entity.getComponent<TransformComponent>();
-		glm::vec4 direction, ambient, diffuse, specular;
-		glm::vec3 attenuation, cutOff;
+		glm::vec3 direction{0.0f}, ambient{0.0f}, diffuse{0.0f}, specular{0.0f};
+		glm::vec3 attenuation{0.0f};
+		float cutOff{0.0f}, outerCutOff{0.0f};
 		float intensity{1.0f};
 		bool castShadow{false};
 
@@ -39,8 +40,6 @@ void GuiSystem::configure() {
 			diffuse = entity.getComponent<DirectionalLightComponent>().diffuse;
 			specular = entity.getComponent<DirectionalLightComponent>().specular;
 			intensity = entity.getComponent<DirectionalLightComponent>().intensity;
-			attenuation = glm::vec3(0.0f);
-			cutOff = glm::vec3(0.0f);
 		} else if (entity.hasComponent<PointLightComponent>()) {
 			ambient = entity.getComponent<PointLightComponent>().ambient;
 			diffuse = entity.getComponent<PointLightComponent>().diffuse;
@@ -48,16 +47,15 @@ void GuiSystem::configure() {
 			intensity = entity.getComponent<PointLightComponent>().intensity;
 			attenuation = entity.getComponent<PointLightComponent>().attenuation;
 			castShadow = entity.getComponent<PointLightComponent>().castShadow;
-			cutOff = glm::vec3(0.0f);
-			direction = glm::vec4(0.0f);
 		} else if (entity.hasComponent<SpotLightComponent>()) {
 			direction = entity.getComponent<SpotLightComponent>().direction;
 			ambient = entity.getComponent<SpotLightComponent>().ambient;
 			diffuse = entity.getComponent<SpotLightComponent>().diffuse;
 			specular = entity.getComponent<SpotLightComponent>().specular;
-			intensity = entity.getComponent<SpotLightComponent>().intensity;
 			attenuation = entity.getComponent<SpotLightComponent>().attenuation;
 			cutOff = entity.getComponent<SpotLightComponent>().cutOff;
+			outerCutOff = entity.getComponent<SpotLightComponent>().outerCutOff;
+			intensity = entity.getComponent<SpotLightComponent>().intensity;
 			castShadow = entity.getComponent<SpotLightComponent>().castShadow;
 		}
 
@@ -74,8 +72,9 @@ void GuiSystem::configure() {
 				specular,
 				attenuation,
 				cutOff,
-				castShadow,
-				intensity
+				outerCutOff,
+				intensity,
+				castShadow
 			}
 		});
 	}

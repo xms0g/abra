@@ -37,7 +37,7 @@ vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 worldPos, vec4 fragPosLightSpa
         DirectionalLight light = dirLights[i];
         vec3 lightDir = normalize(-light.direction.xyz);
         vec3 lightPos = lightDir * 5.0;
-        vec3 radiance = light.diffuse.rgb * light.intensity;
+        vec3 radiance = light.diffuse.rgb * light.intensity.x;
 
         float shadow = calculateDirectionalShadow(fragPosLightSpace, N, lightDir);
 
@@ -49,9 +49,9 @@ vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 worldPos, vec4 fragPosLightSpa
         vec3 lightPos = light.position.xyz;
         float distance = length(lightPos - worldPos);
         float attenuation = 1.0 / (light.attenuation.x + light.attenuation.y * distance + light.attenuation.z * (distance * distance));
-        vec3 radiance = light.diffuse.rgb * light.intensity * attenuation;
+        vec3 radiance = light.diffuse.rgb * light.intensity.x * attenuation;
 
-        float shadow = light.castShadow ? calculateOmnidirectionalShadow(worldPos, N, lightPos, viewPos.xyz, i) : 0.0;
+        float shadow = light.attenuation.w == 1.0 ? calculateOmnidirectionalShadow(worldPos, N, lightPos, viewPos.xyz, i) : 0.0;
 
         Lo += brdf(lightPos, N, V, F0, worldPos, radiance, albedo, metallic, roughness, ao) * (1.0 - shadow);
     }
@@ -67,11 +67,11 @@ vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 worldPos, vec4 fragPosLightSpa
         float epsilon = light.cutOff.x - light.cutOff.y;
         float intensity = clamp((theta - light.cutOff.y) / epsilon, 0.0, 1.0);
 
-        vec3 radiance = light.diffuse.rgb * light.intensity * intensity * attenuation;
+        vec3 radiance = light.diffuse.rgb * light.cutOff.z * intensity * attenuation;
 
         vec4 fragPosPersLightSpace = persLightSpaceMatrix[i] * vec4(worldPos, 1.0);
 
-        float shadow = light.castShadow ? calculatePerspectiveShadow(fragPosPersLightSpace, N, lightDir, i) : 0.0;
+        float shadow = light.attenuation.w == 1.0 ? calculatePerspectiveShadow(fragPosPersLightSpace, N, lightDir, i) : 0.0;
 
         Lo += brdf(lightPos, N, V, F0, worldPos, radiance, albedo, metallic, roughness, ao) * (1.0 - shadow);
     }

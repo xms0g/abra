@@ -6,7 +6,9 @@ bool beginEntity(const char* label);
 
 void endEntity();
 
-bool colorField4(const char* label, glm::vec4& value, float speed = 0.01f, float sameLineOffset = 100.0f);
+bool colorField3(const char* label, glm::vec3& value, float speed = 0.01f, float sameLineOffset = 100.0f);
+
+bool dragFloat(const char* label, float* value, float speed = 0.01f, float sameLineOffset = 100.0f);
 
 bool dragFloat3(const char* label, glm::vec3& value, float speed = 0.01f, float sameLineOffset = 100.0f);
 

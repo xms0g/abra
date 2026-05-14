@@ -24,8 +24,8 @@ public:
 
 	void render(
 		const RenderContext& ctx,
-		const glm::vec4& direction,
-		const glm::vec4& position,
+		const glm::vec3& direction,
+		const glm::vec3& position,
 		float fovy,
 		uint32_t layer);
 

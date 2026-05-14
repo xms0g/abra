@@ -155,7 +155,7 @@ vec3 calculatePointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewP
     diffuse *= attenuation;
     specular *= attenuation;
 
-    float shadow = light.castShadow ? calculateOmnidirectionalShadow(fragPos, light.position, viewPos, layer) : 0.0;
+    float shadow = light.attenuation.w == 1.0 ? calculateOmnidirectionalShadow(fragPos, light.position, viewPos, layer) : 0.0;
     vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + finalSpecular));
     return lighting;
 }
@@ -182,7 +182,7 @@ vec3 calculateSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
 
-    float shadow =  light.castShadow ? calculatePerspectiveShadow(fragPosLightSpace, normal, lightDir, layer) : 0.0;
+    float shadow =  light.attenuation.w == 1.0 ? calculatePerspectiveShadow(fragPosLightSpace, normal, lightDir, layer) : 0.0;
     vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + finalSpecular));
     return lighting;
 }

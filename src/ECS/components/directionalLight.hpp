@@ -1,29 +1,25 @@
 #pragma once
 #include "glm/glm.hpp"
 
-struct alignas(16) DirectionalLightComponent {
-	glm::vec4 direction{};
-
-	glm::vec4 ambient{};
-	glm::vec4 diffuse{};
-	glm::vec4 specular{};
-
-	glm::vec3 padding{};
+struct DirectionalLightComponent {
+	glm::vec3 direction{};
+	glm::vec3 ambient{};
+	glm::vec3 diffuse{};
+	glm::vec3 specular{};
 	float intensity{};
 
 	DirectionalLightComponent() = default;
 
 	explicit DirectionalLightComponent(
-		const glm::vec4 dir,
-		const glm::vec4 a,
-		const glm::vec4 dif,
-		const glm::vec4 s,
-		float i)
+		const glm::vec3 dir,
+		const glm::vec3 a,
+		const glm::vec3 dif,
+		const glm::vec3 s,
+		const float i)
 		: direction(dir),
 		  ambient(a),
 		  diffuse(dif),
 		  specular(s),
-		  padding(0.0),
 		  intensity(i) {
 	}
 };

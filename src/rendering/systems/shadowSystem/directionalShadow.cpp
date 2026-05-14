@@ -28,8 +28,8 @@ glm::mat4 DirectionalShadow::lightSpaceMatrix() const {
 	return mLightSpaceMatrix;
 }
 
-void DirectionalShadow::render(const RenderContext& ctx, const glm::vec4& direction) {
-	const glm::vec3 lightPos = -glm::vec3(direction) * ctx.shadow.directional.height;
+void DirectionalShadow::render(const RenderContext& ctx, const glm::vec3& direction) {
+	const glm::vec3 lightPos = -direction * ctx.shadow.directional.height;
 	const glm::mat4 lightProjection = glm::ortho(
 		ctx.shadow.directional.left,
 		ctx.shadow.directional.right,

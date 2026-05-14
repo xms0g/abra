@@ -11,7 +11,7 @@ void Ui::endEntity() {
 	ImGui::Separator();
 }
 
-bool Ui::colorField4(const char* label, glm::vec4& value, const float speed, const float sameLineOffset) {
+bool Ui::colorField3(const char* label, glm::vec3& value, const float speed, const float sameLineOffset) {
 	bool isDirty{false};
 	ImGui::Text("%s", label);
 	ImGui::SameLine(sameLineOffset);
@@ -20,6 +20,12 @@ bool Ui::colorField4(const char* label, glm::vec4& value, const float speed, con
 	isDirty |= ImGui::ColorEdit3(("##" + std::string(label) + "c").c_str(), glm::value_ptr(value),
 					  ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
 	return isDirty;
+}
+
+bool Ui::dragFloat(const char* label, float* value, const float speed, const float sameLineOffset) {
+	ImGui::Text("%s", label);
+	ImGui::SameLine(sameLineOffset);
+	return ImGui::DragFloat(("##" + std::string(label) + "v").c_str(), value, speed);
 }
 
 bool Ui::dragFloat3(const char* label, glm::vec3& value, const float speed, const float sameLineOffset) {

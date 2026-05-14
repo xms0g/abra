@@ -98,7 +98,7 @@ void ShadowSystem::perspectiveShadowPass(const RenderContext& ctx) const {
 			0,
 			i);
 
-		mPersShadow->render(ctx, light->direction, light->position, light->cutOff.y, i);
+		mPersShadow->render(ctx, light->direction, light->position, light->outerCutOff, i);
 		shadowData.persLightSpaceMatrix[i] = mPersShadow->lightSpaceMatrix(i);
 	}
 	glCullFace(GL_BACK);

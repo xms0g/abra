@@ -1,35 +1,31 @@
 #pragma once
 #include "glm/glm.hpp"
 
-struct alignas(16) PointLightComponent {
-	glm::vec4 position{};
-
-	glm::vec4 ambient{};
-	glm::vec4 diffuse{};
-	glm::vec4 specular{};
+struct PointLightComponent {
+	glm::vec3 position{};
+	glm::vec3 ambient{};
+	glm::vec3 diffuse{};
+	glm::vec3 specular{};
 	glm::vec3 attenuation{};
-	bool castShadow{};
-
-	glm::vec3 padding{};
 	float intensity{};
+	bool castShadow{false};
 
 	PointLightComponent() = default;
 
 	explicit PointLightComponent(
-		const glm::vec4 pos,
-		const glm::vec4 a,
-		const glm::vec4 dif,
-		const glm::vec4 s,
+		const glm::vec3 pos,
+		const glm::vec3 a,
+		const glm::vec3 dif,
+		const glm::vec3 s,
 		const glm::vec3 att,
-		const bool cs,
-		const float i)
+		const float i,
+		bool cs)
 		: position(pos),
 		  ambient(a),
 		  diffuse(dif),
 		  specular(s),
 		  attenuation(att),
-		  castShadow(cs),
-		  padding(0.0),
-		  intensity(i) {
+		  intensity(i),
+		  castShadow(cs) {
 	}
 };
