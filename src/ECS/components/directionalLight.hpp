@@ -2,6 +2,7 @@
 #include "glm/glm.hpp"
 
 struct DirectionalLightComponent {
+	uint32_t idx{};
 	glm::vec3 direction{};
 	glm::vec3 ambient{};
 	glm::vec3 diffuse{};
@@ -11,15 +12,17 @@ struct DirectionalLightComponent {
 	DirectionalLightComponent() = default;
 
 	explicit DirectionalLightComponent(
+		const uint32_t i,
 		const glm::vec3 dir,
 		const glm::vec3 a,
 		const glm::vec3 dif,
 		const glm::vec3 s,
-		const float i)
-		: direction(dir),
+		const float intens)
+		: idx(i),
+		  direction(dir),
 		  ambient(a),
 		  diffuse(dif),
 		  specular(s),
-		  intensity(i) {
+		  intensity(intens) {
 	}
 };

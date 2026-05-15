@@ -31,6 +31,7 @@ void GuiSystem::configure() {
 		glm::vec3 direction{0.0f}, ambient{0.0f}, diffuse{0.0f}, specular{0.0f};
 		float kc{0.0f}, kl{0.0f}, kq{0.0f}, cutOff{0.0f}, outerCutOff{0.0f}, intensity{1.0f};
 		bool castShadow{false};
+		uint32_t idx{0};
 
 		if (entity.hasComponent<DirectionalLightComponent>()) {
 			direction = entity.getComponent<DirectionalLightComponent>().direction;
@@ -47,6 +48,7 @@ void GuiSystem::configure() {
 			kq = entity.getComponent<PointLightComponent>().quadratic;
 			intensity = entity.getComponent<PointLightComponent>().intensity;
 			castShadow = entity.getComponent<PointLightComponent>().castShadow;
+			idx = entity.getComponent<PointLightComponent>().idx;
 		} else if (entity.hasComponent<SpotLightComponent>()) {
 			direction = entity.getComponent<SpotLightComponent>().direction;
 			ambient = entity.getComponent<SpotLightComponent>().ambient;
@@ -59,6 +61,7 @@ void GuiSystem::configure() {
 			outerCutOff = entity.getComponent<SpotLightComponent>().outerCutOff;
 			intensity = entity.getComponent<SpotLightComponent>().intensity;
 			castShadow = entity.getComponent<SpotLightComponent>().castShadow;
+			idx = entity.getComponent<SpotLightComponent>().idx;
 		}
 
 		mEntityStates.push_back({
@@ -67,6 +70,7 @@ void GuiSystem::configure() {
 			false,
 			{transform.position, transform.rotation, transform.scale},
 			{
+				idx,
 				direction,
 				glm::vec4(transform.position, 1.0f),
 				ambient,

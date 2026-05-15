@@ -38,6 +38,7 @@ void PerspectiveShadow::render(
 	const glm::vec3& position,
 	const float fovy,
 	const int32_t layer) {
+
 	glFramebufferTextureLayer(
 		GL_FRAMEBUFFER,
 		GL_DEPTH_ATTACHMENT,
@@ -46,8 +47,6 @@ void PerspectiveShadow::render(
 		layer);
 
 	glClear(GL_DEPTH_BUFFER_BIT);
-
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, mDepthMap->texture(), layer);
 
 	const glm::mat4 lightProjection = glm::perspective(
 		fovy,

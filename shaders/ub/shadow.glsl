@@ -7,7 +7,7 @@ layout (std140) uniform ShadowBlock
 {
     mat4 lightSpaceMatrix;
     mat4 persLightSpaceMatrix[MAX_SPOT_LIGHTS];
-    float omniFarPlanes[MAX_POINT_LIGHTS];
+    vec4 omniFarPlane;
 };
 
 #endif

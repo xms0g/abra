@@ -108,9 +108,11 @@ void GuiPanels::renderDirLight(const Entity& entity, EventBus& eventBus, EntityS
 
 	if (isDirty) {
 		uint32_t matIdx = entity.getComponent<MaterialComponent>().materials[0].at(0).idx;
+
 		eventBus.emitEvent<GuiLightEvent>(
 			entity.id(),
 			matIdx,
+			0u,
 			entityState.light.direction,
 			entityState.light.position,
 			entityState.light.ambient,
@@ -141,9 +143,12 @@ void GuiPanels::renderPointLight(const Entity& entity, EventBus& eventBus, Entit
 
 	if (isDirty) {
 		uint32_t matIdx = entity.getComponent<MaterialComponent>().materials[0].at(0).idx;
+		uint32_t lightIdx = entity.getComponent<PointLightComponent>().idx;
+
 		eventBus.emitEvent<GuiLightEvent>(
 			entity.id(),
 			matIdx,
+			lightIdx,
 			entityState.light.direction,
 			entityState.light.position,
 			entityState.light.ambient,
@@ -175,9 +180,12 @@ void GuiPanels::renderSpotLight(const Entity& entity, EventBus& eventBus, Entity
 
 	if (isDirty) {
 		uint32_t matIdx = entity.getComponent<MaterialComponent>().materials[0].at(0).idx;
+		uint32_t lightIdx = entity.getComponent<SpotLightComponent>().idx;
+
 		eventBus.emitEvent<GuiLightEvent>(
 			entity.id(),
 			matIdx,
+			lightIdx,
 			entityState.light.direction,
 			entityState.light.position,
 			entityState.light.ambient,

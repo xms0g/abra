@@ -31,10 +31,10 @@ void Engine::init(Registry* registry) {
 }
 
 void Engine::configure() const {
-	mRenderPipeline->batchEntities();
 	mCamera->configure(*mEventBus);
-	mGuiSystem->configure();
+	mRenderPipeline->batchEntities();
 	mRenderPipeline->configure(*mCamera, *mEventBus);
+	mGuiSystem->configure();
 }
 
 void Engine::run() {

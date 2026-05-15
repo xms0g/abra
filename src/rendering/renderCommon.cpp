@@ -53,14 +53,6 @@ void RenderCommon::instanced(const RenderContext& ctx, const std::vector<Instanc
 }
 
 void RenderCommon::setupTransform(const size_t entityID, const RenderContext& ctx, const Shader& shader) {
-	static size_t lastEntityID{0};
-
-	if (lastEntityID == entityID) {
-		return;
-	}
-
-	lastEntityID = entityID;
-
 	const auto& model = ctx.renderQueue->entity.models[entityID];
 	const auto& normal = ctx.renderQueue->entity.normals[entityID];
 

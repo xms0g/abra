@@ -60,13 +60,13 @@ void LightSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 	for (auto& entity: getSystemEntities()) {
 		if (entity.hasComponent<DirectionalLightComponent>()) {
 			auto& light = entity.getComponent<DirectionalLightComponent>();
-			mDirLights.push_back(&light);
+			mDirLights[0] = &light;
 		} else if (entity.hasComponent<PointLightComponent>()) {
 			auto& light = entity.getComponent<PointLightComponent>();
-			mPointLights.push_back(&light);
+			mPointLights[light.idx] = &light;
 		} else if (entity.hasComponent<SpotLightComponent>()) {
 			auto& light = entity.getComponent<SpotLightComponent>();
-			mSpotLights.push_back(&light);
+			mSpotLights[light.idx] = &light;
 		}
 	}
 
@@ -78,20 +78,25 @@ const UniformBuffer& LightSystem::ubo() const {
 	return *mUBO;
 }
 
-const std::vector<PointLightComponent*>& LightSystem::pointLights() const {
-	return mPointLights;
-}
-
-const std::vector<DirectionalLightComponent*>& LightSystem::dirLights() const {
+std::array<DirectionalLightComponent*, MAX_DIRECTIONAL_LIGHTS>& LightSystem::dirLights() {
 	return mDirLights;
 }
 
-const std::vector<SpotLightComponent*>& LightSystem::spotLights() const {
+std::array<PointLightComponent*, MAX_POINT_LIGHTS>& LightSystem::pointLights() {
+	return mPointLights;
+}
+
+std::array<SpotLightComponent*, MAX_SPOT_LIGHTS>& LightSystem::spotLights() {
 	return mSpotLights;
 }
 
 void LightSystem::updateLightUBO() const {
+	uint32_t dirLightCount{0}, pointLightCount{0}, spotLightCount{0};
+
 	for (size_t i = 0; i < mDirLights.size(); ++i) {
+		if (!mDirLights[i]) continue;
+
+		++dirLightCount;
 		gpuData.dirLights[i].direction = glm::vec4(mDirLights[i]->direction, 0.0f);
 		gpuData.dirLights[i].ambient = glm::vec4(mDirLights[i]->ambient, 0.0f);
 		gpuData.dirLights[i].diffuse = glm::vec4(mDirLights[i]->diffuse, 0.0f);
@@ -100,6 +105,9 @@ void LightSystem::updateLightUBO() const {
 	}
 
 	for (size_t i = 0; i < mPointLights.size(); ++i) {
+		if (!mPointLights[i]) continue;
+
+		++pointLightCount;
 		gpuData.pointLights[i].position = glm::vec4(mPointLights[i]->position, 0.0f);
 		gpuData.pointLights[i].ambient = glm::vec4(mPointLights[i]->ambient, 0.0f);
 		gpuData.pointLights[i].diffuse = glm::vec4(mPointLights[i]->diffuse, 0.0f);
@@ -113,6 +121,9 @@ void LightSystem::updateLightUBO() const {
 	}
 
 	for (size_t i = 0; i < mSpotLights.size(); ++i) {
+		if (!mSpotLights[i]) continue;
+
+		++spotLightCount;
 		gpuData.spotLights[i].direction = glm::vec4(mSpotLights[i]->direction, 0.0f);
 		gpuData.spotLights[i].position = glm::vec4(mSpotLights[i]->position, 0.0f);
 		gpuData.spotLights[i].ambient = glm::vec4(mSpotLights[i]->ambient, 0.0f);
@@ -130,7 +141,7 @@ void LightSystem::updateLightUBO() const {
 			0.0f);
 	}
 
-	gpuData.lightCount = glm::ivec4(mDirLights.size(), mPointLights.size(), mSpotLights.size(), 0);
+	gpuData.lightCount = glm::ivec4(dirLightCount, pointLightCount, spotLightCount, 0);
 
 	mUBO->bind();
 	mUBO->setData(&gpuData, sizeof(PackedLights), 0);
@@ -138,10 +149,6 @@ void LightSystem::updateLightUBO() const {
 }
 
 void LightSystem::onGuiUpdate(const GuiLightEvent& event) {
-	mDirLights.clear();
-	mPointLights.clear();
-	mSpotLights.clear();
-
 	for (auto& entity: getSystemEntities()) {
 		if (entity.id() != event.entityID)
 			continue;
@@ -155,7 +162,7 @@ void LightSystem::onGuiUpdate(const GuiLightEvent& event) {
 			light.specular = event.specular;
 			light.intensity = event.intensity;
 
-			mDirLights.push_back(&light);
+			mDirLights[0] = &light;
 		} else if (entity.hasComponent<PointLightComponent>()) {
 			auto& light = entity.getComponent<PointLightComponent>();
 
@@ -169,7 +176,7 @@ void LightSystem::onGuiUpdate(const GuiLightEvent& event) {
 			light.intensity = event.intensity;
 			light.castShadow = event.castShadow;
 
-			mPointLights.push_back(&light);
+			mPointLights[event.lightIdx] = &light;
 		} else if (entity.hasComponent<SpotLightComponent>()) {
 			auto& light = entity.getComponent<SpotLightComponent>();
 
@@ -186,7 +193,7 @@ void LightSystem::onGuiUpdate(const GuiLightEvent& event) {
 			light.intensity = event.intensity;
 			light.castShadow = event.castShadow;
 
-			mSpotLights.push_back(&light);
+			mSpotLights[event.lightIdx] = &light;
 		}
 	}
 

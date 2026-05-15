@@ -1,9 +1,11 @@
 #pragma once
+#include <cstdint>
 #include "../event.hpp"
 
 struct GuiLightEvent : Event {
 	size_t entityID;
 	uint32_t matIdx;
+	uint32_t lightIdx;
 	glm::vec3 direction{};
 	glm::vec3 position{};
 	glm::vec3 ambient{};
@@ -19,7 +21,8 @@ struct GuiLightEvent : Event {
 
 	explicit GuiLightEvent(
 		const size_t id,
-		const uint32_t idx,
+		const uint32_t midx,
+		const uint32_t lidx,
 		const glm::vec3& dir,
 		const glm::vec3& pos,
 		const glm::vec3& amb,
@@ -33,7 +36,8 @@ struct GuiLightEvent : Event {
 		const float i,
 		const bool cs)
 		: entityID(id),
-		  matIdx(idx),
+		  matIdx(midx),
+		  lightIdx(lidx),
 		  direction(dir),
 		  position(pos),
 		  ambient(amb),

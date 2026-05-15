@@ -1,4 +1,5 @@
 #pragma once
+#include "../../config/config.hpp"
 #include "../../ECS/system.hpp"
 
 struct GuiLightEvent;
@@ -18,14 +19,9 @@ public:
 	[[nodiscard]]
 	const UniformBuffer& ubo() const;
 
-	[[nodiscard]]
-	const std::vector<PointLightComponent*>& pointLights() const;
-
-	[[nodiscard]]
-	const std::vector<DirectionalLightComponent*>& dirLights() const;
-
-	[[nodiscard]]
-	const std::vector<SpotLightComponent*>& spotLights() const;
+	std::array<DirectionalLightComponent*, MAX_DIRECTIONAL_LIGHTS>& dirLights();
+	std::array<PointLightComponent*, MAX_POINT_LIGHTS>& pointLights();
+	std::array<SpotLightComponent*, MAX_SPOT_LIGHTS>& spotLights();
 
 private:
 	void updateLightUBO() const;
@@ -34,7 +30,7 @@ private:
 
 	EventBus* mEventBus{};
 	std::unique_ptr<UniformBuffer> mUBO;
-	std::vector<DirectionalLightComponent*> mDirLights;
-	std::vector<PointLightComponent*> mPointLights;
-	std::vector<SpotLightComponent*> mSpotLights;
+	std::array<DirectionalLightComponent*, MAX_DIRECTIONAL_LIGHTS> mDirLights{};
+	std::array<PointLightComponent*, MAX_POINT_LIGHTS> mPointLights{};
+	std::array<SpotLightComponent*, MAX_SPOT_LIGHTS> mSpotLights{};
 };

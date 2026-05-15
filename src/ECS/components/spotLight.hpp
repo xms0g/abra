@@ -2,6 +2,7 @@
 #include "glm/glm.hpp"
 
 struct SpotLightComponent {
+	uint32_t idx;
 	glm::vec3 position;
 	glm::vec3 direction;
 	glm::vec3 ambient;
@@ -18,6 +19,7 @@ struct SpotLightComponent {
 	SpotLightComponent() = default;
 
 	explicit SpotLightComponent(
+		const uint32_t i,
 		const glm::vec3 pos,
 		const glm::vec3 dir,
 		const glm::vec3 a,
@@ -28,9 +30,10 @@ struct SpotLightComponent {
 		const float kq,
 		const float co,
 		const float oc,
-		const float i,
+		const float intens,
 		const bool cs)
-		: position(pos),
+		: idx(i),
+		  position(pos),
 		  direction(dir),
 		  ambient(a),
 		  diffuse(dif),
@@ -40,7 +43,7 @@ struct SpotLightComponent {
 		  quadratic(kq),
 		  cutOff(co),
 		  outerCutOff(oc),
-		  intensity(i),
+		  intensity(intens),
 		  castShadow(cs) {
 	}
 };

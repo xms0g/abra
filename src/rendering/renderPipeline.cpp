@@ -188,7 +188,6 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mRenderCtx->light.dirLights = &mLightSystem->dirLights();
 	mRenderCtx->light.pointLights = &mLightSystem->pointLights();
 	mRenderCtx->light.spotLights = &mLightSystem->spotLights();
-	mRenderCtx->shadow.ubo.self = mShadowSystem->ubo();
 	mRenderCtx->shadow.ubo.binding = SHADOW_UBO_BINDING;
 	mRenderCtx->shadow.ubo.blockName = SHADOW_UBO_BLOCK_NAME;
 	mRenderCtx->shadow.textureSlot = SHADOWMAP_TEXTURE_SLOT;
@@ -248,6 +247,7 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 
 	// Configure render passes
 	mShadowSystem->configure(*mRenderCtx, eventBus);
+	mRenderCtx->shadow.ubo.self = mShadowSystem->ubo();
 
 	for (const auto& pass: mRenderPasses) {
 		pass->configure(*mRenderCtx, eventBus);

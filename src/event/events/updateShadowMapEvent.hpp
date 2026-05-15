@@ -2,7 +2,5 @@
 #include "../event.hpp"
 
 struct UpdateShadowMapEvent : Event {
-	explicit UpdateShadowMapEvent() {
-	}
-
+	explicit UpdateShadowMapEvent() = default;
 };

@@ -35,6 +35,8 @@ void OmnidirectionalShadow::render(
 	const RenderContext& ctx,
 	const glm::vec3& position,
 	const int32_t layer) const {
+	constexpr uint32_t faces = 6;
+
 	const glm::mat4 shadowProj = glm::perspective(
 		glm::radians(ctx.shadow.omnidirectional.fovy),
 		static_cast<float>(ctx.shadow.width) / static_cast<float>(ctx.shadow.height),
@@ -47,7 +49,7 @@ void OmnidirectionalShadow::render(
 	}
 
 	mDepthShader->activate();
-	for (uint32_t i = 0; i < 6; ++i) {
+	for (uint32_t i = 0; i < faces; ++i) {
 		mDepthShader->setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
 	}
 

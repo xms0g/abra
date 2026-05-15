@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "glm/glm.hpp"
+#include "../../config/config.hpp"
 
 namespace math {
 struct Frustum;
@@ -47,9 +48,9 @@ struct RenderContext {
 	} ssao;
 
 	struct {
-		const std::vector<DirectionalLightComponent*>* dirLights;
-		const std::vector<PointLightComponent*>* pointLights;
-		const std::vector<SpotLightComponent*>* spotLights;
+		const std::array<DirectionalLightComponent*, MAX_DIRECTIONAL_LIGHTS>* dirLights;
+		const std::array<PointLightComponent*, MAX_POINT_LIGHTS>* pointLights;
+		const std::array<SpotLightComponent*, MAX_SPOT_LIGHTS>* spotLights;
 		uint32_t maxDirLights, maxPointLights, maxSpotLights;
 
 		struct {

@@ -15,10 +15,11 @@
 #include "../../../event/events/updateShadowMapEvent.hpp"
 
 struct alignas(16) ShadowData {
-	glm::mat4 lightSpaceMatrix;
-	glm::mat4 persLightSpaceMatrix[MAX_SPOT_LIGHTS];
-	float omniFarPlanes[MAX_POINT_LIGHTS];
+	glm::mat4 lightSpaceMatrix{};
+	glm::mat4 persLightSpaceMatrix[MAX_SPOT_LIGHTS]{};
+	glm::vec4 omniFarPlane{};
 };
+
 static ShadowData gpuData{};
 
 ShadowSystem::ShadowSystem() = default;
@@ -45,12 +46,15 @@ void ShadowSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 
 	eventBus.subscribeToEvent<ShadowSystem, UpdateShadowMapEvent>(this, &ShadowSystem::onGuiUpdate);
 
-	const UpdateShadowMapEvent event;
+	gpuData.omniFarPlane = glm::vec4(ctx.shadow.omnidirectional.farPlane, 0.0f, 0.0f, 0.0f);
+
+	constexpr UpdateShadowMapEvent event;
 	onGuiUpdate(event);
 }
 
 void ShadowSystem::directionalShadowPass(const RenderContext& ctx) const {
 	for (const auto& light: *ctx.light.dirLights) {
+		if (!light) return;
 		mDirShadow->render(ctx, light->direction);
 		gpuData.lightSpaceMatrix = mDirShadow->lightSpaceMatrix();
 	}
@@ -58,7 +62,6 @@ void ShadowSystem::directionalShadowPass(const RenderContext& ctx) const {
 
 void ShadowSystem::omnidirectionalShadowPass(const RenderContext& ctx) const {
 	const auto& lights = *ctx.light.pointLights;
-	if (lights.empty()) return;
 
 	mOmnidirShadow->depthMap().bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -66,11 +69,11 @@ void ShadowSystem::omnidirectionalShadowPass(const RenderContext& ctx) const {
 
 	for (int32_t i = 0; i < lights.size(); ++i) {
 		const auto& light = lights[i];
-		if (!light->castShadow)
+
+		if (!light || !light->castShadow)
 			continue;
 
 		mOmnidirShadow->render(ctx, light->position, i);
-		gpuData.omniFarPlanes[i] = ctx.shadow.omnidirectional.farPlane;
 	}
 
 	mOmnidirShadow->depthMap().unbind();
@@ -79,7 +82,6 @@ void ShadowSystem::omnidirectionalShadowPass(const RenderContext& ctx) const {
 
 void ShadowSystem::perspectiveShadowPass(const RenderContext& ctx) const {
 	const auto& lights = *ctx.light.spotLights;
-	if (lights.empty()) return;
 
 	mPersShadow->depthMap().bind();
 	glCullFace(GL_FRONT);
@@ -87,12 +89,14 @@ void ShadowSystem::perspectiveShadowPass(const RenderContext& ctx) const {
 
 	for (int32_t i = 0; i < lights.size(); ++i) {
 		const auto& light = lights[i];
-		if (!light->castShadow)
+
+		if (!light || !light->castShadow)
 			continue;
 
 		mPersShadow->render(ctx, light->direction, light->position, light->outerCutOff, i);
 		gpuData.persLightSpaceMatrix[i] = mPersShadow->lightSpaceMatrix(i);
 	}
+
 	glCullFace(GL_BACK);
 	glViewport(0, 0, static_cast<int32_t>(ctx.screen.width), static_cast<int32_t>(ctx.screen.height));
 	mPersShadow->depthMap().unbind();
