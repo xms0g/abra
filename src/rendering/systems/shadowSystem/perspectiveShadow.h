@@ -27,7 +27,7 @@ public:
 		const glm::vec3& direction,
 		const glm::vec3& position,
 		float fovy,
-		uint32_t layer);
+		int32_t layer);
 
 private:
 	glm::mat4 mLightSpaceMatrix[MAX_SPOT_LIGHTS]{};
