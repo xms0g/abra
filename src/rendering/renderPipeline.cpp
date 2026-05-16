@@ -329,7 +329,6 @@ void RenderPipeline::refreshCameraData() const {
 
 	mRenderCtx->camera.ubo.self->bind();
 	mRenderCtx->camera.ubo.self->setData(&packed, sizeof(PackedView), 0);
-	mRenderCtx->camera.ubo.self->unbind();
 }
 
 void RenderPipeline::batchEntity(const Entity& entity) {

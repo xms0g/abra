@@ -145,55 +145,55 @@ void LightSystem::updateLightUBO() const {
 
 	mUBO->bind();
 	mUBO->setData(&gpuData, sizeof(PackedLights), 0);
-	mUBO->unbind();
 }
 
 void LightSystem::onGuiUpdate(const GuiLightEvent& event) {
 	for (auto& entity: getSystemEntities()) {
-		if (entity.id() != event.entityID)
-			continue;
+		if (entity.id() == event.entityID) {
+			if (entity.hasComponent<DirectionalLightComponent>()) {
+				auto& light = entity.getComponent<DirectionalLightComponent>();
 
-		if (entity.hasComponent<DirectionalLightComponent>()) {
-			auto& light = entity.getComponent<DirectionalLightComponent>();
+				light.direction = event.direction;
+				light.ambient = event.ambient;
+				light.diffuse = event.diffuse;
+				light.specular = event.specular;
+				light.intensity = event.intensity;
 
-			light.direction = event.direction;
-			light.ambient = event.ambient;
-			light.diffuse = event.diffuse;
-			light.specular = event.specular;
-			light.intensity = event.intensity;
+				mDirLights[0] = &light;
+			} else if (entity.hasComponent<PointLightComponent>()) {
+				auto& light = entity.getComponent<PointLightComponent>();
 
-			mDirLights[0] = &light;
-		} else if (entity.hasComponent<PointLightComponent>()) {
-			auto& light = entity.getComponent<PointLightComponent>();
+				light.position = event.position;
+				light.ambient = event.ambient;
+				light.diffuse = event.diffuse;
+				light.specular = event.specular;
+				light.constant = event.constant;
+				light.linear = event.linear;
+				light.quadratic = event.quadratic;
+				light.intensity = event.intensity;
+				light.castShadow = event.castShadow;
 
-			light.position = event.position;
-			light.ambient = event.ambient;
-			light.diffuse = event.diffuse;
-			light.specular = event.specular;
-			light.constant = event.constant;
-			light.linear = event.linear;
-			light.quadratic = event.quadratic;
-			light.intensity = event.intensity;
-			light.castShadow = event.castShadow;
+				mPointLights[event.lightIdx] = &light;
+			} else if (entity.hasComponent<SpotLightComponent>()) {
+				auto& light = entity.getComponent<SpotLightComponent>();
 
-			mPointLights[event.lightIdx] = &light;
-		} else if (entity.hasComponent<SpotLightComponent>()) {
-			auto& light = entity.getComponent<SpotLightComponent>();
+				light.position = event.position;
+				light.direction = event.direction;
+				light.ambient = event.ambient;
+				light.diffuse = event.diffuse;
+				light.specular = event.specular;
+				light.constant = event.constant;
+				light.linear = event.linear;
+				light.quadratic = event.quadratic;
+				light.cutOff = event.cutOff;
+				light.outerCutOff = event.outerCutOff;
+				light.intensity = event.intensity;
+				light.castShadow = event.castShadow;
 
-			light.position = event.position;
-			light.direction = event.direction;
-			light.ambient = event.ambient;
-			light.diffuse = event.diffuse;
-			light.specular = event.specular;
-			light.constant = event.constant;
-			light.linear = event.linear;
-			light.quadratic = event.quadratic;
-			light.cutOff = event.cutOff;
-			light.outerCutOff = event.outerCutOff;
-			light.intensity = event.intensity;
-			light.castShadow = event.castShadow;
+				mSpotLights[event.lightIdx] = &light;
+			}
 
-			mSpotLights[event.lightIdx] = &light;
+			break;
 		}
 	}
 
