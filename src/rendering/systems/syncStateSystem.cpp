@@ -16,7 +16,6 @@ void SyncStateSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 	eventBus.subscribeToEvent<SyncStateSystem, GuiDebugEvent>(this, &SyncStateSystem::onDebugUpdate);
 	eventBus.subscribeToEvent<SyncStateSystem, GuiTransformEvent>(this, &SyncStateSystem::onTransformUpdate);
 	eventBus.subscribeToEvent<SyncStateSystem, GuiLightEvent>(this, &SyncStateSystem::onLightUpdate);
-
 }
 
 void SyncStateSystem::onDebugUpdate(const GuiDebugEvent& event) {

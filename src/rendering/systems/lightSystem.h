@@ -20,7 +20,9 @@ public:
 	const UniformBuffer& ubo() const;
 
 	std::array<DirectionalLightComponent*, MAX_DIRECTIONAL_LIGHTS>& dirLights();
+
 	std::array<PointLightComponent*, MAX_POINT_LIGHTS>& pointLights();
+
 	std::array<SpotLightComponent*, MAX_SPOT_LIGHTS>& spotLights();
 
 private:

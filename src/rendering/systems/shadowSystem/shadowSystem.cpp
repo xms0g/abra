@@ -53,11 +53,13 @@ void ShadowSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 }
 
 void ShadowSystem::directionalShadowPass(const RenderContext& ctx) const {
-	for (const auto& light: *ctx.light.dirLights) {
-		if (!light) return;
-		mDirShadow->render(ctx, light->direction);
-		gpuData.lightSpaceMatrix = mDirShadow->lightSpaceMatrix();
-	}
+	const auto& lights = *ctx.light.dirLights;
+
+	if (!lights[0])
+		return;
+
+	mDirShadow->render(ctx, lights[0]->direction);
+	gpuData.lightSpaceMatrix = mDirShadow->lightSpaceMatrix();
 }
 
 void ShadowSystem::omnidirectionalShadowPass(const RenderContext& ctx) const {
@@ -65,7 +67,6 @@ void ShadowSystem::omnidirectionalShadowPass(const RenderContext& ctx) const {
 
 	mOmnidirShadow->depthMap().bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glViewport(0, 0, static_cast<int32_t>(ctx.shadow.width), static_cast<int32_t>(ctx.shadow.height));
 
 	for (int32_t i = 0; i < lights.size(); ++i) {
 		const auto& light = lights[i];
@@ -75,17 +76,12 @@ void ShadowSystem::omnidirectionalShadowPass(const RenderContext& ctx) const {
 
 		mOmnidirShadow->render(ctx, light->position, i);
 	}
-
-	mOmnidirShadow->depthMap().unbind();
-	glViewport(0, 0, static_cast<int32_t>(ctx.screen.width), static_cast<int32_t>(ctx.screen.height));
 }
 
 void ShadowSystem::perspectiveShadowPass(const RenderContext& ctx) const {
 	const auto& lights = *ctx.light.spotLights;
 
 	mPersShadow->depthMap().bind();
-	glCullFace(GL_FRONT);
-	glViewport(0, 0, static_cast<int32_t>(ctx.shadow.width), static_cast<int32_t>(ctx.shadow.height));
 
 	for (int32_t i = 0; i < lights.size(); ++i) {
 		const auto& light = lights[i];
@@ -96,18 +92,19 @@ void ShadowSystem::perspectiveShadowPass(const RenderContext& ctx) const {
 		mPersShadow->render(ctx, light->direction, light->position, light->outerCutOff, i);
 		gpuData.persLightSpaceMatrix[i] = mPersShadow->lightSpaceMatrix(i);
 	}
-
-	glCullFace(GL_BACK);
-	glViewport(0, 0, static_cast<int32_t>(ctx.screen.width), static_cast<int32_t>(ctx.screen.height));
-	mPersShadow->depthMap().unbind();
 }
 
 void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
+	glCullFace(GL_FRONT);
+
 	directionalShadowPass(*mCtx);
 	omnidirectionalShadowPass(*mCtx);
 	perspectiveShadowPass(*mCtx);
 
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glCullFace(GL_BACK);
+	glViewport(0, 0, static_cast<int32_t>(mCtx->screen.width), static_cast<int32_t>(mCtx->screen.height));
+
 	mUBO->bind();
 	mUBO->setData(&gpuData, sizeof(ShadowData), 0);
-	mUBO->unbind();
 }

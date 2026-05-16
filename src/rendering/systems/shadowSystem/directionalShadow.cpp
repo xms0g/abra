@@ -48,8 +48,6 @@ void DirectionalShadow::render(const RenderContext& ctx, const glm::vec3& direct
 	// render scene from light's point of view
 	mDepthMap->bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glCullFace(GL_FRONT);
-	glViewport(0, 0, static_cast<int32_t>(ctx.shadow.width), static_cast<int32_t>(ctx.shadow.height));
 
 	for (const auto& [entityID, matBatch]: ctx.renderQueue->shadowGroups) {
 		RenderCommon::setupTransform(entityID, ctx, *mDepthShader);
@@ -64,6 +62,4 @@ void DirectionalShadow::render(const RenderContext& ctx, const glm::vec3& direct
 			RenderCommon::drawMesh(vao, vertexCount, indexCount);
 		}
 	}
-	glCullFace(GL_BACK);
-	glViewport(0, 0, static_cast<int32_t>(ctx.screen.width), static_cast<int32_t>(ctx.screen.height));
 }
