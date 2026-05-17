@@ -332,7 +332,7 @@ void RenderPipeline::refreshCameraData() const {
 }
 
 void RenderPipeline::batchEntity(const Entity& entity) {
-	static uint32_t materialIndex{0}, meshIndex{0};
+	static uint32_t materialIndex{0}, textureOffset{0}, meshIndex{0};
 
 	auto& matComponent = entity.getComponent<MaterialComponent>();
 
@@ -369,8 +369,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		mRenderQueue.material.alphaCutoffs.emplace_back(material.alphaCutoff);
 		mRenderQueue.material.colors.emplace_back(0.0f);
 
-		std::vector<uint32_t> textures{material.textures[0].id};
-		mRenderQueue.material.textures.push_back(textures);
+		mRenderQueue.material.textures.push_back(material.textures[0].id);
 
 		auto& meshes = entity.getComponent<MeshComponent>().meshes->at(0);
 		mRenderQueue.mesh.vaos.push_back(meshes[0].vao().id());
@@ -381,7 +380,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 
 		std::vector<uint32_t> indices{meshIndex++};
 
-		const MaterialBatch matBatch{materialIndex++, mShaders[5].get(), indices};
+		const MaterialBatch matBatch{materialIndex++, textureOffset++, 1, mShaders[5].get(), indices};
 		const RenderGroup group{entity.id(), matBatch};
 		mRenderQueue.skybox.push_back(group);
 		return;
@@ -399,20 +398,20 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			mRenderQueue.mesh.minCounts.push_back(mesh.min());
 		}
 
-		MaterialBatch matBatch{materialIndex++, nullptr, meshIndices};
-
 		auto& material = matComponent.materials->at(matID);
-		material.idx = matBatch.index;
+		material.idx = materialIndex++;
 
 		mRenderQueue.material.flags.emplace_back(material.flags);
 		mRenderQueue.material.alphaCutoffs.emplace_back(material.alphaCutoff);
 		mRenderQueue.material.colors.emplace_back(material.color);
 
-		std::vector<uint32_t> textures;
 		for (const auto& texture: material.textures) {
-			textures.push_back(texture.id);
+			mRenderQueue.material.textures.push_back(texture.id);
 		}
-		mRenderQueue.material.textures.push_back(textures);
+
+		size_t textureCount = material.textures.size();
+		MaterialBatch matBatch{material.idx, textureOffset, textureCount, nullptr, meshIndices};
+		textureOffset += textureCount;
 
 		if (matComponent.renderFlag & INSTANCED_PASS) {
 			// Set shader

@@ -40,7 +40,9 @@ struct Material {
 };
 
 struct MaterialBatch {
-	uint32_t index{};
+	uint32_t materialIndex{};
+	uint32_t textureOffset{};
+	size_t textureCount{};
 	const Shader* shader{};
 	std::vector<uint32_t> meshIndices;
 };

@@ -11,13 +11,13 @@
 void RenderCommon::forward(const RenderContext& ctx, const std::vector<RenderableObject>& objects) {
 	const Shader* lastShader{nullptr};
 
-	for (const auto& [entityID, materialIdx, meshIdx, shader]: objects) {
+	for (const auto& [entityID, materialIdx, textureOffset, textureCount, meshIdx, shader]: objects) {
 		if (lastShader != shader) {
 			lastShader = shader;
 			lastShader->activate();
 		}
 
-		setupMaterial(entityID, materialIdx, ctx, *lastShader);
+		setupMaterial(entityID, materialIdx, textureOffset, textureCount, ctx, *lastShader);
 		setupTransform(entityID, ctx, *lastShader);
 
 		const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
@@ -32,10 +32,10 @@ void RenderCommon::instanced(const RenderContext& ctx, const std::vector<Instanc
 	for (const auto& [entityID, transforms, matBatch]: objects) {
 		const size_t count = transforms->size() / 9;
 
-		const auto& [materialIdx, shader, meshes] = matBatch;
+		const auto& [materialIdx, textureOffset, textureCount, shader, meshes] = matBatch;
 		shader->activate();
 
-		setupMaterial(entityID, materialIdx, ctx, *shader);
+		setupMaterial(entityID, materialIdx, textureOffset, textureCount, ctx, *shader);
 
 		for (const auto& meshIdx: meshes) {
 			const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
@@ -63,6 +63,8 @@ void RenderCommon::setupTransform(const size_t entityID, const RenderContext& ct
 void RenderCommon::setupMaterial(
 	const size_t entityID,
 	const uint32_t materialIdx,
+	const uint32_t textureOffset,
+	const size_t textureCount,
 	const RenderContext& ctx,
 	const Shader& shader) {
 	static bool isCullingEnabled{true};
@@ -94,15 +96,14 @@ void RenderCommon::setupMaterial(
 		shader.setFloat("material.alphaCutoff", alphaCutoff);
 	}
 
-	if (flags & HAS_SOLID_COLOR) {
+	if (flags & HAS_SOLID_COLOR) [[unlikely]]{
 		const glm::vec3& color = ctx.renderQueue->material.colors[materialIdx];
 		shader.setVec3("material.color", color);
 	} else {
-		const std::vector<uint32_t>& textures = ctx.renderQueue->material.textures[materialIdx];
-
-		for (size_t i = 0; i < textures.size(); ++i) {
-			glActiveTexture(GL_TEXTURE0 + i);
-			glBindTexture(GL_TEXTURE_2D, textures[i]);
+		int slot{0};
+		for (uint32_t i = textureOffset; i < textureOffset + textureCount; ++i) {
+			glActiveTexture(GL_TEXTURE0 + slot++);
+			glBindTexture(GL_TEXTURE_2D, ctx.renderQueue->material.textures[i]);
 		}
 	}
 

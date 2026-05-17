@@ -49,8 +49,8 @@ void DeferredGeometryPass::execute(const RenderContext& ctx) {
 
 	mShader->activate();
 
-	for (const auto& [entityID, materialIdx, meshIdx, shader]: ctx.renderQueue->deferredObjects) {
-		RenderCommon::setupMaterial(entityID, materialIdx, ctx, *mShader);
+	for (const auto& [entityID, materialIdx, textureOffset, textureCount, meshIdx, shader]: ctx.renderQueue->deferredObjects) {
+		RenderCommon::setupMaterial(entityID, materialIdx, textureOffset, textureCount, ctx, *mShader);
 		RenderCommon::setupTransform(entityID, ctx, *mShader);
 
 		const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];

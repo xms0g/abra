@@ -25,7 +25,7 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 				continue;
 			}
 
-			const auto& [matIdx, shader, meshes] = matBatch;
+			const auto& [matIdx, textureOffset, textureCount, shader, meshes] = matBatch;
 			for (const auto& meshIdx: meshes) {
 				const glm::vec3& max = ctx.renderQueue->mesh.maxCounts[meshIdx];
 				const glm::vec3& min = ctx.renderQueue->mesh.minCounts[meshIdx];
@@ -33,7 +33,7 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 				const bool isVisible = math::AABB::isMeshInFrustum(*ctx.camera.frustum, min, max, model);
 
 				if (isVisible) {
-					outQueue.push_back({entityID, matIdx, meshIdx, shader});
+					outQueue.push_back({entityID, matIdx, textureOffset, textureCount, meshIdx, shader});
 				}
 			}
 		}
