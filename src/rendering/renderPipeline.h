@@ -48,7 +48,7 @@ private:
 	std::unique_ptr<ShadowSystem> mShadowSystem;
 	std::unique_ptr<SyncStateSystem> mSyncStateSystem;
 	//Shaders
-	std::vector<std::unique_ptr<Shader>> mShaders;
+	std::vector<std::shared_ptr<Shader>> mShaders;
 	// Frame Buffers
 	std::unique_ptr<FrameBuffer> mSceneBuffer;
 	std::unique_ptr<FrameBuffer> mIntermediateBuffer;

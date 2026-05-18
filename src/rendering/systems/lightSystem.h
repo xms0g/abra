@@ -17,7 +17,7 @@ public:
 	void configure(const RenderContext& ctx, EventBus& eventBus);
 
 	[[nodiscard]]
-	const UniformBuffer& ubo() const;
+	const UniformBuffer* ubo() const;
 
 	std::array<DirectionalLightComponent*, MAX_DIRECTIONAL_LIGHTS>& dirLights();
 
