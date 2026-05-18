@@ -6,7 +6,7 @@
 #include "../../config/config.hpp"
 #include "../../io/filesystem.hpp"
 
-Models::Cubemap::Cubemap(std::span<const char* const> faces) {
+Models::Cubemap::Cubemap(std::vector<std::string>& faces) {
 	constexpr float v[]= {
 		-1.0f,  1.0f, -1.0f,
 		-1.0f, -1.0f, -1.0f,

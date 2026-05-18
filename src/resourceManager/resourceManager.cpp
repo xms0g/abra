@@ -23,14 +23,15 @@ MaterialMap* ResourceManager::getMaterial(const size_t entityID) {
 	return &mMaterialsByEntity.at(entityID);
 }
 
-std::span<const char* const> ResourceManager::getSkyboxTexture() const {
-	return skyboxFaces;
+void ResourceManager::asyncLoadModel(size_t entityID, std::string& file) {
+	mThreadPool.enqueue([this, entityID, file]() {
+		loadModel(entityID, file.c_str());
+	});
 }
 
-void ResourceManager::asyncLoadModel(size_t entityID, const char* file) {
-	mThreadPool.enqueue([this, entityID, file]() {
-		loadModel(entityID, std::string(file).c_str());
-	});
+std::vector<float>* ResourceManager::uploadTransforms(size_t entityID, const std::vector<float>& transforms) {
+	mTransformsByEntity.emplace(entityID, transforms);
+	return &mTransformsByEntity[entityID];
 }
 
 void ResourceManager::uploadModelsToGPU() {

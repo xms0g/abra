@@ -30,7 +30,7 @@ void RenderCommon::forward(const RenderContext& ctx, const std::vector<Renderabl
 
 void RenderCommon::instanced(const RenderContext& ctx, const std::vector<InstanceGroup>& objects) {
 	for (const auto& [entityID, transforms, matBatch]: objects) {
-		const size_t count = transforms->size() / 9;
+		const size_t count = transforms.size() / 9;
 
 		const auto& [materialIdx, textureOffset, textureCount, shader, meshes] = matBatch;
 		shader->activate();

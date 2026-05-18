@@ -1,0 +1,89 @@
+{
+  "scene_name": "Suzanne Instance",
+  "entities": [
+    {
+      "name": "Skybox",
+      "primitive": "Cubemap",
+      "components": {
+        "TransformComponent": {
+          "position": [0.0, 0.0, 0.0],
+          "rotation": [0.0, 0.0, 0.0],
+          "scale": [1.0, 1.0, 1.0]
+        },
+        "MeshComponent": { "from_resource_manager": false },
+        "MaterialComponent": { "from_resource_manager": false },
+        "SkyboxComponent": {
+          "faces": [
+            "skybox/right.jpg",
+            "skybox/left.jpg",
+            "skybox/top.jpg",
+            "skybox/bottom.jpg",
+            "skybox/front.jpg",
+            "skybox/back.jpg"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Suzanne",
+      "model_path": "Suzanne/glTF/Suzanne.gltf",
+      "components": {
+        "TransformComponent": {
+          "position": [0.0, 0.0, 0.0],
+          "rotation": [0.0, 0.0, 0.0],
+          "scale": [0.5, 0.5, 0.5]
+        },
+        "MeshComponent": { "from_resource_manager": true },
+        "MaterialComponent": { "from_resource_manager": true },
+        "BoundingVolumeComponent": { "type": "AABB" },
+        "DebugComponent": {},
+        "InstanceComponent": {
+          "transforms": [
+            -10.8, 1.3, -1.2, 95.0, 12.0, 270.0, 1, 1, 1,
+            -12.4, 2.2, 2.7, 130.0, 340.0, 22.0, 1, 1, 1,
+            -13.5, 3.1, 0.5, 250.0, 80.0, 190.0, 1, 1, 1,
+            -11.3, 4.9, -2.6, 310.0, 10.0, 45.0, 1, 1, 1,
+            -10.2, 5.0, 1.8, 180.0, 300.0, 15.0, 1, 1, 1,
+            -10.1, 6.4, -0.8, 60.0, 45.0, 310.0, 1, 1, 1,
+            -15.9, 7.5, -3.1, 350.0, 120.0, 70.0, 1, 1, 1,
+            -12.7, 1.2, 0.0, 210.0, 33.0, 10.0, 1, 1, 1,
+            -10.9, 4.7, 2.4, 145.0, 200.0, 310.0, 1, 1, 1,
+            -13.9, 5.1, -1.7, 25.0, 88.0, 132.0, 1, 1, 1,
+            -10.4, 1.3, 0.9, 300.0, 260.0, 50.0, 1, 1, 1,
+            -11.2, 5.5, -0.5, 110.0, 170.0, 256.0, 1, 1, 1,
+            -10.1, 1.0, -3.0, 270.0, 30.0, 200.0, 1, 1, 1,
+            -10.4, 5.6, 1.3, 34.0, 300.0, 99.0, 1, 1, 1,
+            -13.8, 5.3, 0.4, 190.0, 210.0, 140.0, 1, 1, 1,
+            -10.0, 5.2, -2.1, 360.0, 44.0, 18.0, 1, 1, 1,
+            -10.7, 5.0, 3.0, 77.0, 180.0, 350.0, 1, 1, 1,
+            -11.9, 6.4, -0.2, 150.0, 330.0, 65.0, 1, 1, 1,
+            -10.0, 1.2, 1.6, 12.0, 99.0, 280.0, 1, 1, 1,
+            -10.6, 1.1, -1.0, 205.0, 70.0, 30.0, 1, 1, 1
+          ]
+        }
+      }
+    },
+    {
+      "name": "Directional Light",
+      "primitive": "Cube",
+      "components": {
+        "TransformComponent": {
+          "position": [-3.2, 5.0, 0.0],
+          "rotation": [0.0, 0.0, 0.0],
+          "scale": [0.2, 0.2, 0.2]
+        },
+        "MeshComponent": { "from_resource_manager": false },
+        "MaterialComponent": { "from_resource_manager": false },
+        "DirectionalLightComponent": {
+          "index": 0,
+          "direction": [1.0, -1.0, 0.0],
+          "ambient": [0.1, 0.1, 0.1],
+          "diffuse": [1.0, 1.0, 1.0],
+          "specular": [1.0, 1.0, 1.0],
+          "intensity": 2.1
+        },
+        "BoundingVolumeComponent": { "type": "AABB" }
+      }
+    }
+  ]
+}

@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <span>
 #include <unordered_set>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -24,10 +23,9 @@ public:
 	[[nodiscard]]
 	MaterialMap* getMaterial(size_t entityID);
 
-	[[nodiscard]]
-	std::span<const char* const> getSkyboxTexture() const;
+	void asyncLoadModel(size_t entityID, std::string& file);
 
-	void asyncLoadModel(size_t entityID, const char* file);
+	std::vector<float>* uploadTransforms(size_t entityID, const std::vector<float>& transforms);
 
 	void uploadModelsToGPU();
 
@@ -67,17 +65,9 @@ private:
 
 	std::unordered_map<size_t, MaterialMap> mMaterialsByEntity;
 	std::unordered_map<size_t, MeshMap> mMeshesByEntity;
+	std::unordered_map<size_t, std::vector<float>> mTransformsByEntity;
 	ThreadPool mThreadPool{};
 	std::mutex mResourceMutex;
-
-	static constexpr const char* skyboxFaces[] = {
-		"skybox/right.jpg",
-		"skybox/left.jpg",
-		"skybox/top.jpg",
-		"skybox/bottom.jpg",
-		"skybox/front.jpg",
-		"skybox/back.jpg"
-	};
 
 	static constexpr aiTextureType textureBindings[] = {
 		aiTextureType_DIFFUSE,

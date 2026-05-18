@@ -425,7 +425,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			}
 
 			const auto& instComponent = entity.getComponent<InstanceComponent>();
-			InstanceGroup instance{entity.id(), instComponent.transforms, matBatch};
+			InstanceGroup instance{entity.id(), *instComponent.transforms, matBatch};
 
 			if (material.flags & OPAQUE) {
 				mRenderQueue.opaqueInstancedGroups.push_back(instance);

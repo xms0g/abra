@@ -7,7 +7,7 @@
 namespace Models {
 class Cubemap {
 public:
-	explicit Cubemap(std::span<const char* const> faces);
+	explicit Cubemap(std::vector<std::string>& faces);
 
 	~Cubemap();
 

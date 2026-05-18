@@ -59,7 +59,7 @@ void InstancedPass::prepareInstanceBuffer(
 
 	size_t totalRequiredSize = 0;
 	for (const auto& [entity, transforms, matb] : groups) {
-		const size_t instanceCount = transforms->size() / 9;
+		const size_t instanceCount = transforms.size() / 9;
 		totalRequiredSize += instanceCount * sizeof(InstanceData);
 	}
 
@@ -74,7 +74,7 @@ void InstancedPass::prepareInstanceBuffer(
 			const uint32_t vao = vaos[meshIdx];
 			Mesh::enableInstanceAttributes(vao, currentOffset);
 		}
-		const size_t instanceCount = transforms->size() / 9;
+		const size_t instanceCount = transforms.size() / 9;
 		currentOffset += static_cast<uint32_t>(instanceCount * sizeof(InstanceData));
 	}
 
@@ -87,14 +87,13 @@ void InstancedPass::uploadInstanceData(const std::vector<InstanceGroup>& groups,
 	uint32_t currentOffset = 0;
 	for (const auto& [entity, transforms, matb]: groups) {
 		std::vector<InstanceData> gpuData;
-		const size_t instanceCount = transforms->size() / 9;
+		const size_t instanceCount = transforms.size() / 9;
 		gpuData.reserve(instanceCount);
 
-		const auto& t = *transforms;
-		for (size_t i = 0; i < t.size(); i += 9) {
-			glm::vec3 pos{t[i], t[i + 1], t[i + 2]};
-			glm::vec3 rot{t[i + 3], t[i + 4], t[i + 5]};
-			glm::vec3 scale{t[i + 6], t[i + 7], t[i + 8]};
+		for (size_t i = 0; i < transforms.size(); i += 9) {
+			glm::vec3 pos{transforms[i], transforms[i + 1], transforms[i + 2]};
+			glm::vec3 rot{transforms[i + 3], transforms[i + 4], transforms[i + 5]};
+			glm::vec3 scale{transforms[i + 6], transforms[i + 7], transforms[i + 8]};
 
 			glm::mat4 model = math::modelMatrix(pos, rot, scale);
 			gpuData.emplace_back(model, math::normalMatrix(model));
