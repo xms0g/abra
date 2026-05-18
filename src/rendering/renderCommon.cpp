@@ -96,7 +96,7 @@ void RenderCommon::setupMaterial(
 		shader.setFloat("material.alphaCutoff", alphaCutoff);
 	}
 
-	if (flags & HAS_SOLID_COLOR) [[unlikely]]{
+	if (flags & HAS_SOLID_COLOR) [[unlikely]] {
 		const glm::vec3& color = ctx.renderQueue->material.colors[materialIdx];
 		shader.setVec3("material.color", color);
 	} else {
@@ -107,7 +107,7 @@ void RenderCommon::setupMaterial(
 		}
 	}
 
-	if (flags & TWOSIDED && isCullingEnabled) {
+	if (flags & TWOSIDED && isCullingEnabled) [[unlikely]] {
 		glDisable(GL_CULL_FACE);
 		isCullingEnabled = false;
 	} else if (!(flags & TWOSIDED) && !isCullingEnabled) {
