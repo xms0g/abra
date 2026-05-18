@@ -64,7 +64,11 @@
           "scale": [0.2, 0.2, 0.2]
         },
         "MeshComponent": { "from_resource_manager": false },
-        "MaterialComponent": { "from_resource_manager": false },
+        "MaterialComponent": {
+          "color": [1.0, 1.0, 1.0],
+          "unlit": true,
+          "from_resource_manager": false
+        },
         "DirectionalLightComponent": {
           "index": 0,
           "direction": [1.0, -1.0, 0.0],

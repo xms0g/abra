@@ -64,7 +64,11 @@
           "scale": [0.2, 0.2, 0.2]
         },
         "MeshComponent": { "from_resource_manager": false },
-        "MaterialComponent": { "from_resource_manager": false },
+        "MaterialComponent": {
+          "color": [1.0, 1.0, 1.0],
+          "unlit": true,
+          "from_resource_manager": false
+        },
         "PointLightComponent": {
           "index": 0,
           "position": [-3.2, 5.0, 0.0],
