@@ -52,18 +52,18 @@ void ShadowSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 	onGuiUpdate(event);
 }
 
-void ShadowSystem::directionalShadowPass(const RenderContext& ctx) const {
-	const auto& lights = *ctx.light.dirLights;
+void ShadowSystem::directionalShadowPass() const {
+	const auto& lights = *mCtx->light.dirLights;
 
 	if (!lights[0])
 		return;
 
-	mDirShadow->render(ctx, lights[0]->direction);
+	mDirShadow->render(*mCtx, lights[0]->direction);
 	gpuData.lightSpaceMatrix = mDirShadow->lightSpaceMatrix();
 }
 
-void ShadowSystem::omnidirectionalShadowPass(const RenderContext& ctx) const {
-	const auto& lights = *ctx.light.pointLights;
+void ShadowSystem::omnidirectionalShadowPass() const {
+	const auto& lights = *mCtx->light.pointLights;
 
 	mOmnidirShadow->depthMap().bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -74,12 +74,12 @@ void ShadowSystem::omnidirectionalShadowPass(const RenderContext& ctx) const {
 		if (!light || !light->castShadow)
 			continue;
 
-		mOmnidirShadow->render(ctx, light->position, i);
+		mOmnidirShadow->render(*mCtx, light->position, i);
 	}
 }
 
-void ShadowSystem::perspectiveShadowPass(const RenderContext& ctx) const {
-	const auto& lights = *ctx.light.spotLights;
+void ShadowSystem::perspectiveShadowPass() const {
+	const auto& lights = *mCtx->light.spotLights;
 
 	mPersShadow->depthMap().bind();
 
@@ -89,7 +89,7 @@ void ShadowSystem::perspectiveShadowPass(const RenderContext& ctx) const {
 		if (!light || !light->castShadow)
 			continue;
 
-		mPersShadow->render(ctx, light->direction, light->position, light->outerCutOff, i);
+		mPersShadow->render(*mCtx, light->direction, light->position, light->outerCutOff, i);
 		gpuData.persLightSpaceMatrix[i] = mPersShadow->lightSpaceMatrix(i);
 	}
 }
@@ -97,9 +97,9 @@ void ShadowSystem::perspectiveShadowPass(const RenderContext& ctx) const {
 void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
 	glCullFace(GL_FRONT);
 
-	directionalShadowPass(*mCtx);
-	omnidirectionalShadowPass(*mCtx);
-	perspectiveShadowPass(*mCtx);
+	directionalShadowPass();
+	omnidirectionalShadowPass();
+	perspectiveShadowPass();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glCullFace(GL_BACK);

@@ -22,11 +22,11 @@ public:
 	void configure(const RenderContext& ctx, EventBus& eventBus);
 
 private:
-	void directionalShadowPass(const RenderContext& ctx) const;
+	void directionalShadowPass() const;
 
-	void omnidirectionalShadowPass(const RenderContext& ctx) const;
+	void omnidirectionalShadowPass() const;
 
-	void perspectiveShadowPass(const RenderContext& ctx) const;
+	void perspectiveShadowPass() const;
 
 	void onGuiUpdate(const UpdateShadowMapEvent& event);
 
