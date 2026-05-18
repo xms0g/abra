@@ -416,7 +416,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		MaterialBatch matBatch{material.idx, textureOffset, textureCount, nullptr, meshIndices};
 		textureOffset += textureCount;
 
-		if (matComponent.renderFlag & INSTANCED_PASS) {
+		if (entity.hasComponent<InstanceComponent>()) {
 			// Set shader
 			if (material.flags & OPAQUE) {
 				matBatch.shader = mShaders[3].get();
