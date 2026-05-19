@@ -25,6 +25,10 @@ public:
 
 	void asyncLoadModel(size_t entityID, std::string& file);
 
+	void uploadMesh(size_t entityID, MeshMap& map);
+
+	void uploadMaterial(size_t entityID, MaterialMap& map);
+
 	std::vector<float>* uploadTransforms(size_t entityID, const std::vector<float>& transforms);
 
 	void uploadModelsToGPU();

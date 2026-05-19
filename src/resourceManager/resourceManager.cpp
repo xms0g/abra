@@ -29,14 +29,25 @@ void ResourceManager::asyncLoadModel(size_t entityID, std::string& file) {
 	});
 }
 
+void ResourceManager::uploadMesh(size_t entityID, MeshMap& map) {
+	std::lock_guard<std::mutex> lock(mResourceMutex);
+	mMeshesByEntity.emplace(entityID, std::move(map));
+
+}
+
+void ResourceManager::uploadMaterial(size_t entityID, MaterialMap& map) {
+	std::lock_guard<std::mutex> lock(mResourceMutex);
+	mMaterialsByEntity.emplace(entityID, std::move(map));
+}
+
 std::vector<float>* ResourceManager::uploadTransforms(size_t entityID, const std::vector<float>& transforms) {
 	mTransformsByEntity.emplace(entityID, transforms);
 	return &mTransformsByEntity[entityID];
 }
 
 void ResourceManager::uploadModelsToGPU() {
-	for (auto& [entityID, meshByMaterial]: mMeshesByEntity) {
-		for (auto& [matID, meshes]: meshByMaterial) {
+	for (auto& [entityID, meshByMaterialID]: mMeshesByEntity) {
+		for (auto& [matID, meshes]: meshByMaterialID) {
 			for (auto& mesh: meshes) {
 				mesh.uploadToGPU();
 			}
@@ -47,6 +58,16 @@ void ResourceManager::uploadModelsToGPU() {
 
 	for (auto& [entityID, materials]: mMaterialsByEntity) {
 		for (auto& [matID, material]: materials) {
+			if (material.flags & CUBEMAP) {
+				std::vector<std::string> paths;
+				for (auto& [id, type, path]: material.textures) {
+					paths.push_back(path);
+				}
+				material.textures.clear();
+				material.textures.emplace_back(texture::loadCubemap(paths), 0,"" );
+				continue;
+			}
+
 			for (auto& [id, type, path]: material.textures) {
 				if (idByPath.contains(path)) {
 					id = idByPath.at(path);
@@ -225,7 +246,11 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 			}
 		}
 
-		materialLoadCtx.materials[req.materialID] = {.id = req.materialID, .flags = flags, .alphaCutoff = alphaCutoff};
+		materialLoadCtx.materials[req.materialID] = {
+			.id = req.materialID,
+			.flags = flags,
+			.alphaCutoff = alphaCutoff
+		};
 	}
 
 	auto& material = materialLoadCtx.materials[req.materialID];

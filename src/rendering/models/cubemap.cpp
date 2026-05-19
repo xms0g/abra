@@ -59,27 +59,24 @@ Models::Cubemap::Cubemap(std::vector<std::string>& faces) {
 
 	std::vector<uint32_t> indices;
 	mMeshes[0].emplace_back(vertices, indices);
-	mMeshes.at(0).at(0).uploadToGPU();
-
-	std::vector<std::string> facesVec;
-	facesVec.reserve(faces.size());
-
-	for (const auto& face : faces) {
-		facesVec.emplace_back(fs::path(ASSET_DIR + face));
-	}
 
 	std::vector<Texture> textures;
-	textures.emplace_back(texture::loadCubemap(facesVec), ALBEDO,"skybox.jpg");
-	mMaterial[0] = {.textures = textures};
+	textures.reserve(faces.size());
+
+	for (const auto& face : faces) {
+		textures.emplace_back(0, ALBEDO, fs::path(ASSET_DIR + face));
+	}
+
+	mMaterial[0] = {.flags = CUBEMAP, .textures = textures};
 }
 
 Models::Cubemap::~Cubemap() = default;
 
-MeshMap* Models::Cubemap::meshes() {
-	return &mMeshes;
+MeshMap& Models::Cubemap::meshes() {
+	return mMeshes;
 }
 
-MaterialMap* Models::Cubemap::material() {
-	return &mMaterial;
+MaterialMap& Models::Cubemap::material() {
+	return mMaterial;
 }
 

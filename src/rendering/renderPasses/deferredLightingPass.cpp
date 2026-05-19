@@ -52,6 +52,7 @@ void DeferredLightingPass::configure(const RenderContext& ctx, EventBus& eventBu
 	mBrdfLUTBuffer->withTextureFP(GL_RG)
 			.checkStatus();
 
+	cube.meshes().at(0).front().uploadToGPU();
 	createEnvMap(ctx);
 	createIrradianceMap();
 	createPrefilterMap(ctx);
@@ -95,7 +96,7 @@ void DeferredLightingPass::execute(const RenderContext& ctx) {
 
 void DeferredLightingPass::createEnvMap(const RenderContext& ctx) {
 	const auto equirectangularToCube = Shader{"pbr/cubemap.vert", "pbr/equirectangularToCube.frag"};
-	const auto& cubeMesh = cube.meshes()->at(0).front();
+	const auto& cubeMesh = cube.meshes().at(0).front();
 	const uint32_t HDRTexture = texture::loadHDR(fs::path(ASSET_DIR + ctx.PBR.HDRTexture).c_str());
 
 	// convert HDR equirectangular environment map to cubemap equivalent
@@ -125,7 +126,7 @@ void DeferredLightingPass::createEnvMap(const RenderContext& ctx) {
 
 void DeferredLightingPass::createIrradianceMap() {
 	const auto irradianceConv = Shader{"pbr/cubemap.vert", "pbr/irradianceConv.frag"};
-	const auto& cubeMesh = cube.meshes()->at(0).front();
+	const auto& cubeMesh = cube.meshes().at(0).front();
 
 	// solve diffuse integral by convolution to create an irradiance (cube)map.
 	irradianceConv.activate();
@@ -148,7 +149,7 @@ void DeferredLightingPass::createIrradianceMap() {
 
 void DeferredLightingPass::createPrefilterMap(const RenderContext& ctx) {
 	const auto prefilter = Shader{"pbr/cubemap.vert", "pbr/prefilter.frag"};
-	const auto& cubeMesh = cube.meshes()->at(0).front();
+	const auto& cubeMesh = cube.meshes().at(0).front();
 
 	// run a quasi monte-carlo simulation on the environment lighting to create a prefilter (cube)map.
 	prefilter.activate();

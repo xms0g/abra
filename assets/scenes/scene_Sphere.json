@@ -1,0 +1,134 @@
+{
+  "scene_name": "Sphere",
+  "entities": [
+    {
+      "name": "Skybox",
+      "primitive": "Cubemap",
+      "components": {
+        "TransformComponent": {
+          "position": [0.0, 0.0, 0.0],
+          "rotation": [0.0, 0.0, 0.0],
+          "scale": [1.0, 1.0, 1.0]
+        },
+        "MeshComponent": { "from_resource_manager": true },
+        "MaterialComponent": { "from_resource_manager": true },
+        "SkyboxComponent": {
+          "faces": [
+            "skybox/right.jpg",
+            "skybox/left.jpg",
+            "skybox/top.jpg",
+            "skybox/bottom.jpg",
+            "skybox/front.jpg",
+            "skybox/back.jpg"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Gold Sphere",
+      "primitive": "Sphere",
+      "components": {
+        "TransformComponent": {
+          "position": [2.0, 1.3, 0.0],
+          "rotation": [0.0, 0.0, 0.0],
+          "scale": [1.0, 1.0, 1.0]
+        },
+        "MeshComponent": { "from_resource_manager": true },
+        "MaterialComponent": {
+          "albedo": "textures/pbr/gold/albedo.png",
+          "normal": "textures/pbr/gold/normal.png",
+          "orm": "textures/pbr/gold/occlusionRoughnessMetallic.png",
+          "from_resource_manager": true
+        },
+        "BoundingVolumeComponent": { "type": "AABB" },
+        "DebugComponent": {}
+      }
+    },
+    {
+      "name": "Plastic Sphere",
+      "primitive": "Sphere",
+      "components": {
+        "TransformComponent": {
+          "position": [4.5, 1.3, 0.0],
+          "rotation": [0.0, 0.0, 0.0],
+          "scale": [1.0, 1.0, 1.0]
+        },
+        "MeshComponent": { "from_resource_manager": true },
+        "MaterialComponent": {
+          "albedo": "textures/pbr/plastic/albedo.png",
+          "normal": "textures/pbr/plastic/normal.png",
+          "orm": "textures/pbr/plastic/occlusionRoughnessMetallic.png",
+          "from_resource_manager": true
+        },
+        "BoundingVolumeComponent": { "type": "AABB" },
+        "DebugComponent": {}
+      }
+    },
+    {
+      "name": "Rusted Iron Sphere",
+      "primitive": "Sphere",
+      "components": {
+        "TransformComponent": {
+          "position": [7.0, 1.3, 0.0],
+          "rotation": [0.0, 0.0, 0.0],
+          "scale": [1.0, 1.0, 1.0]
+        },
+        "MeshComponent": { "from_resource_manager": true },
+        "MaterialComponent": {
+          "albedo": "textures/pbr/rusted_iron/albedo.png",
+          "normal": "textures/pbr/rusted_iron/normal.png",
+          "orm": "textures/pbr/rusted_iron/occlusionRoughnessMetallic.png",
+          "from_resource_manager": true
+        },
+        "BoundingVolumeComponent": { "type": "AABB" },
+        "DebugComponent": {}
+      }
+    },
+    {
+      "name": "Wall Sphere",
+      "primitive": "Sphere",
+      "components": {
+        "TransformComponent": {
+          "position": [9.5, 1.3, 0.0],
+          "rotation": [0.0, 0.0, 0.0],
+          "scale": [1.0, 1.0, 1.0]
+        },
+        "MeshComponent": { "from_resource_manager": true },
+        "MaterialComponent": {
+          "albedo": "textures/pbr/wall/albedo.png",
+          "normal": "textures/pbr/wall/normal.png",
+          "orm": "textures/pbr/wall/occlusionRoughnessMetallic.png",
+          "from_resource_manager": true
+        },
+        "BoundingVolumeComponent": { "type": "AABB" },
+        "DebugComponent": {}
+      }
+    },
+    {
+      "name": "Directional Light",
+      "primitive": "Cube",
+      "components": {
+        "TransformComponent": {
+          "position": [-3.2, 5.0, 0.0],
+          "rotation": [0.0, 0.0, 0.0],
+          "scale": [0.2, 0.2, 0.2]
+        },
+        "MeshComponent": { "from_resource_manager": true },
+        "MaterialComponent": {
+          "color": [1.0, 1.0, 1.0],
+          "unlit": true,
+          "from_resource_manager": true
+        },
+        "DirectionalLightComponent": {
+          "index": 0,
+          "direction": [-0.2, -1.0, -0.3],
+          "ambient": [0.1, 0.1, 0.1],
+          "diffuse": [0.4, 0.4, 0.4],
+          "specular": [0.5, 0.5, 0.5],
+          "intensity": 2.1
+        },
+        "BoundingVolumeComponent": { "type": "AABB" }
+      }
+    }
+  ]
+}

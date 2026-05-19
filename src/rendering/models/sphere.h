@@ -17,10 +17,10 @@ public:
 	~Sphere();
 
 	[[nodiscard]]
-	MeshMap* meshes();
+	MeshMap& meshes();
 
 	[[nodiscard]]
-	MaterialMap* material();
+	MaterialMap& material();
 
 private:
 	MeshMap mMeshes;

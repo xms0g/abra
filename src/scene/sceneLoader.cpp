@@ -16,21 +16,21 @@
 #include "../ECS/components/skybox.hpp"
 #include "../ECS/components/instance.hpp"
 #include "../math/boundingVolume.h"
-#include "../resourceManager/resourceManager.h"
 #include "../rendering/models/cube.h"
 #include "../rendering/models/cubemap.h"
+#include "../rendering/models/sphere.h"
+#include "../resourceManager/resourceManager.h"
 
 using json = nlohmann::json;
 
 glm::vec3 parseVec3(const json& j) {
-	return {j[0].get<float>(), j[1].get<float>(), j[2].get<float>()};
+	return glm::vec3(j[0].get<float>(), j[1].get<float>(), j[2].get<float>());
 }
 
-bool SceneLoader::loadScene(const char* filePath, Registry& registry) {
+void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 	std::ifstream file(fs::path(filePath));
 	if (!file.is_open()) {
-		std::cerr << "Failed to open scene file: " << filePath << std::endl;
-		return false;
+		throw std::runtime_error(std::format("Failed to open scene file: {}", filePath));
 	}
 
 	json sceneJson;
@@ -69,11 +69,50 @@ bool SceneLoader::loadScene(const char* filePath, Registry& registry) {
 
 	// --- PHASE 3: Assemble Components ---
 	for (auto& [entity, comps, isPrimitive, primType]: deferredEntities) {
-		// Handle Primitive instantiation if necessary
-		std::shared_ptr<Models::Cube> localCube = nullptr;
 		if (isPrimitive && primType == "Cube") {
-			localCube = std::make_shared<Models::Cube>(glm::vec3(1.0f), true);
-			mCubes.push_back(localCube);
+			glm::vec3 color{0.0f};
+			bool unlit{false};
+			std::string albedoTexture;
+			std::string specularTexture;
+			std::string normalTexture;
+			std::string heightTexture;
+
+			auto matCom = comps["MaterialComponent"];
+
+			if (matCom.contains("color")) {
+				color = parseVec3(matCom["color"]);
+			}
+			if (matCom.contains("unlit")) {
+				unlit = matCom["unlit"].get<bool>();
+			}
+
+			if (matCom.contains("albedo_texture")) {
+				albedoTexture = matCom["albedo_texture"].get<std::string>();
+			}
+
+			if (matCom.contains("specular_texture")) {
+				specularTexture = matCom["specular_texture"].get<std::string>();
+			}
+
+			if (matCom.contains("normal_texture")) {
+				normalTexture = matCom["normal_texture"].get<std::string>();
+			}
+
+			if (matCom.contains("height_texture")) {
+				heightTexture = matCom["height_texture"].get<std::string>();
+			}
+
+			Models::Cube cube{
+				color,
+				unlit,
+				!albedoTexture.empty() ? albedoTexture.c_str() : nullptr,
+				!specularTexture.empty() ? specularTexture.c_str() : nullptr,
+				!normalTexture.empty() ? normalTexture.c_str() : nullptr,
+				!heightTexture.empty() ? heightTexture.c_str() : nullptr
+			};
+
+			ResourceManager::instance().uploadMesh(entity.id(), cube.meshes());
+			ResourceManager::instance().uploadMaterial(entity.id(), cube.material());
 		} else if (isPrimitive && primType == "Cubemap") {
 			if (comps.contains("SkyboxComponent")) {
 				std::vector<std::string> faceStrings;
@@ -83,8 +122,44 @@ bool SceneLoader::loadScene(const char* filePath, Registry& registry) {
 					faceStrings.push_back(face.get<std::string>());
 				}
 
-				mSkybox = std::make_shared<Models::Cubemap>(faceStrings);
+				Models::Cubemap cubemap{faceStrings};
+				ResourceManager::instance().uploadMesh(entity.id(), cubemap.meshes());
+				ResourceManager::instance().uploadMaterial(entity.id(), cubemap.material());
 			}
+		} else if (isPrimitive && primType == "Sphere") {
+			glm::vec3 color{0.0f};
+			bool unlit{false};
+			std::string albedo;
+			std::string normal;
+			std::string orm;
+
+			auto matCom = comps["MaterialComponent"];
+			if (matCom.contains("color")) {
+				color = parseVec3(matCom["color"]);
+			}
+			if (matCom.contains("unlit")) {
+				unlit = matCom["unlit"].get<bool>();
+			}
+			if (matCom.contains("albedo")) {
+				albedo = matCom["albedo"].get<std::string>();
+			}
+			if (matCom.contains("normal")) {
+				normal = matCom["normal"].get<std::string>();
+			}
+			if (matCom.contains("orm")) {
+				orm = matCom["orm"].get<std::string>();
+			}
+
+			Models::Sphere sphere{
+				color,
+				unlit,
+				!albedo.empty() ? albedo.c_str() : nullptr,
+				!normal.empty() ? normal.c_str() : nullptr,
+				!orm.empty() ? orm.c_str() : nullptr
+			};
+
+			ResourceManager::instance().uploadMesh(entity.id(), sphere.meshes());
+			ResourceManager::instance().uploadMaterial(entity.id(), sphere.material());
 		}
 
 		// Transform Component
@@ -99,13 +174,7 @@ bool SceneLoader::loadScene(const char* filePath, Registry& registry) {
 
 		// Mesh Component
 		if (comps.contains("MeshComponent")) {
-			if (isPrimitive && primType == "Cube") {
-				entity.addComponent<MeshComponent>(localCube->meshes());
-			} else if (isPrimitive && primType == "Cubemap") {
-				entity.addComponent<MeshComponent>(mSkybox->meshes());
-			} else {
-				entity.addComponent<MeshComponent>(ResourceManager::instance().getMeshes(entity.id()));
-			}
+			entity.addComponent<MeshComponent>(ResourceManager::instance().getMeshes(entity.id()));
 		}
 
 		// Bounding Volume Component
@@ -113,6 +182,7 @@ bool SceneLoader::loadScene(const char* filePath, Registry& registry) {
 			auto bvc = comps["BoundingVolumeComponent"];
 			if (bvc["type"] == "AABB") {
 				auto meshComp = entity.getComponent<MeshComponent>();
+
 				entity.addComponent<BoundingVolumeComponent>(
 					std::make_shared<math::AABB>(math::generateAABB(*meshComp.meshes))
 				);
@@ -121,13 +191,7 @@ bool SceneLoader::loadScene(const char* filePath, Registry& registry) {
 
 		// Material Component
 		if (comps.contains("MaterialComponent")) {
-			if (isPrimitive && primType == "Cube") {
-				entity.addComponent<MaterialComponent>(localCube->material());
-			} else if (isPrimitive && primType == "Cubemap") {
-				entity.addComponent<MaterialComponent>(mSkybox->material());
-			} else {
-				entity.addComponent<MaterialComponent>(ResourceManager::instance().getMaterial(entity.id()));
-			}
+			entity.addComponent<MaterialComponent>(ResourceManager::instance().getMaterial(entity.id()));
 		}
 
 		// Debug Component
@@ -138,9 +202,10 @@ bool SceneLoader::loadScene(const char* filePath, Registry& registry) {
 		// Instance Component
 		if (comps.contains("InstanceComponent")) {
 			auto ic = comps["InstanceComponent"];
-			auto transforms = ic["transforms"].get<std::vector<float>>();
+			auto transforms = ic["transforms"].get<std::vector<float> >();
 
-			entity.addComponent<InstanceComponent>(ResourceManager::instance().uploadTransforms(entity.id(), transforms));
+			entity.addComponent<InstanceComponent>(
+				ResourceManager::instance().uploadTransforms(entity.id(), transforms));
 		}
 
 		// Skybox Component
@@ -200,6 +265,4 @@ bool SceneLoader::loadScene(const char* filePath, Registry& registry) {
 	}
 
 	ResourceManager::instance().uploadModelsToGPU();
-
-	return true;
 }

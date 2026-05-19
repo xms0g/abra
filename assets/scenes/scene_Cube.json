@@ -1,0 +1,46 @@
+{
+  "scene_name": "Cube",
+  "entities": [
+    {
+      "name": "Skybox",
+      "primitive": "Cubemap",
+      "components": {
+        "TransformComponent": {
+          "position": [0.0, 0.0, 0.0],
+          "rotation": [0.0, 0.0, 0.0],
+          "scale": [1.0, 1.0, 1.0]
+        },
+        "MeshComponent": { "from_resource_manager": true },
+        "MaterialComponent": { "from_resource_manager": true },
+        "SkyboxComponent": {
+          "faces": [
+            "skybox/right.jpg",
+            "skybox/left.jpg",
+            "skybox/top.jpg",
+            "skybox/bottom.jpg",
+            "skybox/front.jpg",
+            "skybox/back.jpg"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Cube",
+      "primitive": "Cube",
+      "components": {
+        "TransformComponent": {
+          "position": [-3.2, 5.0, 0.0],
+          "rotation": [0.0, 0.0, 0.0],
+          "scale": [1.0, 1.0, 1.0]
+        },
+        "MeshComponent": { "from_resource_manager": true },
+        "MaterialComponent": {
+          "color": [0.0, 1.0, 1.0, 1.0],
+          "unlit": true,
+          "from_resource_manager": true
+        },
+        "BoundingVolumeComponent": { "type": "AABB" }
+      }
+    }
+  ]
+}

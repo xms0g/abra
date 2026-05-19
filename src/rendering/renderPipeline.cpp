@@ -297,6 +297,8 @@ void RenderPipeline::render() {
 	refreshCameraData();
 	sortEntities();
 
+	mRenderCtx->materialCache.reset();
+
 	mSceneBuffer->bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -320,7 +322,7 @@ void RenderPipeline::drawGui() {
 void RenderPipeline::refreshCameraData() const {
 	mRenderCtx->camera.skyView = glm::mat4(glm::mat3(mRenderCtx->camera.self->viewMatrix()));
 
-	struct PackedView {
+	struct alignas(16) PackedView {
 		glm::mat4 view;
 		glm::vec4 viewPos;
 	};

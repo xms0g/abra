@@ -114,30 +114,20 @@ Models::Sphere::Sphere(
 	}
 
 	mMeshes[0].emplace_back(vertices, indices);
-	mMeshes.at(0).at(0).uploadToGPU();
 
 	uint32_t flags{0};
 	std::vector<Texture> textures;
 	if (albedo) {
-		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + albedo).c_str(), 1, true),
-			ALBEDO,
-			albedo
+		textures.emplace_back(0, ALBEDO, fs::path(ASSET_DIR + albedo)
 		);
 	}
 
 	if (normal) {
-		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + normal).c_str(), 1, false),
-			NORMAL,
-			normal);
+		textures.emplace_back(0,NORMAL, fs::path(ASSET_DIR + normal));
 	}
 
 	if (orm) {
-		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + orm).c_str(), 1, false),
-			ROUGHNESS_METALLIC,
-			orm);
+		textures.emplace_back(0, ROUGHNESS_METALLIC, fs::path(ASSET_DIR + orm));
 		flags |= PBR;
 		flags |= HAS_ORM;
 	}
@@ -156,10 +146,10 @@ Models::Sphere::Sphere(
 
 Models::Sphere::~Sphere() = default;
 
-MeshMap* Models::Sphere::meshes() {
-	return &mMeshes;
+MeshMap& Models::Sphere::meshes() {
+	return mMeshes;
 }
 
-MaterialMap* Models::Sphere::material() {
-	return &mMaterial;
+MaterialMap& Models::Sphere::material() {
+	return mMaterial;
 }

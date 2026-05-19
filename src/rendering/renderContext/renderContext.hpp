@@ -2,6 +2,7 @@
 #include <vector>
 #include "glm/glm.hpp"
 #include "../../config/config.hpp"
+#include "../material/material.hpp"
 
 namespace math {
 struct Frustum;
@@ -19,6 +20,7 @@ struct RenderContext {
 	RenderQueue* renderQueue;
 	mutable const FrameBuffer* sceneBuffer;
 	const FrameBuffer* intermediateBuffer;
+	mutable MaterialCache materialCache;
 
 	struct {
 		const FrameBuffer* self;

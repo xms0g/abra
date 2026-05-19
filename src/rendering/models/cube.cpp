@@ -120,37 +120,24 @@ Models::Cube::Cube(
 	}
 
 	mMeshes[0].emplace_back(vertices, indices);
-	mMeshes.at(0).at(0).uploadToGPU();
 
 	std::vector<Texture> textures;
 
 	if (diffuseTexture) {
-		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + diffuseTexture).c_str(), 1, true),
-			ALBEDO,
-			diffuseTexture
+		textures.emplace_back(0, ALBEDO, fs::path(ASSET_DIR + diffuseTexture)
 		);
 	}
 
 	if (specularTexture) {
-		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + specularTexture).c_str(), 1, false),
-			SPECULAR,
-			specularTexture);
+		textures.emplace_back(0, SPECULAR, fs::path(ASSET_DIR + specularTexture));
 	}
 
 	if (normalTexture) {
-		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + normalTexture).c_str(), 1, false),
-			NORMAL,
-			normalTexture);
+		textures.emplace_back(0,NORMAL,fs::path(ASSET_DIR + normalTexture));
 	}
 
 	if (heightTexture) {
-		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + heightTexture).c_str(), 1, false),
-			HEIGHT,
-			heightTexture);
+		textures.emplace_back(0, HEIGHT, fs::path(ASSET_DIR + heightTexture));
 	}
 
 	uint32_t flags{0};
@@ -170,10 +157,10 @@ Models::Cube::Cube(
 
 Models::Cube::~Cube() = default;
 
-MeshMap* Models::Cube::meshes() {
-	return &mMeshes;
+MeshMap& Models::Cube::meshes() {
+	return mMeshes;
 }
 
-MaterialMap* Models::Cube::material() {
-	return &mMaterial;
+MaterialMap& Models::Cube::material() {
+	return mMaterial;
 }

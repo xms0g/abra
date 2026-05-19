@@ -68,21 +68,18 @@ void RenderCommon::setupMaterial(
 	const RenderContext& ctx,
 	const Shader& shader) {
 	static bool isCullingEnabled{true};
-	static uint32_t lastMaterialIdx{0};
-	static uint32_t lastMatFlags{0};
-	static const Shader* lastShader{nullptr};
 
-	if (lastMaterialIdx == materialIdx) {
+	if (ctx.materialCache.lastMaterialIdx == materialIdx) {
 		return;
 	}
 
-	lastMaterialIdx = materialIdx;
+	ctx.materialCache.lastMaterialIdx = materialIdx;
 
 	const uint32_t flags = ctx.renderQueue->material.flags[materialIdx];
 
-	if (lastMatFlags != flags || lastShader != &shader) {
-		lastMatFlags = flags;
-		lastShader = &shader;
+	if (ctx.materialCache.lastMatFlags != flags || ctx.materialCache.lastShader != &shader) {
+		ctx.materialCache.lastMatFlags = flags;
+		ctx.materialCache.lastShader = &shader;
 		shader.setUint("material.flags", flags);
 	}
 
