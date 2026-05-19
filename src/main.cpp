@@ -1,8 +1,7 @@
 #include <iostream>
 #include "core/engine.h"
-#include "resourceManager/resourceManager.h"
 #include "ECS/registry.h"
-#include "scene/sceneLoader.h"
+#include "resourceManager/sceneLoader.h"
 
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 1

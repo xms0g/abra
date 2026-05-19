@@ -3,6 +3,7 @@
 #include <iostream>
 #include "glm/glm.hpp"
 #include "nlohmann/json.hpp"
+#include "resourceManager.h"
 #include "../io/filesystem.hpp"
 #include "../ECS/registry.h"
 #include "../ECS/components/transform.hpp"
@@ -19,7 +20,6 @@
 #include "../rendering/models/cube.h"
 #include "../rendering/models/cubemap.h"
 #include "../rendering/models/sphere.h"
-#include "../resourceManager/resourceManager.h"
 
 using json = nlohmann::json;
 
