@@ -17,9 +17,9 @@ struct PointLightComponent;
 struct SpotLightComponent;
 
 struct RenderContext {
-	RenderQueue* renderQueue;
-	mutable const FrameBuffer* sceneBuffer;
-	const FrameBuffer* intermediateBuffer;
+	RenderQueue* renderQueue{};
+	mutable const FrameBuffer* sceneBuffer{};
+	const FrameBuffer* intermediateBuffer{};
 	mutable MaterialCache materialCache;
 
 	struct {
@@ -30,7 +30,7 @@ struct RenderContext {
 		int32_t albedoTextureIdx;
 		int32_t ormTextureIdx;
 		int32_t depthTextureIdx;
-	} gBuffer;
+	} gBuffer{};
 
 	struct {
 		const FrameBuffer* buffer;
@@ -47,7 +47,7 @@ struct RenderContext {
 		} ubo;
 
 		int32_t textureSlot;
-	} ssao;
+	} ssao{};
 
 	struct {
 		const std::array<DirectionalLightComponent*, MAX_DIRECTIONAL_LIGHTS>* dirLights;
@@ -60,7 +60,7 @@ struct RenderContext {
 			uint32_t binding;
 			const char* blockName;
 		} ubo;
-	} light;
+	} light{};
 
 	struct {
 		const Camera* self;
@@ -72,11 +72,11 @@ struct RenderContext {
 			uint32_t binding;
 			const char* blockName;
 		} ubo;
-	} camera;
+	} camera{};
 
 	struct {
 		uint32_t width, height;
-	} screen;
+	} screen{};
 
 	struct {
 		int32_t textureSlot;
@@ -102,7 +102,7 @@ struct RenderContext {
 			uint32_t maxLights;
 			float nearPlane, farPlane;
 		} perspective;
-	} shadow;
+	} shadow{};
 
 	struct {
 		struct {
@@ -133,7 +133,7 @@ struct RenderContext {
 		int32_t heightTextureSlot;
 
 		const char* HDRTexture;
-	} PBR;
+	} PBR{};
 
 	RenderContext() = default;
 
