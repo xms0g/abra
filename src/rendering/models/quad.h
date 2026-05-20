@@ -10,7 +10,7 @@ public:
 	virtual ~IQuad();
 
 	[[nodiscard]]
-	uint32_t VAO() const { return mVAO; }
+	uint32_t vao() const { return mVAO; }
 
 protected:
 	uint32_t mVAO{0}, mVBO{0};

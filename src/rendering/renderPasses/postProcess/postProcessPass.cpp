@@ -58,11 +58,11 @@ void PostProcessPass::execute(const RenderContext& ctx) {
 		if (!effect->enabled())
 			continue;
 
-		inputTex = effect->render(inputTex, mQuad->VAO(), toggle, mPingPong);
+		inputTex = effect->render(inputTex, mQuad->vao(), toggle, mPingPong);
 	}
 
 	mQuad->shader().activate();
-	RenderCommon::drawQuad(inputTex, mQuad->VAO());
+	RenderCommon::drawQuad(inputTex, mQuad->vao());
 }
 
 void PostProcessPass::onGuiUpdate(const GuiPostProcessEvent& event) {

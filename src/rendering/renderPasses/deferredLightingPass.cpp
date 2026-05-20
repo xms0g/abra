@@ -88,7 +88,7 @@ void DeferredLightingPass::execute(const RenderContext& ctx) {
 	mBrdfLUTBuffer->bindTexture(ctx.PBR.brdfLUT.textureSlot);
 
 	glDisable(GL_DEPTH_TEST);
-	glBindVertexArray(mQuad->VAO());
+	glBindVertexArray(mQuad->vao());
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 	glEnable(GL_DEPTH_TEST);
@@ -192,7 +192,7 @@ void DeferredLightingPass::createBrdfLUT() const {
 	mBrdfLUTBuffer->bind();
 	brdfLUT.activate();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glBindVertexArray(quad.VAO());
+	glBindVertexArray(quad.vao());
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 	mBrdfLUTBuffer->unbind();
