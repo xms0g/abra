@@ -339,8 +339,6 @@ void RenderPipeline::refreshCameraData() const {
 void RenderPipeline::batchEntity(const Entity& entity) {
 	static uint32_t materialIndex{0}, textureOffset{0}, meshIndex{0};
 
-	auto& matComponent = entity.getComponent<MaterialComponent>();
-
 	auto pos = entity.getComponent<TransformComponent>().position;
 	auto rot = entity.getComponent<TransformComponent>().rotation;
 	auto scale = entity.getComponent<TransformComponent>().scale;
@@ -366,6 +364,8 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 
 	mRenderQueue.entity.debugModes.emplace_back(0);
 	mRenderQueue.entity.heightScales.emplace_back(entity.getComponent<MaterialComponent>().heightScale);
+
+	auto& matComponent = entity.getComponent<MaterialComponent>();
 
 	if (entity.hasComponent<SkyboxComponent>()) {
 		const auto& material = matComponent.materials->at(0);

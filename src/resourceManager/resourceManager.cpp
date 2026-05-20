@@ -32,7 +32,6 @@ void ResourceManager::asyncLoadModel(size_t entityID, std::string& file) {
 void ResourceManager::uploadMesh(size_t entityID, MeshMap& map) {
 	std::lock_guard<std::mutex> lock(mResourceMutex);
 	mMeshesByEntity.emplace(entityID, std::move(map));
-
 }
 
 void ResourceManager::uploadMaterial(size_t entityID, MaterialMap& map) {
@@ -60,11 +59,14 @@ void ResourceManager::uploadModelsToGPU() {
 		for (auto& [matID, material]: materials) {
 			if (material.flags & CUBEMAP) {
 				std::vector<std::string> paths;
+				paths.reserve(material.textures.size());
+
 				for (auto& [id, type, path]: material.textures) {
 					paths.push_back(path);
 				}
+
 				material.textures.clear();
-				material.textures.emplace_back(texture::loadCubemap(paths), 0,"" );
+				material.textures.emplace_back(texture::loadCubemap(paths), 0, "");
 				continue;
 			}
 
@@ -277,9 +279,9 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 			case aiTextureType_LIGHTMAP: {
 				if (materialLoadCtx.roughMetalPath == path) {
 					material.flags |= HAS_ORM;
-				} else {
-					material.flags |= HAS_AO_MAP;
+					return;
 				}
+				material.flags |= HAS_AO_MAP;
 				break;
 			}
 		}
