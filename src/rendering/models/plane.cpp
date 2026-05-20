@@ -8,16 +8,17 @@
 
 Models::Plane::Plane(
 	glm::vec3 color,
+	bool unlit,
 	const char* diffuseTexture,
 	const char* specularTexture,
 	const char* normalTexture,
 	const char* heightTexture) {
 	constexpr float v[] = {
 		// Positions        // Normals		   // Texture Coords
-		 5.0f, -0.5f,  5.0f, 0.0f, 1.0f, 0.0f, 2.0f, 0.0f, // top right
-		-5.0f, -0.5f,  5.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, // top left
+		5.0f, -0.5f, 5.0f, 0.0f, 1.0f, 0.0f, 2.0f, 0.0f, // top right
+		-5.0f, -0.5f, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, // top left
 		-5.0f, -0.5f, -5.0f, 0.0f, 1.0f, 0.0f, 0.0f, 2.0f, // bottom left
-		 5.0f, -0.5f, -5.0f, 0.0f, 1.0f, 0.0f, 2.0f, 2.0f // bottom right
+		5.0f, -0.5f, -5.0f, 0.0f, 1.0f, 0.0f, 2.0f, 2.0f // bottom right
 	};
 
 	std::vector<uint32_t> indices = {
@@ -57,9 +58,9 @@ Models::Plane::Plane(
 		float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
 
 		auto tangent = glm::vec3(
-		f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x),
-		f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y),
-		f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z));
+			f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x),
+			f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y),
+			f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z));
 
 		auto bitangent = glm::vec3(
 			f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x),
@@ -77,37 +78,31 @@ Models::Plane::Plane(
 	std::vector<Texture> textures;
 
 	if (diffuseTexture) {
-		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + diffuseTexture).c_str(), 1, true),
-			ALBEDO,
-			diffuseTexture
+		textures.emplace_back(0, ALBEDO, fs::path(ASSET_DIR + diffuseTexture)
 		);
 	}
 
 	if (specularTexture) {
-		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + specularTexture).c_str(), 1, false),
-			SPECULAR,
-			specularTexture);
+		textures.emplace_back(0, SPECULAR, fs::path(ASSET_DIR + specularTexture));
 	}
 
 	if (normalTexture) {
-		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + normalTexture).c_str(), 1, false),
-			NORMAL,
-			normalTexture);
+		textures.emplace_back(0, NORMAL, fs::path(ASSET_DIR + normalTexture));
 	}
 
 	if (heightTexture) {
-		textures.emplace_back(
-			texture::load(fs::path(ASSET_DIR + heightTexture).c_str(), 1, false),
-			HEIGHT,
-			heightTexture);
+		textures.emplace_back(0, HEIGHT, fs::path(ASSET_DIR + heightTexture));
 	}
 
 	uint32_t flags{0};
+	if (unlit) {
+		flags |= UNLIT;
+	} else {
+		flags |= CASTSHADOW;
+	}
 
-	flags |= OPAQUE | CASTSHADOW;
+	flags |= OPAQUE | TWOSIDED;
+
 	if (color != glm::vec3(0.0f)) {
 		flags |= HAS_SOLID_COLOR;
 	}
@@ -116,10 +111,10 @@ Models::Plane::Plane(
 
 Models::Plane::~Plane() = default;
 
- MeshMap* Models::Plane::meshes() {
-	 return &mMeshes;
- }
+MeshMap& Models::Plane::meshes() {
+	return mMeshes;
+}
 
-MaterialMap* Models::Plane::material() {
-	 return &mMaterial;
- }
+MaterialMap& Models::Plane::material() {
+	return mMaterial;
+}

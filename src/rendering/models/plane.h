@@ -8,7 +8,8 @@ namespace Models {
 class Plane {
 public:
 	explicit Plane(
-		glm::vec3 color,
+		glm::vec3 color = glm::vec3(1.0f),
+		bool unlit = false,
 		const char* diffuseTexture = nullptr,
 		const char* specularTexture = nullptr,
 		const char* normalTexture = nullptr,
@@ -17,10 +18,10 @@ public:
 	~Plane();
 
 	[[nodiscard]]
-	MeshMap* meshes();
+	MeshMap& meshes();
 
 	[[nodiscard]]
-	MaterialMap* material();
+	MaterialMap& material();
 
 private:
 	MeshMap mMeshes;

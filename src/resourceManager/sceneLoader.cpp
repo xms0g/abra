@@ -18,8 +18,11 @@
 #include "../ECS/components/instance.hpp"
 #include "../math/boundingVolume.h"
 #include "../rendering/models/cube.h"
+#include "../rendering/models/plane.h"
 #include "../rendering/models/cubemap.h"
 #include "../rendering/models/sphere.h"
+
+#define TEXTURE_PTR(tex) (!(tex).empty() ? (tex).c_str() : nullptr)
 
 using json = nlohmann::json;
 
@@ -46,7 +49,7 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 
 	std::vector<DeferredEntity> deferredEntities;
 
-	// --- PHASE 1: Create Entities & Kick off Async Asset Loading ---
+	// Create Entities & Kick off Async Asset Loading
 	for (const auto& entityData: sceneJson["entities"]) {
 		std::string name = entityData["name"];
 		auto entity = registry.createEntity(name);
@@ -64,12 +67,12 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 		deferredEntities.push_back(deferred);
 	}
 
-	// --- PHASE 2: Wait for GPU/Disk assets to be ready ---
+	// Wait for GPU/Disk assets to be ready
 	ResourceManager::instance().waitForAll();
 
-	// --- PHASE 3: Assemble Components ---
+	// Assemble Components
 	for (auto& [entity, comps, isPrimitive, primType]: deferredEntities) {
-		if (isPrimitive && primType == "Cube") {
+		if (isPrimitive && (primType == "Cube" || primType == "Plane")) {
 			glm::vec3 color{0.0f};
 			bool unlit{false};
 			std::string albedoTexture;
@@ -102,17 +105,36 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 				heightTexture = matCom["height_texture"].get<std::string>();
 			}
 
-			Models::Cube cube{
-				color,
-				unlit,
-				!albedoTexture.empty() ? albedoTexture.c_str() : nullptr,
-				!specularTexture.empty() ? specularTexture.c_str() : nullptr,
-				!normalTexture.empty() ? normalTexture.c_str() : nullptr,
-				!heightTexture.empty() ? heightTexture.c_str() : nullptr
+			auto uploadPrimitives = [&entity]<typename T>(
+				const glm::vec3& c,
+				bool u,
+				const std::string& albedo,
+				const std::string& specular,
+				const std::string& normal,
+				const std::string& height) {
+				T model{c, u, TEXTURE_PTR(albedo), TEXTURE_PTR(specular), TEXTURE_PTR(normal), TEXTURE_PTR(height)};
+
+				ResourceManager::instance().uploadMesh(entity.id(), model.meshes());
+				ResourceManager::instance().uploadMaterial(entity.id(), model.material());
 			};
 
-			ResourceManager::instance().uploadMesh(entity.id(), cube.meshes());
-			ResourceManager::instance().uploadMaterial(entity.id(), cube.material());
+			if (primType == "Cube") {
+				uploadPrimitives.operator()<Models::Cube>(
+					color,
+					unlit,
+					albedoTexture,
+					specularTexture,
+					normalTexture,
+					heightTexture);
+			} else if (primType == "Plane") {
+				uploadPrimitives.operator()<Models::Plane>(
+					color,
+					unlit,
+					albedoTexture,
+					specularTexture,
+					normalTexture,
+					heightTexture);
+			}
 		} else if (isPrimitive && primType == "Cubemap") {
 			if (comps.contains("SkyboxComponent")) {
 				std::vector<std::string> faceStrings;
@@ -153,9 +175,9 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 			Models::Sphere sphere{
 				color,
 				unlit,
-				!albedo.empty() ? albedo.c_str() : nullptr,
-				!normal.empty() ? normal.c_str() : nullptr,
-				!orm.empty() ? orm.c_str() : nullptr
+				TEXTURE_PTR(albedo),
+				TEXTURE_PTR(normal),
+				TEXTURE_PTR(orm)
 			};
 
 			ResourceManager::instance().uploadMesh(entity.id(), sphere.meshes());
