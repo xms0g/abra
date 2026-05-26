@@ -55,7 +55,7 @@ vec3 brdf(vec3 lightPos, vec3 N, vec3 V, vec3 F0, vec3 worldPos, vec3 radiance, 
     vec3 H = normalize(V + L);
     // Cook-Torrance BRDF
     float NDF = distributionGGX(N, H, roughness);
-        float G = geometrySmith(N, V, L, roughness, false);
+    float G = geometrySmith(N, V, L, roughness, false);
     vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
     vec3 numerator = NDF * G * F;

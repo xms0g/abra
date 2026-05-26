@@ -128,14 +128,12 @@ RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLCon
 	mShadowSystem = std::make_unique<ShadowSystem>();
 	mSyncStateSystem = std::make_unique<SyncStateSystem>();
 
-	mShaders = {
-		std::make_shared<Shader>("object.vert", "opaque.frag"),
-		std::make_shared<Shader>("object.vert", "blend.frag"),
-		std::make_shared<Shader>("unlit.vert", "unlit.frag"),
-		std::make_shared<Shader>("instanced.vert", "opaque.frag"),
-		std::make_shared<Shader>("instanced.vert", "blend.frag"),
-		std::make_shared<Shader>("skybox.vert", "skybox.frag")
-	};
+	mShaders.emplace("opaque", std::make_unique<Shader>("object.vert", "opaque.frag"));
+	mShaders.emplace("blend", std::make_unique<Shader>("object.vert", "blend.frag"));
+	mShaders.emplace("unlit", std::make_unique<Shader>("unlit.vert", "unlit.frag"));
+	mShaders.emplace("instancedOpaque", std::make_unique<Shader>("instanced.vert", "opaque.frag"));
+	mShaders.emplace("instancedBlend", std::make_unique<Shader>("instanced.vert", "blend.frag"));
+	mShaders.emplace("skybox", std::make_unique<Shader>("skybox.vert", "skybox.frag"));
 
 	GuiBackend::init(window, context, "#version 410");
 }
@@ -262,7 +260,7 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	}
 
 	// Configure shaders
-	for (const auto& shader: mShaders) {
+	for (const auto& [name,shader]: mShaders) {
 		mRenderCtx->camera.ubo.self->configure(
 			shader->id(),
 			mRenderCtx->camera.ubo.binding,
@@ -385,7 +383,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 
 		std::vector<uint32_t> indices{meshIndex++};
 
-		const MaterialBatch matBatch{materialIndex++, textureOffset++, 1, mShaders[5].get(), indices};
+		const MaterialBatch matBatch{materialIndex++, textureOffset++, 1, mShaders["skybox"].get(), indices};
 		const RenderGroup group{entity.id(), matBatch};
 		mRenderQueue.skybox.push_back(group);
 		return;
@@ -421,9 +419,9 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		if (entity.hasComponent<InstanceComponent>()) {
 			// Set shader
 			if (material.flags & OPAQUE) {
-				matBatch.shader = mShaders[3].get();
+				matBatch.shader = mShaders["instancedOpaque"].get();
 			} else if (material.flags & BLEND) {
-				matBatch.shader = mShaders[4].get();
+				matBatch.shader = mShaders["instancedBlend"].get();
 			}
 
 			const auto& instComponent = entity.getComponent<InstanceComponent>();
@@ -440,12 +438,12 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		// Set shader
 		if (material.flags & OPAQUE) {
 			if (material.flags & UNLIT) {
-				matBatch.shader = mShaders[2].get();
+				matBatch.shader = mShaders["unlit"].get();
 			} else {
-				matBatch.shader = mShaders[0].get();
+				matBatch.shader = mShaders["opaque"].get();
 			}
 		} else if (material.flags & BLEND) {
-			matBatch.shader = mShaders[1].get();
+			matBatch.shader = mShaders["blend"].get();
 		}
 
 		const RenderGroup group{entity.id(), matBatch};

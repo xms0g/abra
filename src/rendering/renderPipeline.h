@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <unordered_map>
 #include <vector>
 #include "renderContext/renderQueue.hpp"
 #include "../ECS/system.hpp"
@@ -48,7 +49,8 @@ private:
 	std::unique_ptr<ShadowSystem> mShadowSystem;
 	std::unique_ptr<SyncStateSystem> mSyncStateSystem;
 	//Shaders
-	std::vector<std::shared_ptr<Shader>> mShaders;
+	std::unordered_map<std::string, std::unique_ptr<Shader>> mShaders;
+	//std::vector<std::shared_ptr<Shader>> mShaders;
 	// Frame Buffers
 	std::unique_ptr<FrameBuffer> mSceneBuffer;
 	std::unique_ptr<FrameBuffer> mIntermediateBuffer;
