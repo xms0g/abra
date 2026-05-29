@@ -30,6 +30,8 @@ public:
 		bindTextureImpl(slot, index);
 	}
 
+	void resizeRenderBuffer(int32_t width, int32_t height) const;
+
 	void checkStatus();
 
 protected:

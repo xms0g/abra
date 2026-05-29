@@ -38,6 +38,12 @@ void BaseFrameBuffer::unbind() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void BaseFrameBuffer::resizeRenderBuffer(const int32_t width, const int32_t height) const {
+	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
+	glViewport(0, 0, width, height);
+}
+
 void BaseFrameBuffer::checkStatus() {
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 		throw std::runtime_error("ERROR::FRAMEBUFFER::NOT_COMPLETE!\n");

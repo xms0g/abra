@@ -163,12 +163,9 @@ void DeferredLightingPass::createPrefilterMap(const RenderContext& ctx) {
 
 	mPrefilterMapBuffer->bind();
 
-	for (uint32_t i = 0; i < mipLevels; ++i) {
-		const auto mipSize = static_cast<int32_t>(ctx.PBR.prefilterMap.size * std::pow(0.5, i));
-
-		glBindRenderbuffer(GL_RENDERBUFFER, mPrefilterMapBuffer->rbo());
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipSize, mipSize);
-		glViewport(0, 0, mipSize, mipSize);
+	for (int32_t i = 0; i < mipLevels; ++i) {
+		const int32_t mipSize = static_cast<int32_t>(ctx.PBR.prefilterMap.size * std::pow(0.5, i));
+		mPrefilterMapBuffer->resizeRenderBuffer(mipSize, mipSize);
 
 		const float roughness = static_cast<float>(i) / static_cast<float>(mipLevels - 1);
 		prefilter.setFloat("roughness", roughness);
@@ -189,12 +186,14 @@ void DeferredLightingPass::createBrdfLUT() const {
 	const Models::SingleQuad quad;
 	const auto brdfLUT = Shader{"pbr/brdfLUT.vert", "pbr/brdfLUT.frag"};
 	// generate a 2D LUT from the BRDF equations used.
-	mBrdfLUTBuffer->bind();
 	brdfLUT.activate();
+	mBrdfLUTBuffer->bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	glBindVertexArray(quad.vao());
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
+
 	mBrdfLUTBuffer->unbind();
 }
 
