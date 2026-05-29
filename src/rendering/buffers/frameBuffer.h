@@ -6,7 +6,7 @@ class BaseFrameBuffer {
 public:
 	BaseFrameBuffer(int32_t width, int32_t height);
 
-	virtual ~BaseFrameBuffer() = default;
+	virtual ~BaseFrameBuffer();
 
 	[[nodiscard]]
 	int32_t width() const;

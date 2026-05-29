@@ -3,11 +3,18 @@
 #include <vector>
 #include "glad/glad.h"
 
-BaseFrameBuffer::BaseFrameBuffer(int32_t width, int32_t height)
+BaseFrameBuffer::BaseFrameBuffer(const int32_t width, const int32_t height)
 	: mWidth(width),
 	  mHeight(height) {
 	glGenFramebuffers(1, &mFBO);
 	bind();
+}
+
+BaseFrameBuffer::~BaseFrameBuffer() {
+	glDeleteFramebuffers(1, &mFBO);
+
+	if (mRBO)
+		glDeleteRenderbuffers(1, &mRBO);
 }
 
 int32_t BaseFrameBuffer::width() const {
@@ -47,11 +54,6 @@ FrameBuffer::~FrameBuffer() {
 			glDeleteTextures(1, &textureID);
 		}
 	}
-
-	if (mRBO)
-		glDeleteRenderbuffers(1, &mRBO);
-
-	glDeleteFramebuffers(1, &mFBO);
 }
 
 const std::vector<std::pair<uint32_t, uint32_t> >& FrameBuffer::textures() const {
@@ -452,8 +454,6 @@ CubemapBuffer::CubemapBuffer(const int32_t width, const int32_t height, const bo
 }
 
 CubemapBuffer::~CubemapBuffer() {
-	glDeleteFramebuffers(1, &mFBO);
-	glDeleteRenderbuffers(1, &mRBO);
 	glDeleteTextures(1, &mCubemapID);
 }
 
