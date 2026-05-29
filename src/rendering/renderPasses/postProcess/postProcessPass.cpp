@@ -58,7 +58,7 @@ void PostProcessPass::execute(const RenderContext& ctx) {
 		if (!effect->enabled())
 			continue;
 
-		inputTex = effect->render(inputTex, mQuad->vao(), toggle, mPingPong);
+		inputTex = effect->render(mQuad->vao(), inputTex, toggle, mPingPong);
 	}
 
 	mQuad->shader().activate();

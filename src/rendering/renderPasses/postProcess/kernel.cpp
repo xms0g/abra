@@ -13,8 +13,8 @@ Kernel::Kernel(const std::string& name, const float* kernel, const bool enabled)
 }
 
 uint32_t Kernel::render(
-	const uint32_t sceneTexture,
 	const uint32_t vao,
+	const uint32_t sceneTexture,
 	bool& toggle,
 	PingPongBuffer& pingPong) const {
 	pingPong[toggle]->bind();

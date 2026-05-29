@@ -12,8 +12,8 @@ FXAA::FXAA(const std::string& name, const bool enabled)
 }
 
 uint32_t FXAA::render(
-	const uint32_t sceneTexture,
 	const uint32_t vao,
+	const uint32_t sceneTexture,
 	bool& toggle,
 	PingPongBuffer& pingPong) const {
 	pingPong[toggle]->bind();

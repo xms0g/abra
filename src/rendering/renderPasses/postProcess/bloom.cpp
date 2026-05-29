@@ -33,8 +33,8 @@ Bloom::Bloom(const std::string& name, const int width, const int height, const b
 Bloom::~Bloom() = default;
 
 uint32_t Bloom::render(
-	const uint32_t sceneTexture,
 	const uint32_t vao,
+	const uint32_t sceneTexture,
 	bool& toggle,
 	PingPongBuffer& pingPong) const {
 	(void) toggle;
@@ -42,9 +42,9 @@ uint32_t Bloom::render(
 	bool toggle_ = false;
 	uint32_t inputTex = sceneTexture;
 
-	inputTex = brightFilterPass(inputTex, vao, toggle_);
-	inputTex = blurPass(inputTex, vao, toggle_);
-	inputTex = combinePass(sceneTexture, inputTex, vao, toggle_);
+	inputTex = brightFilterPass(vao, inputTex, toggle_);
+	inputTex = blurPass(vao, inputTex, toggle_);
+	inputTex = combinePass(vao, sceneTexture, inputTex, toggle_);
 
 	return inputTex;
 }
@@ -52,7 +52,7 @@ uint32_t Bloom::render(
 void Bloom::updateFromEventImpl(const GuiPostProcessEvent& event) {
 }
 
-uint32_t Bloom::brightFilterPass(const uint32_t sceneTexture, const uint32_t vao, bool& toggle) const {
+uint32_t Bloom::brightFilterPass(const uint32_t vao, const uint32_t sceneTexture, bool& toggle) const {
 	mPingPong[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -65,7 +65,7 @@ uint32_t Bloom::brightFilterPass(const uint32_t sceneTexture, const uint32_t vao
 	return outTex;
 }
 
-uint32_t Bloom::blurPass(const uint32_t sceneTexture, const uint32_t vao, bool& toggle) const {
+uint32_t Bloom::blurPass( const uint32_t vao, const uint32_t sceneTexture, bool& toggle) const {
 	bool horizontal = true;
 	uint32_t outTex = sceneTexture;
 
@@ -87,9 +87,9 @@ uint32_t Bloom::blurPass(const uint32_t sceneTexture, const uint32_t vao, bool& 
 }
 
 uint32_t Bloom::combinePass(
-	const uint32_t sceneTexture,
-	const uint32_t bloomBlur,
 	const uint32_t vao,
+	const uint32_t sceneTexture,
+	const uint32_t blurTexture,
 	const bool& toggle) const {
 	mPingPong[toggle]->bind();
 	combine->activate();
@@ -99,7 +99,7 @@ uint32_t Bloom::combinePass(
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, sceneTexture);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, bloomBlur);
+	glBindTexture(GL_TEXTURE_2D, blurTexture);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 	glEnable(GL_DEPTH_TEST);

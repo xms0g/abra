@@ -26,8 +26,8 @@ public:
 	void enabled(const bool e) { mEnabled = e; }
 
 	virtual uint32_t render(
-		uint32_t sceneTexture,
 		uint32_t vao,
+		uint32_t sceneTexture,
 		bool& toggle,
 		PingPongBuffer& pingPong) const = 0;
 

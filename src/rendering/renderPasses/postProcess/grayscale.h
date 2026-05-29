@@ -10,8 +10,8 @@ public:
 	explicit Grayscale(const std::string& name, bool enabled = false);
 
 	uint32_t render(
-		uint32_t sceneTexture,
 		uint32_t vao,
+		uint32_t sceneTexture,
 		bool& toggle,
 		PingPongBuffer& pingPong) const override;
 
