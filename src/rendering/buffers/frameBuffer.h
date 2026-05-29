@@ -4,16 +4,27 @@
 
 class BaseFrameBuffer {
 public:
+	BaseFrameBuffer(int32_t width, int32_t height);
+
 	virtual ~BaseFrameBuffer() = default;
+
+	[[nodiscard]]
+	int32_t width() const;
+
+	[[nodiscard]]
+	int32_t height() const;
 
 	[[nodiscard]]
 	uint32_t texture(const uint32_t index = 0) const {
 		return textureImpl(index);
 	}
 
-	virtual void bind() const = 0;
+	[[nodiscard]]
+	uint32_t rbo() const;
 
-	virtual void unbind() const = 0;
+	void bind() const;
+
+	void unbind() const;
 
 	void bindTexture(const uint32_t slot, const uint32_t index = 0) const {
 		bindTextureImpl(slot, index);
@@ -29,6 +40,9 @@ protected:
 
 	uint32_t mFBO{0};
 	uint32_t mRBO{0};
+	int32_t mWidth{0};
+	int32_t mHeight{0};
+
 };
 
 class FrameBuffer final : public BaseFrameBuffer {
@@ -38,21 +52,11 @@ public:
 	~FrameBuffer() override;
 
 	[[nodiscard]]
-	int32_t width() const;
-
-	[[nodiscard]]
-	int32_t height() const;
-
-	[[nodiscard]]
 	const std::vector<std::pair<uint32_t, uint32_t> >& textures() const;
-
-	void bind() const override;
 
 	void bindForRead() const;
 
 	void bindForDraw() const;
-
-	void unbind() const override;
 
 	FrameBuffer& withTexture(uint32_t format);
 
@@ -93,24 +97,15 @@ private:
 
 	int32_t getInternalFormat(uint32_t format, bool isFloat = false);
 
-	int32_t mWidth{0};
-	int32_t mHeight{0};
 	std::vector<std::pair<uint32_t, uint32_t> > mTextures;
 	std::vector<uint32_t> mAttachments;
 };
 
 class CubemapBuffer final : public BaseFrameBuffer {
 public:
-	CubemapBuffer(int32_t size, bool mipmap = false, bool prefilter = false);
+	CubemapBuffer(int32_t width, int32_t height, bool mipmap = false, bool prefilter = false);
 
 	~CubemapBuffer() override;
-
-	[[nodiscard]]
-	uint32_t rbo() const;
-
-	void bind() const override;
-
-	void unbind() const override;
 
 	void bindFace(uint32_t face, int32_t mip = 0) const;
 
@@ -122,5 +117,4 @@ protected:
 
 private:
 	uint32_t mCubemapID{0};
-	int32_t mSize{0};
 };

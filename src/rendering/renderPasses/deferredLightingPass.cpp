@@ -39,13 +39,13 @@ void DeferredLightingPass::configure(const RenderContext& ctx, EventBus& eventBu
 	ctx.light.ubo.self->configure(mShader->id(), ctx.light.ubo.binding, ctx.light.ubo.blockName);
 	ctx.shadow.ubo.self->configure(mShader->id(), ctx.shadow.ubo.binding, ctx.shadow.ubo.blockName);
 
-	mEnvMapBuffer = std::make_unique<CubemapBuffer>(ctx.PBR.envMap.size, true);
+	mEnvMapBuffer = std::make_unique<CubemapBuffer>(ctx.PBR.envMap.size,ctx.PBR.envMap.size, true);
 	mEnvMapBuffer->checkStatus();
 
-	mIrradianceMapBuffer = std::make_unique<CubemapBuffer>(ctx.PBR.irradianceMap.size);
+	mIrradianceMapBuffer = std::make_unique<CubemapBuffer>(ctx.PBR.irradianceMap.size, ctx.PBR.irradianceMap.size);
 	mIrradianceMapBuffer->checkStatus();
 
-	mPrefilterMapBuffer = std::make_unique<CubemapBuffer>(ctx.PBR.prefilterMap.size, true, true);
+	mPrefilterMapBuffer = std::make_unique<CubemapBuffer>(ctx.PBR.prefilterMap.size,ctx.PBR.prefilterMap.size, true, true);
 	mPrefilterMapBuffer->checkStatus();
 
 	mBrdfLUTBuffer = std::make_unique<FrameBuffer>(ctx.PBR.brdfLUT.size, ctx.PBR.brdfLUT.size);

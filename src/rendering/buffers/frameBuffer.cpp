@@ -3,6 +3,34 @@
 #include <vector>
 #include "glad/glad.h"
 
+BaseFrameBuffer::BaseFrameBuffer(int32_t width, int32_t height)
+	: mWidth(width),
+	  mHeight(height) {
+	glGenFramebuffers(1, &mFBO);
+	bind();
+}
+
+int32_t BaseFrameBuffer::width() const {
+	return mWidth;
+}
+
+int32_t BaseFrameBuffer::height() const {
+	return mHeight;
+}
+
+uint32_t BaseFrameBuffer::rbo() const {
+	return mRBO;
+}
+
+void BaseFrameBuffer::bind() const {
+	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
+	glViewport(0, 0, mWidth, mHeight);
+}
+
+void BaseFrameBuffer::unbind() const {
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void BaseFrameBuffer::checkStatus() {
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 		throw std::runtime_error("ERROR::FRAMEBUFFER::NOT_COMPLETE!\n");
@@ -10,10 +38,7 @@ void BaseFrameBuffer::checkStatus() {
 }
 
 FrameBuffer::FrameBuffer(const int32_t width, const int32_t height)
-	: mWidth(width),
-	  mHeight(height) {
-	glGenFramebuffers(1, &mFBO);
-	bind();
+	: BaseFrameBuffer(width, height) {
 }
 
 FrameBuffer::~FrameBuffer() {
@@ -29,21 +54,8 @@ FrameBuffer::~FrameBuffer() {
 	glDeleteFramebuffers(1, &mFBO);
 }
 
-int32_t FrameBuffer::width() const {
-	return mWidth;
-}
-
-int32_t FrameBuffer::height() const {
-	return mHeight;
-}
-
 const std::vector<std::pair<uint32_t, uint32_t> >& FrameBuffer::textures() const {
 	return mTextures;
-}
-
-void FrameBuffer::bind() const {
-	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
-	glViewport(0, 0, mWidth, mHeight);
 }
 
 void FrameBuffer::bindForRead() const {
@@ -52,10 +64,6 @@ void FrameBuffer::bindForRead() const {
 
 void FrameBuffer::bindForDraw() const {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFBO);
-}
-
-void FrameBuffer::unbind() const {
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 FrameBuffer& FrameBuffer::withTexture(const uint32_t format) {
@@ -404,14 +412,13 @@ int32_t FrameBuffer::getInternalFormat(const uint32_t format, const bool isFloat
 	return 0;
 }
 
-CubemapBuffer::CubemapBuffer(const int32_t size, const bool mipmap, const bool prefilter)
-	: mSize(size) {
-	glGenFramebuffers(1, &mFBO);
+CubemapBuffer::CubemapBuffer(const int32_t width, const int32_t height, const bool mipmap, const bool prefilter)
+	: BaseFrameBuffer(width, height) {
 	glGenRenderbuffers(1, &mRBO);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, size, size);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRBO);
 
 	glGenTextures(1, &mCubemapID);
@@ -422,8 +429,8 @@ CubemapBuffer::CubemapBuffer(const int32_t size, const bool mipmap, const bool p
 			GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
 			0,
 			GL_RGB16F,
-			static_cast<int32_t>(size),
-			static_cast<int32_t>(size),
+			static_cast<int32_t>(width),
+			static_cast<int32_t>(height),
 			0,
 			GL_RGB,
 			GL_FLOAT,
@@ -448,19 +455,6 @@ CubemapBuffer::~CubemapBuffer() {
 	glDeleteFramebuffers(1, &mFBO);
 	glDeleteRenderbuffers(1, &mRBO);
 	glDeleteTextures(1, &mCubemapID);
-}
-
-uint32_t CubemapBuffer::rbo() const {
-	return mRBO;
-}
-
-void CubemapBuffer::bind() const {
-	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
-	glViewport(0, 0, mSize, mSize);
-}
-
-void CubemapBuffer::unbind() const {
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void CubemapBuffer::bindFace(const uint32_t face, const int32_t mip) const {
