@@ -410,15 +410,12 @@ int32_t FrameBuffer::getInternalFormat(const uint32_t format, const bool isFloat
 	}
 
 	assert(false && "Unsupported format");
-
-	return 0;
 }
 
 CubemapBuffer::CubemapBuffer(const int32_t width, const int32_t height, const bool mipmap, const bool prefilter)
 	: BaseFrameBuffer(width, height) {
 	glGenRenderbuffers(1, &mRBO);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRBO);
