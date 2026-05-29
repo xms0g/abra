@@ -23,7 +23,7 @@ uint32_t Kernel::render(
 	shader->activate();
 	shader->setFloatArray("kernel", mKernel, 9);
 
-	RenderCommon::drawQuad(sceneTexture, vao);
+	RenderCommon::drawQuad(vao, sceneTexture);
 
 	const uint32_t texture = pingPong[toggle]->texture();
 	pingPong[toggle]->unbind();

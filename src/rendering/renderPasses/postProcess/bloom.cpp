@@ -58,7 +58,7 @@ uint32_t Bloom::brightFilterPass(const uint32_t sceneTexture, const uint32_t vao
 
 	brightFilter->activate();
 
-	RenderCommon::drawQuad(sceneTexture, vao);
+	RenderCommon::drawQuad(vao, sceneTexture);
 
 	const uint32_t outTex = mPingPong[toggle]->texture();
 	toggle = !toggle;
@@ -77,7 +77,7 @@ uint32_t Bloom::blurPass(const uint32_t sceneTexture, const uint32_t vao, bool& 
 		blur->setBool("horizontal", horizontal);
 		horizontal = !horizontal;
 
-		RenderCommon::drawQuad(outTex, vao);
+		RenderCommon::drawQuad(vao, outTex);
 
 		outTex = mPingPong[toggle]->texture();
 		toggle = !toggle;

@@ -123,7 +123,15 @@ void RenderCommon::drawMesh(const uint32_t vao, const size_t vertexCount, const 
 	}
 }
 
-void RenderCommon::drawQuad(const uint32_t sceneTexture, const uint32_t vao) {
+void RenderCommon::drawQuad(const uint32_t vao) {
+	glDisable(GL_DEPTH_TEST);
+	glBindVertexArray(vao);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+	glEnable(GL_DEPTH_TEST);
+}
+
+void RenderCommon::drawQuad(const uint32_t vao, const uint32_t sceneTexture) {
 	glDisable(GL_DEPTH_TEST);
 	glBindVertexArray(vao);
 	glActiveTexture(GL_TEXTURE0);

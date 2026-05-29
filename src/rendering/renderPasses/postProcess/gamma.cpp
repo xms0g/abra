@@ -21,7 +21,7 @@ uint32_t Gamma::render(
 
 	shader->activate();
 
-	RenderCommon::drawQuad(sceneTexture, vao);
+	RenderCommon::drawQuad(vao, sceneTexture);
 
 	const uint32_t texture = pingPong[toggle]->texture();
 	pingPong[toggle]->unbind();

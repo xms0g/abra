@@ -26,7 +26,9 @@ void setupMaterial(
 
 void drawMesh(uint32_t vao, size_t vertexCount, size_t indexCount);
 
-void drawQuad(uint32_t sceneTexture, uint32_t vao);
+void drawQuad(uint32_t vao);
+
+void drawQuad(uint32_t vao, uint32_t sceneTexture);
 
 void bindShadowMaps(const RenderContext& ctx);
 }

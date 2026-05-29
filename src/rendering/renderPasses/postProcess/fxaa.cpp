@@ -25,7 +25,7 @@ uint32_t FXAA::render(
 	shader->activate();
 	shader->setVec2("resolution", glm::vec2(width, height));
 
-	RenderCommon::drawQuad(sceneTexture, vao);
+	RenderCommon::drawQuad(vao, sceneTexture);
 
 	const uint32_t texture = pingPong[toggle]->texture();
 	pingPong[toggle]->unbind();

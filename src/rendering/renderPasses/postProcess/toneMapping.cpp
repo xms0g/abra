@@ -22,7 +22,7 @@ uint32_t ToneMapping::render(
 	shader->activate();
 	shader->setFloat("exposure", mExposure);
 
-	RenderCommon::drawQuad(sceneTexture, vao);
+	RenderCommon::drawQuad(vao, sceneTexture);
 
 	const uint32_t texture = pingPong[toggle]->texture();
 	pingPong[toggle]->unbind();

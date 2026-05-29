@@ -20,7 +20,7 @@ uint32_t Grayscale::render(
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	shader->activate();
-	RenderCommon::drawQuad(sceneTexture, vao);
+	RenderCommon::drawQuad(vao, sceneTexture);
 
 	const uint32_t texture = pingPong[toggle]->texture();
 	pingPong[toggle]->unbind();

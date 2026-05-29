@@ -87,11 +87,7 @@ void DeferredLightingPass::execute(const RenderContext& ctx) {
 	mPrefilterMapBuffer->bindTexture(ctx.PBR.prefilterMap.textureSlot);
 	mBrdfLUTBuffer->bindTexture(ctx.PBR.brdfLUT.textureSlot);
 
-	glDisable(GL_DEPTH_TEST);
-	glBindVertexArray(mQuad->vao());
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(0);
-	glEnable(GL_DEPTH_TEST);
+	RenderCommon::drawQuad(mQuad->vao());
 }
 
 void DeferredLightingPass::createEnvMap(const RenderContext& ctx) {
@@ -190,9 +186,7 @@ void DeferredLightingPass::createBrdfLUT() const {
 	mBrdfLUTBuffer->bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glBindVertexArray(quad.vao());
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(0);
+	RenderCommon::drawQuad(quad.vao());
 
 	mBrdfLUTBuffer->unbind();
 }

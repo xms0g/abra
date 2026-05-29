@@ -62,7 +62,7 @@ void PostProcessPass::execute(const RenderContext& ctx) {
 	}
 
 	mQuad->shader().activate();
-	RenderCommon::drawQuad(inputTex, mQuad->vao());
+	RenderCommon::drawQuad(mQuad->vao(), inputTex);
 }
 
 void PostProcessPass::onGuiUpdate(const GuiPostProcessEvent& event) {
