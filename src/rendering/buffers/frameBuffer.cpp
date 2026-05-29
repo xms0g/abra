@@ -50,14 +50,10 @@ FrameBuffer::FrameBuffer(const int32_t width, const int32_t height)
 
 FrameBuffer::~FrameBuffer() {
 	if (!mTextures.empty()) {
-		for (const auto& [textureID, type]: mTextures) {
-			glDeleteTextures(1, &textureID);
+		for (const auto& [id, target]: mTextures) {
+			glDeleteTextures(1, &id);
 		}
 	}
-}
-
-const std::vector<std::pair<uint32_t, uint32_t> >& FrameBuffer::textures() const {
-	return mTextures;
 }
 
 void FrameBuffer::bindForRead() const {
@@ -316,8 +312,7 @@ FrameBuffer& FrameBuffer::withRenderBufferDepth(const uint32_t internalFormat) {
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(const int32_t multisampledCount,
-                                                            const uint32_t internalFormat) {
+FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(const int32_t multisampledCount,const uint32_t internalFormat) {
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 
@@ -339,8 +334,7 @@ FrameBuffer& FrameBuffer::withRenderBufferDepthStencil(const int32_t internalFor
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withRenderBufferDepthStencilMultisampled(const int32_t multisampledCount,
-                                                                   const int32_t internalFormat) {
+FrameBuffer& FrameBuffer::withRenderBufferDepthStencilMultisampled(const int32_t multisampledCount, const int32_t internalFormat) {
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 
@@ -362,14 +356,14 @@ FrameBuffer& FrameBuffer::configureAttachments() {
 }
 
 uint32_t FrameBuffer::textureImpl(const uint32_t index) const {
-	return mTextures[index].first;
+	return mTextures[index].id;
 }
 
-void FrameBuffer::bindTextureImpl(uint32_t slot, uint32_t textureIndex) const {
-	auto [id, type] = mTextures[textureIndex];
+void FrameBuffer::bindTextureImpl(const uint32_t slot, const uint32_t textureIndex) const {
+	auto [id, target] = mTextures[textureIndex];
 
 	glActiveTexture(GL_TEXTURE0 + slot);
-	glBindTexture(type, id);
+	glBindTexture(target, id);
 }
 
 void FrameBuffer::setAttachment(const uint32_t textureID, const uint32_t target) {

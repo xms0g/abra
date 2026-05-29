@@ -51,9 +51,6 @@ public:
 
 	~FrameBuffer() override;
 
-	[[nodiscard]]
-	const std::vector<std::pair<uint32_t, uint32_t> >& textures() const;
-
 	void bindForRead() const;
 
 	void bindForDraw() const;
@@ -97,7 +94,12 @@ private:
 
 	int32_t getInternalFormat(uint32_t format, bool isFloat = false);
 
-	std::vector<std::pair<uint32_t, uint32_t> > mTextures;
+	struct TextureDescription {
+		uint32_t id{0};
+		uint32_t target{0};
+	};
+	
+	std::vector<TextureDescription> mTextures;
 	std::vector<uint32_t> mAttachments;
 };
 
