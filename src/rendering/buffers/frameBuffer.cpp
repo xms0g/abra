@@ -25,10 +25,6 @@ int32_t BaseFrameBuffer::height() const {
 	return mHeight;
 }
 
-uint32_t BaseFrameBuffer::rbo() const {
-	return mRBO;
-}
-
 void BaseFrameBuffer::bind() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
 	glViewport(0, 0, mWidth, mHeight);

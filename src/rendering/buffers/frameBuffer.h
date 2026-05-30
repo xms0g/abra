@@ -19,9 +19,6 @@ public:
 		return textureImpl(index);
 	}
 
-	[[nodiscard]]
-	uint32_t rbo() const;
-
 	void bind() const;
 
 	void unbind() const;
