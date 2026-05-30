@@ -136,18 +136,11 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 					heightTexture);
 			}
 		} else if (isPrimitive && primType == "Cubemap") {
-			if (comps.contains("SkyboxComponent")) {
-				std::vector<std::string> faceStrings;
+			auto faces = comps["SkyboxComponent"]["faces"].get<std::vector<std::string>>();
 
-				auto sc = comps["SkyboxComponent"];
-				for (const auto& face: sc["faces"]) {
-					faceStrings.push_back(face.get<std::string>());
-				}
-
-				Models::Cubemap cubemap{faceStrings};
-				ResourceManager::instance().uploadMesh(entity.id(), cubemap.meshes());
-				ResourceManager::instance().uploadMaterial(entity.id(), cubemap.material());
-			}
+			Models::Cubemap cubemap{faces};
+			ResourceManager::instance().uploadMesh(entity.id(), cubemap.meshes());
+			ResourceManager::instance().uploadMaterial(entity.id(), cubemap.material());
 		} else if (isPrimitive && primType == "Sphere") {
 			glm::vec3 color{0.0f};
 			bool unlit{false};
@@ -201,8 +194,8 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 
 		// Bounding Volume Component
 		if (comps.contains("BoundingVolumeComponent")) {
-			auto bvc = comps["BoundingVolumeComponent"];
-			if (bvc["type"] == "AABB") {
+			auto bvType = comps["BoundingVolumeComponent"]["type"];
+			if (bvType == "AABB") {
 				auto meshComp = entity.getComponent<MeshComponent>();
 
 				entity.addComponent<BoundingVolumeComponent>(
@@ -223,8 +216,7 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 
 		// Instance Component
 		if (comps.contains("InstanceComponent")) {
-			auto ic = comps["InstanceComponent"];
-			auto transforms = ic["transforms"].get<std::vector<float> >();
+			auto transforms = comps["InstanceComponent"]["transforms"].get<std::vector<float> >();
 
 			entity.addComponent<InstanceComponent>(
 				ResourceManager::instance().uploadTransforms(entity.id(), transforms));
