@@ -23,6 +23,21 @@ ResourceManager& ResourceManager::instance() {
 	return instance;
 }
 
+void ResourceManager::createShaders() {
+	mShaders.emplace("opaque", std::make_unique<Shader>("object.vert", "opaque.frag"));
+	mShaders.emplace("blend", std::make_unique<Shader>("object.vert", "blend.frag"));
+	mShaders.emplace("unlit", std::make_unique<Shader>("unlit.vert", "unlit.frag"));
+	mShaders.emplace("instancedOpaque", std::make_unique<Shader>("instanced.vert", "opaque.frag"));
+	mShaders.emplace("instancedBlend", std::make_unique<Shader>("instanced.vert", "blend.frag"));
+	mShaders.emplace("skybox", std::make_unique<Shader>("skybox.vert", "skybox.frag"));
+	mShaders.emplace("depth", std::make_unique<Shader>("depth/depth.vert", "depth/depth.frag"));
+	mShaders.emplace("depthCubemap",
+		std::make_unique<Shader>(
+			"depth/depthCubemap.vert",
+			"depth/depthCubemap.frag",
+			"depth/depthCubemap.geom"));
+}
+
 MeshMap* ResourceManager::getMeshes(const size_t entityID) {
 	return &mMeshesByEntity.at(entityID);
 }
@@ -33,6 +48,14 @@ MaterialMap* ResourceManager::getMaterial(const size_t entityID) {
 
 BaseFrameBuffer* ResourceManager::getBuffer(const std::string& name) const {
 	return mBuffers.contains(name) ? mBuffers.at(name).get() : nullptr;
+}
+
+Shader* ResourceManager::getShader(const std::string& name) const {
+	return mShaders.contains(name) ? mShaders.at(name).get() : nullptr;
+}
+
+std::unordered_map<std::string, std::unique_ptr<Shader>>& ResourceManager::getShaders() {
+	return mShaders;
 }
 
 void ResourceManager::asyncLoadModel(size_t entityID, std::string& file) {

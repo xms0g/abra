@@ -32,5 +32,5 @@ public:
 private:
 	glm::mat4 mLightSpaceMatrix[MAX_SPOT_LIGHTS]{};
 	std::unique_ptr<FrameBuffer> mDepthMap;
-	std::unique_ptr<Shader> mDepthShader;
+	const Shader* mDepthShader;
 };

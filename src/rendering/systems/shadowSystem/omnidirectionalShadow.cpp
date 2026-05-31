@@ -15,10 +15,7 @@ OmnidirectionalShadow::OmnidirectionalShadow(const RenderContext& ctx) {
 			.checkStatus();
 	mDepthMap->unbind();
 
-	mDepthShader = std::make_unique<Shader>(
-		"depth/depthCubemap.vert",
-		"depth/depthCubemap.frag",
-		"depth/depthCubemap.geom");
+	mDepthShader = ctx.shadow.omnidirectional.shader;
 }
 
 OmnidirectionalShadow::~OmnidirectionalShadow() = default;

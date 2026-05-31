@@ -20,6 +20,8 @@ public:
 
 	static ResourceManager& instance();
 
+	void createShaders();
+
 	[[nodiscard]]
 	MeshMap* getMeshes(size_t entityID);
 
@@ -28,6 +30,11 @@ public:
 
 	[[nodiscard]]
 	BaseFrameBuffer* getBuffer(const std::string& name) const;
+
+	[[nodiscard]]
+	Shader* getShader(const std::string& name) const;
+
+	std::unordered_map<std::string, std::unique_ptr<Shader>>& getShaders();
 
 	void asyncLoadModel(size_t entityID, std::string& file);
 
@@ -85,6 +92,7 @@ private:
 	std::unordered_map<size_t, MeshMap> mMeshesByEntity;
 	std::unordered_map<size_t, std::vector<float>> mTransformsByEntity;
 	std::unordered_map<std::string, std::unique_ptr<BaseFrameBuffer>> mBuffers;
+	std::unordered_map<std::string, std::unique_ptr<Shader>> mShaders;
 
 	ThreadPool mThreadPool{};
 	std::mutex mResourceMutex;

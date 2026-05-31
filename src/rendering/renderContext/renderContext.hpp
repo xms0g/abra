@@ -12,6 +12,7 @@ class BaseFrameBuffer;
 class FrameBuffer;
 class UniformBuffer;
 class Camera;
+class Shader;
 struct RenderQueue;
 struct DirectionalLightComponent;
 struct PointLightComponent;
@@ -90,16 +91,19 @@ struct RenderContext {
 		} ubo;
 
 		struct {
+			const Shader* shader;
 			uint32_t maxLights;
 			float height, nearPlane, farPlane, left, right, bottom, top;
 		} directional;
 
 		struct {
+			const Shader* shader;
 			uint32_t maxLights;
 			float nearPlane, farPlane, fovy;
 		} omnidirectional;
 
 		struct {
+			const Shader* shader;
 			uint32_t maxLights;
 			float nearPlane, farPlane;
 		} perspective;

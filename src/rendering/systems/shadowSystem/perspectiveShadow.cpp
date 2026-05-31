@@ -15,7 +15,7 @@ PerspectiveShadow::PerspectiveShadow(const RenderContext& ctx) {
 			.checkStatus();
 	mDepthMap->unbind();
 
-	mDepthShader = std::make_unique<Shader>("depth/depth.vert", "depth/depth.frag");
+	mDepthShader = ctx.shadow.perspective.shader;
 }
 
 PerspectiveShadow::~PerspectiveShadow() = default;

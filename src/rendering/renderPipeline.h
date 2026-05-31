@@ -8,8 +8,6 @@
 class SyncStateSystem;
 class EventBus;
 class SSAOPass;
-struct RenderContext;
-class Shader;
 class ShadowSystem;
 class DeferredLightingPass;
 class DeferredGeometryPass;
@@ -20,6 +18,7 @@ class Camera;
 class Registry;
 class LightSystem;
 class PostProcessPass;
+struct RenderContext;
 struct SDL_Window;
 
 typedef void* SDL_GLContext;
@@ -48,9 +47,6 @@ private:
 	LightSystem* mLightSystem{};
 	std::unique_ptr<ShadowSystem> mShadowSystem;
 	std::unique_ptr<SyncStateSystem> mSyncStateSystem;
-	//Shaders
-	std::unordered_map<std::string, std::unique_ptr<Shader>> mShaders;
-	//std::vector<std::shared_ptr<Shader>> mShaders;
 	// Frame Buffers
 	std::unique_ptr<FrameBuffer> mSceneBuffer;
 	std::unique_ptr<FrameBuffer> mIntermediateBuffer;

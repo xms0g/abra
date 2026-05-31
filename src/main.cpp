@@ -2,6 +2,7 @@
 #include "core/engine.h"
 #include "ECS/registry.h"
 #include "resourceManager/sceneLoader.h"
+#include "resourceManager/resourceManager.h"
 
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 1
@@ -19,8 +20,9 @@ int main() {
 		engine.init(&registry);
 
 		SceneLoader::loadScene(registry, "assets/scenes/scene_Sponza_Spotlight.json");
-
 		registry.update();
+
+		ResourceManager::instance().createShaders();
 
 		engine.configure();
 

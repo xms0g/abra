@@ -115,13 +115,6 @@ RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLCon
 	mShadowSystem = std::make_unique<ShadowSystem>();
 	mSyncStateSystem = std::make_unique<SyncStateSystem>();
 
-	mShaders.emplace("opaque", std::make_unique<Shader>("object.vert", "opaque.frag"));
-	mShaders.emplace("blend", std::make_unique<Shader>("object.vert", "blend.frag"));
-	mShaders.emplace("unlit", std::make_unique<Shader>("unlit.vert", "unlit.frag"));
-	mShaders.emplace("instancedOpaque", std::make_unique<Shader>("instanced.vert", "opaque.frag"));
-	mShaders.emplace("instancedBlend", std::make_unique<Shader>("instanced.vert", "blend.frag"));
-	mShaders.emplace("skybox", std::make_unique<Shader>("skybox.vert", "skybox.frag"));
-
 	GuiBackend::init(window, context, "#version 410");
 }
 
@@ -130,6 +123,10 @@ RenderPipeline::~RenderPipeline() {
 }
 
 void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
+	mRenderCtx->shadow.directional.shader = ResourceManager::instance().getShader("depth");
+	mRenderCtx->shadow.omnidirectional.shader = ResourceManager::instance().getShader("depthCubemap");
+	mRenderCtx->shadow.perspective.shader = ResourceManager::instance().getShader("depth");
+
 	mLightSystem->configure(*mRenderCtx, eventBus);
 	mSyncStateSystem->configure(*mRenderCtx, eventBus);
 	mShadowSystem->configure(*mRenderCtx, eventBus);
@@ -161,7 +158,7 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 # ifdef HDR
 	mSceneBuffer->withTextureFP(GL_RGBA)
 # else
-			mSceneBuffer->withTexture(GL_RGBA)
+	mSceneBuffer->withTexture(GL_RGBA)
 # endif
 			.withTextureDepth(GL_DEPTH_COMPONENT24, false)
 #endif
@@ -258,7 +255,7 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	}
 
 	// Configure shaders
-	for (const auto& [name,shader]: mShaders) {
+	for (const auto& [name,shader]: ResourceManager::instance().getShaders()) {
 		mRenderCtx->camera.ubo.self->configure(
 			shader->id(),
 			mRenderCtx->camera.ubo.binding,
@@ -381,7 +378,12 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 
 		std::vector<uint32_t> indices{meshIndex++};
 
-		const MaterialBatch matBatch{materialIndex++, textureOffset++, 1, mShaders["skybox"].get(), indices};
+		const MaterialBatch matBatch{
+			materialIndex++,
+			textureOffset++,
+			1,
+			ResourceManager::instance().getShader("skybox"),
+			indices};
 		const RenderGroup group{entity.id(), matBatch};
 		mRenderQueue.skybox.push_back(group);
 		return;
@@ -417,9 +419,9 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		if (entity.hasComponent<InstanceComponent>()) {
 			// Set shader
 			if (material.flags & OPAQUE) {
-				matBatch.shader = mShaders["instancedOpaque"].get();
+				matBatch.shader = ResourceManager::instance().getShader("instancedOpaque");
 			} else if (material.flags & BLEND) {
-				matBatch.shader = mShaders["instancedBlend"].get();
+				matBatch.shader = ResourceManager::instance().getShader("instancedBlend");
 			}
 
 			const auto& instComponent = entity.getComponent<InstanceComponent>();
@@ -436,12 +438,12 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		// Set shader
 		if (material.flags & OPAQUE) {
 			if (material.flags & UNLIT) {
-				matBatch.shader = mShaders["unlit"].get();
+				matBatch.shader = ResourceManager::instance().getShader("unlit");
 			} else {
-				matBatch.shader = mShaders["opaque"].get();
+				matBatch.shader = ResourceManager::instance().getShader("opaque");
 			}
 		} else if (material.flags & BLEND) {
-			matBatch.shader = mShaders["blend"].get();
+			matBatch.shader = ResourceManager::instance().getShader("blend");
 		}
 
 		const RenderGroup group{entity.id(), matBatch};

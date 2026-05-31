@@ -15,7 +15,7 @@ DirectionalShadow::DirectionalShadow(const RenderContext& ctx) {
 			.checkStatus();
 	mDepthMap->unbind();
 
-	mDepthShader = std::make_unique<Shader>("depth/depth.vert", "depth/depth.frag");
+	mDepthShader = ctx.shadow.directional.shader;
 }
 
 DirectionalShadow::~DirectionalShadow() = default;

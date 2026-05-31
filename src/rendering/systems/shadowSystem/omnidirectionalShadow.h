@@ -22,7 +22,7 @@ public:
 
 private:
 	std::unique_ptr<FrameBuffer> mDepthMap;
-	std::unique_ptr<Shader> mDepthShader;
+	const Shader* mDepthShader;
 
 	static constexpr std::pair<glm::vec3, glm::vec3> mDirUpPairs[] {
 		{glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)},
