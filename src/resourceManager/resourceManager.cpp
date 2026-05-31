@@ -72,10 +72,7 @@ void ResourceManager::uploadModelsToGPU() {
 			if (material.flags & CUBEMAP) {
 				// Handle HDR to Cubemap
 				if (material.textures.size() == 1) {
-					glEnable(GL_DEPTH_TEST);
-					glDepthFunc(GL_LEQUAL);
 					glDisable(GL_CULL_FACE);
-					glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 					const std::string& path = material.textures.front().path;
 					uint32_t id = createEnvMap(path);
@@ -88,8 +85,6 @@ void ResourceManager::uploadModelsToGPU() {
 					createBrdfLUT();
 
 					glEnable(GL_CULL_FACE);
-					glDepthFunc(GL_LESS);
-					glViewport(0, 0, static_cast<int32_t>(SCR_WIDTH), static_cast<int32_t>(SCR_HEIGHT));
 				} else {
 					// Handle 6 faces-cubemap
 					std::vector<std::string> paths;
@@ -327,6 +322,9 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 }
 
 uint32_t ResourceManager::createEnvMap(const std::string& path) {
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+
 	auto envMap = std::make_unique<CubemapBuffer>(PBR_ENVMAP_SIZE, PBR_ENVMAP_SIZE, true);
 	envMap->checkStatus();
 
@@ -362,6 +360,8 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 
 	envMapBuffer->bindTexture(0);
 	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+	glDepthFunc(GL_LESS);
 
 	return envMapBuffer->texture();
 }
@@ -401,6 +401,8 @@ void ResourceManager::createIrradianceMap() {
 }
 
 void ResourceManager::createPrefilterMap() {
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
 	auto prefilterMap = std::make_unique<CubemapBuffer>(PBR_PREFILTER_MAP_SIZE, PBR_PREFILTER_MAP_SIZE, true, true);
 	prefilterMap->checkStatus();
 
