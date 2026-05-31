@@ -17,6 +17,8 @@
 #include "../ECS/components/skybox.hpp"
 #include "../ECS/components/instance.hpp"
 #include "../math/boundingVolume.h"
+#include "../rendering/material/material.hpp"
+#include "../rendering/mesh/mesh.h"
 #include "../rendering/models/cube.h"
 #include "../rendering/models/plane.h"
 #include "../rendering/models/cubemap.h"
@@ -136,9 +138,10 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 					heightTexture);
 			}
 		} else if (isPrimitive && primType == "Cubemap") {
-			auto faces = comps["SkyboxComponent"]["faces"].get<std::vector<std::string>>();
+			auto faces = comps["SkyboxComponent"]["faces"].get<std::vector<std::string> >();
 
 			Models::Cubemap cubemap{faces};
+
 			ResourceManager::instance().uploadMesh(entity.id(), cubemap.meshes());
 			ResourceManager::instance().uploadMaterial(entity.id(), cubemap.material());
 		} else if (isPrimitive && primType == "Sphere") {

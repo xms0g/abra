@@ -14,12 +14,7 @@
         "MaterialComponent": { "from_resource_manager": true },
         "SkyboxComponent": {
           "faces": [
-            "skybox/right.jpg",
-            "skybox/left.jpg",
-            "skybox/top.jpg",
-            "skybox/bottom.jpg",
-            "skybox/front.jpg",
-            "skybox/back.jpg"
+            "textures/hdr/newport_loft.hdr"
           ]
         }
       }

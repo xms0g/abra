@@ -2,13 +2,21 @@
 #include <iostream>
 #include <assimp/GltfMaterial.h>
 #include <assimp/postprocess.h>
+#include "glad/glad.h"
 #include "image/stb_image.h"
+#include "../config/config.hpp"
 #include "../io/filesystem.hpp"
 #include "../config/config.hpp"
+#include "../rendering/shader.h"
+#include "../rendering/models/cube.h"
+#include "../rendering/models/quad.h"
 #include "../rendering/material/material.hpp"
 #include "../rendering/mesh/mesh.h"
 #include "../rendering/mesh/vertex.hpp"
 #include "../rendering/texture/texture.h"
+#include "../rendering/buffers/frameBuffer.h"
+#include "../rendering/renderCommon.h"
+#include "../rendering/mesh/vertexArray.h"
 
 ResourceManager& ResourceManager::instance() {
 	static ResourceManager instance;
@@ -21,6 +29,10 @@ MeshMap* ResourceManager::getMeshes(const size_t entityID) {
 
 MaterialMap* ResourceManager::getMaterial(const size_t entityID) {
 	return &mMaterialsByEntity.at(entityID);
+}
+
+BaseFrameBuffer* ResourceManager::getBuffer(const std::string& name) const {
+	return mBuffers.contains(name) ? mBuffers.at(name).get() : nullptr;
 }
 
 void ResourceManager::asyncLoadModel(size_t entityID, std::string& file) {
@@ -58,15 +70,39 @@ void ResourceManager::uploadModelsToGPU() {
 	for (auto& [entityID, materials]: mMaterialsByEntity) {
 		for (auto& [matID, material]: materials) {
 			if (material.flags & CUBEMAP) {
-				std::vector<std::string> paths;
-				paths.reserve(material.textures.size());
+				// Handle HDR to Cubemap
+				if (material.textures.size() == 1) {
+					glEnable(GL_DEPTH_TEST);
+					glDepthFunc(GL_LEQUAL);
+					glDisable(GL_CULL_FACE);
+					glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-				for (auto& [id, type, path]: material.textures) {
-					paths.push_back(path);
+					const std::string& path = material.textures.front().path;
+					uint32_t id = createEnvMap(path);
+
+					material.textures.clear();
+					material.textures.emplace_back(id, 0, "");
+
+					createIrradianceMap();
+					createPrefilterMap();
+					createBrdfLUT();
+
+					glEnable(GL_CULL_FACE);
+					glDepthFunc(GL_LESS);
+					glViewport(0, 0, static_cast<int32_t>(SCR_WIDTH), static_cast<int32_t>(SCR_HEIGHT));
+				} else {
+					// Handle 6 faces-cubemap
+					std::vector<std::string> paths;
+					paths.reserve(material.textures.size());
+
+					for (auto& [id, type, path]: material.textures) {
+						paths.push_back(path);
+					}
+
+					material.textures.clear();
+					material.textures.emplace_back(texture::loadCubemap(paths), 0, "");
 				}
 
-				material.textures.clear();
-				material.textures.emplace_back(texture::loadCubemap(paths), 0, "");
 				continue;
 			}
 
@@ -288,4 +324,143 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 
 		material.textures.emplace_back(0, req.type, std::move(path));
 	}
+}
+
+uint32_t ResourceManager::createEnvMap(const std::string& path) {
+	auto envMap = std::make_unique<CubemapBuffer>(PBR_ENVMAP_SIZE, PBR_ENVMAP_SIZE, true);
+	envMap->checkStatus();
+
+	mBuffers.emplace("envMap", std::move(envMap));
+
+	const auto& envMapBuffer = mBuffers.at("envMap");
+
+	Models::Cube cube;
+	cube.meshes().at(0).front().uploadToGPU();
+	const auto& cubeMesh = cube.meshes().at(0).front();
+
+	const auto equirectangularToCube = Shader{"pbr/cubemap.vert", "pbr/equirectangularToCube.frag"};
+	const uint32_t HDRTexture = texture::loadHDR(path.c_str());
+
+	// convert HDR equirectangular environment map to cubemap equivalent
+	equirectangularToCube.activate();
+	equirectangularToCube.setInt("equirectangularMap", 0);
+	equirectangularToCube.setMat4("projection", mCaptureProjection);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, HDRTexture);
+
+	envMapBuffer->bind();
+	for (uint32_t i = 0; i < FACES; ++i) {
+		dynamic_cast<CubemapBuffer*>(envMapBuffer.get())->bindFace(i);
+		equirectangularToCube.setMat4("view", mCaptureViews[i]);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		RenderCommon::drawMesh(cubeMesh.vao().id(), cubeMesh.vertices().size(), cubeMesh.indices().size());
+	}
+
+	envMapBuffer->unbind();
+
+	envMapBuffer->bindTexture(0);
+	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+	return envMapBuffer->texture();
+}
+
+void ResourceManager::createIrradianceMap() {
+	auto irradianceMap = std::make_unique<CubemapBuffer>(PBR_IRRADIANCE_MAP_SIZE, PBR_IRRADIANCE_MAP_SIZE);
+	irradianceMap->checkStatus();
+
+	mBuffers.emplace("irradianceMap", std::move(irradianceMap));
+
+	const auto& irradianceMapBuffer = mBuffers.at("irradianceMap");
+	const auto& envMapBuffer = mBuffers.at("envMap");
+
+	Models::Cube cube;
+	cube.meshes().at(0).front().uploadToGPU();
+	const auto& cubeMesh = cube.meshes().at(0).front();
+
+	const auto irradianceConv = Shader{"pbr/cubemap.vert", "pbr/irradianceConv.frag"};
+
+	// solve diffuse integral by convolution to create an irradiance (cube)map.
+	irradianceConv.activate();
+	irradianceConv.setInt("environmentMap", 0);
+	irradianceConv.setMat4("projection", mCaptureProjection);
+
+	envMapBuffer->bindTexture(0);
+
+	irradianceMapBuffer->bind();
+	for (uint32_t i = 0; i < FACES; ++i) {
+		dynamic_cast<CubemapBuffer*>(irradianceMapBuffer.get())->bindFace(i);
+		irradianceConv.setMat4("view", mCaptureViews[i]);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		RenderCommon::drawMesh(cubeMesh.vao().id(), cubeMesh.vertices().size(), cubeMesh.indices().size());
+	}
+
+	irradianceMapBuffer->unbind();
+}
+
+void ResourceManager::createPrefilterMap() {
+	auto prefilterMap = std::make_unique<CubemapBuffer>(PBR_PREFILTER_MAP_SIZE, PBR_PREFILTER_MAP_SIZE, true, true);
+	prefilterMap->checkStatus();
+
+	mBuffers.emplace("prefilterMap", std::move(prefilterMap));
+
+	const auto& prefilterMapBuffer = mBuffers.at("prefilterMap");
+	const auto& envMapBuffer = mBuffers.at("envMap");
+
+	Models::Cube cube;
+	cube.meshes().at(0).front().uploadToGPU();
+	const auto& cubeMesh = cube.meshes().at(0).front();
+
+	const auto prefilter = Shader{"pbr/cubemap.vert", "pbr/prefilter.frag"};
+
+	// run a quasi monte-carlo simulation on the environment lighting to create a prefilter (cube)map.
+	prefilter.activate();
+	prefilter.setInt("environmentMap", 0);
+	prefilter.setMat4("projection", mCaptureProjection);
+	prefilter.setFloat("resolution", static_cast<float>(PBR_ENVMAP_SIZE));
+
+	envMapBuffer->bindTexture(0);
+	prefilterMapBuffer->bind();
+
+	constexpr uint32_t mipLevels = 5;
+	for (int32_t i = 0; i < mipLevels; ++i) {
+		const int32_t mipSize = static_cast<int32_t>(PBR_PREFILTER_MAP_SIZE * std::pow(0.5, i));
+		prefilterMapBuffer->resizeRenderBuffer(mipSize, mipSize);
+
+		const float roughness = static_cast<float>(i) / static_cast<float>(mipLevels - 1);
+		prefilter.setFloat("roughness", roughness);
+
+		for (uint32_t j = 0; j < FACES; ++j) {
+			dynamic_cast<CubemapBuffer*>(prefilterMapBuffer.get())->bindFace(j, i);
+			prefilter.setMat4("view", mCaptureViews[j]);
+
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			RenderCommon::drawMesh(cubeMesh.vao().id(), cubeMesh.vertices().size(), cubeMesh.indices().size());
+		}
+	}
+
+	prefilterMapBuffer->unbind();
+}
+
+void ResourceManager::createBrdfLUT() {
+	auto brdfLUT = std::make_unique<FrameBuffer>(PBR_BRDF_LUT_SIZE, PBR_BRDF_LUT_SIZE);
+	brdfLUT->withTextureFP(GL_RG)
+			.checkStatus();
+
+	mBuffers.emplace("brdfLUT", std::move(brdfLUT));
+
+	const auto& brdfLUTBuffer = mBuffers.at("brdfLUT");
+
+	const Models::SingleQuad quad;
+	const auto brdfLUTShader = Shader{"pbr/brdfLUT.vert", "pbr/brdfLUT.frag"};
+	// generate a 2D LUT from the BRDF equations used.
+	brdfLUTShader.activate();
+	brdfLUTBuffer->bind();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	RenderCommon::drawQuad(quad.vao());
+
+	brdfLUTBuffer->unbind();
 }

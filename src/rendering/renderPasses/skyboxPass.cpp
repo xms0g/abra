@@ -30,7 +30,7 @@ void SkyboxPass::execute(const RenderContext& ctx) {
 
 	glActiveTexture(GL_TEXTURE0); // active proper texture unit before binding
 	// and finally bind the texture
-	glBindTexture(GL_TEXTURE_CUBE_MAP, ctx.PBR.envMap.binding != 0 ? ctx.PBR.envMap.binding : tex);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
 	// Draw
 	glDepthMask(GL_FALSE);
 	glDepthFunc(GL_LEQUAL);

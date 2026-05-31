@@ -43,6 +43,7 @@
 #include "../math/boundingVolume.h"
 #include "../event/eventBus.hpp"
 #include "../math/matrix.h"
+#include "../resourceManager/resourceManager.h"
 
 RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLContext context) {
 	RequireComponent<MeshComponent>();
@@ -103,20 +104,6 @@ RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLCon
 	mRenderCtx->gBuffer.albedoTextureIdx = G_ALBEDO_TEXTURE_IDX;
 	mRenderCtx->gBuffer.ormTextureIdx = G_ORM_TEXTURE_IDX;
 	mRenderCtx->gBuffer.depthTextureIdx = G_DEPTH_TEXTURE_IDX;
-	mRenderCtx->PBR.envMap.size = PBR_ENVMAP_SIZE;
-	mRenderCtx->PBR.irradianceMap.size = PBR_IRRADIANCE_MAP_SIZE;
-	mRenderCtx->PBR.irradianceMap.textureSlot = PBR_IRRADIANCE_MAP_TEXTURE_SLOT;
-	mRenderCtx->PBR.prefilterMap.size = PBR_PREFILTER_MAP_SIZE;
-	mRenderCtx->PBR.prefilterMap.textureSlot = PBR_PREFILTER_MAP_TEXTURE_SLOT;
-	mRenderCtx->PBR.brdfLUT.size = PBR_BRDF_LUT_SIZE;
-	mRenderCtx->PBR.brdfLUT.textureSlot = PBR_BRDF_LUT_TEXTURE_SLOT;
-	mRenderCtx->PBR.HDRTexture = PBR_HDR_TEXTURE;
-	mRenderCtx->PBR.albedoTextureSlot = PBR_ALBEDO_TEXTURE_SLOT;
-	mRenderCtx->PBR.normalTextureSlot = PBR_NORMAL_TEXTURE_SLOT;
-	mRenderCtx->PBR.roughnessMetallicTextureSlot = PBR_RM_TEXTURE_SLOT;
-	mRenderCtx->PBR.aoTextureSlot = PBR_AO_TEXTURE_SLOT;
-	mRenderCtx->PBR.emissiveTextureSlot = PBR_EMISSIVE_TEXTURE_SLOT;
-	mRenderCtx->PBR.heightTextureSlot = PBR_HEIGHT_TEXTURE_SLOT;
 
 	registry->addSystem<LightSystem>();
 	mLightSystem = &registry->getSystem<LightSystem>();
@@ -225,6 +212,18 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mRenderCtx->ssao.ubo.self = mSSAOPass ? mSSAOPass->ubo() : nullptr;
 	mRenderCtx->light.ubo.self = mLightSystem->ubo();
 	mRenderCtx->shadow.ubo.self = mShadowSystem->ubo();
+	mRenderCtx->PBR.irradianceMap.self = ResourceManager::instance().getBuffer("irradianceMap");
+	mRenderCtx->PBR.irradianceMap.textureSlot = PBR_IRRADIANCE_MAP_TEXTURE_SLOT;
+	mRenderCtx->PBR.prefilterMap.self = ResourceManager::instance().getBuffer("prefilterMap");
+	mRenderCtx->PBR.prefilterMap.textureSlot = PBR_PREFILTER_MAP_TEXTURE_SLOT;
+	mRenderCtx->PBR.brdfLUT.self = ResourceManager::instance().getBuffer("brdfLUT");
+	mRenderCtx->PBR.brdfLUT.textureSlot = PBR_BRDF_LUT_TEXTURE_SLOT;
+	mRenderCtx->PBR.albedoTextureSlot = PBR_ALBEDO_TEXTURE_SLOT;
+	mRenderCtx->PBR.normalTextureSlot = PBR_NORMAL_TEXTURE_SLOT;
+	mRenderCtx->PBR.roughnessMetallicTextureSlot = PBR_RM_TEXTURE_SLOT;
+	mRenderCtx->PBR.aoTextureSlot = PBR_AO_TEXTURE_SLOT;
+	mRenderCtx->PBR.emissiveTextureSlot = PBR_EMISSIVE_TEXTURE_SLOT;
+	mRenderCtx->PBR.heightTextureSlot = PBR_HEIGHT_TEXTURE_SLOT;
 
 	// Set camera projection matrix
 	const glm::mat4 projectionMat = glm::perspective(
@@ -249,7 +248,6 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mRenderCtx->camera.ubo.self->unbind();
 
 	// Configure render passes
-
 	for (const auto& pass: mRenderPasses) {
 		pass->configure(*mRenderCtx, eventBus);
 	}

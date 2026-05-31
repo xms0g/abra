@@ -100,6 +100,7 @@ uint32_t texture::loadHDR(const char* path) {
 	int32_t width, height, channel;
 
 	stbi_set_flip_vertically_on_load(true);
+
 	float* data = stbi_loadf(path, &width, &height, &channel, 0);
 	if (!data) {
 		std::cerr << "HDR texture failed to load at path: " << path << std::endl;
@@ -116,6 +117,8 @@ uint32_t texture::loadHDR(const char* path) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	stbi_image_free(data);
+
+	stbi_set_flip_vertically_on_load(false);
 
 	return hdrTexture;
 }

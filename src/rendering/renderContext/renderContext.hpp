@@ -8,6 +8,7 @@ namespace math {
 struct Frustum;
 }
 
+class BaseFrameBuffer;
 class FrameBuffer;
 class UniformBuffer;
 class Camera;
@@ -107,22 +108,21 @@ struct RenderContext {
 	struct {
 		struct {
 			mutable uint32_t binding;
-			uint32_t size;
 		} envMap;
 
 		struct {
+			const BaseFrameBuffer* self;
 			int32_t textureSlot;
-			uint32_t size;
 		} irradianceMap;
 
 		struct {
+			const BaseFrameBuffer* self;
 			int32_t textureSlot;
-			uint32_t size;
 		} prefilterMap;
 
 		struct {
+			const BaseFrameBuffer* self;
 			int32_t textureSlot;
-			uint32_t size;
 		} brdfLUT;
 
 		int32_t albedoTextureSlot;
@@ -131,8 +131,6 @@ struct RenderContext {
 		int32_t aoTextureSlot;
 		int32_t emissiveTextureSlot;
 		int32_t heightTextureSlot;
-
-		const char* HDRTexture;
 	} PBR{};
 
 	RenderContext() = default;

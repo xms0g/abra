@@ -4,10 +4,13 @@
 #include <unordered_set>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 #include "../job/threadPool.h"
 #include "../rendering/types.hpp"
 
 class Shader;
+class BaseFrameBuffer;
 
 class ResourceManager {
 public:
@@ -22,6 +25,9 @@ public:
 
 	[[nodiscard]]
 	MaterialMap* getMaterial(size_t entityID);
+
+	[[nodiscard]]
+	BaseFrameBuffer* getBuffer(const std::string& name) const;
 
 	void asyncLoadModel(size_t entityID, std::string& file);
 
@@ -67,9 +73,19 @@ private:
 
 	void loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& materialLoadCtx) const;
 
+	uint32_t createEnvMap(const std::string& path);
+
+	void createIrradianceMap();
+
+	void createPrefilterMap();
+
+	void createBrdfLUT();
+
 	std::unordered_map<size_t, MaterialMap> mMaterialsByEntity;
 	std::unordered_map<size_t, MeshMap> mMeshesByEntity;
 	std::unordered_map<size_t, std::vector<float>> mTransformsByEntity;
+	std::unordered_map<std::string, std::unique_ptr<BaseFrameBuffer>> mBuffers;
+
 	ThreadPool mThreadPool{};
 	std::mutex mResourceMutex;
 
@@ -80,5 +96,17 @@ private:
 		aiTextureType_LIGHTMAP,
 		aiTextureType_EMISSIVE,
 		aiTextureType_HEIGHT
+	};
+
+	static constexpr uint32_t FACES = 6;
+
+	glm::mat4 mCaptureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+	glm::mat4 mCaptureViews[FACES] = {
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)),
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f))
 	};
 };
