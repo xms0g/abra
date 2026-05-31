@@ -130,6 +130,8 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mRenderCtx->PBR.shader = ResourceManager::instance().getShader("deferredLighting");
 	mRenderCtx->ssao.shader = ResourceManager::instance().getShader("ssao");
 	mRenderCtx->ssao.blurShader = ResourceManager::instance().getShader("ssaoBlur");
+	mRenderCtx->debug.normal = ResourceManager::instance().getShader("debugNormal");
+	mRenderCtx->debug.wireframe = ResourceManager::instance().getShader("debugWireframe");
 
 	mLightSystem->configure(*mRenderCtx, eventBus);
 	mSyncStateSystem->configure(*mRenderCtx, eventBus);

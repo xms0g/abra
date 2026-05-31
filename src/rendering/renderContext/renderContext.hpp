@@ -143,6 +143,11 @@ struct RenderContext {
 		int32_t heightTextureSlot;
 	} PBR{};
 
+	struct {
+		const Shader* normal;
+		const Shader* wireframe;
+	} debug;
+
 	RenderContext() = default;
 
 	RenderContext(const RenderContext&) = delete;

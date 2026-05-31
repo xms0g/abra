@@ -12,17 +12,7 @@
 DebugPass::~DebugPass() = default;
 
 void DebugPass::configure(const RenderContext& ctx, EventBus& eventBus) {
-	mDebugShaders = {
-		nullptr, // for None
-		std::make_shared<Shader>("debug/normal.vert", "debug/normal.frag", "debug/normal.geom"),
-		std::make_shared<Shader>("debug/wireframe.vert", "debug/wireframe.frag", "debug/wireframe.geom")
-	};
-
-	for (const auto& shader: mDebugShaders) {
-		if (!shader)
-			continue;
-		ctx.camera.ubo.self->configure(shader->id(), ctx.camera.ubo.binding, ctx.camera.ubo.blockName);
-	}
+	mDebugShaders = {nullptr, ctx.debug.normal, ctx.debug.wireframe};
 }
 
 void DebugPass::execute(const RenderContext& ctx) {
