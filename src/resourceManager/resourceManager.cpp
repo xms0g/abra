@@ -24,6 +24,10 @@ ResourceManager& ResourceManager::instance() {
 }
 
 void ResourceManager::createShaders() {
+	mShaders.emplace("gBuffer", std::make_unique<Shader>("deferred/gbuffer.vert", "deferred/gbuffer.frag"));
+	mShaders.emplace("deferredLighting", std::make_unique<Shader>("models/quad.vert", "deferred/lighting.frag"));
+	mShaders.emplace("ssao", std::make_unique<Shader>("models/quad.vert", "ssao.frag"));
+	mShaders.emplace("ssaoBlur", std::make_unique<Shader>("models/quad.vert", "ssaoBlur.frag"));
 	mShaders.emplace("opaque", std::make_unique<Shader>("object.vert", "opaque.frag"));
 	mShaders.emplace("blend", std::make_unique<Shader>("object.vert", "blend.frag"));
 	mShaders.emplace("unlit", std::make_unique<Shader>("unlit.vert", "unlit.frag"));

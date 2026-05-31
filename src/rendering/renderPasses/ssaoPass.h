@@ -35,8 +35,8 @@ private:
 	std::unique_ptr<Models::SingleQuad> mQuad;
 	std::unique_ptr<FrameBuffer> mFBO;
 	std::unique_ptr<FrameBuffer> mBlurFBO;
-	std::unique_ptr<Shader> mShader;
-	std::unique_ptr<Shader> mBlurShader;
+	const Shader* mShader;
+	const Shader* mBlurShader;
 	std::unique_ptr<UniformBuffer> mUBO;
 
 	std::vector<glm::vec4> mKernel;

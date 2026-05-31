@@ -11,7 +11,7 @@ DeferredLightingPass::~DeferredLightingPass() = default;
 
 void DeferredLightingPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mQuad = std::make_unique<Models::SingleQuad>();
-	mShader = std::make_unique<Shader>("models/quad.vert", "deferred/lighting.frag");
+	mShader = ctx.PBR.shader;
 	mShader->activate();
 	mShader->setInt("gPosition", 0);
 	mShader->setInt("gNormal", 1);
@@ -24,10 +24,6 @@ void DeferredLightingPass::configure(const RenderContext& ctx, EventBus& eventBu
 	mShader->setInt("irradianceMap", ctx.PBR.irradianceMap.textureSlot);
 	mShader->setInt("prefilterMap", ctx.PBR.prefilterMap.textureSlot);
 	mShader->setInt("brdfLUT", ctx.PBR.brdfLUT.textureSlot);
-
-	ctx.camera.ubo.self->configure(mShader->id(), ctx.camera.ubo.binding, ctx.camera.ubo.blockName);
-	ctx.light.ubo.self->configure(mShader->id(), ctx.light.ubo.binding, ctx.light.ubo.blockName);
-	ctx.shadow.ubo.self->configure(mShader->id(), ctx.shadow.ubo.binding, ctx.shadow.ubo.blockName);
 }
 
 void DeferredLightingPass::execute(const RenderContext& ctx) {

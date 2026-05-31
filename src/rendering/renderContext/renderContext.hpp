@@ -26,6 +26,7 @@ struct RenderContext {
 
 	struct {
 		const FrameBuffer* self;
+		const Shader* shader;
 
 		int32_t positionTextureIdx;
 		int32_t normalTextureIdx;
@@ -36,6 +37,9 @@ struct RenderContext {
 
 	struct {
 		const FrameBuffer* buffer;
+		const Shader* shader;
+		const Shader* blurShader;
+
 		int32_t kernelSize;
 		int32_t noiseTextureSize;
 		float radius;
@@ -110,6 +114,8 @@ struct RenderContext {
 	} shadow{};
 
 	struct {
+		const Shader* shader;
+
 		struct {
 			mutable uint32_t binding;
 		} envMap;

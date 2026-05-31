@@ -31,7 +31,7 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, EventBus& eventBu
 			.withTextureDepth(GL_DEPTH_COMPONENT24, false)
 			.checkStatus();
 
-	mShader = std::make_unique<Shader>("deferred/gbuffer.vert", "deferred/gbuffer.frag");
+	mShader = ctx.gBuffer.shader;
 	mShader->activate();
 	mShader->setInt("material.texture_albedo", ctx.PBR.albedoTextureSlot);
 	mShader->setInt("material.texture_normal", ctx.PBR.normalTextureSlot);
@@ -39,8 +39,6 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, EventBus& eventBu
 	mShader->setInt("material.texture_ao", ctx.PBR.aoTextureSlot);
 	mShader->setInt("material.texture_emissive", ctx.PBR.emissiveTextureSlot);
 	mShader->setInt("material.texture_height", ctx.PBR.heightTextureSlot);
-
-	ctx.camera.ubo.self->configure(mShader->id(), ctx.camera.ubo.binding, ctx.camera.ubo.blockName);
 }
 
 void DeferredGeometryPass::execute(const RenderContext& ctx) {

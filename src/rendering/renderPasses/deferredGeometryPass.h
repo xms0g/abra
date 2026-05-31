@@ -18,5 +18,5 @@ public:
 
 private:
 	std::unique_ptr<FrameBuffer> mGBuffer;
-	std::unique_ptr<Shader> mShader;
+	const Shader* mShader;
 };

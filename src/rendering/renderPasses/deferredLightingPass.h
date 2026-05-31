@@ -19,6 +19,6 @@ public:
 	void execute(const RenderContext& ctx) override;
 
 private:
-	std::unique_ptr<Shader> mShader;
+	const Shader* mShader;
 	std::unique_ptr<Models::SingleQuad> mQuad;
 };

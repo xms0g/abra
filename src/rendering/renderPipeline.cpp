@@ -126,6 +126,10 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mRenderCtx->shadow.directional.shader = ResourceManager::instance().getShader("depth");
 	mRenderCtx->shadow.omnidirectional.shader = ResourceManager::instance().getShader("depthCubemap");
 	mRenderCtx->shadow.perspective.shader = ResourceManager::instance().getShader("depth");
+	mRenderCtx->gBuffer.shader = ResourceManager::instance().getShader("gBuffer");
+	mRenderCtx->PBR.shader = ResourceManager::instance().getShader("deferredLighting");
+	mRenderCtx->ssao.shader = ResourceManager::instance().getShader("ssao");
+	mRenderCtx->ssao.blurShader = ResourceManager::instance().getShader("ssaoBlur");
 
 	mLightSystem->configure(*mRenderCtx, eventBus);
 	mSyncStateSystem->configure(*mRenderCtx, eventBus);
@@ -270,12 +274,6 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 			shader->id(),
 			mRenderCtx->shadow.ubo.binding,
 			mRenderCtx->shadow.ubo.blockName);
-
-		shader->activate();
-		shader->setInt("material.texture_albedo", PBR_ALBEDO_TEXTURE_SLOT);
-		shader->setInt("shadowMap", mRenderCtx->shadow.textureSlot);
-		shader->setInt("shadowCubemap", mRenderCtx->shadow.textureSlot + 1);
-		shader->setInt("persShadowMap", mRenderCtx->shadow.textureSlot + 2);
 	}
 }
 

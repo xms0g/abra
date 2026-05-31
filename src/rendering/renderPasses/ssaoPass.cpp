@@ -27,7 +27,7 @@ void SSAOPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mBlurFBO->withTextureFP(GL_RED)
 			.checkStatus();
 
-	mShader = std::make_unique<Shader>("models/quad.vert", "ssao.frag");
+	mShader = ctx.ssao.shader;
 	mShader->activate();
 	mShader->setInt("gDepthMap", 0);
 	mShader->setInt("gNormal", 1);
@@ -38,7 +38,7 @@ void SSAOPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mShader->setFloat("intensity", ctx.ssao.intensity);
 	mShader->setVec2("resolution", glm::vec2(ctx.screen.width, ctx.screen.height));
 
-	mBlurShader = std::make_unique<Shader>("models/quad.vert", "ssaoBlur.frag");
+	mBlurShader = ctx.ssao.blurShader;
 	mBlurShader->activate();
 	mBlurShader->setInt("ssaoTexture", 0);
 
@@ -57,7 +57,6 @@ void SSAOPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mUBO->unbind();
 
 	mUBO->configure(mShader->id(), ctx.ssao.ubo.binding, ctx.ssao.ubo.blockName);
-	ctx.camera.ubo.self->configure(mShader->id(), ctx.camera.ubo.binding, ctx.camera.ubo.blockName);
 }
 
 void SSAOPass::execute(const RenderContext& ctx) {
