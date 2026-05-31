@@ -22,6 +22,7 @@ int main() {
 		SceneLoader::loadScene(registry, "assets/scenes/scene_Sponza_Spotlight.json");
 		registry.update();
 
+		ResourceManager::instance().createBuffers();
 		ResourceManager::instance().createShaders();
 
 		engine.configure();

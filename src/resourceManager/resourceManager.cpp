@@ -38,6 +38,17 @@ void ResourceManager::createShaders() {
 			"depth/depthCubemap.geom"));
 }
 
+void ResourceManager::createBuffers() {
+	if (!mBuffers.contains("envMap"))
+		return;
+
+	glDisable(GL_CULL_FACE);
+	createIrradianceMap();
+	createPrefilterMap();
+	createBrdfLUT();
+	glEnable(GL_CULL_FACE);
+}
+
 MeshMap* ResourceManager::getMeshes(const size_t entityID) {
 	return &mMeshesByEntity.at(entityID);
 }
@@ -95,19 +106,13 @@ void ResourceManager::uploadModelsToGPU() {
 			if (material.flags & CUBEMAP) {
 				// Handle HDR to Cubemap
 				if (material.textures.size() == 1) {
-					glDisable(GL_CULL_FACE);
-
 					const std::string& path = material.textures.front().path;
+					glDisable(GL_CULL_FACE);
 					uint32_t id = createEnvMap(path);
+					glEnable(GL_CULL_FACE);
 
 					material.textures.clear();
 					material.textures.emplace_back(id, 0, "");
-
-					createIrradianceMap();
-					createPrefilterMap();
-					createBrdfLUT();
-
-					glEnable(GL_CULL_FACE);
 				} else {
 					// Handle 6 faces-cubemap
 					std::vector<std::string> paths;

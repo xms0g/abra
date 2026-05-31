@@ -22,6 +22,8 @@ public:
 
 	void createShaders();
 
+	void createBuffers();
+
 	[[nodiscard]]
 	MeshMap* getMeshes(size_t entityID);
 
