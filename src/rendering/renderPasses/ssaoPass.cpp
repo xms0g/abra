@@ -27,7 +27,7 @@ void SSAOPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mBlurFBO->withTextureFP(GL_RED)
 			.checkStatus();
 
-	mShader = ctx.ssao.shader;
+	mShader = ctx.resourceManager->getShader("ssao");
 	mShader->activate();
 	mShader->setInt("gDepthMap", 0);
 	mShader->setInt("gNormal", 1);
@@ -38,7 +38,7 @@ void SSAOPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mShader->setFloat("intensity", ctx.ssao.intensity);
 	mShader->setVec2("resolution", glm::vec2(ctx.screen.width, ctx.screen.height));
 
-	mBlurShader = ctx.ssao.blurShader;
+	mBlurShader = ctx.resourceManager->getShader("ssaoBlur");
 	mBlurShader->activate();
 	mBlurShader->setInt("ssaoTexture", 0);
 

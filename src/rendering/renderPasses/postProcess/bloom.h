@@ -2,12 +2,13 @@
 #include <memory>
 #include "basePostEffect.hpp"
 
+struct RenderContext;
 class Shader;
 class FrameBuffer;
 
 class Bloom final : public BasePostEffect {
 public:
-	Bloom(const std::string& name, int width, int height, bool enabled = false);
+	Bloom(const std::string& name, const RenderContext& ctx, bool enabled = false);
 
 	~Bloom() override;
 
@@ -33,7 +34,8 @@ private:
 		const bool& toggle) const;
 
 	PingPongBuffer mPingPong;
-	std::unique_ptr<Shader> brightFilter;
-	std::unique_ptr<Shader> blur;
-	std::unique_ptr<Shader> combine;
+
+	const Shader* mBrightFilter;
+	const Shader* mBlur;
+	const Shader* mCombine;
 };

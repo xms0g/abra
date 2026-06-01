@@ -3,12 +3,13 @@
 #include "../../shader.h"
 #include "../../renderCommon.h"
 #include "../../buffers/frameBuffer.h"
+#include "../../renderContext/renderContext.hpp"
 
-FXAA::FXAA(const std::string& name, const bool enabled)
+FXAA::FXAA(const std::string& name, const RenderContext& ctx, const bool enabled)
 	: BasePostEffect(name, enabled) {
-	shader = std::make_unique<Shader>("models/quad.vert", "post-processing/fxaa.frag");
-	shader->activate();
-	shader->setInt("screenTexture", 0);
+	mShader = ctx.resourceManager->getShader("fxaa");
+	mShader->activate();
+	mShader->setInt("screenTexture", 0);
 }
 
 uint32_t FXAA::render(
@@ -22,8 +23,8 @@ uint32_t FXAA::render(
 	const int32_t width = pingPong[toggle]->width();
 	const int32_t height = pingPong[toggle]->height();
 
-	shader->activate();
-	shader->setVec2("resolution", glm::vec2(width, height));
+	mShader->activate();
+	mShader->setVec2("resolution", glm::vec2(width, height));
 
 	RenderCommon::drawQuad(vao, sceneTexture);
 

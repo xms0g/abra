@@ -3,12 +3,13 @@
 #include "../../shader.h"
 #include "../../renderCommon.h"
 #include "../../buffers/frameBuffer.h"
+#include "../../renderContext/renderContext.hpp"
 
-Grayscale::Grayscale(const std::string& name, const bool enabled)
+Grayscale::Grayscale(const std::string& name, const RenderContext& ctx, const bool enabled)
 	: BasePostEffect(name, enabled) {
-	shader = std::make_unique<Shader>("models/quad.vert", "post-processing/grayscale.frag");
-	shader->activate();
-	shader->setInt("screenTexture", 0);
+	mShader = ctx.resourceManager->getShader("grayscale");
+	mShader->activate();
+	mShader->setInt("screenTexture", 0);
 }
 
 uint32_t Grayscale::render(
@@ -19,7 +20,7 @@ uint32_t Grayscale::render(
 	pingPong[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	shader->activate();
+	mShader->activate();
 	RenderCommon::drawQuad(vao, sceneTexture);
 
 	const uint32_t texture = pingPong[toggle]->texture();

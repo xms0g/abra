@@ -3,24 +3,25 @@
 #include "../../shader.h"
 #include "../../renderCommon.h"
 #include "../../buffers/frameBuffer.h"
+#include "../../renderContext/renderContext.hpp"
 
-Bloom::Bloom(const std::string& name, const int width, const int height, const bool enabled)
+Bloom::Bloom(const std::string& name, const RenderContext& ctx, const bool enabled)
 	: BasePostEffect(name, enabled) {
-	brightFilter = std::make_unique<Shader>("models/quad.vert", "post-processing/bloom/brightFilter.frag");
-	brightFilter->activate();
-	brightFilter->setInt("screenTexture", 0);
+	mBrightFilter = ctx.resourceManager->getShader("bloomBF");
+	mBrightFilter->activate();
+	mBrightFilter->setInt("screenTexture", 0);
 
-	blur = std::make_unique<Shader>("models/quad.vert", "post-processing/bloom/blur.frag");
-	blur->activate();
-	blur->setInt("screenTexture", 0);
+	mBlur = ctx.resourceManager->getShader("bloomBlur");
+	mBlur->activate();
+	mBlur->setInt("screenTexture", 0);
 
-	combine = std::make_unique<Shader>("models/quad.vert", "post-processing/bloom/combine.frag");
-	combine->activate();
-	combine->setInt("screenTexture", 0);
-	combine->setInt("bloomBlur", 1);
+	mCombine = ctx.resourceManager->getShader("bloomCombine");
+	mCombine->activate();
+	mCombine->setInt("screenTexture", 0);
+	mCombine->setInt("bloomBlur", 1);
 
 	for (auto& target: mPingPong) {
-		target = std::make_unique<FrameBuffer>(width, height);
+		target = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
 #ifdef HDR
 		target->withTextureFP(GL_RGBA)
 #else
@@ -56,7 +57,7 @@ uint32_t Bloom::brightFilterPass(const uint32_t vao, const uint32_t sceneTexture
 	mPingPong[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	brightFilter->activate();
+	mBrightFilter->activate();
 
 	RenderCommon::drawQuad(vao, sceneTexture);
 
@@ -73,8 +74,8 @@ uint32_t Bloom::blurPass( const uint32_t vao, const uint32_t sceneTexture, bool&
 		mPingPong[toggle]->bind();
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		blur->activate();
-		blur->setBool("horizontal", horizontal);
+		mBlur->activate();
+		mBlur->setBool("horizontal", horizontal);
 		horizontal = !horizontal;
 
 		RenderCommon::drawQuad(vao, outTex);
@@ -92,7 +93,7 @@ uint32_t Bloom::combinePass(
 	const uint32_t blurTexture,
 	const bool& toggle) const {
 	mPingPong[toggle]->bind();
-	combine->activate();
+	mCombine->activate();
 
 	glDisable(GL_DEPTH_TEST);
 	glBindVertexArray(vao);

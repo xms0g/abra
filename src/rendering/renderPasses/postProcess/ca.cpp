@@ -3,12 +3,13 @@
 #include "../../shader.h"
 #include "../../renderCommon.h"
 #include "../../buffers/frameBuffer.h"
+#include "../../renderContext/renderContext.hpp"
 
-CA::CA(const std::string& name, const bool enabled)
+CA::CA(const std::string& name, const RenderContext& ctx, const bool enabled)
 	: BasePostEffect(name, enabled) {
-	shader = std::make_unique<Shader>("models/quad.vert", "post-processing/ca.frag");
-	shader->activate();
-	shader->setInt("screenTexture", 0);
+	mShader = ctx.resourceManager->getShader("ca");
+	mShader->activate();
+	mShader->setInt("screenTexture", 0);
 }
 
 uint32_t CA::render(
@@ -19,8 +20,8 @@ uint32_t CA::render(
 	pingPong[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	shader->activate();
-	shader->setFloat("intensity", mIntensity);
+	mShader->activate();
+	mShader->setFloat("intensity", mIntensity);
 
 	RenderCommon::drawQuad(vao, sceneTexture);
 

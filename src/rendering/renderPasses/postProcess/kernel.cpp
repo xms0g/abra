@@ -3,13 +3,14 @@
 #include "../../shader.h"
 #include "../../renderCommon.h"
 #include "../../buffers/frameBuffer.h"
+#include "../../renderContext/renderContext.hpp"
 
-Kernel::Kernel(const std::string& name, const float* kernel, const bool enabled)
+Kernel::Kernel(const std::string& name, const float* kernel, const RenderContext& ctx, const bool enabled)
 	: BasePostEffect(name, enabled),
 	  mKernel(kernel) {
-	shader = std::make_unique<Shader>("models/quad.vert", "post-processing/kernel.frag");
-	shader->activate();
-	shader->setInt("screenTexture", 0);
+	mShader = ctx.resourceManager->getShader("kernel");
+	mShader->activate();
+	mShader->setInt("screenTexture", 0);
 }
 
 uint32_t Kernel::render(
@@ -20,8 +21,8 @@ uint32_t Kernel::render(
 	pingPong[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	shader->activate();
-	shader->setFloatArray("kernel", mKernel, 9);
+	mShader->activate();
+	mShader->setFloatArray("kernel", mKernel, 9);
 
 	RenderCommon::drawQuad(vao, sceneTexture);
 

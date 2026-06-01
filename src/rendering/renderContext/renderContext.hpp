@@ -3,6 +3,7 @@
 #include "glm/glm.hpp"
 #include "../../config/config.hpp"
 #include "../material/material.hpp"
+#include "../../resourceManager/resourceManager.h"
 
 namespace math {
 struct Frustum;
@@ -12,7 +13,6 @@ class BaseFrameBuffer;
 class FrameBuffer;
 class UniformBuffer;
 class Camera;
-class Shader;
 struct RenderQueue;
 struct DirectionalLightComponent;
 struct PointLightComponent;
@@ -23,10 +23,10 @@ struct RenderContext {
 	mutable const FrameBuffer* sceneBuffer{};
 	const FrameBuffer* intermediateBuffer{};
 	mutable MaterialCache materialCache;
+	const ResourceManager* resourceManager{};
 
 	struct {
 		const FrameBuffer* self;
-		const Shader* shader;
 
 		int32_t positionTextureIdx;
 		int32_t normalTextureIdx;
@@ -37,8 +37,6 @@ struct RenderContext {
 
 	struct {
 		const FrameBuffer* buffer;
-		const Shader* shader;
-		const Shader* blurShader;
 
 		int32_t kernelSize;
 		int32_t noiseTextureSize;
@@ -95,43 +93,38 @@ struct RenderContext {
 		} ubo;
 
 		struct {
-			const Shader* shader;
 			uint32_t maxLights;
 			float height, nearPlane, farPlane, left, right, bottom, top;
 		} directional;
 
 		struct {
-			const Shader* shader;
 			uint32_t maxLights;
 			float nearPlane, farPlane, fovy;
 		} omnidirectional;
 
 		struct {
-			const Shader* shader;
 			uint32_t maxLights;
 			float nearPlane, farPlane;
 		} perspective;
 	} shadow{};
 
 	struct {
-		const Shader* shader;
-
 		struct {
 			mutable uint32_t binding;
 		} envMap;
 
 		struct {
-			const BaseFrameBuffer* self;
+			const BaseFrameBuffer* buffer;
 			int32_t textureSlot;
 		} irradianceMap;
 
 		struct {
-			const BaseFrameBuffer* self;
+			const BaseFrameBuffer* buffer;
 			int32_t textureSlot;
 		} prefilterMap;
 
 		struct {
-			const BaseFrameBuffer* self;
+			const BaseFrameBuffer* buffer;
 			int32_t textureSlot;
 		} brdfLUT;
 
@@ -142,11 +135,6 @@ struct RenderContext {
 		int32_t emissiveTextureSlot;
 		int32_t heightTextureSlot;
 	} PBR{};
-
-	struct {
-		const Shader* normal;
-		const Shader* wireframe;
-	} debug;
 
 	RenderContext() = default;
 

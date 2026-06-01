@@ -11,7 +11,7 @@ DeferredLightingPass::~DeferredLightingPass() = default;
 
 void DeferredLightingPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mQuad = std::make_unique<Models::SingleQuad>();
-	mShader = ctx.PBR.shader;
+	mShader = ctx.resourceManager->getShader("deferredLighting");
 	mShader->activate();
 	mShader->setInt("gPosition", 0);
 	mShader->setInt("gNormal", 1);
@@ -44,9 +44,9 @@ void DeferredLightingPass::execute(const RenderContext& ctx) {
 	ctx.gBuffer.self->bindTexture(2, ctx.gBuffer.albedoTextureIdx);
 	ctx.gBuffer.self->bindTexture(3, ctx.gBuffer.ormTextureIdx);
 	ctx.ssao.buffer->bindTexture(ctx.ssao.textureSlot);
-	ctx.PBR.irradianceMap.self->bindTexture(ctx.PBR.irradianceMap.textureSlot);
-	ctx.PBR.prefilterMap.self->bindTexture(ctx.PBR.prefilterMap.textureSlot);
-	ctx.PBR.brdfLUT.self->bindTexture(ctx.PBR.brdfLUT.textureSlot);
+	ctx.PBR.irradianceMap.buffer->bindTexture(ctx.PBR.irradianceMap.textureSlot);
+	ctx.PBR.prefilterMap.buffer->bindTexture(ctx.PBR.prefilterMap.textureSlot);
+	ctx.PBR.brdfLUT.buffer->bindTexture(ctx.PBR.brdfLUT.textureSlot);
 
 	RenderCommon::drawQuad(mQuad->vao());
 }

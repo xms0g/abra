@@ -3,12 +3,13 @@
 #include "../../shader.h"
 #include "../../renderCommon.h"
 #include "../../buffers/frameBuffer.h"
+#include "../../renderContext/renderContext.hpp"
 
-ToneMapping::ToneMapping(const std::string& name, const bool enabled)
+ToneMapping::ToneMapping(const std::string& name, const RenderContext& ctx, const bool enabled)
 	: BasePostEffect(name, enabled) {
-	shader = std::make_unique<Shader>("models/quad.vert", "post-processing/toneMapping.frag");
-	shader->activate();
-	shader->setInt("screenTexture", 0);
+	mShader = ctx.resourceManager->getShader("toneMapping");
+	mShader->activate();
+	mShader->setInt("screenTexture", 0);
 }
 
 uint32_t ToneMapping::render(
@@ -19,8 +20,8 @@ uint32_t ToneMapping::render(
 	pingPong[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	shader->activate();
-	shader->setFloat("exposure", mExposure);
+	mShader->activate();
+	mShader->setFloat("exposure", mExposure);
 
 	RenderCommon::drawQuad(vao, sceneTexture);
 

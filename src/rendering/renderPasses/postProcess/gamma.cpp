@@ -3,12 +3,13 @@
 #include "../../shader.h"
 #include "../../renderCommon.h"
 #include "../../buffers/frameBuffer.h"
+#include "../../renderContext/renderContext.hpp"
 
-Gamma::Gamma(const std::string& name, const bool enabled)
+Gamma::Gamma(const std::string& name, const RenderContext& ctx, const bool enabled)
 	: BasePostEffect(name, enabled) {
-	shader = std::make_unique<Shader>("models/quad.vert", "post-processing/gamma.frag");
-	shader->activate();
-	shader->setInt("screenTexture", 0);
+	mShader = ctx.resourceManager->getShader("gamma");
+	mShader->activate();
+	mShader->setInt("screenTexture", 0);
 }
 
 uint32_t Gamma::render(
@@ -19,7 +20,7 @@ uint32_t Gamma::render(
 	pingPong[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	shader->activate();
+	mShader->activate();
 
 	RenderCommon::drawQuad(vao, sceneTexture);
 

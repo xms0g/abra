@@ -61,6 +61,7 @@ RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLCon
 	glFrontFace(GL_CCW);
 
 	mRenderCtx = std::make_unique<RenderContext>();
+	mRenderCtx->resourceManager = &ResourceManager::instance();
 	mRenderCtx->screen.width = SCR_WIDTH;
 	mRenderCtx->screen.height = SCR_HEIGHT;
 	mRenderCtx->renderQueue = &mRenderQueue;
@@ -123,16 +124,6 @@ RenderPipeline::~RenderPipeline() {
 }
 
 void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
-	mRenderCtx->shadow.directional.shader = ResourceManager::instance().getShader("depth");
-	mRenderCtx->shadow.omnidirectional.shader = ResourceManager::instance().getShader("depthCubemap");
-	mRenderCtx->shadow.perspective.shader = ResourceManager::instance().getShader("depth");
-	mRenderCtx->gBuffer.shader = ResourceManager::instance().getShader("gBuffer");
-	mRenderCtx->PBR.shader = ResourceManager::instance().getShader("deferredLighting");
-	mRenderCtx->ssao.shader = ResourceManager::instance().getShader("ssao");
-	mRenderCtx->ssao.blurShader = ResourceManager::instance().getShader("ssaoBlur");
-	mRenderCtx->debug.normal = ResourceManager::instance().getShader("debugNormal");
-	mRenderCtx->debug.wireframe = ResourceManager::instance().getShader("debugWireframe");
-
 	mLightSystem->configure(*mRenderCtx, eventBus);
 	mSyncStateSystem->configure(*mRenderCtx, eventBus);
 	mShadowSystem->configure(*mRenderCtx, eventBus);
@@ -215,11 +206,11 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mRenderCtx->ssao.ubo.self = mSSAOPass ? mSSAOPass->ubo() : nullptr;
 	mRenderCtx->light.ubo.self = mLightSystem->ubo();
 	mRenderCtx->shadow.ubo.self = mShadowSystem->ubo();
-	mRenderCtx->PBR.irradianceMap.self = ResourceManager::instance().getBuffer("irradianceMap");
+	mRenderCtx->PBR.irradianceMap.buffer = ResourceManager::instance().getBuffer("irradianceMap");
 	mRenderCtx->PBR.irradianceMap.textureSlot = PBR_IRRADIANCE_MAP_TEXTURE_SLOT;
-	mRenderCtx->PBR.prefilterMap.self = ResourceManager::instance().getBuffer("prefilterMap");
+	mRenderCtx->PBR.prefilterMap.buffer = ResourceManager::instance().getBuffer("prefilterMap");
 	mRenderCtx->PBR.prefilterMap.textureSlot = PBR_PREFILTER_MAP_TEXTURE_SLOT;
-	mRenderCtx->PBR.brdfLUT.self = ResourceManager::instance().getBuffer("brdfLUT");
+	mRenderCtx->PBR.brdfLUT.buffer = ResourceManager::instance().getBuffer("brdfLUT");
 	mRenderCtx->PBR.brdfLUT.textureSlot = PBR_BRDF_LUT_TEXTURE_SLOT;
 	mRenderCtx->PBR.albedoTextureSlot = PBR_ALBEDO_TEXTURE_SLOT;
 	mRenderCtx->PBR.normalTextureSlot = PBR_NORMAL_TEXTURE_SLOT;

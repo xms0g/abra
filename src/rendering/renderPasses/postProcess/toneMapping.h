@@ -4,10 +4,11 @@
 
 class FrameBuffer;
 class Shader;
+struct RenderContext;
 
 class ToneMapping final : public BasePostEffect {
 public:
-	explicit ToneMapping(const std::string& name, bool enabled = false);
+	explicit ToneMapping(const std::string& name, const RenderContext& ctx, bool enabled = false);
 
 	uint32_t render(
 		uint32_t vao,
@@ -20,5 +21,5 @@ protected:
 
 private:
 	float mExposure{1.1f};
-	std::unique_ptr<Shader> shader;
+	const Shader* mShader;
 };

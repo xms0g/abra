@@ -4,10 +4,11 @@
 
 class FrameBuffer;
 class Shader;
+struct RenderContext;
 
 class Kernel final : public BasePostEffect {
 public:
-	explicit Kernel(const std::string& name, const float* kernel, bool enabled = false);
+	explicit Kernel(const std::string& name, const float* kernel, const RenderContext& ctx, bool enabled = false);
 
 	uint32_t render(
 		uint32_t vao,
@@ -19,6 +20,6 @@ protected:
 	void updateFromEventImpl(const GuiPostProcessEvent& event) override;
 
 private:
-	std::unique_ptr<Shader> shader;
+	const Shader* mShader;
 	const float* mKernel;
 };

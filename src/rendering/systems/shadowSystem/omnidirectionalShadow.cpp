@@ -15,7 +15,7 @@ OmnidirectionalShadow::OmnidirectionalShadow(const RenderContext& ctx) {
 			.checkStatus();
 	mDepthMap->unbind();
 
-	mDepthShader = ctx.shadow.omnidirectional.shader;
+	mDepthShader = ctx.resourceManager->getShader("depthCubemap");
 }
 
 OmnidirectionalShadow::~OmnidirectionalShadow() = default;

@@ -31,7 +31,7 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, EventBus& eventBu
 			.withTextureDepth(GL_DEPTH_COMPONENT24, false)
 			.checkStatus();
 
-	mShader = ctx.gBuffer.shader;
+	mShader = ctx.resourceManager->getShader("gBuffer");
 	mShader->activate();
 	mShader->setInt("material.texture_albedo", ctx.PBR.albedoTextureSlot);
 	mShader->setInt("material.texture_normal", ctx.PBR.normalTextureSlot);
