@@ -3,6 +3,7 @@
 #include "../buffers/frameBuffer.h"
 #include "../buffers/vertexBuffer.h"
 #include "../renderCommon.h"
+#include "../shader.h"
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/instanceGroup.hpp"
 #include "../renderContext/renderQueue.hpp"
@@ -21,15 +22,26 @@ InstancedPass::InstancedPass() = default;
 InstancedPass::~InstancedPass() = default;
 
 void InstancedPass::configure(const RenderContext& ctx, EventBus& eventBus) {
+	const Shader* shader{nullptr};
+
 	if (!ctx.renderQueue->opaqueInstancedGroups.empty()) {
 		prepareInstanceBuffer(ctx.renderQueue->opaqueInstancedGroups, ctx.renderQueue->mesh.vaos, mOpaqueVBO);
 		uploadInstanceData(ctx.renderQueue->opaqueInstancedGroups, *mOpaqueVBO);
+
+		shader = ctx.resourceManager->get<Shader>("instancedOpaque");
 	}
 
 	if (!ctx.renderQueue->blendInstancedGroups.empty()) {
 		prepareInstanceBuffer(ctx.renderQueue->blendInstancedGroups, ctx.renderQueue->mesh.vaos, mBlendVBO);
 		uploadInstanceData(ctx.renderQueue->blendInstancedGroups, *mBlendVBO);
+
+		shader = ctx.resourceManager->get<Shader>("instancedBlend");
 	}
+
+	shader->activate();
+	shader->setInt("shadowMap", ctx.shadow.textureSlot);
+	shader->setInt("shadowCubemap", ctx.shadow.textureSlot + 1);
+	shader->setInt("persShadowMap", ctx.shadow.textureSlot + 2);
 }
 
 void InstancedPass::execute(const RenderContext& ctx) {

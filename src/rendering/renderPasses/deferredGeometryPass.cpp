@@ -31,7 +31,7 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, EventBus& eventBu
 			.withTextureDepth(GL_DEPTH_COMPONENT24, false)
 			.checkStatus();
 
-	mShader = ctx.resourceManager->getShader("gBuffer");
+	mShader = ctx.resourceManager->get<Shader>("gBuffer");
 	mShader->activate();
 	mShader->setInt("material.texture_albedo", ctx.PBR.albedoTextureSlot);
 	mShader->setInt("material.texture_normal", ctx.PBR.normalTextureSlot);
@@ -47,7 +47,8 @@ void DeferredGeometryPass::execute(const RenderContext& ctx) {
 
 	mShader->activate();
 
-	for (const auto& [entityID, materialIdx, textureOffset, textureCount, meshIdx, shader]: ctx.renderQueue->deferredObjects) {
+	for (const auto& [entityID, materialIdx, textureOffset, textureCount, meshIdx, shader]: ctx.renderQueue->
+	     deferredObjects) {
 		RenderCommon::setupMaterial(entityID, materialIdx, textureOffset, textureCount, ctx, *mShader);
 		RenderCommon::setupTransform(entityID, ctx, *mShader);
 

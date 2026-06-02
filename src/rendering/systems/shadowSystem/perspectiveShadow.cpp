@@ -15,7 +15,7 @@ PerspectiveShadow::PerspectiveShadow(const RenderContext& ctx) {
 			.checkStatus();
 	mDepthMap->unbind();
 
-	mDepthShader = ctx.resourceManager->getShader("depth");
+	mDepthShader = ctx.resourceManager->get<Shader>("depth");
 }
 
 PerspectiveShadow::~PerspectiveShadow() = default;

@@ -7,15 +7,15 @@
 
 Bloom::Bloom(const std::string& name, const RenderContext& ctx, const bool enabled)
 	: BasePostEffect(name, enabled) {
-	mBrightFilter = ctx.resourceManager->getShader("bloomBF");
+	mBrightFilter = ctx.resourceManager->get<Shader>("bloomBF");
 	mBrightFilter->activate();
 	mBrightFilter->setInt("screenTexture", 0);
 
-	mBlur = ctx.resourceManager->getShader("bloomBlur");
+	mBlur = ctx.resourceManager->get<Shader>("bloomBlur");
 	mBlur->activate();
 	mBlur->setInt("screenTexture", 0);
 
-	mCombine = ctx.resourceManager->getShader("bloomCombine");
+	mCombine = ctx.resourceManager->get<Shader>("bloomCombine");
 	mCombine->activate();
 	mCombine->setInt("screenTexture", 0);
 	mCombine->setInt("bloomBlur", 1);

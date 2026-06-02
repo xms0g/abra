@@ -78,22 +78,6 @@ void ResourceManager::createBuffers() {
 	glEnable(GL_CULL_FACE);
 }
 
-MeshMap* ResourceManager::getMeshes(const size_t entityID) {
-	return &mMeshesByEntity.at(entityID);
-}
-
-MaterialMap* ResourceManager::getMaterial(const size_t entityID) {
-	return &mMaterialsByEntity.at(entityID);
-}
-
-BaseFrameBuffer* ResourceManager::getBuffer(const std::string& name) const {
-	return mBuffers.contains(name) ? mBuffers.at(name).get() : nullptr;
-}
-
-Shader* ResourceManager::getShader(const std::string& name) const {
-	return mShaders.contains(name) ? mShaders.at(name).get() : nullptr;
-}
-
 std::unordered_map<std::string, std::unique_ptr<Shader>>& ResourceManager::getShaders() {
 	return mShaders;
 }
@@ -102,21 +86,6 @@ void ResourceManager::asyncLoadModel(size_t entityID, std::string& file) {
 	mThreadPool.enqueue([this, entityID, file]() {
 		loadModel(entityID, file.c_str());
 	});
-}
-
-void ResourceManager::uploadMesh(size_t entityID, MeshMap& map) {
-	std::lock_guard<std::mutex> lock(mResourceMutex);
-	mMeshesByEntity.emplace(entityID, std::move(map));
-}
-
-void ResourceManager::uploadMaterial(size_t entityID, MaterialMap& map) {
-	std::lock_guard<std::mutex> lock(mResourceMutex);
-	mMaterialsByEntity.emplace(entityID, std::move(map));
-}
-
-std::vector<float>* ResourceManager::uploadTransforms(size_t entityID, const std::vector<float>& transforms) {
-	mTransformsByEntity.emplace(entityID, transforms);
-	return &mTransformsByEntity[entityID];
 }
 
 void ResourceManager::uploadModelsToGPU() {
@@ -393,7 +362,7 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 	cube.meshes().at(0).front().uploadToGPU();
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
-	const auto equirectangularToCube = getShader("equirectangularToCube");
+	const auto equirectangularToCube = get<Shader>("equirectangularToCube");
 	const uint32_t HDRTexture = texture::loadHDR(path.c_str());
 
 	// convert HDR equirectangular environment map to cubemap equivalent
@@ -429,14 +398,14 @@ void ResourceManager::createIrradianceMap() {
 
 	mBuffers.emplace("irradianceMap", std::move(irradianceMap));
 
-	const auto irradianceMapBuffer = getBuffer("irradianceMap");
-	const auto envMapBuffer = getBuffer("envMap");
+	const auto irradianceMapBuffer = get<BaseFrameBuffer>("irradianceMap");
+	const auto envMapBuffer = get<BaseFrameBuffer>("envMap");
 
 	Models::Cube cube;
 	cube.meshes().at(0).front().uploadToGPU();
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
-	const auto irradianceConv = getShader("irradianceConv");
+	const auto irradianceConv = get<Shader>("irradianceConv");
 	// solve diffuse integral by convolution to create an irradiance (cube)map.
 	irradianceConv->activate();
 	irradianceConv->setInt("environmentMap", 0);
@@ -446,7 +415,7 @@ void ResourceManager::createIrradianceMap() {
 
 	irradianceMapBuffer->bind();
 	for (uint32_t i = 0; i < FACES; ++i) {
-		dynamic_cast<CubemapBuffer*>(irradianceMapBuffer)->bindFace(i);
+		dynamic_cast<const CubemapBuffer*>(irradianceMapBuffer)->bindFace(i);
 		irradianceConv->setMat4("view", mCaptureViews[i]);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -464,14 +433,14 @@ void ResourceManager::createPrefilterMap() {
 
 	mBuffers.emplace("prefilterMap", std::move(prefilterMap));
 
-	const auto prefilterMapBuffer = getBuffer("prefilterMap");
-	const auto envMapBuffer = getBuffer("envMap");
+	const auto prefilterMapBuffer = get<BaseFrameBuffer>("prefilterMap");
+	const auto envMapBuffer = get<BaseFrameBuffer>("envMap");
 
 	Models::Cube cube;
 	cube.meshes().at(0).front().uploadToGPU();
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
-	const auto prefilter = getShader("prefilter");
+	const auto prefilter = get<Shader>("prefilter");
 	// run a quasi monte-carlo simulation on the environment lighting to create a prefilter (cube)map.
 	prefilter->activate();
 	prefilter->setInt("environmentMap", 0);
@@ -490,7 +459,7 @@ void ResourceManager::createPrefilterMap() {
 		prefilter->setFloat("roughness", roughness);
 
 		for (uint32_t j = 0; j < FACES; ++j) {
-			dynamic_cast<CubemapBuffer*>(prefilterMapBuffer)->bindFace(j, i);
+			dynamic_cast<const CubemapBuffer*>(prefilterMapBuffer)->bindFace(j, i);
 			prefilter->setMat4("view", mCaptureViews[j]);
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -508,11 +477,11 @@ void ResourceManager::createBrdfLUT() {
 
 	mBuffers.emplace("brdfLUT", std::move(brdfLUT));
 
-	const auto brdfLUTBuffer = getBuffer("brdfLUT");
+	const auto brdfLUTBuffer = get<BaseFrameBuffer>("brdfLUT");
 
 	const Models::SingleQuad quad;
 	// generate a 2D LUT from the BRDF equations used.
-	const auto brdfLUTShader = getShader("brdfLUT");
+	const auto brdfLUTShader = get<Shader>("brdfLUT");
 	brdfLUTShader->activate();
 
 	brdfLUTBuffer->bind();

@@ -5,8 +5,8 @@
 class Mesh;
 struct MeshComponent {
 	using MeshMap = std::unordered_map<uint32_t, std::vector<Mesh>>;
-	MeshMap* meshes;
+	const MeshMap* meshes;
 
 	MeshComponent() = default;
-	explicit MeshComponent(MeshMap* m) : meshes(m) {}
+	explicit MeshComponent(const MeshMap* m) : meshes(m) {}
 };

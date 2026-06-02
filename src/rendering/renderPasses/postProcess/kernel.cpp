@@ -8,7 +8,7 @@
 Kernel::Kernel(const std::string& name, const float* kernel, const RenderContext& ctx, const bool enabled)
 	: BasePostEffect(name, enabled),
 	  mKernel(kernel) {
-	mShader = ctx.resourceManager->getShader("kernel");
+	mShader = ctx.resourceManager->get<Shader>("kernel");
 	mShader->activate();
 	mShader->setInt("screenTexture", 0);
 }

@@ -7,7 +7,7 @@
 
 Gamma::Gamma(const std::string& name, const RenderContext& ctx, const bool enabled)
 	: BasePostEffect(name, enabled) {
-	mShader = ctx.resourceManager->getShader("gamma");
+	mShader = ctx.resourceManager->get<Shader>("gamma");
 	mShader->activate();
 	mShader->setInt("screenTexture", 0);
 }

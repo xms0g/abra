@@ -24,27 +24,16 @@ public:
 
 	void createBuffers();
 
+	template<typename T, typename KeyType>
 	[[nodiscard]]
-	MeshMap* getMeshes(size_t entityID);
+	T* get(const KeyType& key) const;
 
-	[[nodiscard]]
-	MaterialMap* getMaterial(size_t entityID);
-
-	[[nodiscard]]
-	BaseFrameBuffer* getBuffer(const std::string& name) const;
-
-	[[nodiscard]]
-	Shader* getShader(const std::string& name) const;
-
-	std::unordered_map<std::string, std::unique_ptr<Shader>>& getShaders();
+	std::unordered_map<std::string, std::unique_ptr<Shader> >& getShaders();
 
 	void asyncLoadModel(size_t entityID, std::string& file);
 
-	void uploadMesh(size_t entityID, MeshMap& map);
-
-	void uploadMaterial(size_t entityID, MaterialMap& map);
-
-	std::vector<float>* uploadTransforms(size_t entityID, const std::vector<float>& transforms);
+	template<typename T>
+	void upload(size_t entityID, T& map);
 
 	void uploadModelsToGPU();
 
@@ -92,9 +81,9 @@ private:
 
 	std::unordered_map<size_t, MaterialMap> mMaterialsByEntity;
 	std::unordered_map<size_t, MeshMap> mMeshesByEntity;
-	std::unordered_map<size_t, std::vector<float>> mTransformsByEntity;
-	std::unordered_map<std::string, std::unique_ptr<BaseFrameBuffer>> mBuffers;
-	std::unordered_map<std::string, std::unique_ptr<Shader>> mShaders;
+	std::unordered_map<size_t, std::vector<float> > mTransformsByEntity;
+	std::unordered_map<std::string, std::unique_ptr<BaseFrameBuffer> > mBuffers;
+	std::unordered_map<std::string, std::unique_ptr<Shader> > mShaders;
 
 	ThreadPool mThreadPool{};
 	std::mutex mResourceMutex;
@@ -120,3 +109,35 @@ private:
 		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f))
 	};
 };
+
+template<typename T, typename KeyType>
+T* ResourceManager::get(const KeyType& key) const {
+	if constexpr (std::is_same_v<T, MeshMap>) {
+		return const_cast<T*>(&mMeshesByEntity.at(key));
+	} else if constexpr (std::is_same_v<T, MaterialMap>) {
+		return const_cast<T*>(&mMaterialsByEntity.at(key));
+	} else if constexpr (std::is_same_v<T, std::vector<float>>) {
+		return const_cast<T*>(&mTransformsByEntity.at(key));
+	} else if constexpr (std::is_same_v<T, BaseFrameBuffer>) {
+		return mBuffers.contains(key) ? mBuffers.at(key).get() : nullptr;
+	} else if constexpr (std::is_same_v<T, Shader>) {
+		return mShaders.contains(key) ? mShaders.at(key).get() : nullptr;
+	} else {
+		static_assert(false, "Unsupported type for get().");
+	}
+}
+
+template<typename T>
+void ResourceManager::upload(size_t entityID, T& map) {
+	std::lock_guard<std::mutex> lock(mResourceMutex);
+
+	if constexpr (std::is_same_v<T, MeshMap>) {
+		mMeshesByEntity.emplace(entityID, std::move(map));
+	} else if constexpr (std::is_same_v<T, MaterialMap>) {
+		mMaterialsByEntity.emplace(entityID, std::move(map));
+	} else if constexpr (std::is_same_v<T, std::vector<float>>) {
+		mTransformsByEntity.emplace(entityID, std::move(map));
+	}
+}
+
+

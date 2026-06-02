@@ -11,7 +11,7 @@ DeferredLightingPass::~DeferredLightingPass() = default;
 
 void DeferredLightingPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mQuad = std::make_unique<Models::SingleQuad>();
-	mShader = ctx.resourceManager->getShader("deferredLighting");
+	mShader = ctx.resourceManager->get<Shader>("deferredLighting");
 	mShader->activate();
 	mShader->setInt("gPosition", 0);
 	mShader->setInt("gNormal", 1);

@@ -116,8 +116,8 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 				const std::string& height) {
 				T model{c, u, TEXTURE_PTR(albedo), TEXTURE_PTR(specular), TEXTURE_PTR(normal), TEXTURE_PTR(height)};
 
-				ResourceManager::instance().uploadMesh(entity.id(), model.meshes());
-				ResourceManager::instance().uploadMaterial(entity.id(), model.material());
+				ResourceManager::instance().upload<MeshMap>(entity.id(), model.meshes());
+				ResourceManager::instance().upload<MaterialMap>(entity.id(), model.material());
 			};
 
 			if (primType == "Cube") {
@@ -142,8 +142,8 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 
 			Models::Cubemap cubemap{faces};
 
-			ResourceManager::instance().uploadMesh(entity.id(), cubemap.meshes());
-			ResourceManager::instance().uploadMaterial(entity.id(), cubemap.material());
+			ResourceManager::instance().upload<MeshMap>(entity.id(), cubemap.meshes());
+			ResourceManager::instance().upload<MaterialMap>(entity.id(), cubemap.material());
 		} else if (isPrimitive && primType == "Sphere") {
 			glm::vec3 color{0.0f};
 			bool unlit{false};
@@ -176,8 +176,8 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 				TEXTURE_PTR(orm)
 			};
 
-			ResourceManager::instance().uploadMesh(entity.id(), sphere.meshes());
-			ResourceManager::instance().uploadMaterial(entity.id(), sphere.material());
+			ResourceManager::instance().upload<MeshMap>(entity.id(), sphere.meshes());
+			ResourceManager::instance().upload<MaterialMap>(entity.id(), sphere.material());
 		}
 
 		// Transform Component
@@ -192,7 +192,7 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 
 		// Mesh Component
 		if (comps.contains("MeshComponent")) {
-			entity.addComponent<MeshComponent>(ResourceManager::instance().getMeshes(entity.id()));
+			entity.addComponent<MeshComponent>(ResourceManager::instance().get<MeshMap>(entity.id()));
 		}
 
 		// Bounding Volume Component
@@ -209,7 +209,7 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 
 		// Material Component
 		if (comps.contains("MaterialComponent")) {
-			entity.addComponent<MaterialComponent>(ResourceManager::instance().getMaterial(entity.id()));
+			entity.addComponent<MaterialComponent>(ResourceManager::instance().get<MaterialMap>(entity.id()));
 		}
 
 		// Debug Component
@@ -220,9 +220,9 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 		// Instance Component
 		if (comps.contains("InstanceComponent")) {
 			auto transforms = comps["InstanceComponent"]["transforms"].get<std::vector<float> >();
+			ResourceManager::instance().upload<decltype(transforms)>(entity.id(), transforms);
 
-			entity.addComponent<InstanceComponent>(
-				ResourceManager::instance().uploadTransforms(entity.id(), transforms));
+			entity.addComponent<InstanceComponent>(ResourceManager::instance().get<decltype(transforms)>(entity.id()));
 		}
 
 		// Skybox Component

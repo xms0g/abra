@@ -167,6 +167,7 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 		DYNAMIC,
 		3 * sizeof(glm::mat4) + sizeof(glm::vec4),
 		mRenderCtx->camera.ubo.binding);
+
 	// Create render passes
 	mRenderPasses.emplace_back(std::make_shared<FrustumCullingPass>());
 
@@ -206,11 +207,11 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mRenderCtx->ssao.ubo.self = mSSAOPass ? mSSAOPass->ubo() : nullptr;
 	mRenderCtx->light.ubo.self = mLightSystem->ubo();
 	mRenderCtx->shadow.ubo.self = mShadowSystem->ubo();
-	mRenderCtx->PBR.irradianceMap.buffer = ResourceManager::instance().getBuffer("irradianceMap");
+	mRenderCtx->PBR.irradianceMap.buffer = ResourceManager::instance().get<BaseFrameBuffer>("irradianceMap");
 	mRenderCtx->PBR.irradianceMap.textureSlot = PBR_IRRADIANCE_MAP_TEXTURE_SLOT;
-	mRenderCtx->PBR.prefilterMap.buffer = ResourceManager::instance().getBuffer("prefilterMap");
+	mRenderCtx->PBR.prefilterMap.buffer = ResourceManager::instance().get<BaseFrameBuffer>("prefilterMap");
 	mRenderCtx->PBR.prefilterMap.textureSlot = PBR_PREFILTER_MAP_TEXTURE_SLOT;
-	mRenderCtx->PBR.brdfLUT.buffer = ResourceManager::instance().getBuffer("brdfLUT");
+	mRenderCtx->PBR.brdfLUT.buffer = ResourceManager::instance().get<BaseFrameBuffer>("brdfLUT");
 	mRenderCtx->PBR.brdfLUT.textureSlot = PBR_BRDF_LUT_TEXTURE_SLOT;
 	mRenderCtx->PBR.albedoTextureSlot = PBR_ALBEDO_TEXTURE_SLOT;
 	mRenderCtx->PBR.normalTextureSlot = PBR_NORMAL_TEXTURE_SLOT;
@@ -373,7 +374,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			materialIndex++,
 			textureOffset++,
 			1,
-			ResourceManager::instance().getShader("skybox"),
+			ResourceManager::instance().get<Shader>("skybox"),
 			indices};
 		const RenderGroup group{entity.id(), matBatch};
 		mRenderQueue.skybox.push_back(group);
@@ -410,9 +411,9 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		if (entity.hasComponent<InstanceComponent>()) {
 			// Set shader
 			if (material.flags & OPAQUE) {
-				matBatch.shader = ResourceManager::instance().getShader("instancedOpaque");
+				matBatch.shader = ResourceManager::instance().get<Shader>("instancedOpaque");
 			} else if (material.flags & BLEND) {
-				matBatch.shader = ResourceManager::instance().getShader("instancedBlend");
+				matBatch.shader = ResourceManager::instance().get<Shader>("instancedBlend");
 			}
 
 			const auto& instComponent = entity.getComponent<InstanceComponent>();
@@ -429,12 +430,12 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		// Set shader
 		if (material.flags & OPAQUE) {
 			if (material.flags & UNLIT) {
-				matBatch.shader = ResourceManager::instance().getShader("unlit");
+				matBatch.shader = ResourceManager::instance().get<Shader>("unlit");
 			} else {
-				matBatch.shader = ResourceManager::instance().getShader("opaque");
+				matBatch.shader = ResourceManager::instance().get<Shader>("opaque");
 			}
 		} else if (material.flags & BLEND) {
-			matBatch.shader = ResourceManager::instance().getShader("blend");
+			matBatch.shader = ResourceManager::instance().get<Shader>("blend");
 		}
 
 		const RenderGroup group{entity.id(), matBatch};

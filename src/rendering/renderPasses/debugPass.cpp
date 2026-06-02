@@ -14,8 +14,8 @@ DebugPass::~DebugPass() = default;
 void DebugPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mDebugShaders = {
 		nullptr,
-		ctx.resourceManager->getShader("debugNormal"),
-		ctx.resourceManager->getShader("debugWireframe")
+		ctx.resourceManager->get<Shader>("debugNormal"),
+		ctx.resourceManager->get<Shader>("debugWireframe")
 	};
 }
 

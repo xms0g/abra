@@ -7,7 +7,7 @@
 
 Grayscale::Grayscale(const std::string& name, const RenderContext& ctx, const bool enabled)
 	: BasePostEffect(name, enabled) {
-	mShader = ctx.resourceManager->getShader("grayscale");
+	mShader = ctx.resourceManager->get<Shader>("grayscale");
 	mShader->activate();
 	mShader->setInt("screenTexture", 0);
 }
