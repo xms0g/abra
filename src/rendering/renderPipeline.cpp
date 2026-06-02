@@ -268,6 +268,11 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 			shader->id(),
 			mRenderCtx->shadow.ubo.binding,
 			mRenderCtx->shadow.ubo.blockName);
+
+		shader->activate();
+		shader->setInt("shadowMap", mRenderCtx->shadow.textureSlot);
+		shader->setInt("shadowCubemap", mRenderCtx->shadow.textureSlot + 1);
+		shader->setInt("persShadowMap", mRenderCtx->shadow.textureSlot + 2);
 	}
 }
 

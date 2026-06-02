@@ -18,9 +18,6 @@ void DeferredLightingPass::configure(const RenderContext& ctx, EventBus& eventBu
 	mShader->setInt("gAlbedo", 2);
 	mShader->setInt("gORM", 3);
 	mShader->setInt("ssao", ctx.ssao.textureSlot);
-	mShader->setInt("shadowMap", ctx.shadow.textureSlot);
-	mShader->setInt("shadowCubemap", ctx.shadow.textureSlot + 1);
-	mShader->setInt("persShadowMap", ctx.shadow.textureSlot + 2);
 	mShader->setInt("irradianceMap", ctx.PBR.irradianceMap.textureSlot);
 	mShader->setInt("prefilterMap", ctx.PBR.prefilterMap.textureSlot);
 	mShader->setInt("brdfLUT", ctx.PBR.brdfLUT.textureSlot);
