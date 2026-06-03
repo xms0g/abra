@@ -94,18 +94,15 @@ void SSAOPass::ssao(const RenderContext& ctx) const {
 	glActiveTexture(GL_TEXTURE0 + 2);
 	glBindTexture(GL_TEXTURE_2D, mNoiseTexture);
 
-	glBindVertexArray(mQuad->vao());
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(0);
+	RenderCommon::drawQuad(mQuad->vao());
 }
 
 void SSAOPass::blur() const {
 	mBlurFBO->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
+
 	mBlurShader->activate();
 	mFBO->bindTexture(0);
 
-	glBindVertexArray(mQuad->vao());
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(0);
+	RenderCommon::drawQuad(mQuad->vao());
 }
