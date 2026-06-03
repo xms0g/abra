@@ -14,7 +14,6 @@ CA::CA(const std::string& name, const RenderContext& ctx, const bool enabled)
 	};
 
 	RenderCommand::bindTextures(textureBindings, mShader);
-
 }
 
 uint32_t CA::render(
@@ -28,7 +27,8 @@ uint32_t CA::render(
 	mShader->activate();
 	mShader->setFloat("intensity", mIntensity);
 
-	RenderCommand::drawQuad(vao, sceneTexture);
+	uint32_t textures[] = {sceneTexture};
+	RenderCommand::drawQuad(vao, textures);
 
 	const uint32_t texture = pingPong[toggle]->texture();
 	pingPong[toggle]->unbind();

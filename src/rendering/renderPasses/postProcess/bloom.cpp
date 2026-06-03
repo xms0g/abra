@@ -63,14 +63,15 @@ uint32_t Bloom::brightFilterPass(const uint32_t vao, const uint32_t sceneTexture
 
 	mBrightFilter->activate();
 
-	RenderCommand::drawQuad(vao, sceneTexture);
+	uint32_t textures[] = {sceneTexture};
+	RenderCommand::drawQuad(vao, textures);
 
 	const uint32_t outTex = mPingPong[toggle]->texture();
 	toggle = !toggle;
 	return outTex;
 }
 
-uint32_t Bloom::blurPass( const uint32_t vao, const uint32_t sceneTexture, bool& toggle) const {
+uint32_t Bloom::blurPass(const uint32_t vao, const uint32_t sceneTexture, bool& toggle) const {
 	bool horizontal = true;
 	uint32_t outTex = sceneTexture;
 
@@ -82,7 +83,8 @@ uint32_t Bloom::blurPass( const uint32_t vao, const uint32_t sceneTexture, bool&
 		mBlur->setBool("horizontal", horizontal);
 		horizontal = !horizontal;
 
-		RenderCommand::drawQuad(vao, outTex);
+		uint32_t textures[] = {outTex};
+		RenderCommand::drawQuad(vao, textures);
 
 		outTex = mPingPong[toggle]->texture();
 		toggle = !toggle;
@@ -99,15 +101,8 @@ uint32_t Bloom::combinePass(
 	mPingPong[toggle]->bind();
 	mCombine->activate();
 
-	glDisable(GL_DEPTH_TEST);
-	glBindVertexArray(vao);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, sceneTexture);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, blurTexture);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(0);
-	glEnable(GL_DEPTH_TEST);
+	uint32_t textures[] = {sceneTexture, blurTexture};
+	RenderCommand::drawQuad(vao, textures);
 
 	mPingPong[toggle]->unbind();
 

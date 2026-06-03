@@ -139,11 +139,15 @@ void RenderCommand::drawQuad(const uint32_t vao) {
 	glEnable(GL_DEPTH_TEST);
 }
 
-void RenderCommand::drawQuad(const uint32_t vao, const uint32_t sceneTexture) {
+void RenderCommand::drawQuad(const uint32_t vao, const std::span<uint32_t> textures) {
 	glDisable(GL_DEPTH_TEST);
 	glBindVertexArray(vao);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, sceneTexture);
+
+	for (uint32_t i = 0; i < textures.size(); ++i) {
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, textures[i]);
+	}
+
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 	glEnable(GL_DEPTH_TEST);

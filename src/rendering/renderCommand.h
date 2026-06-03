@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <vector>
+#include <span>
 
 struct TextureBinding;
 struct InstanceGroup;
@@ -31,7 +32,7 @@ void drawMesh(uint32_t vao, size_t vertexCount, size_t indexCount);
 
 void drawQuad(uint32_t vao);
 
-void drawQuad(uint32_t vao, uint32_t sceneTexture);
+void drawQuad(uint32_t vao, std::span<uint32_t> textures);
 
 void bindShadowMaps(const RenderContext& ctx);
 }
