@@ -9,8 +9,12 @@ Kernel::Kernel(const std::string& name, const float* kernel, const RenderContext
 	: BasePostEffect(name, enabled),
 	  mKernel(kernel) {
 	mShader = ctx.resourceManager->get<Shader>("kernel");
-	mShader->activate();
-	mShader->setInt("screenTexture", 0);
+
+	const std::vector<TextureBinding> textureBindings = {
+		{"screenTexture", 0},
+	};
+
+	RenderCommon::bindTextures(textureBindings, mShader);
 }
 
 uint32_t Kernel::render(

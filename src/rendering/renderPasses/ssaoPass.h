@@ -38,8 +38,5 @@ private:
 	const Shader* mShader;
 	const Shader* mBlurShader;
 	std::unique_ptr<UniformBuffer> mUBO;
-
-	std::vector<glm::vec4> mKernel;
-	std::vector<float> mNoise;
 	uint32_t mNoiseTexture{0};
 };

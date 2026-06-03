@@ -32,13 +32,17 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, EventBus& eventBu
 			.checkStatus();
 
 	mShader = ctx.resourceManager->get<Shader>("gBuffer");
-	mShader->activate();
-	mShader->setInt("material.texture_albedo", ctx.PBR.albedoTextureSlot);
-	mShader->setInt("material.texture_normal", ctx.PBR.normalTextureSlot);
-	mShader->setInt("material.texture_roughnessMetallic", ctx.PBR.roughnessMetallicTextureSlot);
-	mShader->setInt("material.texture_ao", ctx.PBR.aoTextureSlot);
-	mShader->setInt("material.texture_emissive", ctx.PBR.emissiveTextureSlot);
-	mShader->setInt("material.texture_height", ctx.PBR.heightTextureSlot);
+
+	const std::vector<TextureBinding> textureBindings = {
+		{ "material.texture_albedo", ctx.PBR.albedoTextureSlot },
+		{ "material.texture_normal", ctx.PBR.normalTextureSlot },
+		{ "material.texture_roughnessMetallic", ctx.PBR.roughnessMetallicTextureSlot },
+		{ "material.texture_ao", ctx.PBR.aoTextureSlot },
+		{ "material.texture_emissive", ctx.PBR.emissiveTextureSlot},
+		{"material.texture_height", ctx.PBR.heightTextureSlot}
+	};
+
+	RenderCommon::bindTextures(textureBindings, mShader);
 }
 
 void DeferredGeometryPass::execute(const RenderContext& ctx) {

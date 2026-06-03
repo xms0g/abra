@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <vector>
 
+struct TextureBinding;
 struct InstanceGroup;
 struct RenderableObject;
 struct RenderContext;
@@ -23,6 +24,8 @@ void setupMaterial(
 	size_t textureCount,
 	const RenderContext& ctx,
 	const Shader& shader);
+
+void bindTextures(const std::vector<TextureBinding>& textures, const Shader* shader);
 
 void drawMesh(uint32_t vao, size_t vertexCount, size_t indexCount);
 

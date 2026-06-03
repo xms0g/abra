@@ -2,6 +2,7 @@
 #include "glad/glad.h"
 #include "shader.h"
 #include "material/material.hpp"
+#include "texture/texture.h"
 #include "renderContext/renderContext.hpp"
 #include "renderContext/renderableObject.hpp"
 #include "renderContext/renderQueue.hpp"
@@ -110,6 +111,13 @@ void RenderCommon::setupMaterial(
 	} else if (!(flags & TWOSIDED) && !isCullingEnabled) {
 		glEnable(GL_CULL_FACE);
 		isCullingEnabled = true;
+	}
+}
+
+void RenderCommon::bindTextures(const std::vector<TextureBinding>& textures, const Shader* shader) {
+	shader->activate();
+	for (const auto& [name, slot]: textures) {
+		shader->setInt(name, slot);
 	}
 }
 

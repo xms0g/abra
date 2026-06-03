@@ -11,15 +11,12 @@ uniform sampler2D gNormal;
 uniform sampler2D texNoise;
 
 uniform int kernelSize;
-uniform float radius;
-uniform float bias;
-uniform float intensity;
-
-uniform vec2 resolution;
 
 layout (std140) uniform SSAOBlock
 {
-    vec4 samples[16];
+    vec4 samples[32];
+    vec4 rbi;
+    vec4 resolution;
 };
 
 vec3 viewPosFromDepth(vec2 texCoord) {
@@ -37,6 +34,9 @@ vec3 viewPosFromDepth(vec2 texCoord) {
 out vec4 fragColor;
 
 void main() {
+    float radius = rbi.x;
+    float bias = rbi.y;
+    float intensity = rbi.z;
     vec2 noiseScale = vec2(resolution.x/4.0, resolution.y/4.0);
     // get input for SSAO algorithm
     vec3 normalWorld = texture(gNormal, fs_in.TexCoord).xyz;

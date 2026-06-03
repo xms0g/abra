@@ -8,17 +8,21 @@
 Bloom::Bloom(const std::string& name, const RenderContext& ctx, const bool enabled)
 	: BasePostEffect(name, enabled) {
 	mBrightFilter = ctx.resourceManager->get<Shader>("bloomBF");
-	mBrightFilter->activate();
-	mBrightFilter->setInt("screenTexture", 0);
-
 	mBlur = ctx.resourceManager->get<Shader>("bloomBlur");
-	mBlur->activate();
-	mBlur->setInt("screenTexture", 0);
-
 	mCombine = ctx.resourceManager->get<Shader>("bloomCombine");
-	mCombine->activate();
-	mCombine->setInt("screenTexture", 0);
-	mCombine->setInt("bloomBlur", 1);
+
+	const std::vector<TextureBinding> textureBindings = {
+		{"screenTexture", 0},
+	};
+
+	const std::vector<TextureBinding> combineTextureBindings = {
+		{"screenTexture", 0},
+		{"bloomBlur", 1}
+	};
+
+	RenderCommon::bindTextures(textureBindings, mBrightFilter);
+	RenderCommon::bindTextures(textureBindings, mBlur);
+	RenderCommon::bindTextures(combineTextureBindings, mCombine);
 
 	for (auto& target: mPingPong) {
 		target = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);

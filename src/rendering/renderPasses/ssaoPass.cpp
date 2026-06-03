@@ -6,6 +6,7 @@
 #include "../texture/texture.h"
 #include "../models/quad.h"
 #include "../renderContext/renderContext.hpp"
+#include "../renderCommon.h"
 #include "../../math/random.h"
 
 SSAOPass::~SSAOPass() = default;
@@ -28,32 +29,49 @@ void SSAOPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 			.checkStatus();
 
 	mShader = ctx.resourceManager->get<Shader>("ssao");
-	mShader->activate();
-	mShader->setInt("gDepthMap", 0);
-	mShader->setInt("gNormal", 1);
-	mShader->setInt("texNoise", 2);
-	mShader->setInt("kernelSize", ctx.ssao.kernelSize);
-	mShader->setFloat("radius", ctx.ssao.radius);
-	mShader->setFloat("bias", ctx.ssao.bias);
-	mShader->setFloat("intensity", ctx.ssao.intensity);
-	mShader->setVec2("resolution", glm::vec2(ctx.screen.width, ctx.screen.height));
-
 	mBlurShader = ctx.resourceManager->get<Shader>("ssaoBlur");
-	mBlurShader->activate();
-	mBlurShader->setInt("ssaoTexture", 0);
 
-	mKernel.resize(ctx.ssao.kernelSize);
-	mKernel = math::random::generateKernel(ctx.ssao.kernelSize);
+	const std::vector<TextureBinding> ssaoTextureBindings = {
+		{"gDepthMap", 0},
+		{"gNormal", 1},
+		{"texNoise", 2},
+		{"kernelSize", ctx.ssao.kernelSize}
+	};
 
-	mNoise.resize(ctx.ssao.noiseTextureSize * ctx.ssao.noiseTextureSize);
-	mNoise = math::random::generateNoise(ctx.ssao.noiseTextureSize * ctx.ssao.noiseTextureSize);
-	mNoiseTexture = texture::generate(ctx.ssao.noiseTextureSize, ctx.ssao.noiseTextureSize, mNoise.data());
+	const std::vector<TextureBinding> blurTextureBindings = {
+		{"ssaoTexture", 0}
+	};
 
-	uint32_t uboSize = ctx.ssao.kernelSize * sizeof(glm::vec4);
+	RenderCommon::bindTextures(ssaoTextureBindings, mShader);
+	RenderCommon::bindTextures(blurTextureBindings, mBlurShader);
 
-	mUBO = std::make_unique<UniformBuffer>(DYNAMIC, uboSize, ctx.ssao.ubo.binding);
+	std::vector<float> noise;
+	noise.resize(ctx.ssao.noiseTextureSize * ctx.ssao.noiseTextureSize);
+	noise = math::random::generateNoise(ctx.ssao.noiseTextureSize * ctx.ssao.noiseTextureSize);
+	mNoiseTexture = texture::generate(ctx.ssao.noiseTextureSize, ctx.ssao.noiseTextureSize, noise.data());
+
+	std::vector<glm::vec4> kernel;
+	kernel.resize(ctx.ssao.kernelSize);
+	kernel = math::random::generateKernel(ctx.ssao.kernelSize);
+
+	struct alignas(16) SSAOData {
+		glm::vec4 samples[32];
+		glm::vec4 rbi;
+		glm::vec4 resolution;
+	};
+
+	SSAOData data{};
+
+	for (size_t i = 0; i < kernel.size(); ++i) {
+		data.samples[i] = kernel[i];
+	}
+
+	data.rbi = glm::vec4(ctx.ssao.radius, ctx.ssao.bias, ctx.ssao.intensity, 0.0f);
+	data.resolution = glm::vec4(ctx.screen.width, ctx.screen.height, 0.0f, 0.0f);
+
+	mUBO = std::make_unique<UniformBuffer>(DYNAMIC, sizeof(SSAOData), ctx.ssao.ubo.binding);
 	mUBO->bind();
-	mUBO->setData(mKernel.data(), uboSize, 0);
+	mUBO->setData(&data, sizeof(SSAOData), 0);
 	mUBO->unbind();
 
 	mUBO->configure(mShader->id(), ctx.ssao.ubo.binding, ctx.ssao.ubo.blockName);

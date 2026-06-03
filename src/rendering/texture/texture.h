@@ -18,6 +18,11 @@ struct Texture {
     std::string path;
 };
 
+struct TextureBinding {
+	std::string name;
+	int32_t slot;
+};
+
 namespace texture {
 uint32_t generate(int32_t width, int32_t height, const float* data);
 

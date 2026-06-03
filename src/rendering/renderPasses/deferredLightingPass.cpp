@@ -12,15 +12,19 @@ DeferredLightingPass::~DeferredLightingPass() = default;
 void DeferredLightingPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mQuad = std::make_unique<Models::SingleQuad>();
 	mShader = ctx.resourceManager->get<Shader>("deferredLighting");
-	mShader->activate();
-	mShader->setInt("gPosition", 0);
-	mShader->setInt("gNormal", 1);
-	mShader->setInt("gAlbedo", 2);
-	mShader->setInt("gORM", 3);
-	mShader->setInt("ssao", ctx.ssao.textureSlot);
-	mShader->setInt("irradianceMap", ctx.PBR.irradianceMap.textureSlot);
-	mShader->setInt("prefilterMap", ctx.PBR.prefilterMap.textureSlot);
-	mShader->setInt("brdfLUT", ctx.PBR.brdfLUT.textureSlot);
+
+	const std::vector<TextureBinding> textureBindings = {
+		{"gPosition", 0},
+		{"gNormal", 1},
+		{"gAlbedo", 2},
+		{"gORM", 3},
+		{"ssao", ctx.ssao.textureSlot},
+		{"irradianceMap", ctx.PBR.irradianceMap.textureSlot},
+		{"prefilterMap", ctx.PBR.prefilterMap.textureSlot},
+		{"brdfLUT", ctx.PBR.brdfLUT.textureSlot}
+	};
+
+	RenderCommon::bindTextures(textureBindings, mShader);
 }
 
 void DeferredLightingPass::execute(const RenderContext& ctx) {
