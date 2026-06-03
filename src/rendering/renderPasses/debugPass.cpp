@@ -1,6 +1,6 @@
 #include "debugPass.h"
 #include "../shader.h"
-#include "../renderCommon.h"
+#include "../renderCommand.h"
 #include "../buffers/uniformBuffer.h"
 #include "../buffers/frameBuffer.h"
 #include "../renderContext/renderContext.hpp"
@@ -31,12 +31,12 @@ void DebugPass::execute(const RenderContext& ctx) {
 		const auto& dbgShader = mDebugShaders[mode];
 		dbgShader->activate();
 
-		RenderCommon::setupTransform(object.entityID, ctx, *dbgShader);
+		RenderCommand::setupTransform(object.entityID, ctx, *dbgShader);
 
 		const uint32_t vao = ctx.renderQueue->mesh.vaos[object.meshIndex];
 		const size_t vertexCount = ctx.renderQueue->mesh.vertexCounts[object.meshIndex];
 		const size_t indexCount = ctx.renderQueue->mesh.indexCounts[object.meshIndex];
 
-		RenderCommon::drawMesh(vao, vertexCount, indexCount);
+		RenderCommand::drawMesh(vao, vertexCount, indexCount);
 	}
 }

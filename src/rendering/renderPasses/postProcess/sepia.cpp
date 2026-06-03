@@ -1,7 +1,7 @@
 #include "sepia.h"
 #include "glad/glad.h"
 #include "../../shader.h"
-#include "../../renderCommon.h"
+#include "../../renderCommand.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderContext/renderContext.hpp"
 
@@ -13,7 +13,7 @@ Sepia::Sepia(const std::string& name, const RenderContext& ctx, const bool enabl
 		{"screenTexture", 0},
 	};
 
-	RenderCommon::bindTextures(textureBindings, mShader);
+	RenderCommand::bindTextures(textureBindings, mShader);
 }
 
 uint32_t Sepia::render(
@@ -25,7 +25,7 @@ uint32_t Sepia::render(
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	mShader->activate();
-	RenderCommon::drawQuad(vao, sceneTexture);
+	RenderCommand::drawQuad(vao, sceneTexture);
 
 	const uint32_t texture = pingPong[toggle]->texture();
 	pingPong[toggle]->unbind();

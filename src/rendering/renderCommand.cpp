@@ -1,4 +1,4 @@
-#include "renderCommon.h"
+#include "renderCommand.h"
 #include "glad/glad.h"
 #include "shader.h"
 #include "material/material.hpp"
@@ -9,7 +9,7 @@
 #include "renderContext/instanceGroup.hpp"
 #include "../ECS/components/mesh.hpp"
 
-void RenderCommon::forward(const RenderContext& ctx, const std::vector<RenderableObject>& objects) {
+void RenderCommand::forward(const RenderContext& ctx, const std::vector<RenderableObject>& objects) {
 	const Shader* lastShader{nullptr};
 
 	for (const auto& [entityID, materialIdx, textureOffset, textureCount, meshIdx, shader]: objects) {
@@ -29,7 +29,7 @@ void RenderCommon::forward(const RenderContext& ctx, const std::vector<Renderabl
 	}
 }
 
-void RenderCommon::instanced(const RenderContext& ctx, const std::vector<InstanceGroup>& objects) {
+void RenderCommand::instanced(const RenderContext& ctx, const std::vector<InstanceGroup>& objects) {
 	for (const auto& [entityID, transforms, matBatch]: objects) {
 		const size_t count = transforms.size() / 9;
 
@@ -53,7 +53,7 @@ void RenderCommon::instanced(const RenderContext& ctx, const std::vector<Instanc
 	}
 }
 
-void RenderCommon::setupTransform(const size_t entityID, const RenderContext& ctx, const Shader& shader) {
+void RenderCommand::setupTransform(const size_t entityID, const RenderContext& ctx, const Shader& shader) {
 	const auto& model = ctx.renderQueue->entity.models[entityID];
 	const auto& normal = ctx.renderQueue->entity.normals[entityID];
 
@@ -61,7 +61,7 @@ void RenderCommon::setupTransform(const size_t entityID, const RenderContext& ct
 	shader.setMat3("normalMatrix", normal);
 }
 
-void RenderCommon::setupMaterial(
+void RenderCommand::setupMaterial(
 	const size_t entityID,
 	const uint32_t materialIdx,
 	const uint32_t textureOffset,
@@ -114,14 +114,14 @@ void RenderCommon::setupMaterial(
 	}
 }
 
-void RenderCommon::bindTextures(const std::vector<TextureBinding>& textures, const Shader* shader) {
+void RenderCommand::bindTextures(const std::vector<TextureBinding>& textures, const Shader* shader) {
 	shader->activate();
 	for (const auto& [name, slot]: textures) {
 		shader->setInt(name, slot);
 	}
 }
 
-void RenderCommon::drawMesh(const uint32_t vao, const size_t vertexCount, const size_t indexCount) {
+void RenderCommand::drawMesh(const uint32_t vao, const size_t vertexCount, const size_t indexCount) {
 	glBindVertexArray(vao);
 
 	if (indexCount > 0) [[likely]] {
@@ -131,7 +131,7 @@ void RenderCommon::drawMesh(const uint32_t vao, const size_t vertexCount, const 
 	}
 }
 
-void RenderCommon::drawQuad(const uint32_t vao) {
+void RenderCommand::drawQuad(const uint32_t vao) {
 	glDisable(GL_DEPTH_TEST);
 	glBindVertexArray(vao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -139,7 +139,7 @@ void RenderCommon::drawQuad(const uint32_t vao) {
 	glEnable(GL_DEPTH_TEST);
 }
 
-void RenderCommon::drawQuad(const uint32_t vao, const uint32_t sceneTexture) {
+void RenderCommand::drawQuad(const uint32_t vao, const uint32_t sceneTexture) {
 	glDisable(GL_DEPTH_TEST);
 	glBindVertexArray(vao);
 	glActiveTexture(GL_TEXTURE0);
@@ -149,7 +149,7 @@ void RenderCommon::drawQuad(const uint32_t vao, const uint32_t sceneTexture) {
 	glEnable(GL_DEPTH_TEST);
 }
 
-void RenderCommon::bindShadowMaps(const RenderContext& ctx) {
+void RenderCommand::bindShadowMaps(const RenderContext& ctx) {
 	glActiveTexture(GL_TEXTURE0 + ctx.shadow.textureSlot);
 	glBindTexture(GL_TEXTURE_2D, ctx.renderQueue->shadowMaps[0]);
 

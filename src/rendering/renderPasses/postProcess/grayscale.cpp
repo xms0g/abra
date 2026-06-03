@@ -1,7 +1,7 @@
 #include "grayscale.h"
 #include "glad/glad.h"
 #include "../../shader.h"
-#include "../../renderCommon.h"
+#include "../../renderCommand.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderContext/renderContext.hpp"
 
@@ -13,7 +13,7 @@ Grayscale::Grayscale(const std::string& name, const RenderContext& ctx, const bo
 		{"screenTexture", 0},
 	};
 
-	RenderCommon::bindTextures(textureBindings, mShader);
+	RenderCommand::bindTextures(textureBindings, mShader);
 }
 
 uint32_t Grayscale::render(
@@ -25,7 +25,7 @@ uint32_t Grayscale::render(
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	mShader->activate();
-	RenderCommon::drawQuad(vao, sceneTexture);
+	RenderCommand::drawQuad(vao, sceneTexture);
 
 	const uint32_t texture = pingPong[toggle]->texture();
 	pingPong[toggle]->unbind();

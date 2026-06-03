@@ -1,7 +1,7 @@
 #include "toneMapping.h"
 #include "glad/glad.h"
 #include "../../shader.h"
-#include "../../renderCommon.h"
+#include "../../renderCommand.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderContext/renderContext.hpp"
 
@@ -13,7 +13,7 @@ ToneMapping::ToneMapping(const std::string& name, const RenderContext& ctx, cons
 		{"screenTexture", 0},
 	};
 
-	RenderCommon::bindTextures(textureBindings, mShader);
+	RenderCommand::bindTextures(textureBindings, mShader);
 }
 
 uint32_t ToneMapping::render(
@@ -27,7 +27,7 @@ uint32_t ToneMapping::render(
 	mShader->activate();
 	mShader->setFloat("exposure", mExposure);
 
-	RenderCommon::drawQuad(vao, sceneTexture);
+	RenderCommand::drawQuad(vao, sceneTexture);
 
 	const uint32_t texture = pingPong[toggle]->texture();
 	pingPong[toggle]->unbind();

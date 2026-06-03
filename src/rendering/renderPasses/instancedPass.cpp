@@ -2,7 +2,7 @@
 #include "glad/glad.h"
 #include "../buffers/frameBuffer.h"
 #include "../buffers/vertexBuffer.h"
-#include "../renderCommon.h"
+#include "../renderCommand.h"
 #include "../shader.h"
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/instanceGroup.hpp"
@@ -36,20 +36,20 @@ void InstancedPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 void InstancedPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
 
-	RenderCommon::bindShadowMaps(ctx);
+	RenderCommand::bindShadowMaps(ctx);
 
 	if (!ctx.renderQueue->blendInstancedGroups.empty()) {
 		glDepthMask(GL_FALSE);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		RenderCommon::instanced(ctx, ctx.renderQueue->blendInstancedGroups);
+		RenderCommand::instanced(ctx, ctx.renderQueue->blendInstancedGroups);
 
 		glDepthMask(GL_TRUE);
 		glDisable(GL_BLEND);
 	}
 
-	RenderCommon::instanced(ctx, ctx.renderQueue->opaqueInstancedGroups);
+	RenderCommand::instanced(ctx, ctx.renderQueue->opaqueInstancedGroups);
 }
 
 void InstancedPass::prepareInstanceBuffer(

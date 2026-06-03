@@ -1,7 +1,7 @@
 #include "ca.h"
 #include "glad/glad.h"
 #include "../../shader.h"
-#include "../../renderCommon.h"
+#include "../../renderCommand.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderContext/renderContext.hpp"
 
@@ -13,7 +13,7 @@ CA::CA(const std::string& name, const RenderContext& ctx, const bool enabled)
 		{"screenTexture", 0},
 	};
 
-	RenderCommon::bindTextures(textureBindings, mShader);
+	RenderCommand::bindTextures(textureBindings, mShader);
 
 }
 
@@ -28,7 +28,7 @@ uint32_t CA::render(
 	mShader->activate();
 	mShader->setFloat("intensity", mIntensity);
 
-	RenderCommon::drawQuad(vao, sceneTexture);
+	RenderCommand::drawQuad(vao, sceneTexture);
 
 	const uint32_t texture = pingPong[toggle]->texture();
 	pingPong[toggle]->unbind();

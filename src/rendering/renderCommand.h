@@ -10,7 +10,7 @@ struct Material;
 struct Texture;
 class Shader;
 
-namespace RenderCommon {
+namespace RenderCommand {
 void forward(const RenderContext& ctx, const std::vector<RenderableObject>& objects);
 
 void instanced(const RenderContext& ctx, const std::vector<InstanceGroup>& objects);

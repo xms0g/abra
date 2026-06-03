@@ -1,7 +1,7 @@
 #include "bloom.h"
 #include "glad/glad.h"
 #include "../../shader.h"
-#include "../../renderCommon.h"
+#include "../../renderCommand.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderContext/renderContext.hpp"
 
@@ -20,9 +20,9 @@ Bloom::Bloom(const std::string& name, const RenderContext& ctx, const bool enabl
 		{"bloomBlur", 1}
 	};
 
-	RenderCommon::bindTextures(textureBindings, mBrightFilter);
-	RenderCommon::bindTextures(textureBindings, mBlur);
-	RenderCommon::bindTextures(combineTextureBindings, mCombine);
+	RenderCommand::bindTextures(textureBindings, mBrightFilter);
+	RenderCommand::bindTextures(textureBindings, mBlur);
+	RenderCommand::bindTextures(combineTextureBindings, mCombine);
 
 	for (auto& target: mPingPong) {
 		target = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
@@ -63,7 +63,7 @@ uint32_t Bloom::brightFilterPass(const uint32_t vao, const uint32_t sceneTexture
 
 	mBrightFilter->activate();
 
-	RenderCommon::drawQuad(vao, sceneTexture);
+	RenderCommand::drawQuad(vao, sceneTexture);
 
 	const uint32_t outTex = mPingPong[toggle]->texture();
 	toggle = !toggle;
@@ -82,7 +82,7 @@ uint32_t Bloom::blurPass( const uint32_t vao, const uint32_t sceneTexture, bool&
 		mBlur->setBool("horizontal", horizontal);
 		horizontal = !horizontal;
 
-		RenderCommon::drawQuad(vao, outTex);
+		RenderCommand::drawQuad(vao, outTex);
 
 		outTex = mPingPong[toggle]->texture();
 		toggle = !toggle;

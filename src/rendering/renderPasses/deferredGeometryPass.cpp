@@ -1,7 +1,7 @@
 #include "deferredGeometryPass.h"
 #include "glad/glad.h"
 #include "../shader.h"
-#include "../renderCommon.h"
+#include "../renderCommand.h"
 #include "../buffers/frameBuffer.h"
 #include "../buffers/uniformBuffer.h"
 #include "../material/material.hpp"
@@ -42,7 +42,7 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, EventBus& eventBu
 		{"material.texture_height", ctx.PBR.heightTextureSlot}
 	};
 
-	RenderCommon::bindTextures(textureBindings, mShader);
+	RenderCommand::bindTextures(textureBindings, mShader);
 }
 
 void DeferredGeometryPass::execute(const RenderContext& ctx) {
@@ -53,13 +53,13 @@ void DeferredGeometryPass::execute(const RenderContext& ctx) {
 
 	for (const auto& [entityID, materialIdx, textureOffset, textureCount, meshIdx, shader]: ctx.renderQueue->
 	     deferredObjects) {
-		RenderCommon::setupMaterial(entityID, materialIdx, textureOffset, textureCount, ctx, *mShader);
-		RenderCommon::setupTransform(entityID, ctx, *mShader);
+		RenderCommand::setupMaterial(entityID, materialIdx, textureOffset, textureCount, ctx, *mShader);
+		RenderCommand::setupTransform(entityID, ctx, *mShader);
 
 		const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
 		const size_t vertexCount = ctx.renderQueue->mesh.vertexCounts[meshIdx];
 		const size_t indexCount = ctx.renderQueue->mesh.indexCounts[meshIdx];
 
-		RenderCommon::drawMesh(vao, vertexCount, indexCount);
+		RenderCommand::drawMesh(vao, vertexCount, indexCount);
 	}
 }

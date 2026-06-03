@@ -7,7 +7,7 @@
 #include "../../renderContext/renderGroup.hpp"
 #include "../../renderContext/renderQueue.hpp"
 #include "../../buffers/frameBuffer.h"
-#include "../../renderCommon.h"
+#include "../../renderCommand.h"
 
 DirectionalShadow::DirectionalShadow(const RenderContext& ctx) {
 	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadow.width, ctx.shadow.height);
@@ -50,14 +50,14 @@ void DirectionalShadow::render(const RenderContext& ctx, const glm::vec3& direct
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 	for (const auto& [entityID, matBatch]: ctx.renderQueue->shadowGroups) {
-		RenderCommon::setupTransform(entityID, ctx, *mDepthShader);
+		RenderCommand::setupTransform(entityID, ctx, *mDepthShader);
 
 		for (const auto& meshIdx: matBatch.meshIndices) {
 			const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
 			const size_t vertexCount = ctx.renderQueue->mesh.vertexCounts[meshIdx];
 			const size_t indexCount = ctx.renderQueue->mesh.indexCounts[meshIdx];
 
-			RenderCommon::drawMesh(vao, vertexCount, indexCount);
+			RenderCommand::drawMesh(vao, vertexCount, indexCount);
 		}
 	}
 }

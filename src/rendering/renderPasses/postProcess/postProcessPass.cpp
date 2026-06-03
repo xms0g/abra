@@ -10,7 +10,7 @@
 #include "fxaa.h"
 #include "kernels.hpp"
 #include "../../shader.h"
-#include "../../renderCommon.h"
+#include "../../renderCommand.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../models/quad.h"
 #include "../../renderContext/renderContext.hpp"
@@ -62,7 +62,7 @@ void PostProcessPass::execute(const RenderContext& ctx) {
 	}
 
 	mQuad->shader().activate();
-	RenderCommon::drawQuad(mQuad->vao(), inputTex);
+	RenderCommand::drawQuad(mQuad->vao(), inputTex);
 }
 
 void PostProcessPass::onGuiUpdate(const GuiPostProcessEvent& event) {

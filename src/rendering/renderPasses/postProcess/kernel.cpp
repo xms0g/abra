@@ -1,7 +1,7 @@
 #include "kernel.h"
 #include "glad/glad.h"
 #include "../../shader.h"
-#include "../../renderCommon.h"
+#include "../../renderCommand.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderContext/renderContext.hpp"
 
@@ -14,7 +14,7 @@ Kernel::Kernel(const std::string& name, const float* kernel, const RenderContext
 		{"screenTexture", 0},
 	};
 
-	RenderCommon::bindTextures(textureBindings, mShader);
+	RenderCommand::bindTextures(textureBindings, mShader);
 }
 
 uint32_t Kernel::render(
@@ -28,7 +28,7 @@ uint32_t Kernel::render(
 	mShader->activate();
 	mShader->setFloatArray("kernel", mKernel, 9);
 
-	RenderCommon::drawQuad(vao, sceneTexture);
+	RenderCommand::drawQuad(vao, sceneTexture);
 
 	const uint32_t texture = pingPong[toggle]->texture();
 	pingPong[toggle]->unbind();

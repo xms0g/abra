@@ -15,7 +15,7 @@
 #include "../rendering/mesh/vertex.hpp"
 #include "../rendering/texture/texture.h"
 #include "../rendering/buffers/frameBuffer.h"
-#include "../rendering/renderCommon.h"
+#include "../rendering/renderCommand.h"
 #include "../rendering/mesh/vertexArray.h"
 
 ResourceManager& ResourceManager::instance() {
@@ -379,7 +379,7 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 		equirectangularToCube->setMat4("view", mCaptureViews[i]);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		RenderCommon::drawMesh(cubeMesh.vao().id(), cubeMesh.vertices().size(), cubeMesh.indices().size());
+		RenderCommand::drawMesh(cubeMesh.vao().id(), cubeMesh.vertices().size(), cubeMesh.indices().size());
 	}
 
 	envMapBuffer->unbind();
@@ -419,7 +419,7 @@ void ResourceManager::createIrradianceMap() {
 		irradianceConv->setMat4("view", mCaptureViews[i]);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		RenderCommon::drawMesh(cubeMesh.vao().id(), cubeMesh.vertices().size(), cubeMesh.indices().size());
+		RenderCommand::drawMesh(cubeMesh.vao().id(), cubeMesh.vertices().size(), cubeMesh.indices().size());
 	}
 
 	irradianceMapBuffer->unbind();
@@ -463,7 +463,7 @@ void ResourceManager::createPrefilterMap() {
 			prefilter->setMat4("view", mCaptureViews[j]);
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			RenderCommon::drawMesh(cubeMesh.vao().id(), cubeMesh.vertices().size(), cubeMesh.indices().size());
+			RenderCommand::drawMesh(cubeMesh.vao().id(), cubeMesh.vertices().size(), cubeMesh.indices().size());
 		}
 	}
 
@@ -487,7 +487,7 @@ void ResourceManager::createBrdfLUT() {
 	brdfLUTBuffer->bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	RenderCommon::drawQuad(quad.vao());
+	RenderCommand::drawQuad(quad.vao());
 
 	brdfLUTBuffer->unbind();
 }

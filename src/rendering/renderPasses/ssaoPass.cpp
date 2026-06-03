@@ -6,7 +6,7 @@
 #include "../texture/texture.h"
 #include "../models/quad.h"
 #include "../renderContext/renderContext.hpp"
-#include "../renderCommon.h"
+#include "../renderCommand.h"
 #include "../../math/random.h"
 
 SSAOPass::~SSAOPass() = default;
@@ -42,8 +42,8 @@ void SSAOPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 		{"ssaoTexture", 0}
 	};
 
-	RenderCommon::bindTextures(ssaoTextureBindings, mShader);
-	RenderCommon::bindTextures(blurTextureBindings, mBlurShader);
+	RenderCommand::bindTextures(ssaoTextureBindings, mShader);
+	RenderCommand::bindTextures(blurTextureBindings, mBlurShader);
 
 	std::vector<float> noise;
 	noise.resize(ctx.ssao.noiseTextureSize * ctx.ssao.noiseTextureSize);
@@ -94,7 +94,7 @@ void SSAOPass::ssao(const RenderContext& ctx) const {
 	glActiveTexture(GL_TEXTURE0 + 2);
 	glBindTexture(GL_TEXTURE_2D, mNoiseTexture);
 
-	RenderCommon::drawQuad(mQuad->vao());
+	RenderCommand::drawQuad(mQuad->vao());
 }
 
 void SSAOPass::blur() const {
@@ -104,5 +104,5 @@ void SSAOPass::blur() const {
 	mBlurShader->activate();
 	mFBO->bindTexture(0);
 
-	RenderCommon::drawQuad(mQuad->vao());
+	RenderCommand::drawQuad(mQuad->vao());
 }

@@ -4,7 +4,7 @@
 #include "../buffers/frameBuffer.h"
 #include "../buffers/uniformBuffer.h"
 #include "../mesh/mesh.h"
-#include "../renderCommon.h"
+#include "../renderCommand.h"
 #include "../renderContext/renderContext.hpp"
 
 DeferredLightingPass::~DeferredLightingPass() = default;
@@ -24,7 +24,7 @@ void DeferredLightingPass::configure(const RenderContext& ctx, EventBus& eventBu
 		{"brdfLUT", ctx.PBR.brdfLUT.textureSlot}
 	};
 
-	RenderCommon::bindTextures(textureBindings, mShader);
+	RenderCommand::bindTextures(textureBindings, mShader);
 }
 
 void DeferredLightingPass::execute(const RenderContext& ctx) {
@@ -38,7 +38,7 @@ void DeferredLightingPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
 	mShader->activate();
 
-	RenderCommon::bindShadowMaps(ctx);
+	RenderCommand::bindShadowMaps(ctx);
 
 	ctx.gBuffer.self->bindTexture(0, ctx.gBuffer.positionTextureIdx);
 	ctx.gBuffer.self->bindTexture(1, ctx.gBuffer.normalTextureIdx);
@@ -49,5 +49,5 @@ void DeferredLightingPass::execute(const RenderContext& ctx) {
 	ctx.PBR.prefilterMap.buffer->bindTexture(ctx.PBR.prefilterMap.textureSlot);
 	ctx.PBR.brdfLUT.buffer->bindTexture(ctx.PBR.brdfLUT.textureSlot);
 
-	RenderCommon::drawQuad(mQuad->vao());
+	RenderCommand::drawQuad(mQuad->vao());
 }
