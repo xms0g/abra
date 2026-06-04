@@ -45,7 +45,7 @@ struct RenderContext {
 		float intensity;
 
 		struct {
-			const UniformBuffer* self;
+			const UniformBuffer* buffer;
 			uint32_t binding;
 			const char* blockName;
 		} ubo;
@@ -60,7 +60,7 @@ struct RenderContext {
 		uint32_t maxDirLights, maxPointLights, maxSpotLights;
 
 		struct {
-			const UniformBuffer* self;
+			const UniformBuffer* buffer;
 			uint32_t binding;
 			const char* blockName;
 		} ubo;
@@ -72,7 +72,7 @@ struct RenderContext {
 		glm::mat4 skyView;
 
 		struct {
-			const UniformBuffer* self;
+			const UniformBuffer* buffer;
 			uint32_t binding;
 			const char* blockName;
 		} ubo;
@@ -87,7 +87,7 @@ struct RenderContext {
 		uint32_t width, height;
 
 		struct {
-			const UniformBuffer* self;
+			const UniformBuffer* buffer;
 			uint32_t binding;
 			const char* blockName;
 		} ubo;
