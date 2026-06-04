@@ -26,7 +26,7 @@ struct RenderContext {
 	const ResourceManager* resourceManager{};
 
 	struct {
-		const FrameBuffer* self;
+		const FrameBuffer* buffer;
 
 		int32_t positionTextureIdx;
 		int32_t normalTextureIdx;

@@ -7,7 +7,6 @@
 #include "../renderContext/renderQueue.hpp"
 #include "../renderContext/renderableObject.hpp"
 #include "../../ECS/components/debug.hpp"
-#include "../../event/eventBus.hpp"
 
 DebugPass::~DebugPass() = default;
 

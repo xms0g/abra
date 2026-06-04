@@ -3,7 +3,6 @@
 #include "../shader.h"
 #include "../renderCommand.h"
 #include "../buffers/frameBuffer.h"
-#include "../buffers/uniformBuffer.h"
 #include "../material/material.hpp"
 #include "../renderContext/renderQueue.hpp"
 #include "../renderContext/renderContext.hpp"

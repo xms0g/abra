@@ -248,7 +248,7 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	}
 
 	if (mDeferredGeometryPass) {
-		mRenderCtx->gBuffer.self = mDeferredGeometryPass->gBuffer();
+		mRenderCtx->gBuffer.buffer = mDeferredGeometryPass->gBuffer();
 		mRenderCtx->ssao.buffer = mSSAOPass->blurFBO();
 	}
 
@@ -297,11 +297,8 @@ void RenderPipeline::render() {
 	}
 
 	mRenderCtx->sceneBuffer = mSceneBuffer.get();
-	glViewport(
-		0,
-		0,
-		static_cast<int32_t>(mRenderCtx->screen.width),
-		static_cast<int32_t>(mRenderCtx->screen.height));
+	glViewport(0, 0,
+		static_cast<int32_t>(mRenderCtx->screen.width), static_cast<int32_t>(mRenderCtx->screen.height));
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
