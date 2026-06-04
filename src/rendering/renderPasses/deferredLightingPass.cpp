@@ -24,7 +24,7 @@ void DeferredLightingPass::configure(const RenderContext& ctx, EventBus& eventBu
 		{"brdfLUT", ctx.PBR.brdfLUT.textureSlot}
 	};
 
-	RenderCommand::bindTextures(textureBindings, mShader);
+	RenderCommand::bindTextures(textureBindings, *mShader);
 }
 
 void DeferredLightingPass::execute(const RenderContext& ctx) {

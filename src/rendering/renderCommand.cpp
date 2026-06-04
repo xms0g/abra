@@ -114,10 +114,11 @@ void RenderCommand::setupMaterial(
 	}
 }
 
-void RenderCommand::bindTextures(const std::vector<TextureBinding>& textures, const Shader* shader) {
-	shader->activate();
+void RenderCommand::bindTextures(const std::vector<TextureBinding>& textures, const Shader& shader) {
+	shader.activate();
+
 	for (const auto& [name, slot]: textures) {
-		shader->setInt(name, slot);
+		shader.setInt(name, slot);
 	}
 }
 

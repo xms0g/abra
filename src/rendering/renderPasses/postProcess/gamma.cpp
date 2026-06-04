@@ -13,7 +13,7 @@ Gamma::Gamma(const std::string& name, const RenderContext& ctx, const bool enabl
 		{"screenTexture", 0},
 	};
 
-	RenderCommand::bindTextures(textureBindings, mShader);
+	RenderCommand::bindTextures(textureBindings, *mShader);
 }
 
 uint32_t Gamma::render(

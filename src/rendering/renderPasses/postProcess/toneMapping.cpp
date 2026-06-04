@@ -13,7 +13,7 @@ ToneMapping::ToneMapping(const std::string& name, const RenderContext& ctx, cons
 		{"screenTexture", 0},
 	};
 
-	RenderCommand::bindTextures(textureBindings, mShader);
+	RenderCommand::bindTextures(textureBindings, *mShader);
 }
 
 uint32_t ToneMapping::render(

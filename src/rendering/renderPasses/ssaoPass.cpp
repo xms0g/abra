@@ -42,8 +42,8 @@ void SSAOPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 		{"ssaoTexture", 0}
 	};
 
-	RenderCommand::bindTextures(ssaoTextureBindings, mShader);
-	RenderCommand::bindTextures(blurTextureBindings, mBlurShader);
+	RenderCommand::bindTextures(ssaoTextureBindings, *mShader);
+	RenderCommand::bindTextures(blurTextureBindings, *mBlurShader);
 
 	std::vector<float> noise;
 	noise.resize(ctx.ssao.noiseTextureSize * ctx.ssao.noiseTextureSize);

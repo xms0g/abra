@@ -13,7 +13,7 @@ FXAA::FXAA(const std::string& name, const RenderContext& ctx, const bool enabled
 		{"screenTexture", 0},
 	};
 
-	RenderCommand::bindTextures(textureBindings, mShader);
+	RenderCommand::bindTextures(textureBindings, *mShader);
 }
 
 uint32_t FXAA::render(

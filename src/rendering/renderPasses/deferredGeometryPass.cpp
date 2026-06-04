@@ -41,7 +41,7 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, EventBus& eventBu
 		{"material.texture_height", ctx.PBR.heightTextureSlot}
 	};
 
-	RenderCommand::bindTextures(textureBindings, mShader);
+	RenderCommand::bindTextures(textureBindings, *mShader);
 }
 
 void DeferredGeometryPass::execute(const RenderContext& ctx) {
@@ -50,8 +50,7 @@ void DeferredGeometryPass::execute(const RenderContext& ctx) {
 
 	mShader->activate();
 
-	for (const auto& [entityID, materialIdx, textureOffset, textureCount, meshIdx, shader]: ctx.renderQueue->
-	     deferredObjects) {
+	for (const auto& [entityID, materialIdx, textureOffset, textureCount, meshIdx, shader]: ctx.renderQueue->deferredObjects) {
 		RenderCommand::setupMaterial(entityID, materialIdx, textureOffset, textureCount, ctx, *mShader);
 		RenderCommand::setupTransform(entityID, ctx, *mShader);
 

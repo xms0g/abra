@@ -289,7 +289,7 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 			configure(shader->id(), binding, blockName.c_str());
 		}
 
-		RenderCommand::bindTextures(shadowMapBindings, shader.get());
+		RenderCommand::bindTextures(shadowMapBindings, *shader);
 	}
 }
 
