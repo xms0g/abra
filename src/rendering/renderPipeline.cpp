@@ -4,6 +4,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/norm.hpp"
 #include "shader.h"
+#include "renderCommand.h"
 #include "systems/lightSystem.h"
 #include "systems/syncStateSystem.h"
 #include "systems/shadowSystem/shadowSystem.h"
@@ -203,10 +204,10 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mRenderCtx->sceneBuffer = mSceneBuffer.get();
 	mRenderCtx->camera.self = &camera;
 	mRenderCtx->camera.frustum = &camera.frustum();
-	mRenderCtx->camera.ubo.self = mCameraUBO.get();
-	mRenderCtx->ssao.ubo.self = mSSAOPass ? mSSAOPass->ubo() : nullptr;
-	mRenderCtx->light.ubo.self = mLightSystem->ubo();
-	mRenderCtx->shadow.ubo.self = mShadowSystem->ubo();
+	mRenderCtx->camera.ubo.buffer = mCameraUBO.get();
+	mRenderCtx->ssao.ubo.buffer = mSSAOPass ? mSSAOPass->ubo() : nullptr;
+	mRenderCtx->light.ubo.buffer = mLightSystem->ubo();
+	mRenderCtx->shadow.ubo.buffer = mShadowSystem->ubo();
 	mRenderCtx->PBR.irradianceMap.buffer = ResourceManager::instance().get<BaseFrameBuffer>("irradianceMap");
 	mRenderCtx->PBR.irradianceMap.textureSlot = PBR_IRRADIANCE_MAP_TEXTURE_SLOT;
 	mRenderCtx->PBR.prefilterMap.buffer = ResourceManager::instance().get<BaseFrameBuffer>("prefilterMap");
@@ -228,19 +229,19 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 
 	const glm::mat4 invProjectionMat = glm::inverse(projectionMat);
 
-	mRenderCtx->camera.ubo.self->bind();
+	mRenderCtx->camera.ubo.buffer->bind();
 
-	mRenderCtx->camera.ubo.self->setData(
+	mRenderCtx->camera.ubo.buffer->setData(
 		glm::value_ptr(projectionMat),
 		sizeof(glm::mat4),
 		sizeof(glm::mat4) + sizeof(glm::vec4));
 
-	mRenderCtx->camera.ubo.self->setData(
+	mRenderCtx->camera.ubo.buffer->setData(
 		glm::value_ptr(invProjectionMat),
 		sizeof(glm::mat4),
 		2 * sizeof(glm::mat4) + sizeof(glm::vec4));
 
-	mRenderCtx->camera.ubo.self->unbind();
+	mRenderCtx->camera.ubo.buffer->unbind();
 
 	// Configure render passes
 	for (const auto& pass: mRenderPasses) {
@@ -252,27 +253,43 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 		mRenderCtx->ssao.buffer = mSSAOPass->blurFBO();
 	}
 
+	const std::vector<UniformBinding> uboBindings = {
+		{
+			mRenderCtx->camera.ubo.blockName,
+			mRenderCtx->camera.ubo.binding,
+			[ptr = mRenderCtx->camera.ubo.buffer](const uint32_t a, const uint32_t b, const char* c) {
+				ptr->configure(a, b, c);
+			}
+		},
+		{
+			mRenderCtx->light.ubo.blockName,
+			mRenderCtx->light.ubo.binding,
+			[ptr = mRenderCtx->light.ubo.buffer](const uint32_t a, const uint32_t b, const char* c) {
+				ptr->configure(a, b, c);
+			}
+		},
+		{
+			mRenderCtx->shadow.ubo.blockName,
+			mRenderCtx->shadow.ubo.binding,
+			[ptr = mRenderCtx->shadow.ubo.buffer](const uint32_t a, const uint32_t b, const char* c) {
+				ptr->configure(a, b, c);
+			}
+		}
+	};
+
+	const std::vector<TextureBinding> shadowMapBindings = {
+		{"shadowMap", mRenderCtx->shadow.textureSlot},
+		{"shadowCubemap", mRenderCtx->shadow.textureSlot + 1},
+		{"persShadowMap", mRenderCtx->shadow.textureSlot + 2}
+	};
+
 	// Configure shaders
 	for (const auto& [name,shader]: ResourceManager::instance().getShaders()) {
-		mRenderCtx->camera.ubo.self->configure(
-			shader->id(),
-			mRenderCtx->camera.ubo.binding,
-			mRenderCtx->camera.ubo.blockName);
+		for (const auto& [blockName, binding, configure]: uboBindings) {
+			configure(shader->id(), binding, blockName.c_str());
+		}
 
-		mRenderCtx->light.ubo.self->configure(
-			shader->id(),
-			mRenderCtx->light.ubo.binding,
-			mRenderCtx->light.ubo.blockName);
-
-		mRenderCtx->shadow.ubo.self->configure(
-			shader->id(),
-			mRenderCtx->shadow.ubo.binding,
-			mRenderCtx->shadow.ubo.blockName);
-
-		shader->activate();
-		shader->setInt("shadowMap", mRenderCtx->shadow.textureSlot);
-		shader->setInt("shadowCubemap", mRenderCtx->shadow.textureSlot + 1);
-		shader->setInt("persShadowMap", mRenderCtx->shadow.textureSlot + 2);
+		RenderCommand::bindTextures(shadowMapBindings, shader.get());
 	}
 }
 
@@ -298,7 +315,7 @@ void RenderPipeline::render() {
 
 	mRenderCtx->sceneBuffer = mSceneBuffer.get();
 	glViewport(0, 0,
-		static_cast<int32_t>(mRenderCtx->screen.width), static_cast<int32_t>(mRenderCtx->screen.height));
+	           static_cast<int32_t>(mRenderCtx->screen.width), static_cast<int32_t>(mRenderCtx->screen.height));
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -319,8 +336,8 @@ void RenderPipeline::refreshCameraData() const {
 		glm::vec4(mRenderCtx->camera.self->position(), 1.0)
 	};
 
-	mRenderCtx->camera.ubo.self->bind();
-	mRenderCtx->camera.ubo.self->setData(&packed, sizeof(PackedView), 0);
+	mRenderCtx->camera.ubo.buffer->bind();
+	mRenderCtx->camera.ubo.buffer->setData(&packed, sizeof(PackedView), 0);
 }
 
 void RenderPipeline::batchEntity(const Entity& entity) {
@@ -377,7 +394,8 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			textureOffset++,
 			1,
 			ResourceManager::instance().get<Shader>("skybox"),
-			indices};
+			indices
+		};
 		const RenderGroup group{entity.id(), matBatch};
 		mRenderQueue.skybox.push_back(group);
 		return;
