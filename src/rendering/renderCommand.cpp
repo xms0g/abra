@@ -161,13 +161,13 @@ void RenderCommand::bindShadowMaps(const RenderContext& ctx) {
 		uint32_t mID;
 	};
 
-	const ShadowBinding targets[] = {
+	const ShadowBinding shadowBindings[] = {
 		{GL_TEXTURE0 + ctx.shadow.textureSlot, GL_TEXTURE_2D, ctx.renderQueue->shadowMaps[0]},
 		{GL_TEXTURE0 + ctx.shadow.textureSlot + 1, GL_TEXTURE_CUBE_MAP_ARRAY, ctx.renderQueue->shadowMaps[1]},
 		{GL_TEXTURE0 + ctx.shadow.textureSlot + 2, GL_TEXTURE_2D_ARRAY, ctx.renderQueue->shadowMaps[2]},
 	};
 
-	for (const auto& [slot, target, mID]: targets) {
+	for (const auto& [slot, target, mID]: shadowBindings) {
 		glActiveTexture(slot);
 		glBindTexture(target, mID);
 	}
