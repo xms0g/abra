@@ -32,5 +32,4 @@ private:
 	const Shader* mShader;
 	const Shader* mBlurShader;
 	std::unique_ptr<UniformBuffer> mUBO;
-	uint32_t mNoiseTexture{0};
 };

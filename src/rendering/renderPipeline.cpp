@@ -101,6 +101,7 @@ RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLCon
 	mRenderCtx->ssao.bias = SSAO_BIAS;
 	mRenderCtx->ssao.intensity = SSAO_INTENSITY;
 	mRenderCtx->ssao.textureSlot = SSAO_TEXTURE_SLOT;
+	mRenderCtx->ssao.noise.textureSlot = SSAO_NOISE_TEXTURE_SLOT;
 	mRenderCtx->gBuffer.position.textureIdx = G_POSITION_TEXTURE_IDX;
 	mRenderCtx->gBuffer.position.textureSlot = G_POSITION_TEXTURE_SLOT;
 	mRenderCtx->gBuffer.normal.textureIdx = G_NORMAL_TEXTURE_IDX;
@@ -110,6 +111,7 @@ RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLCon
 	mRenderCtx->gBuffer.orm.textureIdx = G_ORM_TEXTURE_IDX;
 	mRenderCtx->gBuffer.orm.textureSlot = G_ORM_TEXTURE_SLOT;
 	mRenderCtx->gBuffer.depth.textureIdx = G_DEPTH_TEXTURE_IDX;
+	mRenderCtx->gBuffer.depth.textureSlot = G_DEPTH_TEXTURE_SLOT;
 
 	registry->addSystem<LightSystem>();
 	mLightSystem = &registry->getSystem<LightSystem>();

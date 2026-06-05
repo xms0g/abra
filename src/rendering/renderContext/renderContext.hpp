@@ -50,6 +50,7 @@ struct RenderContext {
 
 		struct {
 			int32_t textureIdx;
+			int32_t textureSlot;
 		} depth;
 
 	} gBuffer{};
@@ -70,6 +71,10 @@ struct RenderContext {
 		} ubo;
 
 		int32_t textureSlot;
+
+		struct {
+			int32_t textureSlot;
+		} noise;
 	} ssao{};
 
 	struct {

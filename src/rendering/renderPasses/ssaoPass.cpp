@@ -26,9 +26,9 @@ void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	mBlurShader = ctx.resourceManager->get<Shader>("ssaoBlur");
 
 	const std::vector<TextureBinding> ssaoTextureBindings = {
-		{"gDepthMap", 0},
-		{"gNormal", 1},
-		{"texNoise", 2},
+		{"gDepthMap", ctx.gBuffer.depth.textureSlot},
+		{"gNormal", ctx.gBuffer.normal.textureSlot},
+		{"texNoise", ctx.ssao.noise.textureSlot},
 		{"kernelSize", ctx.ssao.kernelSize}
 	};
 
@@ -39,10 +39,16 @@ void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	RenderCommand::setTextureUnits(ssaoTextureBindings, *mShader);
 	RenderCommand::setTextureUnits(blurTextureBindings, *mBlurShader);
 
+	ctx.gBuffer.buffer->bindTexture(ctx.gBuffer.depth.textureSlot, ctx.gBuffer.depth.textureIdx);
+	ctx.gBuffer.buffer->bindTexture(ctx.gBuffer.normal.textureSlot, ctx.gBuffer.normal.textureIdx);
+
 	std::vector<float> noise;
 	noise.resize(ctx.ssao.noiseTextureSize * ctx.ssao.noiseTextureSize);
 	noise = math::random::generateNoise(ctx.ssao.noiseTextureSize * ctx.ssao.noiseTextureSize);
-	mNoiseTexture = texture::generate(ctx.ssao.noiseTextureSize, ctx.ssao.noiseTextureSize, noise.data());
+	const uint32_t noiseTexture = texture::generate(ctx.ssao.noiseTextureSize, ctx.ssao.noiseTextureSize, noise.data());
+
+	glActiveTexture(GL_TEXTURE0 + ctx.ssao.noise.textureSlot);
+	glBindTexture(GL_TEXTURE_2D, noiseTexture);
 
 	std::vector<glm::vec4> kernel;
 	kernel.resize(ctx.ssao.kernelSize);
@@ -82,13 +88,6 @@ void SSAOPass::ssao(const RenderContext& ctx) const {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	mShader->activate();
-
-	ctx.gBuffer.buffer->bindTexture(0, ctx.gBuffer.depth.textureIdx); // the depth texture
-	ctx.gBuffer.buffer->bindTexture(1, ctx.gBuffer.normal.textureIdx); // normal texture
-
-	glActiveTexture(GL_TEXTURE0 + 2);
-	glBindTexture(GL_TEXTURE_2D, mNoiseTexture);
-
 	RenderCommand::drawQuad(mQuad->vao());
 }
 
