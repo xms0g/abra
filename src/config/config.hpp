@@ -85,5 +85,9 @@ constexpr int32_t G_NORMAL_TEXTURE_IDX{1};
 constexpr int32_t G_ALBEDO_TEXTURE_IDX{2};
 constexpr int32_t G_ORM_TEXTURE_IDX{3};
 constexpr int32_t G_DEPTH_TEXTURE_IDX{4};
+constexpr int32_t G_POSITION_TEXTURE_SLOT{13};
+constexpr int32_t G_NORMAL_TEXTURE_SLOT{14};
+constexpr int32_t G_ALBEDO_TEXTURE_SLOT{15};
+constexpr int32_t G_ORM_TEXTURE_SLOT{16};
 
 

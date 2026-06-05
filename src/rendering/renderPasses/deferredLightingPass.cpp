@@ -14,10 +14,10 @@ void DeferredLightingPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	mShader = ctx.resourceManager->get<Shader>("deferredLighting");
 
 	const std::vector<TextureBinding> textureBindings = {
-		{"gPosition", 13},
-		{"gNormal", 14},
-		{"gAlbedo", 15},
-		{"gORM", 16},
+		{"gPosition", ctx.gBuffer.position.textureSlot},
+		{"gNormal", ctx.gBuffer.normal.textureSlot},
+		{"gAlbedo", ctx.gBuffer.albedo.textureSlot},
+		{"gORM", ctx.gBuffer.orm.textureSlot},
 		{"ssao", ctx.ssao.textureSlot},
 		{"irradianceMap", ctx.PBR.irradianceMap.textureSlot},
 		{"prefilterMap", ctx.PBR.prefilterMap.textureSlot},
@@ -27,14 +27,14 @@ void DeferredLightingPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
 	RenderCommand::bindShadowMaps(ctx);
 
+	ctx.gBuffer.buffer->bindTexture(ctx.gBuffer.position.textureSlot, ctx.gBuffer.position.textureIdx);
+	ctx.gBuffer.buffer->bindTexture(ctx.gBuffer.normal.textureSlot, ctx.gBuffer.normal.textureIdx);
+	ctx.gBuffer.buffer->bindTexture(ctx.gBuffer.albedo.textureSlot, ctx.gBuffer.albedo.textureIdx);
+	ctx.gBuffer.buffer->bindTexture(ctx.gBuffer.orm.textureSlot, ctx.gBuffer.orm.textureIdx);
 	ctx.ssao.buffer->bindTexture(ctx.ssao.textureSlot);
 	ctx.PBR.irradianceMap.buffer->bindTexture(ctx.PBR.irradianceMap.textureSlot);
 	ctx.PBR.prefilterMap.buffer->bindTexture(ctx.PBR.prefilterMap.textureSlot);
 	ctx.PBR.brdfLUT.buffer->bindTexture(ctx.PBR.brdfLUT.textureSlot);
-	ctx.gBuffer.buffer->bindTexture(13, ctx.gBuffer.positionTextureIdx);
-	ctx.gBuffer.buffer->bindTexture(14, ctx.gBuffer.normalTextureIdx);
-	ctx.gBuffer.buffer->bindTexture(15, ctx.gBuffer.albedoTextureIdx);
-	ctx.gBuffer.buffer->bindTexture(16, ctx.gBuffer.ormTextureIdx);
 }
 
 void DeferredLightingPass::execute(const RenderContext& ctx) {

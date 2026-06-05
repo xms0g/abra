@@ -101,11 +101,15 @@ RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLCon
 	mRenderCtx->ssao.bias = SSAO_BIAS;
 	mRenderCtx->ssao.intensity = SSAO_INTENSITY;
 	mRenderCtx->ssao.textureSlot = SSAO_TEXTURE_SLOT;
-	mRenderCtx->gBuffer.positionTextureIdx = G_POSITION_TEXTURE_IDX;
-	mRenderCtx->gBuffer.normalTextureIdx = G_NORMAL_TEXTURE_IDX;
-	mRenderCtx->gBuffer.albedoTextureIdx = G_ALBEDO_TEXTURE_IDX;
-	mRenderCtx->gBuffer.ormTextureIdx = G_ORM_TEXTURE_IDX;
-	mRenderCtx->gBuffer.depthTextureIdx = G_DEPTH_TEXTURE_IDX;
+	mRenderCtx->gBuffer.position.textureIdx = G_POSITION_TEXTURE_IDX;
+	mRenderCtx->gBuffer.position.textureSlot = G_POSITION_TEXTURE_SLOT;
+	mRenderCtx->gBuffer.normal.textureIdx = G_NORMAL_TEXTURE_IDX;
+	mRenderCtx->gBuffer.normal.textureSlot = G_NORMAL_TEXTURE_SLOT;
+	mRenderCtx->gBuffer.albedo.textureIdx = G_ALBEDO_TEXTURE_IDX;
+	mRenderCtx->gBuffer.albedo.textureSlot = G_ALBEDO_TEXTURE_SLOT;
+	mRenderCtx->gBuffer.orm.textureIdx = G_ORM_TEXTURE_IDX;
+	mRenderCtx->gBuffer.orm.textureSlot = G_ORM_TEXTURE_SLOT;
+	mRenderCtx->gBuffer.depth.textureIdx = G_DEPTH_TEXTURE_IDX;
 
 	registry->addSystem<LightSystem>();
 	mLightSystem = &registry->getSystem<LightSystem>();

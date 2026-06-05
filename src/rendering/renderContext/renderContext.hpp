@@ -28,11 +28,30 @@ struct RenderContext {
 	struct {
 		const FrameBuffer* buffer;
 
-		int32_t positionTextureIdx;
-		int32_t normalTextureIdx;
-		int32_t albedoTextureIdx;
-		int32_t ormTextureIdx;
-		int32_t depthTextureIdx;
+		struct {
+			int32_t textureIdx;
+			int32_t textureSlot;
+		} position;
+
+		struct {
+			int32_t textureIdx;
+			int32_t textureSlot;
+		} normal;
+
+		struct {
+			int32_t textureIdx;
+			int32_t textureSlot;
+		} albedo;
+
+		struct {
+			int32_t textureIdx;
+			int32_t textureSlot;
+		} orm;
+
+		struct {
+			int32_t textureIdx;
+		} depth;
+
 	} gBuffer{};
 
 	struct {
