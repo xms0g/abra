@@ -104,7 +104,5 @@ uint32_t Bloom::combinePass(
 	uint32_t textures[] = {sceneTexture, blurTexture};
 	RenderCommand::drawQuad(vao, textures);
 
-	mPingPong[toggle]->unbind();
-
 	return mPingPong[toggle]->texture();
 }

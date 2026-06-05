@@ -76,6 +76,8 @@ void ShadowSystem::omnidirectionalShadowPass() const {
 
 		mOmnidirShadow->render(*mCtx, light->position, i);
 	}
+
+	mOmnidirShadow->depthMap().unbind();
 }
 
 void ShadowSystem::perspectiveShadowPass() const {
@@ -92,6 +94,8 @@ void ShadowSystem::perspectiveShadowPass() const {
 		mPersShadow->render(*mCtx, light->direction, light->position, light->outerCutOff, i);
 		gpuData.persLightSpaceMatrix[i] = mPersShadow->lightSpaceMatrix(i);
 	}
+
+	mPersShadow->depthMap().unbind();
 }
 
 void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
@@ -101,7 +105,6 @@ void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
 	omnidirectionalShadowPass();
 	perspectiveShadowPass();
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glCullFace(GL_BACK);
 	glViewport(0, 0, static_cast<int32_t>(mCtx->screen.width), static_cast<int32_t>(mCtx->screen.height));
 

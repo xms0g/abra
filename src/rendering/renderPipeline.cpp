@@ -310,8 +310,6 @@ void RenderPipeline::render() {
 	}
 
 	mRenderCtx->sceneBuffer = mSceneBuffer.get();
-	glViewport(0, 0, static_cast<int32_t>(SCR_WIDTH), static_cast<int32_t>(SCR_HEIGHT));
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void RenderPipeline::drawGui() {

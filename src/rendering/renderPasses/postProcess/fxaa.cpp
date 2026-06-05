@@ -34,7 +34,6 @@ uint32_t FXAA::render(
 	RenderCommand::drawQuad(vao, textures);
 
 	const uint32_t texture = pingPong[toggle]->texture();
-	pingPong[toggle]->unbind();
 	toggle = !toggle;
 	return texture;
 }

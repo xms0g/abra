@@ -62,6 +62,7 @@ void PostProcessPass::execute(const RenderContext& ctx) {
 	}
 
 	mQuad->shader().activate();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	uint32_t textures[] = {inputTex};
 	RenderCommand::drawQuad(mQuad->vao(), textures);

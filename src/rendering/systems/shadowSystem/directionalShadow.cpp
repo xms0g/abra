@@ -60,4 +60,5 @@ void DirectionalShadow::render(const RenderContext& ctx, const glm::vec3& direct
 			RenderCommand::drawMesh(vao, vertexCount, indexCount);
 		}
 	}
+	mDepthMap->unbind();
 }
