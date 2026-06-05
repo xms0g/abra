@@ -11,7 +11,7 @@ DeferredLightingPass::~DeferredLightingPass() = default;
 
 void DeferredLightingPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	mQuad = std::make_unique<Models::SingleQuad>();
-	mShader = ctx.resourceManager->get<Shader>("deferredLighting");
+	mShader = ResourceManager::instance().get<Shader>("deferredLighting");
 
 	const std::vector<TextureBinding> textureBindings = {
 		{"gPosition", ctx.gBuffer.position.textureSlot},

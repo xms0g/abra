@@ -7,9 +7,9 @@
 
 Bloom::Bloom(const std::string& name, const RenderContext& ctx, const bool enabled)
 	: BasePostEffect(name, enabled) {
-	mBrightFilter = ctx.resourceManager->get<Shader>("bloomBF");
-	mBlur = ctx.resourceManager->get<Shader>("bloomBlur");
-	mCombine = ctx.resourceManager->get<Shader>("bloomCombine");
+	mBrightFilter = ResourceManager::instance().get<Shader>("bloomBF");
+	mBlur = ResourceManager::instance().get<Shader>("bloomBlur");
+	mCombine = ResourceManager::instance().get<Shader>("bloomCombine");
 
 	const std::vector<TextureBinding> textureBindings = {
 		{"screenTexture", 0},

@@ -23,7 +23,6 @@ struct RenderContext {
 	mutable const FrameBuffer* sceneBuffer{};
 	const FrameBuffer* intermediateBuffer{};
 	mutable MaterialCache materialCache;
-	const ResourceManager* resourceManager{};
 
 	struct {
 		const FrameBuffer* buffer;

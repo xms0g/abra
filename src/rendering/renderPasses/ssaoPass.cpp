@@ -22,8 +22,8 @@ void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 
 	ctx.ssao.buffer = mBlurFBO.get();
 
-	mShader = ctx.resourceManager->get<Shader>("ssao");
-	mBlurShader = ctx.resourceManager->get<Shader>("ssaoBlur");
+	mShader = ResourceManager::instance().get<Shader>("ssao");
+	mBlurShader = ResourceManager::instance().get<Shader>("ssaoBlur");
 
 	const std::vector<TextureBinding> ssaoTextureBindings = {
 		{"gDepthMap", ctx.gBuffer.depth.textureSlot},

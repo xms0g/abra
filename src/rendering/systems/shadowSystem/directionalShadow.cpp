@@ -15,7 +15,7 @@ DirectionalShadow::DirectionalShadow(const RenderContext& ctx) {
 			.checkStatus();
 	mDepthMap->unbind();
 
-	mDepthShader = ctx.resourceManager->get<Shader>("depth");
+	mDepthShader = ResourceManager::instance().get<Shader>("depth");
 }
 
 DirectionalShadow::~DirectionalShadow() = default;

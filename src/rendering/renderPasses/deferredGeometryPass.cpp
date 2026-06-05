@@ -27,7 +27,7 @@ void DeferredGeometryPass::configure(RenderContext& ctx, EventBus& eventBus) {
 			.checkStatus();
 
 	ctx.gBuffer.buffer = mGBuffer.get();
-	mShader = ctx.resourceManager->get<Shader>("gBuffer");
+	mShader = ResourceManager::instance().get<Shader>("gBuffer");
 
 	const std::vector<TextureBinding> textureBindings = {
 		{ "material.texture_albedo", ctx.PBR.albedoTextureSlot },

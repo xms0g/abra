@@ -7,7 +7,7 @@
 
 ToneMapping::ToneMapping(const std::string& name, const RenderContext& ctx, const bool enabled)
 	: BasePostEffect(name, enabled) {
-	mShader = ctx.resourceManager->get<Shader>("toneMapping");
+	mShader = ResourceManager::instance().get<Shader>("toneMapping");
 
 	const std::vector<TextureBinding> textureBindings = {
 		{"screenTexture", 0},

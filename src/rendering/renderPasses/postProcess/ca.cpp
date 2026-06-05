@@ -7,7 +7,7 @@
 
 CA::CA(const std::string& name, const RenderContext& ctx, const bool enabled)
 	: BasePostEffect(name, enabled) {
-	mShader = ctx.resourceManager->get<Shader>("ca");
+	mShader = ResourceManager::instance().get<Shader>("ca");
 
 	const std::vector<TextureBinding> textureBindings = {
 		{"screenTexture", 0},
