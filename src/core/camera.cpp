@@ -43,8 +43,18 @@ const glm::vec3& Camera::front() const {
 	return mFront;
 }
 
-const math::Frustum& Camera::frustum() const {
-	return mFrustum;
+math::Frustum Camera::generateFrustum() const {
+	math::Frustum frustum;
+
+	const glm::vec3 frontMultFar = ZFAR * mFront;
+	frustum.nearFace = {mPosition + ZNEAR * mFront, mFront};
+	frustum.farFace = {mPosition + frontMultFar, -mFront};
+	frustum.rightFace = {mPosition, glm::cross(frontMultFar - mRight * halfHSide, mUp)};
+	frustum.leftFace = {mPosition, glm::cross(mUp, frontMultFar + mRight * halfHSide)};
+	frustum.topFace = {mPosition, glm::cross(mRight, frontMultFar - mUp * halfVSide)};
+	frustum.bottomFace = {mPosition, glm::cross(frontMultFar + mUp * halfVSide, mRight)};
+
+	return frustum;
 }
 
 void Camera::configure(EventBus& eventBus) {
@@ -64,8 +74,6 @@ void Camera::update() {
 	// normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
 	mRight = glm::normalize(glm::cross(mFront, mWorldUp));
 	mUp = glm::normalize(glm::cross(mRight, mFront));
-
-	generateFrustum();
 }
 
 void Camera::processKeyboard(const KeyPressedEvent& event) {
@@ -95,15 +103,4 @@ void Camera::processMouseMovement(const MouseMovementEvent& event) {
 		mPitch = 89.0f;
 	if (mPitch < -89.0f)
 		mPitch = -89.0f;
-}
-
-void Camera::generateFrustum() {
-	const glm::vec3 frontMultFar = ZFAR * mFront;
-
-	mFrustum.nearFace = {mPosition + ZNEAR * mFront, mFront};
-	mFrustum.farFace = {mPosition + frontMultFar, -mFront};
-	mFrustum.rightFace = {mPosition, glm::cross(frontMultFar - mRight * halfHSide, mUp)};
-	mFrustum.leftFace = {mPosition, glm::cross(mUp, frontMultFar + mRight * halfHSide)};
-	mFrustum.topFace = {mPosition, glm::cross(mRight, frontMultFar - mUp * halfVSide)};
-	mFrustum.bottomFace = {mPosition, glm::cross(frontMultFar + mUp * halfVSide, mRight)};
 }

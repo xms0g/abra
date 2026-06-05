@@ -1,4 +1,6 @@
 #include "frustumCullingPass.h"
+
+#include "../../core/camera.h"
 #include "../mesh/mesh.h"
 #include "../renderContext/renderQueue.hpp"
 #include "../renderContext/renderContext.hpp"
@@ -16,12 +18,14 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 	auto cullItems = [&](const std::vector<RenderGroup>& groups, std::vector<RenderableObject>& outQueue) -> void {
 		outQueue.clear();
 
+		const auto frustum = ctx.camera.self->generateFrustum();
+
 		for (const auto& [entityID, matBatch]: groups) {
 			const auto& model = ctx.renderQueue->entity.models[entityID];
 			const auto& center= ctx.renderQueue->entity.centers[entityID];
 			const auto& extents = ctx.renderQueue->entity.extents[entityID];
 
-			if (!math::AABB::isOnFrustum(*ctx.camera.frustum, model, center, extents)) {
+			if (!math::AABB::isOnFrustum(frustum, model, center, extents)) {
 				continue;
 			}
 
@@ -30,7 +34,7 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 				const glm::vec3& max = ctx.renderQueue->mesh.maxCounts[meshIdx];
 				const glm::vec3& min = ctx.renderQueue->mesh.minCounts[meshIdx];
 
-				const bool isVisible = math::AABB::isMeshInFrustum(*ctx.camera.frustum, min, max, model);
+				const bool isVisible = math::AABB::isMeshInFrustum(frustum, min, max, model);
 
 				if (isVisible) {
 					outQueue.push_back({entityID, matIdx, textureOffset, textureCount, meshIdx, shader});

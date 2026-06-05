@@ -1,8 +1,8 @@
 #pragma once
 #include "glm/glm.hpp"
 #include "glm/ext/matrix_transform.hpp"
-#include "../math/frustum.h"
 #include "../config/config.hpp"
+#include "../math/frustum.h"
 
 struct MouseMovementEvent;
 struct KeyPressedEvent;
@@ -35,7 +35,7 @@ public:
 	const glm::vec3& front() const;
 
 	[[nodiscard]]
-	const math::Frustum& frustum() const;
+	math::Frustum generateFrustum() const;
 
 	void configure(EventBus& eventBus);
 
@@ -46,9 +46,6 @@ public:
 	void processMouseMovement(const MouseMovementEvent& event);
 
 private:
-	void generateFrustum();
-
-	math::Frustum mFrustum;
 	// camera Attributes
 	glm::vec3 mPosition{};
 	glm::vec3 mFront;

@@ -91,7 +91,6 @@ struct RenderContext {
 
 	struct {
 		const Camera* self;
-		const math::Frustum* frustum;
 		glm::mat4 skyView;
 
 		struct {

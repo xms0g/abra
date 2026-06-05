@@ -204,7 +204,6 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 
 	mRenderCtx->sceneBuffer = mSceneBuffer.get();
 	mRenderCtx->camera.self = &camera;
-	mRenderCtx->camera.frustum = &camera.frustum();
 	mRenderCtx->PBR.irradianceMap.buffer = ResourceManager::instance().get<BaseFrameBuffer>("irradianceMap");
 	mRenderCtx->PBR.irradianceMap.textureSlot = PBR_IRRADIANCE_MAP_TEXTURE_SLOT;
 	mRenderCtx->PBR.prefilterMap.buffer = ResourceManager::instance().get<BaseFrameBuffer>("prefilterMap");
