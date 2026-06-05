@@ -11,11 +11,7 @@
 
 DeferredGeometryPass::~DeferredGeometryPass() = default;
 
-const FrameBuffer* DeferredGeometryPass::gBuffer() const {
-	return mGBuffer.get();
-}
-
-void DeferredGeometryPass::configure(const RenderContext& ctx, EventBus& eventBus) {
+void DeferredGeometryPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	mGBuffer = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
 	mGBuffer->withTextureFP(GL_RGBA) // position
 			.withTextureFP(GL_RGBA) // normal
@@ -30,6 +26,7 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, EventBus& eventBu
 			.withTextureDepth(GL_DEPTH_COMPONENT24, false)
 			.checkStatus();
 
+	ctx.gBuffer.buffer = mGBuffer.get();
 	mShader = ctx.resourceManager->get<Shader>("gBuffer");
 
 	const std::vector<TextureBinding> textureBindings = {
@@ -41,7 +38,7 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, EventBus& eventBu
 		{"material.texture_height", ctx.PBR.heightTextureSlot}
 	};
 
-	RenderCommand::bindTextures(textureBindings, *mShader);
+	RenderCommand::setTextureUnits(textureBindings, *mShader);
 }
 
 void DeferredGeometryPass::execute(const RenderContext& ctx) {

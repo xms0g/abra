@@ -20,9 +20,9 @@ Bloom::Bloom(const std::string& name, const RenderContext& ctx, const bool enabl
 		{"bloomBlur", 1}
 	};
 
-	RenderCommand::bindTextures(textureBindings, *mBrightFilter);
-	RenderCommand::bindTextures(textureBindings, *mBlur);
-	RenderCommand::bindTextures(combineTextureBindings, *mCombine);
+	RenderCommand::setTextureUnits(textureBindings, *mBrightFilter);
+	RenderCommand::setTextureUnits(textureBindings, *mBlur);
+	RenderCommand::setTextureUnits(combineTextureBindings, *mCombine);
 
 	for (auto& target: mPingPong) {
 		target = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);

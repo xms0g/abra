@@ -26,7 +26,7 @@ void setupMaterial(
 	const RenderContext& ctx,
 	const Shader& shader);
 
-void bindTextures(const std::vector<TextureBinding>& textures, const Shader& shader);
+void setTextureUnits(const std::vector<TextureBinding>& textures, const Shader& shader);
 
 void drawMesh(uint32_t vao, size_t vertexCount, size_t indexCount);
 

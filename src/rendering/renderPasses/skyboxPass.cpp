@@ -11,7 +11,7 @@
 
 SkyboxPass::~SkyboxPass() = default;
 
-void SkyboxPass::configure(const RenderContext& ctx, EventBus& eventBus) {
+void SkyboxPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	const auto& [entity, matb] = ctx.renderQueue->skybox.front();
 	matb.shader->activate();
 	matb.shader->setInt("skybox", 0);

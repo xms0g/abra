@@ -8,7 +8,7 @@ class DebugPass final : public IRenderPass {
 public:
 	~DebugPass() override;
 
-	void configure(const RenderContext& ctx, EventBus& eventBus) override;
+	void configure(RenderContext& ctx, EventBus& eventBus) override;
 
 	void execute(const RenderContext& ctx) override;
 

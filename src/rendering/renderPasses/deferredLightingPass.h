@@ -14,7 +14,7 @@ class DeferredLightingPass final : public IRenderPass {
 public:
 	~DeferredLightingPass() override;
 
-	void configure(const RenderContext& ctx, EventBus& eventBus) override;
+	void configure(RenderContext& ctx, EventBus& eventBus) override;
 
 	void execute(const RenderContext& ctx) override;
 

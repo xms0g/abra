@@ -13,7 +13,7 @@ CA::CA(const std::string& name, const RenderContext& ctx, const bool enabled)
 		{"screenTexture", 0},
 	};
 
-	RenderCommand::bindTextures(textureBindings, *mShader);
+	RenderCommand::setTextureUnits(textureBindings, *mShader);
 }
 
 uint32_t CA::render(

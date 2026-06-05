@@ -19,7 +19,7 @@
 
 PostProcessPass::~PostProcessPass() = default;
 
-void PostProcessPass::configure(const RenderContext& ctx, EventBus& eventBus) {
+void PostProcessPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	mQuad = std::make_unique<Models::Quad>();
 	mEffects = {
 		std::make_shared<Bloom>("Bloom", ctx, false),

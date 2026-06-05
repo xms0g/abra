@@ -10,7 +10,7 @@
 
 DebugPass::~DebugPass() = default;
 
-void DebugPass::configure(const RenderContext& ctx, EventBus& eventBus) {
+void DebugPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	mDebugShaders = {
 		nullptr,
 		ctx.resourceManager->get<Shader>("debugNormal"),

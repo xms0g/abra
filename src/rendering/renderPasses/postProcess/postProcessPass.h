@@ -18,7 +18,7 @@ class PostProcessPass final : public IRenderPass {
 public:
 	~PostProcessPass() override;
 
-	void configure(const RenderContext& ctx, EventBus& eventBus) override;
+	void configure(RenderContext& ctx, EventBus& eventBus) override;
 
 	void execute(const RenderContext& ctx) override;
 

@@ -173,13 +173,9 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mRenderPasses.emplace_back(std::make_shared<FrustumCullingPass>());
 
 	if (!mRenderQueue.deferredGroups.empty()) {
-		mDeferredGeometryPass = std::make_shared<DeferredGeometryPass>();
-		mDeferredLightingPass = std::make_shared<DeferredLightingPass>();
-		mSSAOPass = std::make_shared<SSAOPass>();
-
-		mRenderPasses.push_back(mDeferredGeometryPass);
-		mRenderPasses.push_back(mSSAOPass);
-		mRenderPasses.push_back(mDeferredLightingPass);
+		mRenderPasses.push_back(std::make_shared<DeferredGeometryPass>());
+		mRenderPasses.push_back( std::make_shared<SSAOPass>());
+		mRenderPasses.push_back(std::make_shared<DeferredLightingPass>());
 	}
 
 	if (!mRenderQueue.opaqueGroups.empty() || !mRenderQueue.blendGroups.empty()) {
@@ -205,7 +201,6 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mRenderCtx->camera.self = &camera;
 	mRenderCtx->camera.frustum = &camera.frustum();
 	mRenderCtx->camera.ubo.buffer = mCameraUBO.get();
-	mRenderCtx->ssao.ubo.buffer = mSSAOPass ? mSSAOPass->ubo() : nullptr;
 	mRenderCtx->light.ubo.buffer = mLightSystem->ubo();
 	mRenderCtx->shadow.ubo.buffer = mShadowSystem->ubo();
 	mRenderCtx->PBR.irradianceMap.buffer = ResourceManager::instance().get<BaseFrameBuffer>("irradianceMap");
@@ -248,11 +243,6 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 		pass->configure(*mRenderCtx, eventBus);
 	}
 
-	if (mDeferredGeometryPass) {
-		mRenderCtx->gBuffer.buffer = mDeferredGeometryPass->gBuffer();
-		mRenderCtx->ssao.buffer = mSSAOPass->blurFBO();
-	}
-
 	const std::vector<UniformBinding> uboBindings = {
 		{
 			mRenderCtx->camera.ubo.blockName,
@@ -289,7 +279,7 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 			configure(shader->id(), binding, blockName.c_str());
 		}
 
-		RenderCommand::bindTextures(shadowMapBindings, *shader);
+		RenderCommand::setTextureUnits(shadowMapBindings, *shader);
 	}
 }
 
@@ -314,8 +304,7 @@ void RenderPipeline::render() {
 	}
 
 	mRenderCtx->sceneBuffer = mSceneBuffer.get();
-	glViewport(0, 0,
-	           static_cast<int32_t>(mRenderCtx->screen.width), static_cast<int32_t>(mRenderCtx->screen.height));
+	glViewport(0, 0, static_cast<int32_t>(SCR_WIDTH), static_cast<int32_t>(SCR_HEIGHT));
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 

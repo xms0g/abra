@@ -114,7 +114,7 @@ void RenderCommand::setupMaterial(
 	}
 }
 
-void RenderCommand::bindTextures(const std::vector<TextureBinding>& textures, const Shader& shader) {
+void RenderCommand::setTextureUnits(const std::vector<TextureBinding>& textures, const Shader& shader) {
 	shader.activate();
 
 	for (const auto& [name, slot]: textures) {
@@ -155,12 +155,20 @@ void RenderCommand::drawQuad(const uint32_t vao, const std::span<uint32_t> textu
 }
 
 void RenderCommand::bindShadowMaps(const RenderContext& ctx) {
-	glActiveTexture(GL_TEXTURE0 + ctx.shadow.textureSlot);
-	glBindTexture(GL_TEXTURE_2D, ctx.renderQueue->shadowMaps[0]);
+	struct ShadowBinding {
+		int32_t slot;
+		uint32_t target;
+		uint32_t mID;
+	};
 
-	glActiveTexture(GL_TEXTURE0 + ctx.shadow.textureSlot + 1);
-	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, ctx.renderQueue->shadowMaps[1]);
+	const ShadowBinding targets[] = {
+		{GL_TEXTURE0 + ctx.shadow.textureSlot, GL_TEXTURE_2D, ctx.renderQueue->shadowMaps[0]},
+		{GL_TEXTURE0 + ctx.shadow.textureSlot + 1, GL_TEXTURE_CUBE_MAP_ARRAY, ctx.renderQueue->shadowMaps[1]},
+		{GL_TEXTURE0 + ctx.shadow.textureSlot + 2, GL_TEXTURE_2D_ARRAY, ctx.renderQueue->shadowMaps[2]},
+	};
 
-	glActiveTexture(GL_TEXTURE0 + ctx.shadow.textureSlot + 2);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, ctx.renderQueue->shadowMaps[2]);
+	for (const auto& [slot, target, mID]: targets) {
+		glActiveTexture(slot);
+		glBindTexture(target, mID);
+	}
 }

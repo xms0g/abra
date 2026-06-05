@@ -56,8 +56,5 @@ private:
 	// Render context
 	std::unique_ptr<RenderContext> mRenderCtx;
 	// Render passes
-	std::shared_ptr<DeferredGeometryPass> mDeferredGeometryPass;
-	std::shared_ptr<DeferredLightingPass> mDeferredLightingPass;
-	std::shared_ptr<SSAOPass> mSSAOPass;
 	std::vector<std::shared_ptr<IRenderPass>> mRenderPasses;
 };

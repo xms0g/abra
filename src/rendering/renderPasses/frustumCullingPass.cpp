@@ -9,7 +9,7 @@
 
 FrustumCullingPass::~FrustumCullingPass() = default;
 
-void FrustumCullingPass::configure(const RenderContext& ctx, EventBus& eventBus) {
+void FrustumCullingPass::configure(RenderContext& ctx, EventBus& eventBus) {
 }
 
 void FrustumCullingPass::execute(const RenderContext& ctx) {

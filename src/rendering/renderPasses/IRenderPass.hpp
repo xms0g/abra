@@ -7,7 +7,7 @@ class IRenderPass {
 public:
 	virtual ~IRenderPass() = default;
 
-	virtual void configure(const RenderContext& ctx, EventBus& eventBus) = 0;
+	virtual void configure(RenderContext& ctx, EventBus& eventBus) = 0;
 
 	virtual void execute(const RenderContext& ctx) = 0;
 };

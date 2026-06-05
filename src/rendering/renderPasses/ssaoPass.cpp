@@ -11,15 +11,7 @@
 
 SSAOPass::~SSAOPass() = default;
 
-const FrameBuffer* SSAOPass::blurFBO() const {
-	return mBlurFBO.get();
-}
-
-const UniformBuffer* SSAOPass::ubo() const {
-	return mUBO.get();
-}
-
-void SSAOPass::configure(const RenderContext& ctx, EventBus& eventBus) {
+void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	mQuad = std::make_unique<Models::SingleQuad>();
 	mFBO = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
 	mFBO->withTextureFP(GL_RED)
@@ -27,6 +19,8 @@ void SSAOPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mBlurFBO = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
 	mBlurFBO->withTextureFP(GL_RED)
 			.checkStatus();
+
+	ctx.ssao.buffer = mBlurFBO.get();
 
 	mShader = ctx.resourceManager->get<Shader>("ssao");
 	mBlurShader = ctx.resourceManager->get<Shader>("ssaoBlur");
@@ -42,8 +36,8 @@ void SSAOPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 		{"ssaoTexture", 0}
 	};
 
-	RenderCommand::bindTextures(ssaoTextureBindings, *mShader);
-	RenderCommand::bindTextures(blurTextureBindings, *mBlurShader);
+	RenderCommand::setTextureUnits(ssaoTextureBindings, *mShader);
+	RenderCommand::setTextureUnits(blurTextureBindings, *mBlurShader);
 
 	std::vector<float> noise;
 	noise.resize(ctx.ssao.noiseTextureSize * ctx.ssao.noiseTextureSize);
@@ -75,6 +69,7 @@ void SSAOPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mUBO->unbind();
 
 	mUBO->configure(mShader->id(), ctx.ssao.ubo.binding, ctx.ssao.ubo.blockName);
+	ctx.ssao.ubo.buffer = mUBO.get();
 }
 
 void SSAOPass::execute(const RenderContext& ctx) {

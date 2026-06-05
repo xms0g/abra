@@ -21,7 +21,7 @@ InstancedPass::InstancedPass() = default;
 
 InstancedPass::~InstancedPass() = default;
 
-void InstancedPass::configure(const RenderContext& ctx, EventBus& eventBus) {
+void InstancedPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	if (!ctx.renderQueue->opaqueInstancedGroups.empty()) {
 		prepareInstanceBuffer(ctx.renderQueue->opaqueInstancedGroups, ctx.renderQueue->mesh.vaos, mOpaqueVBO);
 		uploadInstanceData(ctx.renderQueue->opaqueInstancedGroups, *mOpaqueVBO);
@@ -31,12 +31,12 @@ void InstancedPass::configure(const RenderContext& ctx, EventBus& eventBus) {
 		prepareInstanceBuffer(ctx.renderQueue->blendInstancedGroups, ctx.renderQueue->mesh.vaos, mBlendVBO);
 		uploadInstanceData(ctx.renderQueue->blendInstancedGroups, *mBlendVBO);
 	}
+
+	RenderCommand::bindShadowMaps(ctx);
 }
 
 void InstancedPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
-
-	RenderCommand::bindShadowMaps(ctx);
 
 	if (!ctx.renderQueue->blendInstancedGroups.empty()) {
 		glDepthMask(GL_FALSE);

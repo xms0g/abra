@@ -8,13 +8,12 @@
 
 ForwardPass::~ForwardPass() = default;
 
-void ForwardPass::configure(const RenderContext& ctx, EventBus& eventBus) {
+void ForwardPass::configure(RenderContext& ctx, EventBus& eventBus) {
+	RenderCommand::bindShadowMaps(ctx);
 }
 
 void ForwardPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
-
-	RenderCommand::bindShadowMaps(ctx);
 
 	if (!ctx.renderQueue->blendObjects.empty()) {
 		glDepthMask(GL_FALSE);
