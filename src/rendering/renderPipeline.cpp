@@ -24,7 +24,7 @@
 #include "renderPasses/debugPass.h"
 #include "renderPasses/forwardPass.h"
 #include "renderPasses/instancedPass.h"
-#include "renderPasses/frustumCullingPass.h"
+#include "renderPasses/cullingPass.h"
 #include "renderPasses/skyboxPass.h"
 #include "renderPasses/resolvePass.h"
 #include "renderPasses/postProcess/postProcessPass.h"
@@ -175,7 +175,7 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 		CAMERA_UBO_BINDING);
 
 	// Create render passes
-	mRenderPasses.emplace_back(std::make_shared<FrustumCullingPass>());
+	mRenderPasses.emplace_back(std::make_shared<CullingPass>());
 
 	if (!mRenderQueue.deferredGroups.empty()) {
 		mRenderPasses.push_back(std::make_shared<DeferredGeometryPass>());

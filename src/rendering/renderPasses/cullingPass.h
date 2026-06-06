@@ -9,9 +9,9 @@ namespace math {
 struct RenderGroup;
 struct RenderableObject;
 
-class FrustumCullingPass final : public IRenderPass {
+class CullingPass final : public IRenderPass {
 public:
-	~FrustumCullingPass() override;
+	~CullingPass() override;
 
 	void configure(RenderContext& ctx, EventBus& eventBus) override;
 

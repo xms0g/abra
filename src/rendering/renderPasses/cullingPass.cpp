@@ -1,4 +1,4 @@
-#include "frustumCullingPass.h"
+#include "cullingPass.h"
 #include "../mesh/mesh.h"
 #include "../renderContext/renderQueue.hpp"
 #include "../renderContext/renderContext.hpp"
@@ -8,12 +8,12 @@
 #include "../../math/boundingVolume.h"
 #include "../../core/camera.h"
 
-FrustumCullingPass::~FrustumCullingPass() = default;
+CullingPass::~CullingPass() = default;
 
-void FrustumCullingPass::configure(RenderContext& ctx, EventBus& eventBus) {
+void CullingPass::configure(RenderContext& ctx, EventBus& eventBus) {
 }
 
-void FrustumCullingPass::execute(const RenderContext& ctx) {
+void CullingPass::execute(const RenderContext& ctx) {
 	const auto frustum = ctx.camera.self->generateFrustum();
 
 	cullScene(ctx, frustum, ctx.renderQueue->opaqueGroups, ctx.renderQueue->opaqueObjects);
@@ -22,7 +22,7 @@ void FrustumCullingPass::execute(const RenderContext& ctx) {
 	cullScene(ctx, frustum, ctx.renderQueue->debugGroups, ctx.renderQueue->dbgObjects);
 }
 
-void FrustumCullingPass::cullScene(
+void CullingPass::cullScene(
 	const RenderContext& ctx,
 	const math::Frustum& frustum,
 	const std::vector<RenderGroup>& groups,
