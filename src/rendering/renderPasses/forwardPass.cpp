@@ -1,7 +1,6 @@
 #include "forwardPass.h"
 #include "glad/glad.h"
 #include "../renderCommand.h"
-#include "../shader.h"
 #include "../buffers/frameBuffer.h"
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderQueue.hpp"

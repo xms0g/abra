@@ -3,7 +3,6 @@
 #include "../shader.h"
 #include "../buffers/frameBuffer.h"
 #include "../material/material.hpp"
-#include "../mesh/mesh.h"
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderQueue.hpp"
 #include "../renderContext/renderGroup.hpp"
@@ -22,15 +21,14 @@ void SkyboxPass::execute(const RenderContext& ctx) {
 	const auto [materialIdx, textureOffset, textureCount, shader, meshes] = matb;
 	const uint32_t meshIdx = meshes.front();
 	const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
-	const uint32_t tex = ctx.renderQueue->material.textures[textureOffset];
+	const uint32_t textureId = ctx.renderQueue->material.textures[textureOffset];
 
 	ctx.sceneBuffer->bind();
 	shader->activate();
 	shader->setMat4("skyView", ctx.camera.skyView);
 
-	glActiveTexture(GL_TEXTURE0); // active proper texture unit before binding
-	// and finally bind the texture
-	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
 	// Draw
 	glDepthMask(GL_FALSE);
 	glDepthFunc(GL_LEQUAL);
