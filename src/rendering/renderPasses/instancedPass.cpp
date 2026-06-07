@@ -3,9 +3,8 @@
 #include "../buffers/frameBuffer.h"
 #include "../buffers/vertexBuffer.h"
 #include "../renderCommand.h"
-#include "../shader.h"
 #include "../renderContext/renderContext.hpp"
-#include "../renderContext/instanceGroup.hpp"
+#include "../renderContext/renderGroup.hpp"
 #include "../renderContext/renderQueue.hpp"
 #include "../material/material.hpp"
 #include "../mesh/mesh.h"
@@ -59,8 +58,8 @@ void InstancedPass::prepareInstanceBuffer(
 	vbo = std::make_unique<VertexBuffer>(DYNAMIC);
 
 	size_t totalRequiredSize = 0;
-	for (const auto& [entity, transforms, matb] : groups) {
-		const size_t instanceCount = transforms.size() / 9;
+	for (const auto& group : groups) {
+		const size_t instanceCount = group.transforms.size() / 9;
 		totalRequiredSize += instanceCount * sizeof(InstanceData);
 	}
 
@@ -70,12 +69,12 @@ void InstancedPass::prepareInstanceBuffer(
 
 	// Setup attributes now that the buffer is allocated
 	uint32_t currentOffset = 0;
-	for (const auto& [entity, transforms, matb] : groups) {
-		for (const auto meshIdx : matb.meshIndices) {
+	for (const auto& group : groups) {
+		for (const auto meshIdx : group.matBatch.meshIndices) {
 			const uint32_t vao = vaos[meshIdx];
 			Mesh::enableInstanceAttributes(vao, currentOffset);
 		}
-		const size_t instanceCount = transforms.size() / 9;
+		const size_t instanceCount = group.transforms.size() / 9;
 		currentOffset += static_cast<uint32_t>(instanceCount * sizeof(InstanceData));
 	}
 
@@ -86,15 +85,15 @@ void InstancedPass::uploadInstanceData(const std::vector<InstanceGroup>& groups,
 	vbo.bind();
 
 	uint32_t currentOffset = 0;
-	for (const auto& [entity, transforms, matb]: groups) {
+	for (const auto& group: groups) {
 		std::vector<InstanceData> gpuData;
-		const size_t instanceCount = transforms.size() / 9;
+		const size_t instanceCount = group.transforms.size() / 9;
 		gpuData.reserve(instanceCount);
 
-		for (size_t i = 0; i < transforms.size(); i += 9) {
-			glm::vec3 pos{transforms[i], transforms[i + 1], transforms[i + 2]};
-			glm::vec3 rot{transforms[i + 3], transforms[i + 4], transforms[i + 5]};
-			glm::vec3 scale{transforms[i + 6], transforms[i + 7], transforms[i + 8]};
+		for (size_t i = 0; i < group.transforms.size(); i += 9) {
+			glm::vec3 pos{group.transforms[i], group.transforms[i + 1], group.transforms[i + 2]};
+			glm::vec3 rot{group.transforms[i + 3], group.transforms[i + 4], group.transforms[i + 5]};
+			glm::vec3 scale{group.transforms[i + 6], group.transforms[i + 7], group.transforms[i + 8]};
 
 			glm::mat4 model = math::modelMatrix(pos, rot, scale);
 			gpuData.emplace_back(model, math::normalMatrix(model));

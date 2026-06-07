@@ -6,7 +6,7 @@
 #include "renderContext/renderContext.hpp"
 #include "renderContext/renderableObject.hpp"
 #include "renderContext/renderQueue.hpp"
-#include "renderContext/instanceGroup.hpp"
+#include "renderContext/renderGroup.hpp"
 #include "../ECS/components/mesh.hpp"
 
 void RenderCommand::forward(const RenderContext& ctx, const std::vector<RenderableObject>& objects) {
@@ -30,13 +30,13 @@ void RenderCommand::forward(const RenderContext& ctx, const std::vector<Renderab
 }
 
 void RenderCommand::instanced(const RenderContext& ctx, const std::vector<InstanceGroup>& objects) {
-	for (const auto& [entityID, transforms, matBatch]: objects) {
-		const size_t count = transforms.size() / 9;
+	for (const auto& obj: objects) {
+		const size_t count = obj.transforms.size() / 9;
 
-		const auto& [materialIdx, textureOffset, textureCount, shader, meshes] = matBatch;
+		const auto& [materialIdx, textureOffset, textureCount, shader, meshes] = obj.matBatch;
 		shader->activate();
 
-		setupMaterial(entityID, materialIdx, textureOffset, textureCount, ctx, *shader);
+		setupMaterial(obj.entityID, materialIdx, textureOffset, textureCount, ctx, *shader);
 
 		for (const auto& meshIdx: meshes) {
 			const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];

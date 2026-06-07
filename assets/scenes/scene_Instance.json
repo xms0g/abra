@@ -25,8 +25,8 @@
       }
     },
     {
-      "name": "Suzanne",
-      "model_path": "Suzanne/glTF/Suzanne.gltf",
+      "name": "Cube",
+      "primitive": "Cube",
       "components": {
         "TransformComponent": {
           "position": [0.0, 0.0, 0.0],
@@ -34,7 +34,12 @@
           "scale": [0.5, 0.5, 0.5]
         },
         "MeshComponent": { "from_resource_manager": true },
-        "MaterialComponent": { "from_resource_manager": true },
+        "MaterialComponent": {
+          "albedo_texture": "textures/brickwall.jpg",
+          "specular_texture": "textures/brickwall_specular.jpg",
+          "normal_texture": "textures/brickwall_normal.jpg",
+          "from_resource_manager": true
+        },
         "BoundingVolumeComponent": { "type": "AABB" },
         "DebugComponent": {},
         "InstanceComponent": {

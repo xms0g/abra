@@ -16,7 +16,6 @@
 #include "renderContext/renderFlags.hpp"
 #include "renderContext/renderGroup.hpp"
 #include "renderContext/renderableObject.hpp"
-#include "renderContext/instanceGroup.hpp"
 #include "renderPasses/IRenderPass.hpp"
 #include "renderPasses/deferredGeometryPass.h"
 #include "renderPasses/deferredLightingPass.h"
@@ -377,40 +376,36 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		MaterialBatch matBatch{material.idx, textureOffset, textureCount, nullptr, meshIndices};
 		textureOffset += textureCount;
 
-		if (entity.hasComponent<InstanceComponent>()) {
-			// Set shader
-			if (material.flags & OPAQUE) {
-				matBatch.shader = ResourceManager::instance().get<Shader>("instancedOpaque");
-			} else if (material.flags & BLEND) {
-				matBatch.shader = ResourceManager::instance().get<Shader>("instancedBlend");
-			}
-
-			const auto& instComponent = entity.getComponent<InstanceComponent>();
-			InstanceGroup instance{entity.id(), *instComponent.transforms, matBatch};
-
-			if (material.flags & OPAQUE) {
-				mRenderQueue.opaqueInstancedGroups.push_back(instance);
-			} else if (material.flags & BLEND) {
-				mRenderQueue.blendInstancedGroups.push_back(instance);
-			}
-
-			continue;
-		}
-
 		// Set shader
 		if (material.flags & OPAQUE) {
 			if (material.flags & UNLIT) {
 				matBatch.shader = ResourceManager::instance().get<Shader>("unlit");
 			} else {
-				matBatch.shader = ResourceManager::instance().get<Shader>("opaque");
+				if (entity.hasComponent<InstanceComponent>()) {
+					matBatch.shader = ResourceManager::instance().get<Shader>("instancedOpaque");
+				} else {
+					matBatch.shader = ResourceManager::instance().get<Shader>("opaque");
+				}
 			}
 		} else if (material.flags & BLEND) {
-			matBatch.shader = ResourceManager::instance().get<Shader>("blend");
+			if (entity.hasComponent<InstanceComponent>()) {
+				matBatch.shader = ResourceManager::instance().get<Shader>("instancedBlend");
+			} else {
+				matBatch.shader = ResourceManager::instance().get<Shader>("blend");
+			}
 		} else if (material.flags & CUBEMAP) {
 			matBatch.shader = ResourceManager::instance().get<Shader>("skybox");
 		}
 
-		const RenderGroup group{entity.id(), matBatch};
+		RenderGroup group;
+		InstanceGroup instance;
+
+		if (entity.hasComponent<InstanceComponent>()) {
+			const auto& instComponent = entity.getComponent<InstanceComponent>();
+			instance = {entity.id(), matBatch, *instComponent.transforms};
+		} else {
+			group = {entity.id(), matBatch};
+		}
 
 		if (entity.hasComponent<DebugComponent>()) {
 			mRenderQueue.debugGroups.push_back(group);
@@ -423,9 +418,17 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		if (material.flags & PBR) {
 			mRenderQueue.deferredGroups.push_back(group);
 		} else if (material.flags & OPAQUE) {
-			mRenderQueue.opaqueGroups.push_back(group);
+			if (entity.hasComponent<InstanceComponent>()) {
+				mRenderQueue.opaqueInstancedGroups.push_back(instance);
+			} else {
+				mRenderQueue.opaqueGroups.push_back(group);
+			}
 		} else if (material.flags & BLEND) {
-			mRenderQueue.blendGroups.push_back(group);
+			if (entity.hasComponent<InstanceComponent>()) {
+				mRenderQueue.blendInstancedGroups.push_back(instance);
+			} else {
+				mRenderQueue.blendGroups.push_back(group);
+			}
 		} else if (material.flags & CUBEMAP) {
 			mRenderQueue.skybox.push_back(group);
 		}
