@@ -350,36 +350,6 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 
 	auto& matComponent = entity.getComponent<MaterialComponent>();
 
-	if (entity.hasComponent<SkyboxComponent>()) {
-		const auto& material = matComponent.materials->at(0);
-
-		mRenderQueue.material.flags.emplace_back(material.flags);
-		mRenderQueue.material.alphaCutoffs.emplace_back(material.alphaCutoff);
-		mRenderQueue.material.colors.emplace_back(0.0f);
-
-		mRenderQueue.material.textures.push_back(material.textures[0].id);
-
-		auto& meshes = entity.getComponent<MeshComponent>().meshes->at(0);
-		mRenderQueue.mesh.vaos.push_back(meshes[0].vao().id());
-		mRenderQueue.mesh.vertexCounts.push_back(meshes[0].vertices().size());
-		mRenderQueue.mesh.indexCounts.push_back(meshes[0].indices().size());
-		mRenderQueue.mesh.maxCounts.push_back(meshes[0].max());
-		mRenderQueue.mesh.minCounts.push_back(meshes[0].min());
-
-		std::vector<uint32_t> indices{meshIndex++};
-
-		const MaterialBatch matBatch{
-			materialIndex++,
-			textureOffset++,
-			1,
-			ResourceManager::instance().get<Shader>("skybox"),
-			indices
-		};
-		const RenderGroup group{entity.id(), matBatch};
-		mRenderQueue.skybox.push_back(group);
-		return;
-	}
-
 	for (auto& [matID, meshes]: *entity.getComponent<MeshComponent>().meshes) {
 		std::vector<uint32_t> meshIndices;
 
@@ -426,6 +396,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 
 			continue;
 		}
+
 		// Set shader
 		if (material.flags & OPAQUE) {
 			if (material.flags & UNLIT) {
@@ -435,6 +406,8 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			}
 		} else if (material.flags & BLEND) {
 			matBatch.shader = ResourceManager::instance().get<Shader>("blend");
+		} else if (material.flags & CUBEMAP) {
+			matBatch.shader = ResourceManager::instance().get<Shader>("skybox");
 		}
 
 		const RenderGroup group{entity.id(), matBatch};
@@ -453,6 +426,8 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			mRenderQueue.opaqueGroups.push_back(group);
 		} else if (material.flags & BLEND) {
 			mRenderQueue.blendGroups.push_back(group);
+		} else if (material.flags & CUBEMAP) {
+			mRenderQueue.skybox.push_back(group);
 		}
 	}
 }
