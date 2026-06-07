@@ -1,5 +1,7 @@
 #include "renderPipeline.h"
 #include <SDL.h>
+#include <secure/_string.h>
+
 #include "glad/glad.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/norm.hpp"
@@ -178,7 +180,7 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 
 	if (!mRenderQueue.deferredGroups.empty()) {
 		mRenderPasses.push_back(std::make_shared<DeferredGeometryPass>());
-		mRenderPasses.push_back( std::make_shared<SSAOPass>());
+		mRenderPasses.push_back(std::make_shared<SSAOPass>());
 		mRenderPasses.push_back(std::make_shared<DeferredLightingPass>());
 	}
 
@@ -225,8 +227,8 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	const glm::mat4 invProjectionMat = glm::inverse(projectionMat);
 
 	mCameraUBO->bind();
-	mCameraUBO->setData(glm::value_ptr(projectionMat), sizeof(glm::mat4),sizeof(glm::mat4) + sizeof(glm::vec4));
-	mCameraUBO->setData(glm::value_ptr(invProjectionMat),sizeof(glm::mat4),2 * sizeof(glm::mat4) + sizeof(glm::vec4));
+	mCameraUBO->setData(glm::value_ptr(projectionMat), sizeof(glm::mat4), sizeof(glm::mat4) + sizeof(glm::vec4));
+	mCameraUBO->setData(glm::value_ptr(invProjectionMat), sizeof(glm::mat4), 2 * sizeof(glm::mat4) + sizeof(glm::vec4));
 	mCameraUBO->unbind();
 
 	// Configure render passes
@@ -235,27 +237,9 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	}
 
 	const std::vector<UniformBinding> uboBindings = {
-		{
-			CAMERA_UBO_BLOCK_NAME,
-			CAMERA_UBO_BINDING,
-			[ptr = mCameraUBO.get()](const uint32_t a, const uint32_t b, const char* c) {
-				ptr->configure(a, b, c);
-			}
-		},
-		{
-			LIGHT_UBO_BLOCK_NAME,
-			LIGHT_UBO_BINDING,
-			[ptr = mLightSystem->ubo()](const uint32_t a, const uint32_t b, const char* c) {
-				ptr->configure(a, b, c);
-			}
-		},
-		{
-			SHADOW_UBO_BLOCK_NAME,
-			SHADOW_UBO_BINDING,
-			[ptr = mShadowSystem->ubo()](const uint32_t a, const uint32_t b, const char* c) {
-				ptr->configure(a, b, c);
-			}
-		}
+		{CAMERA_UBO_BLOCK_NAME, CAMERA_UBO_BINDING, mCameraUBO.get(), &UniformBuffer::configure},
+		{LIGHT_UBO_BLOCK_NAME, LIGHT_UBO_BINDING, mLightSystem->ubo(), &UniformBuffer::configure},
+		{SHADOW_UBO_BLOCK_NAME, SHADOW_UBO_BINDING, mShadowSystem->ubo(), &UniformBuffer::configure}
 	};
 
 	const std::vector<TextureBinding> shadowMapBindings = {
@@ -266,8 +250,8 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 
 	// Configure shaders
 	for (const auto& [name,shader]: ResourceManager::instance().getShaders()) {
-		for (const auto& [blockName, binding, configure]: uboBindings) {
-			configure(shader->id(), binding, blockName.c_str());
+		for (const auto& [blockName, binding, buffer, configure]: uboBindings) {
+			std::invoke(configure, buffer, shader->id(), binding, blockName.c_str());
 		}
 
 		RenderCommand::setTextureUnits(shadowMapBindings, *shader);

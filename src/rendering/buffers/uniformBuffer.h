@@ -8,7 +8,8 @@ class UniformBuffer;
 struct UniformBinding {
 	std::string name;
 	uint32_t binding;
-	std::function<void(uint32_t, uint32_t, const char*)> configure;
+	const UniformBuffer* buffer;
+	void (UniformBuffer::* configure)(uint32_t, uint32_t, const char*) const;
 };
 
 class UniformBuffer : public Buffer {
