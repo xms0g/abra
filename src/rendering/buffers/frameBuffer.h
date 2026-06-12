@@ -31,6 +31,8 @@ public:
 
 	void checkStatus();
 
+	virtual void generateMipmaps() = 0;
+
 protected:
 	[[nodiscard]]
 	virtual uint32_t textureImpl(uint32_t index) const = 0;
@@ -80,6 +82,8 @@ public:
 
 	FrameBuffer& configureAttachments();
 
+	void generateMipmaps() override;
+
 protected:
 	[[nodiscard]]
 	uint32_t textureImpl(uint32_t index) const override;
@@ -109,6 +113,8 @@ public:
 	~CubemapBuffer() override;
 
 	void bindFace(uint32_t face, int32_t mip = 0) const;
+
+	void generateMipmaps() override;
 
 protected:
 	[[nodiscard]]

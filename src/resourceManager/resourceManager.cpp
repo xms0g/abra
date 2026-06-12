@@ -385,7 +385,7 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 	envMapBuffer->unbind();
 
 	envMapBuffer->bindTexture(0);
-	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+	envMapBuffer->generateMipmaps();
 
 	glDepthFunc(GL_LESS);
 

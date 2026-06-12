@@ -314,7 +314,8 @@ FrameBuffer& FrameBuffer::withRenderBufferDepth(const uint32_t internalFormat) {
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(const int32_t multisampledCount,const uint32_t internalFormat) {
+FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(const int32_t multisampledCount,
+                                                            const uint32_t internalFormat) {
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 
@@ -336,7 +337,8 @@ FrameBuffer& FrameBuffer::withRenderBufferDepthStencil(const int32_t internalFor
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withRenderBufferDepthStencilMultisampled(const int32_t multisampledCount, const int32_t internalFormat) {
+FrameBuffer& FrameBuffer::withRenderBufferDepthStencilMultisampled(const int32_t multisampledCount,
+                                                                   const int32_t internalFormat) {
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 
@@ -355,6 +357,10 @@ FrameBuffer& FrameBuffer::configureAttachments() {
 	glDrawBuffers(static_cast<int32_t>(mAttachments.size()), mAttachments.data());
 
 	return *this;
+}
+
+void FrameBuffer::generateMipmaps() {
+	glGenerateMipmap(GL_TEXTURE_2D);
 }
 
 uint32_t FrameBuffer::textureImpl(const uint32_t index) const {
@@ -459,6 +465,10 @@ void CubemapBuffer::bindFace(const uint32_t face, const int32_t mip) const {
 		mip);
 
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+}
+
+void CubemapBuffer::generateMipmaps() {
+	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 }
 
 uint32_t CubemapBuffer::textureImpl(uint32_t index) const {
