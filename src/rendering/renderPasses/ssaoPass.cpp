@@ -45,10 +45,8 @@ void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	std::vector<float> noise;
 	noise.resize(ctx.ssao.noiseTextureSize * ctx.ssao.noiseTextureSize);
 	noise = math::random::generateNoise(ctx.ssao.noiseTextureSize * ctx.ssao.noiseTextureSize);
-	const uint32_t noiseTexture = texture::generate(ctx.ssao.noiseTextureSize, ctx.ssao.noiseTextureSize, noise.data());
-
-	glActiveTexture(GL_TEXTURE0 + ctx.ssao.noise.textureSlot);
-	glBindTexture(GL_TEXTURE_2D, noiseTexture);
+	const Texture noiseTexture = texture::generate(ctx.ssao.noiseTextureSize, ctx.ssao.noiseTextureSize, noise.data());
+	noiseTexture.bind(ctx.ssao.noise.textureSlot);
 
 	std::vector<glm::vec4> kernel;
 	kernel.resize(ctx.ssao.kernelSize);

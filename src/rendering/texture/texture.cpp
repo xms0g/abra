@@ -4,7 +4,7 @@
 #include "image/stb_image.h"
 #include "../material/material.hpp"
 
-uint32_t texture::generate(const int32_t width, const int32_t height, const float* data) {
+Texture texture::generate(const int32_t width, const int32_t height, const float* data) {
 	uint32_t textureID;
 
 	glGenTextures(1, &textureID);
@@ -26,7 +26,7 @@ uint32_t texture::generate(const int32_t width, const int32_t height, const floa
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	return textureID;
+	return {textureID, GL_TEXTURE_2D, ""};
 }
 
 uint32_t texture::load(const char* path, const uint32_t flags, const bool isSRGB) {
@@ -95,8 +95,8 @@ uint32_t texture::loadCubemap(const std::vector<std::string>& faces) {
 	return textureID;
 }
 
-uint32_t texture::loadHDR(const char* path) {
-	uint32_t hdrTexture;
+Texture texture::loadHDR(const char* path) {
+	uint32_t texID;
 	int32_t width, height, channel;
 
 	stbi_set_flip_vertically_on_load(true);
@@ -104,11 +104,11 @@ uint32_t texture::loadHDR(const char* path) {
 	float* data = stbi_loadf(path, &width, &height, &channel, 0);
 	if (!data) {
 		std::cerr << "HDR texture failed to load at path: " << path << std::endl;
-		return 0;
+		return {};
 	}
 
-	glGenTextures(1, &hdrTexture);
-	glBindTexture(GL_TEXTURE_2D, hdrTexture);
+	glGenTextures(1, &texID);
+	glBindTexture(GL_TEXTURE_2D, texID);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -120,5 +120,10 @@ uint32_t texture::loadHDR(const char* path) {
 
 	stbi_set_flip_vertically_on_load(false);
 
-	return hdrTexture;
+	return {texID, GL_TEXTURE_2D, ""};
+}
+
+void Texture::bind(const uint32_t slot) const {
+	glActiveTexture(GL_TEXTURE0 + slot);
+	glBindTexture(GL_TEXTURE_2D, id);
 }
