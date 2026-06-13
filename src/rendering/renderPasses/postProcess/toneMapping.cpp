@@ -20,8 +20,8 @@ uint32_t ToneMapping::render(
 	const uint32_t vao,
 	const uint32_t sceneTexture,
 	bool& toggle,
-	PingPongBuffer& pingPong) const {
-	pingPong[toggle]->bind();
+	PingPongBuffer& renderTargets) const {
+	renderTargets[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	mShader->activate();
@@ -30,7 +30,7 @@ uint32_t ToneMapping::render(
 	uint32_t textures[] = {sceneTexture};
 	RenderCommand::drawQuad(vao, textures);
 
-	const uint32_t texture = pingPong[toggle]->texture();
+	const uint32_t texture = renderTargets[toggle]->texture();
 	toggle = !toggle;
 	return texture;
 }

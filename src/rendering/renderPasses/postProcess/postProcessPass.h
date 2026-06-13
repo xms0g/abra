@@ -25,7 +25,7 @@ public:
 private:
 	void onGuiUpdate(const GuiPostProcessEvent& event);
 
-	PingPongBuffer mPingPong;
+	PingPongBuffer mRenderTargets;
 	std::unique_ptr<Models::Quad> mQuad;
 	std::vector<std::shared_ptr<BasePostEffect> > mEffects;
 };

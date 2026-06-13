@@ -24,7 +24,7 @@ Bloom::Bloom(const std::string& name, const RenderContext& ctx, const bool enabl
 	RenderCommand::setTextureUnits(textureBindings, *mBlur);
 	RenderCommand::setTextureUnits(combineTextureBindings, *mCombine);
 
-	for (auto& target: mPingPong) {
+	for (auto& target: mRenderTargets) {
 		target = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
 #ifdef HDR
 		target->withTextureFP(GL_RGBA)
@@ -41,9 +41,9 @@ uint32_t Bloom::render(
 	const uint32_t vao,
 	const uint32_t sceneTexture,
 	bool& toggle,
-	PingPongBuffer& pingPong) const {
+	PingPongBuffer& renderTargets) const {
 	(void) toggle;
-	(void) pingPong;
+	(void) renderTargets;
 	bool toggle_ = false;
 	uint32_t inputTex = sceneTexture;
 
@@ -58,7 +58,7 @@ void Bloom::updateFromEventImpl(const GuiPostProcessEvent& event) {
 }
 
 uint32_t Bloom::brightFilterPass(const uint32_t vao, const uint32_t sceneTexture, bool& toggle) const {
-	mPingPong[toggle]->bind();
+	mRenderTargets[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	mBrightFilter->activate();
@@ -66,7 +66,7 @@ uint32_t Bloom::brightFilterPass(const uint32_t vao, const uint32_t sceneTexture
 	uint32_t textures[] = {sceneTexture};
 	RenderCommand::drawQuad(vao, textures);
 
-	const uint32_t outTex = mPingPong[toggle]->texture();
+	const uint32_t outTex = mRenderTargets[toggle]->texture();
 	toggle = !toggle;
 	return outTex;
 }
@@ -76,7 +76,7 @@ uint32_t Bloom::blurPass(const uint32_t vao, const uint32_t sceneTexture, bool& 
 	uint32_t outTex = sceneTexture;
 
 	for (int i = 0; i < 10; ++i) {
-		mPingPong[toggle]->bind();
+		mRenderTargets[toggle]->bind();
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		mBlur->activate();
@@ -86,7 +86,7 @@ uint32_t Bloom::blurPass(const uint32_t vao, const uint32_t sceneTexture, bool& 
 		uint32_t textures[] = {outTex};
 		RenderCommand::drawQuad(vao, textures);
 
-		outTex = mPingPong[toggle]->texture();
+		outTex = mRenderTargets[toggle]->texture();
 		toggle = !toggle;
 	}
 
@@ -98,11 +98,11 @@ uint32_t Bloom::combinePass(
 	const uint32_t sceneTexture,
 	const uint32_t blurTexture,
 	const bool& toggle) const {
-	mPingPong[toggle]->bind();
+	mRenderTargets[toggle]->bind();
 	mCombine->activate();
 
 	uint32_t textures[] = {sceneTexture, blurTexture};
 	RenderCommand::drawQuad(vao, textures);
 
-	return mPingPong[toggle]->texture();
+	return mRenderTargets[toggle]->texture();
 }

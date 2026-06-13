@@ -2,10 +2,8 @@
 #include <memory>
 #include <array>
 #include <string>
+#include "../../types.hpp"
 #include "../../../event/events/guiPostProcessEvent.hpp"
-
-class FrameBuffer;
-using PingPongBuffer = std::array<std::unique_ptr<FrameBuffer>, 2>;
 
 class BasePostEffect {
 public:
@@ -29,7 +27,7 @@ public:
 		uint32_t vao,
 		uint32_t sceneTexture,
 		bool& toggle,
-		PingPongBuffer& pingPong) const = 0;
+		PingPongBuffer& renderTargets) const = 0;
 
 	void updateFromEvent(const GuiPostProcessEvent& event) {
 		this->enabled(event.enabled);

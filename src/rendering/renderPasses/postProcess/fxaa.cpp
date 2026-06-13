@@ -20,12 +20,12 @@ uint32_t FXAA::render(
 	const uint32_t vao,
 	const uint32_t sceneTexture,
 	bool& toggle,
-	PingPongBuffer& pingPong) const {
-	pingPong[toggle]->bind();
+	PingPongBuffer& renderTargets) const {
+	renderTargets[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	const int32_t width = pingPong[toggle]->width();
-	const int32_t height = pingPong[toggle]->height();
+	const int32_t width = renderTargets[toggle]->width();
+	const int32_t height = renderTargets[toggle]->height();
 
 	mShader->activate();
 	mShader->setVec2("resolution", glm::vec2(width, height));
@@ -33,7 +33,7 @@ uint32_t FXAA::render(
 	uint32_t textures[] = {sceneTexture};
 	RenderCommand::drawQuad(vao, textures);
 
-	const uint32_t texture = pingPong[toggle]->texture();
+	const uint32_t texture = renderTargets[toggle]->texture();
 	toggle = !toggle;
 	return texture;
 }

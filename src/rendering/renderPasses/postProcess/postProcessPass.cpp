@@ -34,7 +34,7 @@ void PostProcessPass::configure(RenderContext& ctx, EventBus& eventBus) {
 		std::make_shared<FXAA>("FXAA", ctx, false),
 	};
 
-	for (auto& target: mPingPong) {
+	for (auto& target: mRenderTargets) {
 		target = std::make_unique<FrameBuffer>(
 			static_cast<int32_t>(ctx.screen.width),
 			static_cast<int32_t>(ctx.screen.height));
@@ -58,7 +58,7 @@ void PostProcessPass::execute(const RenderContext& ctx) {
 		if (!effect->enabled())
 			continue;
 
-		inputTex = effect->render(mQuad->vao(), inputTex, toggle, mPingPong);
+		inputTex = effect->render(mQuad->vao(), inputTex, toggle, mRenderTargets);
 	}
 
 	mQuad->shader().activate();

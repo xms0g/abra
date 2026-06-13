@@ -14,7 +14,7 @@ public:
 		uint32_t vao,
 		uint32_t sceneTexture,
 		bool& toggle,
-		PingPongBuffer& pingPong) const override;
+		PingPongBuffer& renderTargets) const override;
 
 protected:
 	void updateFromEventImpl(const GuiPostProcessEvent& event) override;

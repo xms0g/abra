@@ -16,7 +16,7 @@ public:
 		uint32_t vao,
 		uint32_t sceneTexture,
 		bool& toggle,
-		PingPongBuffer& pingPong) const override;
+		PingPongBuffer& renderTargets) const override;
 
 protected:
 	void updateFromEventImpl(const GuiPostProcessEvent& event) override;
@@ -33,7 +33,7 @@ private:
 		uint32_t blurTexture,
 		const bool& toggle) const;
 
-	PingPongBuffer mPingPong;
+	PingPongBuffer mRenderTargets;
 
 	const Shader* mBrightFilter;
 	const Shader* mBlur;
