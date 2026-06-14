@@ -32,7 +32,7 @@ void drawMesh(uint32_t vao, size_t vertexCount, size_t indexCount);
 
 void drawQuad(uint32_t vao);
 
-void drawQuad(uint32_t vao, std::span<uint32_t> textures);
+void drawQuad(uint32_t vao, std::span<const uint32_t> textures);
 
 void bindShadowMaps(const RenderContext& ctx);
 }

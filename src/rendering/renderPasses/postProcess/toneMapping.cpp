@@ -27,7 +27,7 @@ uint32_t ToneMapping::render(
 	mShader->activate();
 	mShader->setFloat("exposure", mExposure);
 
-	uint32_t textures[] = {sceneTexture};
+	const uint32_t textures[] = {sceneTexture};
 	RenderCommand::drawQuad(vao, textures);
 
 	const uint32_t texture = renderTargets[toggle]->texture();

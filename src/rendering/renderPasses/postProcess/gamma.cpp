@@ -26,7 +26,7 @@ uint32_t Gamma::render(
 
 	mShader->activate();
 
-	uint32_t textures[] = {sceneTexture};
+	const uint32_t textures[] = {sceneTexture};
 	RenderCommand::drawQuad(vao, textures);
 
 	const uint32_t texture = renderTargets[toggle]->texture();

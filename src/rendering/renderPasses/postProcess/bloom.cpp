@@ -63,7 +63,7 @@ uint32_t Bloom::brightFilterPass(const uint32_t vao, const uint32_t sceneTexture
 
 	mBrightFilter->activate();
 
-	uint32_t textures[] = {sceneTexture};
+	const uint32_t textures[] = {sceneTexture};
 	RenderCommand::drawQuad(vao, textures);
 
 	const uint32_t outTex = mRenderTargets[toggle]->texture();

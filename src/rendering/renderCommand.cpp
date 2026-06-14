@@ -140,7 +140,7 @@ void RenderCommand::drawQuad(const uint32_t vao) {
 	glEnable(GL_DEPTH_TEST);
 }
 
-void RenderCommand::drawQuad(const uint32_t vao, const std::span<uint32_t> textures) {
+void RenderCommand::drawQuad(const uint32_t vao, const std::span<const uint32_t> textures) {
 	glDisable(GL_DEPTH_TEST);
 	glBindVertexArray(vao);
 

@@ -28,7 +28,7 @@ uint32_t Kernel::render(
 	mShader->activate();
 	mShader->setFloatArray("kernel", mKernel, 9);
 
-	uint32_t textures[] = {sceneTexture};
+	const uint32_t textures[] = {sceneTexture};
 	RenderCommand::drawQuad(vao, textures);
 
 	const uint32_t texture = renderTargets[toggle]->texture();

@@ -27,7 +27,7 @@ uint32_t CA::render(
 	mShader->activate();
 	mShader->setFloat("intensity", mIntensity);
 
-	uint32_t textures[] = {sceneTexture};
+	const uint32_t textures[] = {sceneTexture};
 	RenderCommand::drawQuad(vao, textures);
 
 	const uint32_t texture = renderTargets[toggle]->texture();

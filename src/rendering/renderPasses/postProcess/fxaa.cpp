@@ -30,7 +30,7 @@ uint32_t FXAA::render(
 	mShader->activate();
 	mShader->setVec2("resolution", glm::vec2(width, height));
 
-	uint32_t textures[] = {sceneTexture};
+	const uint32_t textures[] = {sceneTexture};
 	RenderCommand::drawQuad(vao, textures);
 
 	const uint32_t texture = renderTargets[toggle]->texture();
