@@ -6,7 +6,7 @@
 #include "../../config/config.hpp"
 #include "../../io/filesystem.hpp"
 
-Models::Sphere::Sphere(
+Model::Sphere::Sphere(
 	glm::vec3 color,
 	bool unlit,
 	const char* albedo,
@@ -144,12 +144,12 @@ Models::Sphere::Sphere(
 	mMaterial[0] = {.id = 0, .flags = flags, .color = color, .textures = textures};
 }
 
-Models::Sphere::~Sphere() = default;
+Model::Sphere::~Sphere() = default;
 
-MeshMap& Models::Sphere::meshes() {
+MeshMap& Model::Sphere::meshes() {
 	return mMeshes;
 }
 
-MaterialMap& Models::Sphere::material() {
+MaterialMap& Model::Sphere::material() {
 	return mMaterial;
 }

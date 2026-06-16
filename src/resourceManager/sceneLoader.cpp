@@ -121,7 +121,7 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 			};
 
 			if (primType == "Cube") {
-				uploadPrimitives.operator()<Models::Cube>(
+				uploadPrimitives.operator()<Model::Cube>(
 					color,
 					unlit,
 					albedoTexture,
@@ -129,7 +129,7 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 					normalTexture,
 					heightTexture);
 			} else if (primType == "Plane") {
-				uploadPrimitives.operator()<Models::Plane>(
+				uploadPrimitives.operator()<Model::Plane>(
 					color,
 					unlit,
 					albedoTexture,
@@ -140,7 +140,7 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 		} else if (isPrimitive && primType == "Cubemap") {
 			auto faces = comps["SkyboxComponent"]["faces"].get<std::vector<std::string> >();
 
-			Models::Cubemap cubemap{faces};
+			Model::Cubemap cubemap{faces};
 
 			ResourceManager::instance().upload<MeshMap>(entity.id(), cubemap.meshes());
 			ResourceManager::instance().upload<MaterialMap>(entity.id(), cubemap.material());
@@ -168,7 +168,7 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 				orm = matCom["orm"].get<std::string>();
 			}
 
-			Models::Sphere sphere{
+			Model::Sphere sphere{
 				color,
 				unlit,
 				TEXTURE_PTR(albedo),

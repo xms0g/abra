@@ -359,7 +359,7 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 
 	const auto& envMapBuffer = mBuffers.at("envMap");
 
-	Models::Cube cube;
+	Model::Cube cube;
 	cube.meshes().at(0).front().uploadToGPU();
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
@@ -401,7 +401,7 @@ void ResourceManager::createIrradianceMap() {
 	const auto irradianceMapBuffer = get<BaseFrameBuffer>("irradianceMap");
 	const auto envMapBuffer = get<BaseFrameBuffer>("envMap");
 
-	Models::Cube cube;
+	Model::Cube cube;
 	cube.meshes().at(0).front().uploadToGPU();
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
@@ -436,7 +436,7 @@ void ResourceManager::createPrefilterMap() {
 	const auto prefilterMapBuffer = get<BaseFrameBuffer>("prefilterMap");
 	const auto envMapBuffer = get<BaseFrameBuffer>("envMap");
 
-	Models::Cube cube;
+	Model::Cube cube;
 	cube.meshes().at(0).front().uploadToGPU();
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
@@ -479,7 +479,7 @@ void ResourceManager::createBrdfLUT() {
 
 	const auto brdfLUTBuffer = get<BaseFrameBuffer>("brdfLUT");
 
-	const Models::SingleQuad quad;
+	const Model::SingleQuad quad;
 	// generate a 2D LUT from the BRDF equations used.
 	const auto brdfLUTShader = get<Shader>("brdfLUT");
 	brdfLUTShader->activate();

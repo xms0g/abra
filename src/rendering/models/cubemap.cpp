@@ -6,7 +6,7 @@
 #include "../../config/config.hpp"
 #include "../../io/filesystem.hpp"
 
-Models::Cubemap::Cubemap(std::vector<std::string>& faces) {
+Model::Cubemap::Cubemap(std::vector<std::string>& faces) {
 	constexpr float v[]= {
 		-1.0f,  1.0f, -1.0f,
 		-1.0f, -1.0f, -1.0f,
@@ -70,13 +70,13 @@ Models::Cubemap::Cubemap(std::vector<std::string>& faces) {
 	mMaterial[0] = {.flags = CUBEMAP, .textures = textures};
 }
 
-Models::Cubemap::~Cubemap() = default;
+Model::Cubemap::~Cubemap() = default;
 
-MeshMap& Models::Cubemap::meshes() {
+MeshMap& Model::Cubemap::meshes() {
 	return mMeshes;
 }
 
-MaterialMap& Models::Cubemap::material() {
+MaterialMap& Model::Cubemap::material() {
 	return mMaterial;
 }
 

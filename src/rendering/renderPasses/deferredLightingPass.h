@@ -20,5 +20,5 @@ public:
 
 private:
 	const Shader* mShader;
-	std::unique_ptr<Models::SingleQuad> mQuad;
+	std::unique_ptr<Model::SingleQuad> mQuad;
 };

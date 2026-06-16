@@ -6,7 +6,7 @@
 #include "../../config/config.hpp"
 #include "../../io/filesystem.hpp"
 
-Models::Cube::Cube(
+Model::Cube::Cube(
 	glm::vec3 color,
 	bool unlit,
 	const char* diffuseTexture,
@@ -154,12 +154,12 @@ Models::Cube::Cube(
 	mMaterial[0] = {.id = 0, .flags = flags, .color = color, .textures = textures};
 }
 
-Models::Cube::~Cube() = default;
+Model::Cube::~Cube() = default;
 
-MeshMap& Models::Cube::meshes() {
+MeshMap& Model::Cube::meshes() {
 	return mMeshes;
 }
 
-MaterialMap& Models::Cube::material() {
+MaterialMap& Model::Cube::material() {
 	return mMaterial;
 }

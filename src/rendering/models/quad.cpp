@@ -31,13 +31,13 @@ IQuad::~IQuad() {
 	glDeleteVertexArrays(1, &mVAO);
 }
 
-Models::Quad::Quad() {
+Model::Quad::Quad() {
 	mShader = std::make_unique<Shader>( "models/quad.vert", "models/quad.frag");
 	mShader->activate();
 	mShader->setInt("screenTexture", 0);
 }
 
-const Shader& Models::Quad::shader() const {
+const Shader& Model::Quad::shader() const {
 	return *mShader;
 }
 

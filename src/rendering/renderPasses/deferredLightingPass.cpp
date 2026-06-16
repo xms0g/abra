@@ -10,7 +10,7 @@
 DeferredLightingPass::~DeferredLightingPass() = default;
 
 void DeferredLightingPass::configure(RenderContext& ctx, EventBus& eventBus) {
-	mQuad = std::make_unique<Models::SingleQuad>();
+	mQuad = std::make_unique<Model::SingleQuad>();
 	mShader = ResourceManager::instance().get<Shader>("deferredLighting");
 
 	const std::vector<TextureBinding> textureBindings = {

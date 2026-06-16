@@ -8,7 +8,7 @@ struct GuiPostProcessEvent;
 class EventBus;
 struct RenderContext;
 
-namespace Models {
+namespace Model {
 class Quad;
 }
 
@@ -26,6 +26,6 @@ private:
 	void onGuiUpdate(const GuiPostProcessEvent& event);
 
 	PingPongBuffer mRenderTargets;
-	std::unique_ptr<Models::Quad> mQuad;
+	std::unique_ptr<Model::Quad> mQuad;
 	std::vector<std::shared_ptr<BasePostEffect> > mEffects;
 };

@@ -12,7 +12,7 @@
 SSAOPass::~SSAOPass() = default;
 
 void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
-	mQuad = std::make_unique<Models::SingleQuad>();
+	mQuad = std::make_unique<Model::SingleQuad>();
 	mFBO = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
 	mFBO->withTextureFP(GL_RED)
 			.checkStatus();

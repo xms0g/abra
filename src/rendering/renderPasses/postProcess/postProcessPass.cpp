@@ -20,7 +20,7 @@
 PostProcessPass::~PostProcessPass() = default;
 
 void PostProcessPass::configure(RenderContext& ctx, EventBus& eventBus) {
-	mQuad = std::make_unique<Models::Quad>();
+	mQuad = std::make_unique<Model::Quad>();
 	mEffects = {
 		std::make_shared<Bloom>("Bloom", ctx, false),
 		std::make_shared<ToneMapping>("Tone Mapping", ctx, false),

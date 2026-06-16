@@ -4,7 +4,7 @@
 #include "glm/glm.hpp"
 #include "../types.hpp"
 
-namespace Models {
+namespace Model {
 class Plane {
 public:
 	explicit Plane(

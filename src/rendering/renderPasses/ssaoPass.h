@@ -9,7 +9,7 @@ class UniformBuffer;
 class FrameBuffer;
 class Shader;
 
-namespace Models {
+namespace Model {
 class SingleQuad;
 }
 
@@ -26,7 +26,7 @@ private:
 
 	void blur() const;
 
-	std::unique_ptr<Models::SingleQuad> mQuad;
+	std::unique_ptr<Model::SingleQuad> mQuad;
 	std::unique_ptr<FrameBuffer> mFBO;
 	std::unique_ptr<FrameBuffer> mBlurFBO;
 	const Shader* mShader;

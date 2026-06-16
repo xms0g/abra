@@ -16,7 +16,7 @@ protected:
 	uint32_t mVAO{0}, mVBO{0};
 };
 
-namespace Models {
+namespace Model {
 class SingleQuad final : public IQuad {
 public:
 	SingleQuad() = default;

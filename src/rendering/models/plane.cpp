@@ -6,7 +6,7 @@
 #include "../../config/config.hpp"
 #include "../../io/filesystem.hpp"
 
-Models::Plane::Plane(
+Model::Plane::Plane(
 	glm::vec3 color,
 	bool unlit,
 	const char* diffuseTexture,
@@ -109,12 +109,12 @@ Models::Plane::Plane(
 	mMaterial[0] = {.id = 0, .flags = flags, .color = color, .textures = textures};
 }
 
-Models::Plane::~Plane() = default;
+Model::Plane::~Plane() = default;
 
-MeshMap& Models::Plane::meshes() {
+MeshMap& Model::Plane::meshes() {
 	return mMeshes;
 }
 
-MaterialMap& Models::Plane::material() {
+MaterialMap& Model::Plane::material() {
 	return mMaterial;
 }

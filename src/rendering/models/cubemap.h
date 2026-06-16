@@ -4,7 +4,7 @@
 #include <span>
 #include "../types.hpp"
 
-namespace Models {
+namespace Model {
 class Cubemap {
 public:
 	explicit Cubemap(std::vector<std::string>& faces);
