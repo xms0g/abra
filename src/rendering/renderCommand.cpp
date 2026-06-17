@@ -155,20 +155,17 @@ void RenderCommand::drawQuad(const uint32_t vao, const std::span<const uint32_t>
 }
 
 void RenderCommand::bindShadowMaps(const RenderContext& ctx) {
-	struct ShadowBinding {
-		int32_t slot;
-		uint32_t target;
-		uint32_t mID;
-	};
+	static const int32_t slot = GL_TEXTURE0 + ctx.shadow.textureSlot;
+	static const uint32_t dirShadowMap = ctx.renderQueue->shadowMaps[0];
+	static const uint32_t omnidirShadowMap = ctx.renderQueue->shadowMaps[1];
+	static const uint32_t persShadowMap = ctx.renderQueue->shadowMaps[2];
 
-	const ShadowBinding shadowBindings[] = {
-		{GL_TEXTURE0 + ctx.shadow.textureSlot, GL_TEXTURE_2D, ctx.renderQueue->shadowMaps[0]},
-		{GL_TEXTURE0 + ctx.shadow.textureSlot + 1, GL_TEXTURE_CUBE_MAP_ARRAY, ctx.renderQueue->shadowMaps[1]},
-		{GL_TEXTURE0 + ctx.shadow.textureSlot + 2, GL_TEXTURE_2D_ARRAY, ctx.renderQueue->shadowMaps[2]},
-	};
+	glActiveTexture(slot);
+	glBindTexture(GL_TEXTURE_2D, dirShadowMap);
 
-	for (const auto& [slot, target, mID]: shadowBindings) {
-		glActiveTexture(slot);
-		glBindTexture(target, mID);
-	}
+	glActiveTexture(slot + 1);
+	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, omnidirShadowMap);
+
+	glActiveTexture(slot + 2);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, persShadowMap);
 }
