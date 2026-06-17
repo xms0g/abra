@@ -6,7 +6,7 @@
 #include "../io/filesystem.hpp"
 #include "../config/config.hpp"
 
-Shader::Shader(const char* vs, const char* fs, const char* gs) {
+Shader::Shader(const char* vs, const char* fs, const char* gs, const char* tcs, const char* tes) {
 	std::unordered_set<std::string> includedFiles{};
 
 	try {
@@ -16,16 +16,28 @@ Shader::Shader(const char* vs, const char* fs, const char* gs) {
 		includedFiles.clear();
 		const std::string geometryCode = gs ? preprocess(loadFile(gs), gs, includedFiles) : "";
 		includedFiles.clear();
+		const std::string tessControlCode = tcs ? preprocess(loadFile(tcs), tcs, includedFiles) : "";
+		includedFiles.clear();
+		const std::string tessEvaluationCode = tes ? preprocess(loadFile(tes), tes, includedFiles) : "";
+		includedFiles.clear();
 
 		const uint32_t vertex = compileShader(vertexCode, vs, GL_VERTEX_SHADER);
 		const uint32_t fragment = compileShader(fragmentCode, fs, GL_FRAGMENT_SHADER);
-		uint32_t geometry = 0;
+		uint32_t geometry = 0, tessControl = 0, tessEvaluation = 0;
 
 		if (gs) {
 			geometry = compileShader(geometryCode, gs, GL_GEOMETRY_SHADER);
 		}
 
-		linkShader(vertex, fragment, geometry);
+		if (tcs) {
+			tessControl = compileShader(tessControlCode, tcs, GL_TESS_CONTROL_SHADER);
+		}
+
+		if (tes) {
+			tessEvaluation = compileShader(tessEvaluationCode, tes, GL_TESS_EVALUATION_SHADER);
+		}
+
+		linkShader(vertex, fragment, geometry, tessControl, tessEvaluation);
 	} catch (std::runtime_error& e) {
 		throw std::runtime_error(std::string("Shader ") + e.what());
 	}
@@ -181,7 +193,12 @@ uint32_t Shader::compileShader(const std::string& source, const char* fn, const 
 	return shader;
 }
 
-uint32_t Shader::linkShader(const uint32_t vertex, const uint32_t fragment, const uint32_t geometry) {
+uint32_t Shader::linkShader(
+	const uint32_t vertex,
+	const uint32_t fragment,
+	const uint32_t geometry,
+	const uint32_t tessControl,
+	const uint32_t tessEvaluation) {
 	mID = glCreateProgram();
 
 	glAttachShader(mID, vertex);
@@ -189,6 +206,10 @@ uint32_t Shader::linkShader(const uint32_t vertex, const uint32_t fragment, cons
 
 	if (geometry != 0)
 		glAttachShader(mID, geometry);
+	if (tessControl != 0)
+		glAttachShader(mID, tessControl);
+	if (tessEvaluation != 0)
+		glAttachShader(mID, tessEvaluation);
 
 	glLinkProgram(mID);
 

@@ -5,7 +5,12 @@
 
 class Shader {
 public:
-	Shader(const char* vs, const char* fs, const char* gs = nullptr);
+	Shader(
+		const char* vs,
+		const char* fs,
+		const char* gs = nullptr,
+		const char* tcs = nullptr,
+		const char* tes = nullptr);
 
 	~Shader();
 
@@ -55,11 +60,17 @@ public:
 private:
 	std::string loadFile(const char* fn);
 
-	std::string preprocess(const std::string& source, const char* fileName, std::unordered_set<std::string>& includedFiles);
+	std::string preprocess(const std::string& source, const char* fileName,
+	                       std::unordered_set<std::string>& includedFiles);
 
 	uint32_t compileShader(const std::string& source, const char* fn, uint32_t type);
 
-	uint32_t linkShader(uint32_t vertex, uint32_t fragment, uint32_t geometry = 0);
+	uint32_t linkShader(
+		uint32_t vertex,
+		uint32_t fragment,
+		uint32_t geometry = 0,
+		uint32_t tessControl = 0,
+		uint32_t tessEvaluation = 0);
 
 	// the program ID
 	uint32_t mID{};
