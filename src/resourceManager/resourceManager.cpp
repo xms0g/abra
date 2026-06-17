@@ -24,6 +24,14 @@ ResourceManager& ResourceManager::instance() {
 }
 
 void ResourceManager::createShaders() {
+	// Terrain
+	mShaders.emplace("terrain",
+		std::make_unique<Shader>(
+			"models/terrain.vert",
+			"models/terrain.frag",
+			nullptr,
+			"models/terrain.tcs",
+			"models/terrain.tes"));
 	// Deferred
 	mShaders.emplace("gBuffer", std::make_unique<Shader>("deferred/gbuffer.vert", "deferred/gbuffer.frag"));
 	mShaders.emplace("deferredLighting", std::make_unique<Shader>("models/quad.vert", "deferred/lighting.frag"));

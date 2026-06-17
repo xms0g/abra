@@ -1,7 +1,5 @@
 #include "renderPipeline.h"
 #include <SDL.h>
-#include <secure/_string.h>
-
 #include "glad/glad.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/norm.hpp"
@@ -28,6 +26,7 @@
 #include "renderPasses/cullingPass.h"
 #include "renderPasses/skyboxPass.h"
 #include "renderPasses/resolvePass.h"
+#include "renderPasses/terrainPass.h"
 #include "renderPasses/postProcess/postProcessPass.h"
 #include "gui/backend.h"
 #include "material/material.hpp"
@@ -194,6 +193,10 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 
 	if (!mRenderQueue.opaqueInstancedGroups.empty() || !mRenderQueue.blendInstancedGroups.empty()) {
 		mRenderPasses.emplace_back(std::make_shared<InstancedPass>());
+	}
+
+	if (!mRenderQueue.terrain.empty()) {
+		mRenderPasses.emplace_back(std::make_shared<TerrainPass>());
 	}
 
 	mRenderPasses.emplace_back(std::make_shared<SkyboxPass>());
@@ -379,6 +382,8 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			}
 		} else if (material.flags & CUBEMAP) {
 			matBatch.shader = ResourceManager::instance().get<Shader>("skybox");
+		} else if (material.flags & TERRAIN) {
+			matBatch.shader = ResourceManager::instance().get<Shader>("terrain");
 		}
 
 		RenderGroup group;
@@ -415,6 +420,8 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			}
 		} else if (material.flags & CUBEMAP) {
 			mRenderQueue.skybox.push_back(group);
+		} else if (material.flags & TERRAIN) {
+			mRenderQueue.terrain.push_back(group);
 		}
 	}
 }

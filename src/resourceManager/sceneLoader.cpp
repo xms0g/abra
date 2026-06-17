@@ -23,6 +23,7 @@
 #include "../rendering/models/plane.h"
 #include "../rendering/models/cubemap.h"
 #include "../rendering/models/sphere.h"
+#include "../rendering/models/terrain.h"
 
 #define TEXTURE_PTR(tex) (!(tex).empty() ? (tex).c_str() : nullptr)
 
@@ -74,7 +75,7 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 
 	// Assemble Components
 	for (auto& [entity, comps, isPrimitive, primType]: deferredEntities) {
-		if (isPrimitive && (primType == "Cube" || primType == "Plane")) {
+		if (isPrimitive && (primType == "Cube" || primType == "Plane" || primType == "Terrain")) {
 			glm::vec3 color{0.0f};
 			bool unlit{false};
 			std::string albedoTexture;
@@ -136,6 +137,15 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 					specularTexture,
 					normalTexture,
 					heightTexture);
+			} else if (primType == "Terrain") {
+				uploadPrimitives.operator()<Model::Terrain>(
+					color,
+					unlit,
+					albedoTexture,
+					specularTexture,
+					normalTexture,
+					heightTexture
+				);
 			}
 		} else if (isPrimitive && primType == "Cubemap") {
 			auto faces = comps["SkyboxComponent"]["faces"].get<std::vector<std::string> >();
