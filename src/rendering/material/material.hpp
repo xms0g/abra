@@ -18,7 +18,8 @@ enum MaterialFlag: uint32_t {
 	HAS_ORM = 1 << 9,
 	ALPHACUTOFF = 1 << 10,
 	HAS_SOLID_COLOR = 1 << 11,
-	CUBEMAP = 1 << 12
+	CUBEMAP = 1 << 12,
+	TERRAIN = 1 << 13
 };
 
 class Shader;

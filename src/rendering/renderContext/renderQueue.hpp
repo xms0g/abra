@@ -17,6 +17,7 @@ struct RenderQueue {
 	std::vector<RenderGroup> blendGroups;
 	std::vector<RenderGroup> shadowGroups;
 	std::vector<RenderGroup> skybox;
+	std::vector<RenderGroup> terrain;
 	// Renderable Objects
 	std::vector<RenderableObject> deferredObjects;
 	std::vector<RenderableObject> opaqueObjects;
