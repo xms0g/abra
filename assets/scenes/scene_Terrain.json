@@ -36,6 +36,7 @@
         "MeshComponent": { "from_resource_manager": true },
         "MaterialComponent": {
           "height_texture": "textures/iceland_heightmap.png",
+          "height_scale": 64.0,
           "from_resource_manager": true
         },
         "BoundingVolumeComponent": { "type": "AABB" },

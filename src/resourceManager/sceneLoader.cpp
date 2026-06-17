@@ -219,7 +219,14 @@ void SceneLoader::loadScene(Registry& registry, const char* filePath) {
 
 		// Material Component
 		if (comps.contains("MaterialComponent")) {
-			entity.addComponent<MaterialComponent>(ResourceManager::instance().get<MaterialMap>(entity.id()));
+			float heightScale{1.0f};
+			if (comps["MaterialComponent"].contains("height_scale")) {
+				heightScale = comps["MaterialComponent"]["height_scale"].get<float>();
+			}
+
+			entity.addComponent<MaterialComponent>(
+				ResourceManager::instance().get<MaterialMap>(entity.id()),
+				heightScale);
 		}
 
 		// Debug Component

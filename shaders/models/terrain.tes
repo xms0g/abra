@@ -1,12 +1,15 @@
 #version 410 core
 layout (quads, fractional_odd_spacing, cw) in;
 
+#define HEIGHT_SHIFT 16.0
+
 in TCS_OUT
 {
     vec2 TexCoord;
 } tes_in[];
 
 #include "ub/camera.glsl"
+#include "legacy/material.glsl"
 
 uniform sampler2D heightMap;
 uniform mat4 model;
@@ -33,7 +36,7 @@ void main() {
     vec2 texCoord = (t1 - t0) * v + t0;
 
     // lookup texel at patch coordinate for height and scale + shift as desired
-    tes_out.Height = texture(heightMap, texCoord).y * 64.0 - 16.0;
+    tes_out.Height = texture(heightMap, texCoord).y * material.heightScale - HEIGHT_SHIFT;
 
     // retrieve control point position coordinates
     vec4 p00 = gl_in[0].gl_Position;
