@@ -35,6 +35,6 @@ void TerrainPass::execute(const RenderContext& ctx) {
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glBindVertexArray(vao);
-	glDrawArrays(GL_PATCHES, 0, count);
+	glDrawArrays(GL_PATCHES, 0, static_cast<int32_t>(count));
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
