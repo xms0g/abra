@@ -36,11 +36,14 @@ It’s designed for clarity, experimentation, and real-time graphics research �
 - **Debug Tools**
   - Normal visualization
   - Wireframe mode
+- **Tessellation Pipeline**
+  - Terrain rendering with dynamic LOD
 - **Built-in Models**
   - Cube – perfect for testing transforms, lighting, and shadow maps
   - Cubemap – used for skybox rendering
   - Plane
   - Sphere
+  - Terrain
   - Screen Quad – for post-processing, deferred pipeline, and blitting
 - **Supported Model Format**
   - Abra currently supports glTF 2.0 models only.Other formats (e.g., OBJ, FBX) are not supported.
@@ -69,6 +72,7 @@ It’s designed for clarity, experimentation, and real-time graphics research �
 ![Screenshot](assets/screenshot.png)
 ![Screenshot3](assets/screenshot3.png)
 ![Screenshot4](assets/screenshot4.png)
+![Tessellation](assets/screenshot6.png)
 
 
 ## Controls
