@@ -56,5 +56,5 @@ private:
 	// Render context
 	std::unique_ptr<RenderContext> mRenderCtx;
 	// Render passes
-	std::vector<std::shared_ptr<IRenderPass>> mRenderPasses;
+	std::vector<std::unique_ptr<IRenderPass>> mRenderPasses;
 };

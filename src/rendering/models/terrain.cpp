@@ -22,7 +22,7 @@ Model::Terrain::Terrain(
 	std::vector<float> v;
 
 	uint32_t rez = 20;
-	float rezf = static_cast<float>(rez);
+	auto rezf = static_cast<float>(rez);
 	
 	for (uint32_t i = 0; i <= rez - 1; ++i) {
 		for (uint32_t j = 0; j <= rez - 1; ++j) {

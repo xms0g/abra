@@ -175,36 +175,36 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 		CAMERA_UBO_BINDING);
 
 	// Create render passes
-	mRenderPasses.emplace_back(std::make_shared<CullingPass>());
+	mRenderPasses.emplace_back(std::make_unique<CullingPass>());
 
 	if (!mRenderQueue.deferredGroups.empty()) {
-		mRenderPasses.push_back(std::make_shared<DeferredGeometryPass>());
-		mRenderPasses.push_back(std::make_shared<SSAOPass>());
-		mRenderPasses.push_back(std::make_shared<DeferredLightingPass>());
+		mRenderPasses.push_back(std::make_unique<DeferredGeometryPass>());
+		mRenderPasses.push_back(std::make_unique<SSAOPass>());
+		mRenderPasses.push_back(std::make_unique<DeferredLightingPass>());
 	}
 
 	if (!mRenderQueue.opaqueGroups.empty() || !mRenderQueue.blendGroups.empty()) {
-		mRenderPasses.emplace_back(std::make_shared<ForwardPass>());
+		mRenderPasses.emplace_back(std::make_unique<ForwardPass>());
 	}
 
 	if (!mRenderQueue.debugGroups.empty()) {
-		mRenderPasses.emplace_back(std::make_shared<DebugPass>());
+		mRenderPasses.emplace_back(std::make_unique<DebugPass>());
 	}
 
 	if (!mRenderQueue.opaqueInstancedGroups.empty() || !mRenderQueue.blendInstancedGroups.empty()) {
-		mRenderPasses.emplace_back(std::make_shared<InstancedPass>());
+		mRenderPasses.emplace_back(std::make_unique<InstancedPass>());
 	}
 
 	if (!mRenderQueue.terrain.empty()) {
-		mRenderPasses.emplace_back(std::make_shared<TerrainPass>());
+		mRenderPasses.emplace_back(std::make_unique<TerrainPass>());
 	}
 
-	mRenderPasses.emplace_back(std::make_shared<SkyboxPass>());
+	mRenderPasses.emplace_back(std::make_unique<SkyboxPass>());
 #ifdef MSAA
-	mRenderPasses.emplace_back(std::make_shared<ResolvePass>());
+	mRenderPasses.emplace_back(std::make_unique<ResolvePass>());
 	mRenderCtx->intermediateBuffer = mIntermediateBuffer.get();
 #endif
-	mRenderPasses.emplace_back(std::make_shared<PostProcessPass>());
+	mRenderPasses.emplace_back(std::make_unique<PostProcessPass>());
 
 	mRenderCtx->sceneBuffer = mSceneBuffer.get();
 	mRenderCtx->camera.self = &camera;
