@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 #include "glm/glm.hpp"
-#include "../../../config/config.hpp"
 
 struct RenderContext;
 class Shader;
@@ -30,7 +29,7 @@ public:
 		int32_t layer);
 
 private:
-	glm::mat4 mLightSpaceMatrix[MAX_SPOT_LIGHTS]{};
+	glm::mat4 mLightSpaceMatrix[4]{};
 	std::unique_ptr<FrameBuffer> mDepthMap;
 	const Shader* mDepthShader;
 };

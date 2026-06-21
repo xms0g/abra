@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include "glm/glm.hpp"
-#include "../../config/config.hpp"
 #include "../material/material.hpp"
 #include "../../resourceManager/resourceManager.h"
 
@@ -23,111 +22,29 @@ struct RenderContext {
 	mutable const FrameBuffer* sceneBuffer{};
 	const FrameBuffer* intermediateBuffer{};
 	mutable MaterialCache materialCache;
+	const FrameBuffer* gBuffer{};
 
 	struct {
 		const FrameBuffer* buffer;
-
-		struct {
-			int32_t textureIdx;
-			int32_t textureSlot;
-		} position;
-
-		struct {
-			int32_t textureIdx;
-			int32_t textureSlot;
-		} normal;
-
-		struct {
-			int32_t textureIdx;
-			int32_t textureSlot;
-		} albedo;
-
-		struct {
-			int32_t textureIdx;
-			int32_t textureSlot;
-		} orm;
-
-		struct {
-			int32_t textureIdx;
-			int32_t textureSlot;
-		} depth;
-
-	} gBuffer{};
-
-	struct {
-		const FrameBuffer* buffer;
-
-		int32_t kernelSize;
-		int32_t noiseTextureSize;
-		float radius;
-		float bias;
-		float intensity;
-
-		struct {
-			const UniformBuffer* buffer;
-			uint32_t binding;
-			const char* blockName;
-		} ubo;
-
-		int32_t textureSlot;
-
-		struct {
-			int32_t textureSlot;
-		} noise;
+		const UniformBuffer* ubo;
 	} ssao{};
 
 	struct {
-		const std::array<DirectionalLightComponent*, MAX_DIRECTIONAL_LIGHTS>* dirLights;
-		const std::array<PointLightComponent*, MAX_POINT_LIGHTS>* pointLights;
-		const std::array<SpotLightComponent*, MAX_SPOT_LIGHTS>* spotLights;
+		const std::array<DirectionalLightComponent*, 1>* dirLights;
+		const std::array<PointLightComponent*, 4>* pointLights;
+		const std::array<SpotLightComponent*, 4>* spotLights;
 		uint32_t maxDirLights, maxPointLights, maxSpotLights;
-
-		struct {
-			const UniformBuffer* buffer;
-			uint32_t binding;
-			const char* blockName;
-		} ubo;
+		const UniformBuffer* ubo;
 	} light{};
 
 	struct {
 		const Camera* self;
 		glm::mat4 skyView;
-
-		struct {
-			const UniformBuffer* buffer;
-			uint32_t binding;
-			const char* blockName;
-		} ubo;
+		const UniformBuffer* ubo;
 	} camera{};
 
 	struct {
-		uint32_t width, height;
-	} screen{};
-
-	struct {
-		int32_t textureSlot;
-		uint32_t width, height;
-
-		struct {
-			const UniformBuffer* buffer;
-			uint32_t binding;
-			const char* blockName;
-		} ubo;
-
-		struct {
-			uint32_t maxLights;
-			float height, nearPlane, farPlane, left, right, bottom, top;
-		} directional;
-
-		struct {
-			uint32_t maxLights;
-			float nearPlane, farPlane, fovy;
-		} omnidirectional;
-
-		struct {
-			uint32_t maxLights;
-			float nearPlane, farPlane;
-		} perspective;
+		const UniformBuffer* ubo;
 	} shadow{};
 
 	struct {
@@ -135,27 +52,9 @@ struct RenderContext {
 			mutable uint32_t binding;
 		} envMap;
 
-		struct {
-			const BaseFrameBuffer* buffer;
-			int32_t textureSlot;
-		} irradianceMap;
-
-		struct {
-			const BaseFrameBuffer* buffer;
-			int32_t textureSlot;
-		} prefilterMap;
-
-		struct {
-			const BaseFrameBuffer* buffer;
-			int32_t textureSlot;
-		} brdfLUT;
-
-		int32_t albedoTextureSlot;
-		int32_t normalTextureSlot;
-		int32_t roughnessMetallicTextureSlot;
-		int32_t aoTextureSlot;
-		int32_t emissiveTextureSlot;
-		int32_t heightTextureSlot;
+		const BaseFrameBuffer* irradianceMap;
+		const BaseFrameBuffer* prefilterMap;
+		const BaseFrameBuffer* brdfLUT;
 	} PBR{};
 
 	RenderContext() = default;

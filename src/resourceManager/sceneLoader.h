@@ -1,5 +1,6 @@
 #pragma once
 
+struct Config;
 class Registry;
 
 namespace  SceneLoader {

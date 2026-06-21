@@ -29,7 +29,7 @@ private:
 	std::unique_ptr<Model::SingleQuad> mQuad;
 	std::unique_ptr<FrameBuffer> mFBO;
 	std::unique_ptr<FrameBuffer> mBlurFBO;
-	const Shader* mShader;
-	const Shader* mBlurShader;
+	const Shader* mShader = nullptr;
+	const Shader* mBlurShader = nullptr;
 	std::unique_ptr<UniformBuffer> mUBO;
 };

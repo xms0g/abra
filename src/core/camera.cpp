@@ -1,34 +1,16 @@
 #include "camera.h"
 #include "glm/gtc/matrix_transform.hpp"
+#include "../config/configManager.h"
 #include "../event/eventBus.hpp"
 #include "../event/events/keyPressedEvent.hpp"
 #include "../event/events/mouseMovementEvent.hpp"
 
 Camera::Camera(
 	const glm::vec3& position,
-	const glm::vec3& up,
-	const float yaw,
-	const float pitch)
+	const glm::vec3& up)
 	: mPosition(position),
 	  mFront(0.0f, 0.0f, -1.0f),
-	  mWorldUp(up),
-	  mYaw(yaw),
-	  mPitch(pitch),
-	  mMovementSpeed(SPEED),
-	  mMouseSensitivity(SENSITIVITY) {
-}
-
-Camera::Camera(
-	const float posX, const float posY, const float posZ,
-	const float upX, const float upY, const float upZ,
-	const float yaw, const float pitch)
-	: mPosition(posX, posY, posZ),
-	  mFront(0.0f, 0.0f, -1.0f),
-	  mWorldUp(upX, upY, upZ),
-	  mYaw(yaw),
-	  mPitch(pitch),
-	  mMovementSpeed(SPEED),
-	  mMouseSensitivity(SENSITIVITY) {
+	  mWorldUp(up){
 }
 
 glm::mat4 Camera::viewMatrix() const {
@@ -46,19 +28,29 @@ const glm::vec3& Camera::front() const {
 math::Frustum Camera::generateFrustum() const {
 	math::Frustum frustum;
 
-	const glm::vec3 frontMultFar = ZFAR * mFront;
-	frustum.nearFace = {mPosition + ZNEAR * mFront, mFront};
+	const glm::vec3 frontMultFar = mZFar * mFront;
+	frustum.nearFace = {mPosition + mZNear * mFront, mFront};
 	frustum.farFace = {mPosition + frontMultFar, -mFront};
-	frustum.rightFace = {mPosition, glm::cross(frontMultFar - mRight * halfHSide, mUp)};
-	frustum.leftFace = {mPosition, glm::cross(mUp, frontMultFar + mRight * halfHSide)};
-	frustum.topFace = {mPosition, glm::cross(mRight, frontMultFar - mUp * halfVSide)};
-	frustum.bottomFace = {mPosition, glm::cross(frontMultFar + mUp * halfVSide, mRight)};
+	frustum.rightFace = {mPosition, glm::cross(frontMultFar - mRight * mHalfHSide, mUp)};
+	frustum.leftFace = {mPosition, glm::cross(mUp, frontMultFar + mRight * mHalfHSide)};
+	frustum.topFace = {mPosition, glm::cross(mRight, frontMultFar - mUp * mHalfVSide)};
+	frustum.bottomFace = {mPosition, glm::cross(frontMultFar + mUp * mHalfVSide, mRight)};
 
 	return frustum;
 }
 
 void Camera::configure(EventBus& eventBus) {
+	mYaw = ConfigManager::instance().camera.yaw;
+	mPitch = ConfigManager::instance().camera.pitch;
+	mMovementSpeed = ConfigManager::instance().camera.speed;
+	mMouseSensitivity = ConfigManager::instance().camera.sensitivity;
+	mZNear = ConfigManager::instance().camera.znear;
+	mZFar = ConfigManager::instance().camera.zfar;
+	mHalfVSide = ConfigManager::instance().camera.zfar * tanf(glm::radians(ConfigManager::instance().camera.zoom) * 0.5f);
+	mHalfHSide =  mHalfVSide * (static_cast<float>(ConfigManager::instance().window.width) / static_cast<float>(ConfigManager::instance().window.height));
+
 	update();
+
 	eventBus.subscribeToEvent<Camera, KeyPressedEvent>(this, &Camera::processKeyboard);
 	eventBus.subscribeToEvent<Camera, MouseMovementEvent>(this, &Camera::processMouseMovement);
 }

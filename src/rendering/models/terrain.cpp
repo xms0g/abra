@@ -4,8 +4,8 @@
 #include "../mesh/vertex.hpp"
 #include "../texture/texture.h"
 #include "../material/material.hpp"
-#include "../../config/config.hpp"
 #include "../../io/filesystem.hpp"
+#include "../../config/configManager.h"
 
 Model::Terrain::Terrain(
 	glm::vec3 color,
@@ -14,7 +14,7 @@ Model::Terrain::Terrain(
 	const char* specularTexture,
 	const char* normalTexture,
 	const char* heightTexture) {
-	std::string path = fs::path(ASSET_DIR + heightTexture);
+	std::string path = fs::path(ConfigManager::instance().paths.asset_dir + heightTexture);
 
 	int32_t width, height, channel;
 	stbi_info(path.c_str(), &width, &height, &channel);
@@ -66,7 +66,7 @@ Model::Terrain::Terrain(
 	std::vector<Texture> textures;
 	if (heightTexture) {
 		flags |= HAS_HEIGHT_MAP;
-		textures.emplace_back(0, HEIGHT, std::move(path));
+		textures.emplace_back(0, HEIGHT, heightTexture);
 	}
 
 	mMaterial[0] = {.id = 0, .flags = flags | TERRAIN, .color = glm::vec3(0.0f), .textures = textures};

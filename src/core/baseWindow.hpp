@@ -5,12 +5,8 @@ class BaseWindow {
 public:
 	virtual ~BaseWindow() = default;
 
-	void init(
-		const char* title = "Test Window",
-		const int width = 800,
-		const int height = 600,
-		const bool fullscreen = false) {
-		initImpl(title, width, height, fullscreen);
+	void init() {
+		initImpl();
 	}
 
 	T* nativeHandle() const {
@@ -24,7 +20,7 @@ public:
 	virtual void swapBuffer() = 0;
 
 protected:
-	virtual void initImpl(const char* title, int width, int height, bool fullscreen) = 0;
+	virtual void initImpl() = 0;
 
 	virtual void clearImpl(float r, float g, float b, float a) = 0;
 

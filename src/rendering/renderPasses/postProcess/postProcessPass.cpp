@@ -16,6 +16,7 @@
 #include "../../renderContext/renderContext.hpp"
 #include "../../../event/eventBus.hpp"
 #include "../../../event/events/guiPostProcessEvent.hpp"
+#include "../../../config/configManager.h"
 
 PostProcessPass::~PostProcessPass() = default;
 
@@ -36,8 +37,8 @@ void PostProcessPass::configure(RenderContext& ctx, EventBus& eventBus) {
 
 	for (auto& target: mRenderTargets) {
 		target = std::make_unique<FrameBuffer>(
-			static_cast<int32_t>(ctx.screen.width),
-			static_cast<int32_t>(ctx.screen.height));
+			static_cast<int32_t>(ConfigManager::instance().window.width),
+			static_cast<int32_t>(ConfigManager::instance().window.height));
 #ifdef HDR
 		target->withTextureFP(GL_RGBA)
 #else

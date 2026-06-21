@@ -8,10 +8,11 @@
 #include "../../renderContext/renderQueue.hpp"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderCommand.h"
+#include "../../../config/configManager.h"
 
 PerspectiveShadow::PerspectiveShadow(const RenderContext& ctx) {
-	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadow.width, ctx.shadow.height);
-	mDepthMap->withTextureDepthArray(ctx.shadow.perspective.maxLights, GL_DEPTH_COMPONENT24, true)
+	mDepthMap = std::make_unique<FrameBuffer>(ConfigManager::instance().shadow.map_width, ConfigManager::instance().shadow.map_height);
+	mDepthMap->withTextureDepthArray(ConfigManager::instance().light.max_spot, GL_DEPTH_COMPONENT24, true)
 			.checkStatus();
 	mDepthMap->unbind();
 
@@ -50,9 +51,9 @@ void PerspectiveShadow::render(
 
 	const glm::mat4 lightProjection = glm::perspective(
 		fovy,
-		static_cast<float>(ctx.shadow.width) / static_cast<float>(ctx.shadow.height),
-		ctx.shadow.perspective.nearPlane,
-		ctx.shadow.perspective.farPlane);
+		static_cast<float>(ConfigManager::instance().shadow.map_width) / static_cast<float>(ConfigManager::instance().shadow.map_height),
+		ConfigManager::instance().shadow.perspective.nearPlane,
+		ConfigManager::instance().shadow.perspective.farPlane);
 
 	const glm::mat4 lightView = glm::lookAt(position, position + direction, glm::vec3(0.0, 1.0, 0.0));
 	mLightSpaceMatrix[layer] = lightProjection * lightView;

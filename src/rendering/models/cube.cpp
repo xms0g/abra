@@ -3,7 +3,6 @@
 #include "../mesh/vertex.hpp"
 #include "../texture/texture.h"
 #include "../material/material.hpp"
-#include "../../config/config.hpp"
 #include "../../io/filesystem.hpp"
 
 Model::Cube::Cube(
@@ -16,39 +15,39 @@ Model::Cube::Cube(
 	constexpr float v[] = {
 		// Back face (-Z)
 		-0.5f, -0.5f, -0.5f, 0, 0, -1, 0, 0,
-		 0.5f, -0.5f, -0.5f, 0, 0, -1, 1, 0,
-		 0.5f,  0.5f, -0.5f, 0, 0, -1, 1, 1,
-		-0.5f,  0.5f, -0.5f, 0, 0, -1, 0, 1,
+		0.5f, -0.5f, -0.5f, 0, 0, -1, 1, 0,
+		0.5f, 0.5f, -0.5f, 0, 0, -1, 1, 1,
+		-0.5f, 0.5f, -0.5f, 0, 0, -1, 0, 1,
 
 		// Front face (+Z)
-		-0.5f, -0.5f,  0.5f, 0, 0, 1, 0, 0,
-		 0.5f, -0.5f,  0.5f, 0, 0, 1, 1, 0,
-		 0.5f,  0.5f,  0.5f, 0, 0, 1, 1, 1,
-		-0.5f,  0.5f,  0.5f, 0, 0, 1, 0, 1,
+		-0.5f, -0.5f, 0.5f, 0, 0, 1, 0, 0,
+		0.5f, -0.5f, 0.5f, 0, 0, 1, 1, 0,
+		0.5f, 0.5f, 0.5f, 0, 0, 1, 1, 1,
+		-0.5f, 0.5f, 0.5f, 0, 0, 1, 0, 1,
 
 		// Left face (-X)
 		-0.5f, -0.5f, -0.5f, -1, 0, 0, 0, 0,
-		-0.5f,  0.5f, -0.5f, -1, 0, 0, 1, 0,
-		-0.5f,  0.5f,  0.5f, -1, 0, 0, 1, 1,
-		-0.5f, -0.5f,  0.5f, -1, 0, 0, 0, 1,
+		-0.5f, 0.5f, -0.5f, -1, 0, 0, 1, 0,
+		-0.5f, 0.5f, 0.5f, -1, 0, 0, 1, 1,
+		-0.5f, -0.5f, 0.5f, -1, 0, 0, 0, 1,
 
 		// Right face (+X)
 		0.5f, -0.5f, -0.5f, 1, 0, 0, 0, 0,
-		0.5f,  0.5f, -0.5f, 1, 0, 0, 1, 0,
-		0.5f,  0.5f,  0.5f, 1, 0, 0, 1, 1,
-		0.5f, -0.5f,  0.5f, 1, 0, 0, 0, 1,
+		0.5f, 0.5f, -0.5f, 1, 0, 0, 1, 0,
+		0.5f, 0.5f, 0.5f, 1, 0, 0, 1, 1,
+		0.5f, -0.5f, 0.5f, 1, 0, 0, 0, 1,
 
 		// Bottom face (-Y)
 		-0.5f, -0.5f, -0.5f, 0, -1, 0, 0, 0,
-		 0.5f, -0.5f, -0.5f, 0, -1, 0, 1, 0,
-		 0.5f, -0.5f,  0.5f, 0, -1, 0, 1, 1,
-		-0.5f, -0.5f,  0.5f, 0, -1, 0, 0, 1,
+		0.5f, -0.5f, -0.5f, 0, -1, 0, 1, 0,
+		0.5f, -0.5f, 0.5f, 0, -1, 0, 1, 1,
+		-0.5f, -0.5f, 0.5f, 0, -1, 0, 0, 1,
 
 		// Top face (+Y)
 		-0.5f, 0.5f, -0.5f, 0, 1, 0, 0, 0,
-		 0.5f, 0.5f, -0.5f, 0, 1, 0, 1, 0,
-		 0.5f, 0.5f,  0.5f, 0, 1, 0, 1, 1,
-		-0.5f, 0.5f,  0.5f, 0, 1, 0, 0, 1
+		0.5f, 0.5f, -0.5f, 0, 1, 0, 1, 0,
+		0.5f, 0.5f, 0.5f, 0, 1, 0, 1, 1,
+		-0.5f, 0.5f, 0.5f, 0, 1, 0, 0, 1
 	};
 
 	std::vector<uint32_t> indices = {
@@ -124,19 +123,19 @@ Model::Cube::Cube(
 	std::vector<Texture> textures;
 
 	if (diffuseTexture) {
-		textures.emplace_back(0, ALBEDO, fs::path(ASSET_DIR + diffuseTexture));
+		textures.emplace_back(0, ALBEDO, diffuseTexture);
 	}
 
 	if (specularTexture) {
-		textures.emplace_back(0, SPECULAR, fs::path(ASSET_DIR + specularTexture));
+		textures.emplace_back(0, SPECULAR, specularTexture);
 	}
 
 	if (normalTexture) {
-		textures.emplace_back(0,NORMAL,fs::path(ASSET_DIR + normalTexture));
+		textures.emplace_back(0, NORMAL, normalTexture);
 	}
 
 	if (heightTexture) {
-		textures.emplace_back(0, HEIGHT, fs::path(ASSET_DIR + heightTexture));
+		textures.emplace_back(0, HEIGHT, heightTexture);
 	}
 
 	uint32_t flags{0};

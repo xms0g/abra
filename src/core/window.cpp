@@ -1,7 +1,7 @@
 #include "window.h"
 #include <iostream>
 #include "glad/glad.h"
-#include "../config/config.hpp"
+#include "../config/configManager.h"
 
 Window::~Window() {
 	SDL_GL_DeleteContext(mGlContext);
@@ -13,15 +13,15 @@ SDL_GLContext Window::glContext() const {
 	return mGlContext;
 }
 
-void Window::initImpl(const char* title, int width, int height, const bool fullscreen) {
+void Window::initImpl() {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		throw std::runtime_error("Failed to initialize SDL_VIDEO");
 	}
 
-	mTitle = title;
+	mTitle = ConfigManager::instance().window.title;
 
 	int flags = SDL_WINDOW_OPENGL;
-	if (fullscreen)
+	if (ConfigManager::instance().window.fullscreen)
 		flags |= SDL_WINDOW_FULLSCREEN;
 	else
 		flags |= SDL_WINDOW_RESIZABLE;
@@ -30,7 +30,7 @@ void Window::initImpl(const char* title, int width, int height, const bool fulls
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, MULTISAMPLED_COUNT);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, ConfigManager::instance().msaa.sample_count);
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
@@ -38,8 +38,8 @@ void Window::initImpl(const char* title, int width, int height, const bool fulls
 
 	SDL_DisplayMode displayMode;
 	SDL_GetCurrentDisplayMode(0, &displayMode);
-	SCR_WIDTH = displayMode.w;
-	SCR_HEIGHT = displayMode.h;
+	ConfigManager::instance().window.width = displayMode.w;
+	ConfigManager::instance().window.height = displayMode.h;
 
 	mWindow = SDL_CreateWindow(
 		mTitle.c_str(),

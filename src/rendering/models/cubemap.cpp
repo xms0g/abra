@@ -3,7 +3,6 @@
 #include "../mesh/vertex.hpp"
 #include "../texture/texture.h"
 #include "../material/material.hpp"
-#include "../../config/config.hpp"
 #include "../../io/filesystem.hpp"
 
 Model::Cubemap::Cubemap(std::vector<std::string>& faces) {
@@ -64,7 +63,7 @@ Model::Cubemap::Cubemap(std::vector<std::string>& faces) {
 	textures.reserve(faces.size());
 
 	for (const auto& face : faces) {
-		textures.emplace_back(0, ALBEDO, fs::path(ASSET_DIR + face));
+		textures.emplace_back(0, ALBEDO,  face);
 	}
 
 	mMaterial[0] = {.flags = CUBEMAP, .textures = textures};

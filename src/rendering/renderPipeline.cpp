@@ -31,9 +31,9 @@
 #include "gui/backend.h"
 #include "material/material.hpp"
 #include "mesh/vertexArray.h"
-#include "../config/config.hpp"
-#include "../ECS/registry.h"
+#include "../config/configManager.h"
 #include "../core/camera.h"
+#include "../ECS/registry.h"
 #include "../ECS/components/bv.hpp"
 #include "../ECS/components/debug.hpp"
 #include "../ECS/components/transform.hpp"
@@ -42,8 +42,8 @@
 #include "../ECS/components/instance.hpp"
 #include "../ECS/components/skybox.hpp"
 #include "../math/boundingVolume.h"
-#include "../event/eventBus.hpp"
 #include "../math/matrix.h"
+#include "../event/eventBus.hpp"
 #include "../resourceManager/resourceManager.h"
 
 RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLContext context) {
@@ -62,55 +62,7 @@ RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLCon
 	glFrontFace(GL_CCW);
 
 	mRenderCtx = std::make_unique<RenderContext>();
-	mRenderCtx->screen.width = SCR_WIDTH;
-	mRenderCtx->screen.height = SCR_HEIGHT;
 	mRenderCtx->renderQueue = &mRenderQueue;
-	mRenderCtx->camera.ubo.binding = CAMERA_UBO_BINDING;
-	mRenderCtx->camera.ubo.blockName = CAMERA_UBO_BLOCK_NAME;
-	mRenderCtx->light.maxDirLights = MAX_DIRECTIONAL_LIGHTS;
-	mRenderCtx->light.maxPointLights = MAX_POINT_LIGHTS;
-	mRenderCtx->light.maxSpotLights = MAX_SPOT_LIGHTS;
-	mRenderCtx->light.ubo.binding = LIGHT_UBO_BINDING;
-	mRenderCtx->light.ubo.blockName = LIGHT_UBO_BLOCK_NAME;
-	mRenderCtx->shadow.ubo.binding = SHADOW_UBO_BINDING;
-	mRenderCtx->shadow.ubo.blockName = SHADOW_UBO_BLOCK_NAME;
-	mRenderCtx->shadow.textureSlot = SHADOWMAP_TEXTURE_SLOT;
-	mRenderCtx->shadow.width = SHADOWMAP_WIDTH;
-	mRenderCtx->shadow.height = SHADOWMAP_HEIGHT;
-	mRenderCtx->shadow.directional.maxLights = MAX_DIRECTIONAL_LIGHTS;
-	mRenderCtx->shadow.directional.height = SHADOW_DIRECTIONAL_HEIGHT;
-	mRenderCtx->shadow.directional.nearPlane = SHADOW_DIRECTIONAL_NEAR;
-	mRenderCtx->shadow.directional.farPlane = SHADOW_DIRECTIONAL_FAR;
-	mRenderCtx->shadow.directional.left = SHADOW_DIRECTIONAL_LEFT;
-	mRenderCtx->shadow.directional.right = SHADOW_DIRECTIONAL_RIGHT;
-	mRenderCtx->shadow.directional.bottom = SHADOW_DIRECTIONAL_BOTTOM;
-	mRenderCtx->shadow.directional.top = SHADOW_DIRECTIONAL_TOP;
-	mRenderCtx->shadow.omnidirectional.maxLights = MAX_POINT_LIGHTS;
-	mRenderCtx->shadow.omnidirectional.nearPlane = SHADOW_OMNIDIRECTIONAL_NEAR;
-	mRenderCtx->shadow.omnidirectional.farPlane = SHADOW_OMNIDIRECTIONAL_FAR;
-	mRenderCtx->shadow.omnidirectional.fovy = SHADOW_OMNIDIRECTIONAL_FOVY;
-	mRenderCtx->shadow.perspective.maxLights = MAX_SPOT_LIGHTS;
-	mRenderCtx->shadow.perspective.nearPlane = SHADOW_PERSPECTIVE_NEAR;
-	mRenderCtx->shadow.perspective.farPlane = SHADOW_PERSPECTIVE_FAR;
-	mRenderCtx->ssao.ubo.binding = SSAO_UBO_BINDING;
-	mRenderCtx->ssao.ubo.blockName = SSAO_UBO_BLOCK_NAME;
-	mRenderCtx->ssao.kernelSize = SSAO_KERNEL_SIZE;
-	mRenderCtx->ssao.noiseTextureSize = SSAO_NOISE_TEXTURE_SIZE;
-	mRenderCtx->ssao.radius = SSAO_RADIUS;
-	mRenderCtx->ssao.bias = SSAO_BIAS;
-	mRenderCtx->ssao.intensity = SSAO_INTENSITY;
-	mRenderCtx->ssao.textureSlot = SSAO_TEXTURE_SLOT;
-	mRenderCtx->ssao.noise.textureSlot = SSAO_NOISE_TEXTURE_SLOT;
-	mRenderCtx->gBuffer.position.textureIdx = G_POSITION_TEXTURE_IDX;
-	mRenderCtx->gBuffer.position.textureSlot = G_POSITION_TEXTURE_SLOT;
-	mRenderCtx->gBuffer.normal.textureIdx = G_NORMAL_TEXTURE_IDX;
-	mRenderCtx->gBuffer.normal.textureSlot = G_NORMAL_TEXTURE_SLOT;
-	mRenderCtx->gBuffer.albedo.textureIdx = G_ALBEDO_TEXTURE_IDX;
-	mRenderCtx->gBuffer.albedo.textureSlot = G_ALBEDO_TEXTURE_SLOT;
-	mRenderCtx->gBuffer.orm.textureIdx = G_ORM_TEXTURE_IDX;
-	mRenderCtx->gBuffer.orm.textureSlot = G_ORM_TEXTURE_SLOT;
-	mRenderCtx->gBuffer.depth.textureIdx = G_DEPTH_TEXTURE_IDX;
-	mRenderCtx->gBuffer.depth.textureSlot = G_DEPTH_TEXTURE_SLOT;
 
 	registry->addSystem<LightSystem>();
 	mLightSystem = &registry->getSystem<LightSystem>();
@@ -135,7 +87,7 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mShadowSystem->configure(*mRenderCtx, eventBus);
 
 	// Create framebuffers
-	mSceneBuffer = std::make_unique<FrameBuffer>(SCR_WIDTH, SCR_HEIGHT);
+	mSceneBuffer = std::make_unique<FrameBuffer>(ConfigManager::instance().window.width, ConfigManager::instance().window.height);
 #ifdef MSAA
 	glEnable(GL_MULTISAMPLE);
 	mIntermediateBuffer = std::make_unique<FrameBuffer>(mSceneBuffer->width(), mSceneBuffer->height());
@@ -172,7 +124,7 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mCameraUBO = std::make_unique<UniformBuffer>(
 		DYNAMIC,
 		3 * sizeof(glm::mat4) + sizeof(glm::vec4),
-		CAMERA_UBO_BINDING);
+		ConfigManager::instance().camera.ubo_binding);
 
 	// Create render passes
 	mRenderPasses.emplace_back(std::make_unique<CullingPass>());
@@ -208,24 +160,15 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 
 	mRenderCtx->sceneBuffer = mSceneBuffer.get();
 	mRenderCtx->camera.self = &camera;
-	mRenderCtx->PBR.irradianceMap.buffer = ResourceManager::instance().get<BaseFrameBuffer>("irradianceMap");
-	mRenderCtx->PBR.irradianceMap.textureSlot = PBR_IRRADIANCE_MAP_TEXTURE_SLOT;
-	mRenderCtx->PBR.prefilterMap.buffer = ResourceManager::instance().get<BaseFrameBuffer>("prefilterMap");
-	mRenderCtx->PBR.prefilterMap.textureSlot = PBR_PREFILTER_MAP_TEXTURE_SLOT;
-	mRenderCtx->PBR.brdfLUT.buffer = ResourceManager::instance().get<BaseFrameBuffer>("brdfLUT");
-	mRenderCtx->PBR.brdfLUT.textureSlot = PBR_BRDF_LUT_TEXTURE_SLOT;
-	mRenderCtx->PBR.albedoTextureSlot = PBR_ALBEDO_TEXTURE_SLOT;
-	mRenderCtx->PBR.normalTextureSlot = PBR_NORMAL_TEXTURE_SLOT;
-	mRenderCtx->PBR.roughnessMetallicTextureSlot = PBR_RM_TEXTURE_SLOT;
-	mRenderCtx->PBR.aoTextureSlot = PBR_AO_TEXTURE_SLOT;
-	mRenderCtx->PBR.emissiveTextureSlot = PBR_EMISSIVE_TEXTURE_SLOT;
-	mRenderCtx->PBR.heightTextureSlot = PBR_HEIGHT_TEXTURE_SLOT;
+	mRenderCtx->PBR.irradianceMap = ResourceManager::instance().get<BaseFrameBuffer>("irradianceMap");
+	mRenderCtx->PBR.prefilterMap = ResourceManager::instance().get<BaseFrameBuffer>("prefilterMap");
+	mRenderCtx->PBR.brdfLUT = ResourceManager::instance().get<BaseFrameBuffer>("brdfLUT");
 
 	// Set camera projection matrix
 	const glm::mat4 projectionMat = glm::perspective(
-		glm::radians(ZOOM),
-		static_cast<float>(mRenderCtx->screen.width) / static_cast<float>(mRenderCtx->screen.height),
-		ZNEAR, ZFAR);
+		glm::radians(ConfigManager::instance().camera.zoom),
+		static_cast<float>(ConfigManager::instance().window.width) / static_cast<float>(ConfigManager::instance().window.height),
+		ConfigManager::instance().camera.znear, ConfigManager::instance().camera.zfar);
 
 	const glm::mat4 invProjectionMat = glm::inverse(projectionMat);
 
@@ -240,15 +183,15 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	}
 
 	const std::vector<UniformBinding> uboBindings = {
-		{CAMERA_UBO_BLOCK_NAME, CAMERA_UBO_BINDING, mCameraUBO.get(), &UniformBuffer::configure},
-		{LIGHT_UBO_BLOCK_NAME, LIGHT_UBO_BINDING, mLightSystem->ubo(), &UniformBuffer::configure},
-		{SHADOW_UBO_BLOCK_NAME, SHADOW_UBO_BINDING, mShadowSystem->ubo(), &UniformBuffer::configure}
+		{ConfigManager::instance().camera.block_name, ConfigManager::instance().camera.ubo_binding, mCameraUBO.get(), &UniformBuffer::configure},
+		{ConfigManager::instance().light.block_name, ConfigManager::instance().light.ubo_binding, mLightSystem->ubo(), &UniformBuffer::configure},
+		{ConfigManager::instance().shadow.block_name, ConfigManager::instance().shadow.ubo_binding, mShadowSystem->ubo(), &UniformBuffer::configure}
 	};
 
 	const std::vector<TextureBinding> shadowMapBindings = {
-		{"shadowMap", mRenderCtx->shadow.textureSlot},
-		{"shadowCubemap", mRenderCtx->shadow.textureSlot + 1},
-		{"persShadowMap", mRenderCtx->shadow.textureSlot + 2}
+		{"shadowMap", ConfigManager::instance().shadow.texture_slot},
+		{"shadowCubemap", ConfigManager::instance().shadow.texture_slot + 1},
+		{"persShadowMap", ConfigManager::instance().shadow.texture_slot + 2}
 	};
 
 	// Configure shaders

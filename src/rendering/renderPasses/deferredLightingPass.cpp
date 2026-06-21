@@ -6,6 +6,7 @@
 #include "../mesh/mesh.h"
 #include "../renderCommand.h"
 #include "../renderContext/renderContext.hpp"
+#include "../../config/configManager.h"
 
 DeferredLightingPass::~DeferredLightingPass() = default;
 
@@ -14,34 +15,34 @@ void DeferredLightingPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	mShader = ResourceManager::instance().get<Shader>("deferredLighting");
 
 	const std::vector<TextureBinding> textureBindings = {
-		{"gPosition", ctx.gBuffer.position.textureSlot},
-		{"gNormal", ctx.gBuffer.normal.textureSlot},
-		{"gAlbedo", ctx.gBuffer.albedo.textureSlot},
-		{"gORM", ctx.gBuffer.orm.textureSlot},
-		{"ssao", ctx.ssao.textureSlot},
-		{"irradianceMap", ctx.PBR.irradianceMap.textureSlot},
-		{"prefilterMap", ctx.PBR.prefilterMap.textureSlot},
-		{"brdfLUT", ctx.PBR.brdfLUT.textureSlot}
+		{"gPosition", ConfigManager::instance().gBuffer.position.textureSlot},
+		{"gNormal", ConfigManager::instance().gBuffer.normal.textureSlot},
+		{"gAlbedo", ConfigManager::instance().gBuffer.albedo.textureSlot},
+		{"gORM", ConfigManager::instance().gBuffer.orm.textureSlot},
+		{"ssao", ConfigManager::instance().ssao.textureSlot},
+		{"irradianceMap", ConfigManager::instance().PBR.irradianceMap.textureSlot},
+		{"prefilterMap", ConfigManager::instance().PBR.prefilterMap.textureSlot},
+		{"brdfLUT", ConfigManager::instance().PBR.brdfLUT.textureSlot}
 	};
 
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
 	RenderCommand::bindShadowMaps(ctx);
 
-	ctx.gBuffer.buffer->bindTexture(ctx.gBuffer.position.textureSlot, ctx.gBuffer.position.textureIdx);
-	ctx.gBuffer.buffer->bindTexture(ctx.gBuffer.normal.textureSlot, ctx.gBuffer.normal.textureIdx);
-	ctx.gBuffer.buffer->bindTexture(ctx.gBuffer.albedo.textureSlot, ctx.gBuffer.albedo.textureIdx);
-	ctx.gBuffer.buffer->bindTexture(ctx.gBuffer.orm.textureSlot, ctx.gBuffer.orm.textureIdx);
-	ctx.ssao.buffer->bindTexture(ctx.ssao.textureSlot);
-	ctx.PBR.irradianceMap.buffer->bindTexture(ctx.PBR.irradianceMap.textureSlot);
-	ctx.PBR.prefilterMap.buffer->bindTexture(ctx.PBR.prefilterMap.textureSlot);
-	ctx.PBR.brdfLUT.buffer->bindTexture(ctx.PBR.brdfLUT.textureSlot);
+	ctx.gBuffer->bindTexture(ConfigManager::instance().gBuffer.position.textureSlot, ConfigManager::instance().gBuffer.position.textureIdx);
+	ctx.gBuffer->bindTexture(ConfigManager::instance().gBuffer.normal.textureSlot, ConfigManager::instance().gBuffer.normal.textureIdx);
+	ctx.gBuffer->bindTexture(ConfigManager::instance().gBuffer.albedo.textureSlot, ConfigManager::instance().gBuffer.albedo.textureIdx);
+	ctx.gBuffer->bindTexture(ConfigManager::instance().gBuffer.orm.textureSlot, ConfigManager::instance().gBuffer.orm.textureIdx);
+	ctx.ssao.buffer->bindTexture(ConfigManager::instance().ssao.textureSlot);
+	ctx.PBR.irradianceMap->bindTexture(ConfigManager::instance().PBR.irradianceMap.textureSlot);
+	ctx.PBR.prefilterMap->bindTexture(ConfigManager::instance().PBR.prefilterMap.textureSlot);
+	ctx.PBR.brdfLUT->bindTexture(ConfigManager::instance().PBR.brdfLUT.textureSlot);
 }
 
 void DeferredLightingPass::execute(const RenderContext& ctx) {
 	// Copy depth buffer of gBuffer to scene buffer for the proper depth testing
-	ctx.gBuffer.buffer->bindForRead();
+	ctx.gBuffer->bindForRead();
 	ctx.sceneBuffer->bindForDraw();
-	glBlitFramebuffer(0, 0, ctx.gBuffer.buffer->width(), ctx.gBuffer.buffer->height(),
+	glBlitFramebuffer(0, 0, ctx.gBuffer->width(), ctx.gBuffer->height(),
 	                  0, 0, ctx.sceneBuffer->width(), ctx.sceneBuffer->height(),
 	                  GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 

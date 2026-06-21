@@ -3,6 +3,7 @@
 #include "directionalShadow.h"
 #include "omnidirectionalShadow.h"
 #include "perspectiveShadow.h"
+#include "../../../config/configManager.h"
 #include "../../renderContext/renderContext.hpp"
 #include "../../renderContext/renderQueue.hpp"
 #include "../../buffers/uniformBuffer.h"
@@ -10,13 +11,12 @@
 #include "../../../ECS/components/directionalLight.hpp"
 #include "../../../ECS/components/pointLight.hpp"
 #include "../../../ECS/components/spotLight.hpp"
-#include "../../../config/config.hpp"
 #include "../../../event/eventBus.hpp"
 #include "../../../event/events/updateShadowMapEvent.hpp"
 
 struct alignas(16) ShadowData {
 	glm::mat4 lightSpaceMatrix{};
-	glm::mat4 persLightSpaceMatrix[MAX_SPOT_LIGHTS]{};
+	glm::mat4 persLightSpaceMatrix[4]{};
 	glm::vec4 omniFarPlane{};
 };
 
@@ -36,7 +36,7 @@ void ShadowSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mOmnidirShadow = std::make_unique<OmnidirectionalShadow>(ctx);
 	mPersShadow = std::make_unique<PerspectiveShadow>(ctx);
 
-	mUBO = std::make_unique<UniformBuffer>(DYNAMIC, sizeof(ShadowData), ctx.shadow.ubo.binding);
+	mUBO = std::make_unique<UniformBuffer>(DYNAMIC, sizeof(ShadowData), ConfigManager::instance().shadow.ubo_binding);
 
 	ctx.renderQueue->shadowMaps = {
 		mDirShadow->depthTexture(),
@@ -46,7 +46,7 @@ void ShadowSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 
 	eventBus.subscribeToEvent<ShadowSystem, UpdateShadowMapEvent>(this, &ShadowSystem::onGuiUpdate);
 
-	gpuData.omniFarPlane = glm::vec4(ctx.shadow.omnidirectional.farPlane, 0.0f, 0.0f, 0.0f);
+	gpuData.omniFarPlane = glm::vec4(ConfigManager::instance().shadow.omnidirectional.farPlane, 0.0f, 0.0f, 0.0f);
 
 	constexpr UpdateShadowMapEvent event;
 	onGuiUpdate(event);
@@ -106,7 +106,7 @@ void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
 	perspectiveShadowPass();
 
 	glCullFace(GL_BACK);
-	glViewport(0, 0, static_cast<int32_t>(mCtx->screen.width), static_cast<int32_t>(mCtx->screen.height));
+	glViewport(0, 0, static_cast<int32_t>(ConfigManager::instance().window.width), static_cast<int32_t>(ConfigManager::instance().window.height));
 
 	mUBO->bind();
 	mUBO->setData(&gpuData, sizeof(ShadowData), 0);

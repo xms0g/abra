@@ -3,7 +3,6 @@
 #include "../mesh/vertex.hpp"
 #include "../texture/texture.h"
 #include "../material/material.hpp"
-#include "../../config/config.hpp"
 #include "../../io/filesystem.hpp"
 
 Model::Sphere::Sphere(
@@ -118,16 +117,15 @@ Model::Sphere::Sphere(
 	uint32_t flags{0};
 	std::vector<Texture> textures;
 	if (albedo) {
-		textures.emplace_back(0, ALBEDO, fs::path(ASSET_DIR + albedo)
-		);
+		textures.emplace_back(0, ALBEDO, albedo);
 	}
 
 	if (normal) {
-		textures.emplace_back(0,NORMAL, fs::path(ASSET_DIR + normal));
+		textures.emplace_back(0,NORMAL,  normal);
 	}
 
 	if (orm) {
-		textures.emplace_back(0, ROUGHNESS_METALLIC, fs::path(ASSET_DIR + orm));
+		textures.emplace_back(0, ROUGHNESS_METALLIC,  orm);
 		flags |= PBR;
 		flags |= HAS_ORM;
 	}

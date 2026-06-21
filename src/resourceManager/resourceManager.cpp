@@ -4,9 +4,8 @@
 #include <assimp/postprocess.h>
 #include "glad/glad.h"
 #include "image/stb_image.h"
-#include "../config/config.hpp"
+#include "../config/configManager.h"
 #include "../io/filesystem.hpp"
-#include "../config/config.hpp"
 #include "../rendering/shader.h"
 #include "../rendering/models/cube.h"
 #include "../rendering/models/quad.h"
@@ -90,9 +89,9 @@ std::unordered_map<std::string, std::unique_ptr<Shader>>& ResourceManager::getSh
 	return mShaders;
 }
 
-void ResourceManager::asyncLoadModel(size_t entityID, std::string& file) {
+void ResourceManager::asyncLoadModel(size_t entityID, const std::string& file) {
 	mThreadPool.enqueue([this, entityID, file]() {
-		loadModel(entityID, file.c_str());
+		loadModel(entityID, file);
 	});
 }
 
@@ -112,7 +111,7 @@ void ResourceManager::uploadModelsToGPU() {
 			if (material.flags & CUBEMAP) {
 				// Handle HDR to Cubemap
 				if (material.textures.size() == 1) {
-					const std::string& path = material.textures.front().path;
+					const std::string path = fs::path(ConfigManager::instance().paths.asset_dir + material.textures.front().path);
 					glDisable(GL_CULL_FACE);
 					uint32_t id = createEnvMap(path);
 					glEnable(GL_CULL_FACE);
@@ -125,7 +124,7 @@ void ResourceManager::uploadModelsToGPU() {
 					paths.reserve(material.textures.size());
 
 					for (auto& [id, type, path]: material.textures) {
-						paths.push_back(path);
+						paths.push_back(fs::path(ConfigManager::instance().paths.asset_dir + path));
 					}
 
 					material.textures.clear();
@@ -142,7 +141,7 @@ void ResourceManager::uploadModelsToGPU() {
 				}
 
 				id = texture::load(
-					path.c_str(),
+					fs::path(ConfigManager::instance().paths.asset_dir + path).c_str(),
 					material.flags,
 					type == aiTextureType_DIFFUSE || type == aiTextureType_EMISSIVE
 					);
@@ -156,11 +155,11 @@ void ResourceManager::waitForAll() const {
 	mThreadPool.wait();
 }
 
-void ResourceManager::loadModel(const size_t entityID, const char* file) {
+void ResourceManager::loadModel(const size_t entityID, const std::string& file) {
 	// read file via ASSIMP
 	Assimp::Importer importer;
 
-	const std::string path = fs::path(ASSET_DIR + file);
+	const std::string path = fs::path(ConfigManager::instance().paths.asset_dir + file);
 	const aiScene* scene = importer.ReadFile(
 		path,
 		aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -172,7 +171,7 @@ void ResourceManager::loadModel(const size_t entityID, const char* file) {
 
 	// process ASSIMP's root node recursively
 	MeshMap meshesByMatID;
-	MaterialLoadContext mlCtx{.baseDir = path.substr(0, path.find_last_of('/')).append("/")};
+	MaterialLoadContext mlCtx{.baseDir = file.substr(0, file.find_last_of('/')).append("/")};
 
 	processMeshes(scene->mRootNode, scene, meshesByMatID, mlCtx);
 	processMaterials(scene, mlCtx);
@@ -184,7 +183,8 @@ void ResourceManager::loadModel(const size_t entityID, const char* file) {
 	}
 }
 
-void ResourceManager::processMeshes(
+void ResourceManager::
+processMeshes(
 	const aiNode* node,
 	const aiScene* scene,
 	MeshMap& meshesByMatID,
@@ -327,7 +327,7 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 		aiString str;
 
 		req.mat->GetTexture(req.type, i, &str);
-		std::string path = materialLoadCtx.baseDir + str.C_Str();
+		std::string path = materialLoadCtx .baseDir + str.C_Str();
 
 		if (material.hasTexture(path, req.type))
 			break;
@@ -360,7 +360,7 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 
-	auto envMap = std::make_unique<CubemapBuffer>(PBR_ENVMAP_SIZE, PBR_ENVMAP_SIZE, true);
+	auto envMap = std::make_unique<CubemapBuffer>(ConfigManager::instance().PBR.envMap.size, ConfigManager::instance().PBR.envMap.size, true);
 	envMap->checkStatus();
 
 	mBuffers.emplace("envMap", std::move(envMap));
@@ -401,7 +401,7 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 }
 
 void ResourceManager::createIrradianceMap() {
-	auto irradianceMap = std::make_unique<CubemapBuffer>(PBR_IRRADIANCE_MAP_SIZE, PBR_IRRADIANCE_MAP_SIZE);
+	auto irradianceMap = std::make_unique<CubemapBuffer>(ConfigManager::instance().PBR.irradianceMap.size, ConfigManager::instance().PBR.irradianceMap.size);
 	irradianceMap->checkStatus();
 
 	mBuffers.emplace("irradianceMap", std::move(irradianceMap));
@@ -436,7 +436,7 @@ void ResourceManager::createIrradianceMap() {
 void ResourceManager::createPrefilterMap() {
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-	auto prefilterMap = std::make_unique<CubemapBuffer>(PBR_PREFILTER_MAP_SIZE, PBR_PREFILTER_MAP_SIZE, true, true);
+	auto prefilterMap = std::make_unique<CubemapBuffer>(ConfigManager::instance().PBR.prefilterMap.size, ConfigManager::instance().PBR.prefilterMap.size, true, true);
 	prefilterMap->checkStatus();
 
 	mBuffers.emplace("prefilterMap", std::move(prefilterMap));
@@ -453,14 +453,14 @@ void ResourceManager::createPrefilterMap() {
 	prefilter->activate();
 	prefilter->setInt("environmentMap", 0);
 	prefilter->setMat4("projection", mCaptureProjection);
-	prefilter->setFloat("resolution", static_cast<float>(PBR_ENVMAP_SIZE));
+	prefilter->setFloat("resolution", static_cast<float>(ConfigManager::instance().PBR.envMap.size));
 
 	envMapBuffer->bindTexture(0);
 	prefilterMapBuffer->bind();
 
 	constexpr uint32_t mipLevels = 5;
 	for (int32_t i = 0; i < mipLevels; ++i) {
-		const int32_t mipSize = static_cast<int32_t>(PBR_PREFILTER_MAP_SIZE * std::pow(0.5, i));
+		const int32_t mipSize = static_cast<int32_t>(ConfigManager::instance().PBR.prefilterMap.size * std::pow(0.5, i));
 		prefilterMapBuffer->resizeRenderBuffer(mipSize, mipSize);
 
 		const float roughness = static_cast<float>(i) / static_cast<float>(mipLevels - 1);
@@ -479,7 +479,7 @@ void ResourceManager::createPrefilterMap() {
 }
 
 void ResourceManager::createBrdfLUT() {
-	auto brdfLUT = std::make_unique<FrameBuffer>(PBR_BRDF_LUT_SIZE, PBR_BRDF_LUT_SIZE);
+	auto brdfLUT = std::make_unique<FrameBuffer>(ConfigManager::instance().PBR.brdfLUT.size, ConfigManager::instance().PBR.brdfLUT.size);
 	brdfLUT->withTextureFP(GL_RG)
 			.checkStatus();
 

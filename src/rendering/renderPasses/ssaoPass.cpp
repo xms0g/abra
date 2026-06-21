@@ -7,16 +7,17 @@
 #include "../models/quad.h"
 #include "../renderContext/renderContext.hpp"
 #include "../renderCommand.h"
+#include "../../config/configManager.h"
 #include "../../math/random.h"
 
 SSAOPass::~SSAOPass() = default;
 
 void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	mQuad = std::make_unique<Model::SingleQuad>();
-	mFBO = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
+	mFBO = std::make_unique<FrameBuffer>(ConfigManager::instance().window.width, ConfigManager::instance().window.height);
 	mFBO->withTextureFP(GL_RED)
 			.checkStatus();
-	mBlurFBO = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
+	mBlurFBO = std::make_unique<FrameBuffer>(ConfigManager::instance().window.width, ConfigManager::instance().window.height);
 	mBlurFBO->withTextureFP(GL_RED)
 			.checkStatus();
 
@@ -26,10 +27,10 @@ void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	mBlurShader = ResourceManager::instance().get<Shader>("ssaoBlur");
 
 	const std::vector<TextureBinding> ssaoTextureBindings = {
-		{"gDepthMap", ctx.gBuffer.depth.textureSlot},
-		{"gNormal", ctx.gBuffer.normal.textureSlot},
-		{"texNoise", ctx.ssao.noise.textureSlot},
-		{"kernelSize", ctx.ssao.kernelSize}
+		{"gDepthMap", ConfigManager::instance().gBuffer.depth.textureSlot},
+		{"gNormal", ConfigManager::instance().gBuffer.normal.textureSlot},
+		{"texNoise", ConfigManager::instance().ssao.noise.textureSlot},
+		{"kernelSize", ConfigManager::instance().ssao.kernelSize}
 	};
 
 	const std::vector<TextureBinding> blurTextureBindings = {
@@ -39,18 +40,21 @@ void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	RenderCommand::setTextureUnits(ssaoTextureBindings, *mShader);
 	RenderCommand::setTextureUnits(blurTextureBindings, *mBlurShader);
 
-	ctx.gBuffer.buffer->bindTexture(ctx.gBuffer.depth.textureSlot, ctx.gBuffer.depth.textureIdx);
-	ctx.gBuffer.buffer->bindTexture(ctx.gBuffer.normal.textureSlot, ctx.gBuffer.normal.textureIdx);
+	ctx.gBuffer->bindTexture(ConfigManager::instance().gBuffer.depth.textureSlot, ConfigManager::instance().gBuffer.depth.textureIdx);
+	ctx.gBuffer->bindTexture(ConfigManager::instance().gBuffer.normal.textureSlot, ConfigManager::instance().gBuffer.normal.textureIdx);
+
+	int32_t textureSize = ConfigManager::instance().ssao.noise.textureSize;
 
 	std::vector<float> noise;
-	noise.resize(ctx.ssao.noiseTextureSize * ctx.ssao.noiseTextureSize);
-	noise = math::random::generateNoise(ctx.ssao.noiseTextureSize * ctx.ssao.noiseTextureSize);
-	const Texture noiseTexture = texture::generate(ctx.ssao.noiseTextureSize, ctx.ssao.noiseTextureSize, noise.data());
-	noiseTexture.bind(ctx.ssao.noise.textureSlot);
+	noise.resize(textureSize * textureSize);
+	noise = math::random::generateNoise(textureSize * textureSize);
+
+	const Texture noiseTexture = texture::generate(textureSize, textureSize, noise.data());
+	noiseTexture.bind(ConfigManager::instance().ssao.noise.textureSlot);
 
 	std::vector<glm::vec4> kernel;
-	kernel.resize(ctx.ssao.kernelSize);
-	kernel = math::random::generateKernel(ctx.ssao.kernelSize);
+	kernel.resize(ConfigManager::instance().ssao.kernelSize);
+	kernel = math::random::generateKernel(ConfigManager::instance().ssao.kernelSize);
 
 	struct alignas(16) SSAOData {
 		glm::vec4 samples[32];
@@ -64,16 +68,16 @@ void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 		data.samples[i] = kernel[i];
 	}
 
-	data.rbi = glm::vec4(ctx.ssao.radius, ctx.ssao.bias, ctx.ssao.intensity, 0.0f);
-	data.resolution = glm::vec4(ctx.screen.width, ctx.screen.height, 0.0f, 0.0f);
+	data.rbi = glm::vec4(ConfigManager::instance().ssao.radius, ConfigManager::instance().ssao.bias, ConfigManager::instance().ssao.intensity, 0.0f);
+	data.resolution = glm::vec4(ConfigManager::instance().window.width, ConfigManager::instance().window.height, 0.0f, 0.0f);
 
-	mUBO = std::make_unique<UniformBuffer>(DYNAMIC, sizeof(SSAOData), ctx.ssao.ubo.binding);
+	mUBO = std::make_unique<UniformBuffer>(DYNAMIC, sizeof(SSAOData), ConfigManager::instance().ssao.ubo_binding);
 	mUBO->bind();
 	mUBO->setData(&data, sizeof(SSAOData), 0);
 	mUBO->unbind();
 
-	mUBO->configure(mShader->id(), ctx.ssao.ubo.binding, ctx.ssao.ubo.blockName);
-	ctx.ssao.ubo.buffer = mUBO.get();
+	mUBO->configure(mShader->id(), ConfigManager::instance().ssao.ubo_binding, ConfigManager::instance().ssao.block_name.c_str());
+	ctx.ssao.ubo = mUBO.get();
 }
 
 void SSAOPass::execute(const RenderContext& ctx) {

@@ -1,8 +1,9 @@
 #include "lightSystem.h"
+
+#include "../../config/configManager.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "../buffers/uniformBuffer.h"
 #include "../renderContext/renderContext.hpp"
-#include "../../config/config.hpp"
 #include "../../ECS/registry.h"
 #include "../../ECS/components/directionalLight.hpp"
 #include "../../ECS/components/pointLight.hpp"
@@ -39,9 +40,9 @@ struct alignas(16) SpotLight {
 };
 
 struct alignas(16) PackedLights {
-	DirectionalLight dirLights[MAX_DIRECTIONAL_LIGHTS]{};
-	PointLight pointLights[MAX_POINT_LIGHTS]{};
-	SpotLight spotLights[MAX_SPOT_LIGHTS]{};
+	DirectionalLight dirLights[1]{};
+	PointLight pointLights[4]{};
+	SpotLight spotLights[4]{};
 	glm::ivec4 lightCount{};
 };
 
@@ -70,7 +71,7 @@ void LightSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 		}
 	}
 
-	mUBO = std::make_unique<UniformBuffer>(DYNAMIC, sizeof(PackedLights), ctx.light.ubo.binding);
+	mUBO = std::make_unique<UniformBuffer>(DYNAMIC, sizeof(PackedLights), ConfigManager::instance().light.ubo_binding);
 	updateLightUBO();
 }
 
@@ -78,15 +79,15 @@ const UniformBuffer* LightSystem::ubo() const {
 	return mUBO.get();
 }
 
-std::array<DirectionalLightComponent*, MAX_DIRECTIONAL_LIGHTS>& LightSystem::dirLights() {
+std::array<DirectionalLightComponent*, 1>& LightSystem::dirLights() {
 	return mDirLights;
 }
 
-std::array<PointLightComponent*, MAX_POINT_LIGHTS>& LightSystem::pointLights() {
+std::array<PointLightComponent*, 4>& LightSystem::pointLights() {
 	return mPointLights;
 }
 
-std::array<SpotLightComponent*, MAX_SPOT_LIGHTS>& LightSystem::spotLights() {
+std::array<SpotLightComponent*, 4>& LightSystem::spotLights() {
 	return mSpotLights;
 }
 

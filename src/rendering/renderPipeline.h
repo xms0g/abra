@@ -4,6 +4,7 @@
 #include "renderContext/renderQueue.hpp"
 #include "../ECS/system.hpp"
 
+struct Config;
 class SyncStateSystem;
 class EventBus;
 class SSAOPass;

@@ -1,6 +1,7 @@
 #include "renderCommand.h"
 #include "glad/glad.h"
 #include "shader.h"
+#include "../config/configManager.h"
 #include "material/material.hpp"
 #include "texture/texture.h"
 #include "renderContext/renderContext.hpp"
@@ -155,9 +156,9 @@ void RenderCommand::drawQuad(const uint32_t vao, const std::span<const uint32_t>
 }
 
 void RenderCommand::bindShadowMaps(const RenderContext& ctx) {
-	static const int32_t slot0 = GL_TEXTURE0 + ctx.shadow.textureSlot;
-	static const int32_t slot1 = GL_TEXTURE0 + ctx.shadow.textureSlot + 1;
-	static const int32_t slot2 = GL_TEXTURE0 + ctx.shadow.textureSlot + 2;
+	static const int32_t slot0 = GL_TEXTURE0 + ConfigManager::instance().shadow.texture_slot;
+	static const int32_t slot1 = GL_TEXTURE0 + ConfigManager::instance().shadow.texture_slot + 1;
+	static const int32_t slot2 = GL_TEXTURE0 + ConfigManager::instance().shadow.texture_slot + 2;
 	static const uint32_t dirShadowMap = ctx.renderQueue->shadowMaps[0];
 	static const uint32_t omnidirShadowMap = ctx.renderQueue->shadowMaps[1];
 	static const uint32_t persShadowMap = ctx.renderQueue->shadowMaps[2];

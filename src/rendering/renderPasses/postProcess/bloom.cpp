@@ -4,6 +4,7 @@
 #include "../../renderCommand.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderContext/renderContext.hpp"
+#include "../../../config/configManager.h"
 
 Bloom::Bloom(const std::string& name, const RenderContext& ctx, const bool enabled)
 	: BasePostEffect(name, enabled) {
@@ -25,7 +26,7 @@ Bloom::Bloom(const std::string& name, const RenderContext& ctx, const bool enabl
 	RenderCommand::setTextureUnits(combineTextureBindings, *mCombine);
 
 	for (auto& target: mRenderTargets) {
-		target = std::make_unique<FrameBuffer>(ctx.screen.width, ctx.screen.height);
+		target = std::make_unique<FrameBuffer>(ConfigManager::instance().window.width, ConfigManager::instance().window.height);
 #ifdef HDR
 		target->withTextureFP(GL_RGBA)
 #else

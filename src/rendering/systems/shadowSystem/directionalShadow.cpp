@@ -8,9 +8,10 @@
 #include "../../renderContext/renderQueue.hpp"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderCommand.h"
+#include "../../../config/configManager.h"
 
 DirectionalShadow::DirectionalShadow(const RenderContext& ctx) {
-	mDepthMap = std::make_unique<FrameBuffer>(ctx.shadow.width, ctx.shadow.height);
+	mDepthMap = std::make_unique<FrameBuffer>(ConfigManager::instance().shadow.map_width, ConfigManager::instance().shadow.map_height);
 	mDepthMap->withTextureDepth(GL_DEPTH_COMPONENT24, true)
 			.checkStatus();
 	mDepthMap->unbind();
@@ -29,14 +30,14 @@ glm::mat4 DirectionalShadow::lightSpaceMatrix() const {
 }
 
 void DirectionalShadow::render(const RenderContext& ctx, const glm::vec3& direction) {
-	const glm::vec3 lightPos = -direction * ctx.shadow.directional.height;
+	const glm::vec3 lightPos = -direction * ConfigManager::instance().shadow.directional.height;
 	const glm::mat4 lightProjection = glm::ortho(
-		ctx.shadow.directional.left,
-		ctx.shadow.directional.right,
-		ctx.shadow.directional.bottom,
-		ctx.shadow.directional.top,
-		ctx.shadow.directional.nearPlane,
-		ctx.shadow.directional.farPlane);
+		 ConfigManager::instance().shadow.directional.left,
+		 ConfigManager::instance().shadow.directional.right,
+		 ConfigManager::instance().shadow.directional.bottom,
+		 ConfigManager::instance().shadow.directional.top,
+		 ConfigManager::instance().shadow.directional.nearPlane,
+		 ConfigManager::instance().shadow.directional.farPlane);
 
 	const glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 

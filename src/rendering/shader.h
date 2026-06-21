@@ -3,6 +3,8 @@
 #include <unordered_set>
 #include "glm/glm.hpp"
 
+struct Config;
+
 class Shader {
 public:
 	Shader(

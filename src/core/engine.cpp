@@ -17,7 +17,7 @@ void Engine::init(Registry* registry) {
 	mRegistry = registry;
 
 	mWindow = std::make_unique<Window>();
-	mWindow->init("Abra");
+	mWindow->init();
 
 	registry->addSystem<GuiSystem>();
 	mGuiSystem = &registry->getSystem<GuiSystem>();

@@ -30,7 +30,7 @@ public:
 
 	std::unordered_map<std::string, std::unique_ptr<Shader> >& getShaders();
 
-	void asyncLoadModel(size_t entityID, std::string& file);
+	void asyncLoadModel(size_t entityID, const std::string& file);
 
 	template<typename T>
 	void upload(size_t entityID, T& map);
@@ -57,7 +57,7 @@ private:
 		uint32_t materialID;
 	};
 
-	void loadModel(size_t entityID, const char* file);
+	void loadModel(size_t entityID, const std::string& file);
 
 	void processMeshes(
 		const aiNode* node,

@@ -3,7 +3,6 @@
 #include "../mesh/vertex.hpp"
 #include "../texture/texture.h"
 #include "../material/material.hpp"
-#include "../../config/config.hpp"
 #include "../../io/filesystem.hpp"
 
 Model::Plane::Plane(
@@ -78,20 +77,19 @@ Model::Plane::Plane(
 	std::vector<Texture> textures;
 
 	if (diffuseTexture) {
-		textures.emplace_back(0, ALBEDO, fs::path(ASSET_DIR + diffuseTexture)
-		);
+		textures.emplace_back(0, ALBEDO,diffuseTexture);
 	}
 
 	if (specularTexture) {
-		textures.emplace_back(0, SPECULAR, fs::path(ASSET_DIR + specularTexture));
+		textures.emplace_back(0, SPECULAR, specularTexture);
 	}
 
 	if (normalTexture) {
-		textures.emplace_back(0, NORMAL, fs::path(ASSET_DIR + normalTexture));
+		textures.emplace_back(0, NORMAL,  normalTexture);
 	}
 
 	if (heightTexture) {
-		textures.emplace_back(0, HEIGHT, fs::path(ASSET_DIR + heightTexture));
+		textures.emplace_back(0, HEIGHT, heightTexture);
 	}
 
 	uint32_t flags{0};
