@@ -155,17 +155,19 @@ void RenderCommand::drawQuad(const uint32_t vao, const std::span<const uint32_t>
 }
 
 void RenderCommand::bindShadowMaps(const RenderContext& ctx) {
-	static const int32_t slot = GL_TEXTURE0 + ctx.shadow.textureSlot;
+	static const int32_t slot0 = GL_TEXTURE0 + ctx.shadow.textureSlot;
+	static const int32_t slot1 = GL_TEXTURE0 + ctx.shadow.textureSlot + 1;
+	static const int32_t slot2 = GL_TEXTURE0 + ctx.shadow.textureSlot + 2;
 	static const uint32_t dirShadowMap = ctx.renderQueue->shadowMaps[0];
 	static const uint32_t omnidirShadowMap = ctx.renderQueue->shadowMaps[1];
 	static const uint32_t persShadowMap = ctx.renderQueue->shadowMaps[2];
 
-	glActiveTexture(slot);
+	glActiveTexture(slot0);
 	glBindTexture(GL_TEXTURE_2D, dirShadowMap);
 
-	glActiveTexture(slot + 1);
+	glActiveTexture(slot1);
 	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, omnidirShadowMap);
 
-	glActiveTexture(slot + 2);
+	glActiveTexture(slot2);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, persShadowMap);
 }
