@@ -29,11 +29,11 @@ Texture texture::generate(const int32_t width, const int32_t height, const float
 	return {textureID, GL_TEXTURE_2D, ""};
 }
 
-uint32_t texture::load(const char* path, const uint32_t flags, const bool isSRGB) {
+uint32_t texture::load(const std::string& path, const uint32_t flags, const bool isSRGB) {
 	uint32_t textureID;
 
 	int32_t width, height, channel;
-	unsigned char* data = stbi_load(path, &width, &height, &channel, 4);
+	unsigned char* data = stbi_load(path.c_str(), &width, &height, &channel, 4);
 
 	if (!data) {
 		std::cerr << "Texture failed to load at path: " << path << std::endl;
@@ -95,13 +95,13 @@ uint32_t texture::loadCubemap(const std::vector<std::string>& faces) {
 	return textureID;
 }
 
-Texture texture::loadHDR(const char* path) {
+Texture texture::loadHDR(const std::string& path) {
 	uint32_t texID;
 	int32_t width, height, channel;
 
 	stbi_set_flip_vertically_on_load(true);
 
-	float* data = stbi_loadf(path, &width, &height, &channel, 0);
+	float* data = stbi_loadf(path.c_str(), &width, &height, &channel, 0);
 	if (!data) {
 		std::cerr << "HDR texture failed to load at path: " << path << std::endl;
 		return {};

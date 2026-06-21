@@ -141,7 +141,7 @@ void ResourceManager::uploadModelsToGPU() {
 				}
 
 				id = texture::load(
-					fs::path(ConfigManager::instance().paths.asset_dir + path).c_str(),
+					fs::path(ConfigManager::instance().paths.asset_dir + path),
 					material.flags,
 					type == aiTextureType_DIFFUSE || type == aiTextureType_EMISSIVE
 					);
@@ -372,7 +372,7 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
 	const auto equirectangularToCube = get<Shader>("equirectangularToCube");
-	const Texture hdrTexture = texture::loadHDR(path.c_str());
+	const Texture hdrTexture = texture::loadHDR(path);
 
 	// convert HDR equirectangular environment map to cubemap equivalent
 	equirectangularToCube->activate();

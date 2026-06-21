@@ -28,9 +28,9 @@ struct TextureBinding {
 namespace texture {
 Texture generate(int32_t width, int32_t height, const float* data);
 
-uint32_t load(const char* path, uint32_t flags, bool isSRGB);
+uint32_t load(const std::string& path, uint32_t flags, bool isSRGB);
 
 uint32_t loadCubemap(const std::vector<std::string>& faces);
 
-Texture loadHDR(const char* path);
+Texture loadHDR(const std::string& path);
 }
