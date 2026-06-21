@@ -46,8 +46,9 @@ public:
 	}
 
 	template<typename T, typename ...Args>
-	void addSystem(Args&& ...args) {
+	T& addSystem(Args&& ...args) {
 		systems.insert({std::type_index{typeid(T)}, std::make_shared<T>(std::forward<Args>(args)...)});
+		return getSystem<T>();
 
 	}
 

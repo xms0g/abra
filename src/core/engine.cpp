@@ -19,11 +19,8 @@ void Engine::init(Registry* registry) {
 	mWindow = std::make_unique<Window>();
 	mWindow->init();
 
-	registry->addSystem<GuiSystem>();
-	mGuiSystem = &registry->getSystem<GuiSystem>();
-
-	registry->addSystem<RenderPipeline>(mRegistry, mWindow->nativeHandle(), mWindow->glContext());
-	mRenderPipeline = &registry->getSystem<RenderPipeline>();
+	mGuiSystem = &registry->addSystem<GuiSystem>();
+	mRenderPipeline = &registry->addSystem<RenderPipeline>(mRegistry, mWindow->nativeHandle(), mWindow->glContext());
 
 	mCamera = std::make_unique<Camera>(glm::vec3(0.0f, 2.0f, 5.0f));
 	mInput = std::make_unique<Input>();

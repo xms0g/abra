@@ -64,8 +64,7 @@ RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLCon
 	mRenderCtx = std::make_unique<RenderContext>();
 	mRenderCtx->renderQueue = &mRenderQueue;
 
-	registry->addSystem<LightSystem>();
-	mLightSystem = &registry->getSystem<LightSystem>();
+	mLightSystem = &registry->addSystem<LightSystem>();
 
 	mRenderCtx->light.dirLights = &mLightSystem->dirLights();
 	mRenderCtx->light.pointLights = &mLightSystem->pointLights();

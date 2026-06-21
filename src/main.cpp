@@ -1,4 +1,5 @@
 #include <iostream>
+#include "config/configManager.h"
 #include "core/engine.h"
 #include "ECS/registry.h"
 #include "resourceManager/sceneLoader.h"
@@ -17,6 +18,7 @@ int main() {
 
 	try {
 		Engine engine;
+		ConfigManager::instance().load("config.toml");
 		engine.init(&registry);
 
 		ResourceManager::instance().createShaders();
