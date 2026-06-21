@@ -1,7 +1,6 @@
 #include "renderCommand.h"
 #include "glad/glad.h"
 #include "shader.h"
-#include "../config/configManager.h"
 #include "material/material.hpp"
 #include "texture/texture.h"
 #include "renderContext/renderContext.hpp"
@@ -9,6 +8,7 @@
 #include "renderContext/renderQueue.hpp"
 #include "renderContext/renderGroup.hpp"
 #include "../ECS/components/mesh.hpp"
+#include "../config/configManager.h"
 
 void RenderCommand::forward(const RenderContext& ctx, const std::vector<RenderableObject>& objects) {
 	const Shader* lastShader{nullptr};

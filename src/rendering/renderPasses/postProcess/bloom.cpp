@@ -84,7 +84,7 @@ uint32_t Bloom::blurPass(const uint32_t vao, const uint32_t sceneTexture, bool& 
 		mBlur->setBool("horizontal", horizontal);
 		horizontal = !horizontal;
 
-		uint32_t textures[] = {outTex};
+		const uint32_t textures[] = {outTex};
 		RenderCommand::drawQuad(vao, textures);
 
 		outTex = mRenderTargets[toggle]->texture();
@@ -102,7 +102,7 @@ uint32_t Bloom::combinePass(
 	mRenderTargets[toggle]->bind();
 	mCombine->activate();
 
-	uint32_t textures[] = {sceneTexture, blurTexture};
+	const uint32_t textures[] = {sceneTexture, blurTexture};
 	RenderCommand::drawQuad(vao, textures);
 
 	return mRenderTargets[toggle]->texture();
