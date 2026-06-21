@@ -18,11 +18,11 @@ public:
 	[[nodiscard]]
 	const UniformBuffer* ubo() const;
 
-	std::array<DirectionalLightComponent*, 1>& dirLights();
+	std::vector<DirectionalLightComponent*>& dirLights();
 
-	std::array<PointLightComponent*, 4>& pointLights();
+	std::vector<PointLightComponent*>& pointLights();
 
-	std::array<SpotLightComponent*, 4>& spotLights();
+	std::vector<SpotLightComponent*>& spotLights();
 
 private:
 	void updateLightUBO() const;
@@ -31,7 +31,7 @@ private:
 
 	EventBus* mEventBus{};
 	std::unique_ptr<UniformBuffer> mUBO;
-	std::array<DirectionalLightComponent*, 1> mDirLights{};
-	std::array<PointLightComponent*, 4> mPointLights{};
-	std::array<SpotLightComponent*, 4> mSpotLights{};
+	std::vector<DirectionalLightComponent*> mDirLights{};
+	std::vector<PointLightComponent*> mPointLights{};
+	std::vector<SpotLightComponent*> mSpotLights{};
 };

@@ -30,10 +30,9 @@ struct RenderContext {
 	} ssao{};
 
 	struct {
-		const std::array<DirectionalLightComponent*, 1>* dirLights;
-		const std::array<PointLightComponent*, 4>* pointLights;
-		const std::array<SpotLightComponent*, 4>* spotLights;
-		uint32_t maxDirLights, maxPointLights, maxSpotLights;
+		const std::vector<DirectionalLightComponent*>* dirLights;
+		const std::vector<PointLightComponent*>* pointLights;
+		const std::vector<SpotLightComponent*>* spotLights;
 		const UniformBuffer* ubo;
 	} light{};
 

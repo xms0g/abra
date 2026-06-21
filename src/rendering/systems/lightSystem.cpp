@@ -1,6 +1,4 @@
 #include "lightSystem.h"
-
-#include "../../config/configManager.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "../buffers/uniformBuffer.h"
 #include "../renderContext/renderContext.hpp"
@@ -11,6 +9,7 @@
 #include "../../event/eventBus.hpp"
 #include "../../event/events/guiLightEvent.hpp"
 #include "../../event/events/updateShadowMapEvent.hpp"
+#include "../../config/configManager.h"
 
 struct alignas(16) DirectionalLight {
 	glm::vec4 direction;
@@ -55,19 +54,23 @@ LightSystem::LightSystem() {
 }
 
 void LightSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
+	mDirLights.reserve(ConfigManager::instance().light.max_directional);
+	mPointLights.reserve(ConfigManager::instance().light.max_point);
+	mSpotLights.reserve(ConfigManager::instance().light.max_spot);
+
 	mEventBus = &eventBus;
 	eventBus.subscribeToEvent<LightSystem, GuiLightEvent>(this, &LightSystem::onGuiUpdate);
 
 	for (auto& entity: getSystemEntities()) {
 		if (entity.hasComponent<DirectionalLightComponent>()) {
 			auto& light = entity.getComponent<DirectionalLightComponent>();
-			mDirLights[0] = &light;
+			mDirLights.push_back(&light);
 		} else if (entity.hasComponent<PointLightComponent>()) {
 			auto& light = entity.getComponent<PointLightComponent>();
-			mPointLights[light.idx] = &light;
+			mPointLights.push_back(&light);
 		} else if (entity.hasComponent<SpotLightComponent>()) {
 			auto& light = entity.getComponent<SpotLightComponent>();
-			mSpotLights[light.idx] = &light;
+			mSpotLights.push_back(&light);
 		}
 	}
 
@@ -79,15 +82,15 @@ const UniformBuffer* LightSystem::ubo() const {
 	return mUBO.get();
 }
 
-std::array<DirectionalLightComponent*, 1>& LightSystem::dirLights() {
+std::vector<DirectionalLightComponent*>& LightSystem::dirLights() {
 	return mDirLights;
 }
 
-std::array<PointLightComponent*, 4>& LightSystem::pointLights() {
+std::vector<PointLightComponent*>& LightSystem::pointLights() {
 	return mPointLights;
 }
 
-std::array<SpotLightComponent*, 4>& LightSystem::spotLights() {
+std::vector<SpotLightComponent*>& LightSystem::spotLights() {
 	return mSpotLights;
 }
 
