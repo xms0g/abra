@@ -29,7 +29,7 @@ private:
 
 template<typename T>
 T& ConfigManager::get(const std::string& key) {
-	return std::any_cast<T&>(mConfig.at(key));
+	return std::any_cast<T&>(mConfig[key]);
 }
 
 template<typename T>

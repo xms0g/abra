@@ -10,15 +10,15 @@ Shader::Shader(const char* vs, const char* fs, const char* gs, const char* tcs, 
 	std::unordered_set<std::string> includedFiles{};
 
 	try {
-		const std::string vertexCode = preprocess(loadFile(vs), vs, includedFiles);
+		const std::string vertexCode = preprocess(loadFile(vs), includedFiles);
 		includedFiles.clear();
-		const std::string fragmentCode = preprocess(loadFile(fs), fs, includedFiles);
+		const std::string fragmentCode = preprocess(loadFile(fs), includedFiles);
 		includedFiles.clear();
-		const std::string geometryCode = gs ? preprocess(loadFile(gs), gs, includedFiles) : "";
+		const std::string geometryCode = gs ? preprocess(loadFile(gs), includedFiles) : "";
 		includedFiles.clear();
-		const std::string tessControlCode = tcs ? preprocess(loadFile(tcs), tcs, includedFiles) : "";
+		const std::string tessControlCode = tcs ? preprocess(loadFile(tcs), includedFiles) : "";
 		includedFiles.clear();
-		const std::string tessEvaluationCode = tes ? preprocess(loadFile(tes), tes, includedFiles) : "";
+		const std::string tessEvaluationCode = tes ? preprocess(loadFile(tes), includedFiles) : "";
 		includedFiles.clear();
 
 		const uint32_t vertex = compileShader(vertexCode, vs, GL_VERTEX_SHADER);
@@ -134,7 +134,6 @@ std::string Shader::loadFile(const char* fn) {
 
 std::string Shader::preprocess(
 	const std::string& source,
-	const char* fileName,
 	std::unordered_set<std::string>& includedFiles) {
 	std::stringstream result;
 	std::istringstream stream(source);
@@ -155,7 +154,7 @@ std::string Shader::preprocess(
 				}
 				includedFiles.insert(includeFile);
 				// Load included file
-				result << preprocess(loadFile(includeFile.c_str()), fileName, includedFiles) << "\n";
+				result << preprocess(loadFile(includeFile.c_str()), includedFiles) << "\n";
 			}
 		} else {
 			result << line << "\n";

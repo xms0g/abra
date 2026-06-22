@@ -24,13 +24,9 @@ ResourceManager& ResourceManager::instance() {
 
 void ResourceManager::createShaders() {
 	// Terrain
-	mShaders.emplace("terrain",
-	                 std::make_unique<Shader>(
-		                 "models/terrain.vert",
-		                 "models/terrain.frag",
-		                 nullptr,
-		                 "models/terrain.tcs",
-		                 "models/terrain.tes"));
+	mShaders.emplace(
+		"terrain",
+		std::make_unique<Shader>("models/terrain.vert","models/terrain.frag",nullptr,"models/terrain.tcs","models/terrain.tes"));
 	// Deferred
 	mShaders.emplace("gBuffer", std::make_unique<Shader>("deferred/gbuffer.vert", "deferred/gbuffer.frag"));
 	mShaders.emplace("deferredLighting", std::make_unique<Shader>("models/quad.vert", "deferred/lighting.frag"));
@@ -48,26 +44,30 @@ void ResourceManager::createShaders() {
 	mShaders.emplace("skybox", std::make_unique<Shader>("skybox.vert", "skybox.frag"));
 	// Depth
 	mShaders.emplace("depth", std::make_unique<Shader>("depth/depth.vert", "depth/depth.frag"));
-	mShaders.emplace("depthCubemap",
-	                 std::make_unique<Shader>("depth/depthCubemap.vert", "depth/depthCubemap.frag",
-	                                          "depth/depthCubemap.geom"));
+	mShaders.emplace(
+		"depthCubemap",
+		std::make_unique<Shader>("depth/depthCubemap.vert", "depth/depthCubemap.frag","depth/depthCubemap.geom"));
 	// Debug
-	mShaders.emplace("debugNormal",
-	                 std::make_unique<Shader>("debug/normal.vert", "debug/normal.frag", "debug/normal.geom"));
+	mShaders.emplace(
+		"debugNormal",
+		std::make_unique<Shader>("debug/normal.vert", "debug/normal.frag", "debug/normal.geom"));
 	mShaders.emplace("debugWireframe",
 	                 std::make_unique<Shader>("debug/wireframe.vert", "debug/wireframe.frag", "debug/wireframe.geom"));
 	// PBR
-	mShaders.emplace("equirectangularToCube",
-	                 std::make_unique<Shader>("pbr/cubemap.vert", "pbr/equirectangularToCube.frag"));
+	mShaders.emplace(
+		"equirectangularToCube",
+		std::make_unique<Shader>("pbr/cubemap.vert", "pbr/equirectangularToCube.frag"));
 	mShaders.emplace("irradianceConv", std::make_unique<Shader>("pbr/cubemap.vert", "pbr/irradianceConv.frag"));
 	mShaders.emplace("prefilter", std::make_unique<Shader>("pbr/cubemap.vert", "pbr/prefilter.frag"));
 	mShaders.emplace("brdfLUT", std::make_unique<Shader>("pbr/brdfLUT.vert", "pbr/brdfLUT.frag"));
 	// PostFX
 	mShaders.emplace(
-		"bloomBF", std::make_unique<Shader>("models/quad.vert", "post-processing/bloom/brightFilter.frag"));
+		"bloomBF",
+		std::make_unique<Shader>("models/quad.vert", "post-processing/bloom/brightFilter.frag"));
 	mShaders.emplace("bloomBlur", std::make_unique<Shader>("models/quad.vert", "post-processing/bloom/blur.frag"));
-	mShaders.emplace("bloomCombine",
-	                 std::make_unique<Shader>("models/quad.vert", "post-processing/bloom/combine.frag"));
+	mShaders.emplace(
+		"bloomCombine",
+		std::make_unique<Shader>("models/quad.vert", "post-processing/bloom/combine.frag"));
 	mShaders.emplace("toneMapping", std::make_unique<Shader>("models/quad.vert", "post-processing/toneMapping.frag"));
 	mShaders.emplace("grayscale", std::make_unique<Shader>("models/quad.vert", "post-processing/grayscale.frag"));
 	mShaders.emplace("sepia", std::make_unique<Shader>("models/quad.vert", "post-processing/sepia.frag"));
@@ -177,7 +177,9 @@ void ResourceManager::loadModel(const size_t entityID, const std::string& file) 
 	MaterialLoadContext mlCtx{.baseDir = file.substr(0, file.find_last_of('/')).append("/")};
 
 	processMeshes(scene->mRootNode, scene, meshesByMatID, mlCtx);
-	processMaterials(scene, mlCtx); {
+	processMaterials(scene, mlCtx);
+
+	{
 		std::lock_guard<std::mutex> lock(mResourceMutex);
 		mMeshesByEntity.emplace(entityID, std::move(meshesByMatID));
 		mMaterialsByEntity.emplace(entityID, mlCtx.materials);
