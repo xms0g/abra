@@ -44,7 +44,7 @@
 #include "../math/boundingVolume.h"
 #include "../math/matrix.h"
 #include "../event/eventBus.hpp"
-#include "../resourceManager/resourceManager.h"
+#include "../resource/resourceManager.h"
 
 RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLContext context) {
 	RequireComponent<MeshComponent>();

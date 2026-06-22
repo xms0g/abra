@@ -2,7 +2,7 @@
 #include <vector>
 #include "glm/glm.hpp"
 #include "../material/material.hpp"
-#include "../../resourceManager/resourceManager.h"
+#include "../../resource/resourceManager.h"
 
 namespace math {
 struct Frustum;

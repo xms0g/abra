@@ -2,8 +2,8 @@
 #include "config/configManager.h"
 #include "core/engine.h"
 #include "ECS/registry.h"
-#include "resourceManager/sceneLoader.h"
-#include "resourceManager/resourceManager.h"
+#include "resource/sceneLoader.h"
+#include "resource/resourceManager.h"
 
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 1
