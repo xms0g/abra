@@ -74,12 +74,12 @@ void ConfigManager::load(const std::string& filepath) {
 		set("PBR.prefilterMap.textureSlot", config["pbr"]["prefilter_map_texture_slot"].value_or(10));
 		set("PBR.brdfLUT.textureSlot", config["pbr"]["brdf_lut_texture_slot"].value_or(11));
 
-		set("PBR.albedoTextureSlot", config["pbr"]["texture_slots"]["albedo"].value_or(12));
-		set("PBR.normalTextureSlot", config["pbr"]["texture_slots"]["normal"].value_or(13));
-		set("PBR.roughnessMetallicTextureSlot", config["pbr"]["texture_slots"]["rm"].value_or(14));
-		set("PBR.aoTextureSlot", config["pbr"]["texture_slots"]["ao"].value_or(15));
-		set("PBR.emissiveTextureSlot", config["pbr"]["texture_slots"]["emissive"].value_or(16));
-		set("PBR.heightTextureSlot", config["pbr"]["texture_slots"]["height"].value_or(17));
+		set("PBR.albedo.textureSlot", config["pbr"]["texture_slots"]["albedo"].value_or(12));
+		set("PBR.normal.textureSlot", config["pbr"]["texture_slots"]["normal"].value_or(13));
+		set("PBR.roughnessMetallic.textureSlot", config["pbr"]["texture_slots"]["rm"].value_or(14));
+		set("PBR.ao.textureSlot", config["pbr"]["texture_slots"]["ao"].value_or(15));
+		set("PBR.emissive.textureSlot", config["pbr"]["texture_slots"]["emissive"].value_or(16));
+		set("PBR.height.textureSlot", config["pbr"]["texture_slots"]["height"].value_or(17));
 
 		set("gBuffer.position.textureIdx", config["gbuffer"]["indices"]["position"].value_or(0));
 		set("gBuffer.position.textureSlot", config["gbuffer"]["texture_slots"]["position"].value_or(19));

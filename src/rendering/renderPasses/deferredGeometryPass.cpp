@@ -34,12 +34,12 @@ void DeferredGeometryPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	mShader = ResourceManager::instance().get<Shader>("gBuffer");
 
 	const std::vector<TextureBinding> textureBindings = {
-		{"material.texture_albedo", ConfigManager::instance().get<int32_t>("PBR.albedoTextureSlot")},
-		{"material.texture_normal", ConfigManager::instance().get<int32_t>("PBR.normalTextureSlot")},
-		{"material.texture_roughnessMetallic", ConfigManager::instance().get<int32_t>("PBR.roughnessMetallicTextureSlot")},
-		{"material.texture_ao", ConfigManager::instance().get<int32_t>("PBR.aoTextureSlot")},
-		{"material.texture_emissive", ConfigManager::instance().get<int32_t>("PBR.emissiveTextureSlot")},
-		{"material.texture_height", ConfigManager::instance().get<int32_t>("PBR.heightTextureSlot")},
+		{"material.texture_albedo", ConfigManager::instance().get<int32_t>("PBR.albedo.textureSlot")},
+		{"material.texture_normal", ConfigManager::instance().get<int32_t>("PBR.normal.textureSlot")},
+		{"material.texture_roughnessMetallic", ConfigManager::instance().get<int32_t>("PBR.roughnessMetallic.textureSlot")},
+		{"material.texture_ao", ConfigManager::instance().get<int32_t>("PBR.ao.textureSlot")},
+		{"material.texture_emissive", ConfigManager::instance().get<int32_t>("PBR.emissive.textureSlot")},
+		{"material.texture_height", ConfigManager::instance().get<int32_t>("PBR.height.textureSlot")},
 	};
 
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
