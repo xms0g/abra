@@ -156,19 +156,14 @@ void RenderCommand::drawQuad(const uint32_t vao, const std::span<const uint32_t>
 }
 
 void RenderCommand::bindShadowMaps(const RenderContext& ctx) {
-	static const int32_t slot0 = GL_TEXTURE0 + ConfigManager::instance().get<int32_t>("shadow.texture_slot");
-	static const int32_t slot1 = GL_TEXTURE0 + ConfigManager::instance().get<int32_t>("shadow.texture_slot") + 1;
-	static const int32_t slot2 = GL_TEXTURE0 + ConfigManager::instance().get<int32_t>("shadow.texture_slot") + 2;
-	static const uint32_t dirShadowMap = ctx.renderQueue->shadowMaps[0];
-	static const uint32_t omnidirShadowMap = ctx.renderQueue->shadowMaps[1];
-	static const uint32_t persShadowMap = ctx.renderQueue->shadowMaps[2];
+	const int32_t slot = GL_TEXTURE0 + ConfigManager::instance().get<int32_t>("shadow.texture_slot");
 
-	glActiveTexture(slot0);
-	glBindTexture(GL_TEXTURE_2D, dirShadowMap);
+	glActiveTexture(slot);
+	glBindTexture(GL_TEXTURE_2D, ctx.renderQueue->shadowMaps[0]);
 
-	glActiveTexture(slot1);
-	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, omnidirShadowMap);
+	glActiveTexture(slot + 1);
+	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, ctx.renderQueue->shadowMaps[1]);
 
-	glActiveTexture(slot2);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, persShadowMap);
+	glActiveTexture(slot + 2);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, ctx.renderQueue->shadowMaps[2]);
 }
