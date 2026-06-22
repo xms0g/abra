@@ -21,6 +21,7 @@ public:
 	void render(const RenderContext& ctx, const glm::vec3& direction);
 
 private:
+	float mHeight, mLeft, mRight, mBottom, mTop, mNear, mFar;
 	glm::mat4 mLightSpaceMatrix{};
 	std::unique_ptr<FrameBuffer> mDepthMap;
 	const Shader* mDepthShader;

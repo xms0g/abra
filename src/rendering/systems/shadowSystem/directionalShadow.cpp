@@ -11,12 +11,22 @@
 #include "../../../config/configManager.h"
 
 DirectionalShadow::DirectionalShadow(const RenderContext& ctx) {
-	mDepthMap = std::make_unique<FrameBuffer>(ConfigManager::instance().shadow.map_width, ConfigManager::instance().shadow.map_height);
+	mDepthMap = std::make_unique<FrameBuffer>(
+		ConfigManager::instance().get<int32_t>("shadow.map_width"),
+		ConfigManager::instance().get<int32_t>("shadow.map_height"));
 	mDepthMap->withTextureDepth(GL_DEPTH_COMPONENT24, true)
 			.checkStatus();
 	mDepthMap->unbind();
 
 	mDepthShader = ResourceManager::instance().get<Shader>("depth");
+
+	mHeight = ConfigManager::instance().get<float>("shadow.directional.height");
+	mRight = ConfigManager::instance().get<float>("shadow.directional.right");
+	mLeft = ConfigManager::instance().get<float>("shadow.directional.left");
+	mTop = ConfigManager::instance().get<float>("shadow.directional.top");
+	mBottom = ConfigManager::instance().get<float>("shadow.directional.bottom");
+	mNear = ConfigManager::instance().get<float>("shadow.directional.nearPlane");
+	mFar = ConfigManager::instance().get<float>("shadow.directional.farPlane");
 }
 
 DirectionalShadow::~DirectionalShadow() = default;
@@ -30,15 +40,8 @@ glm::mat4 DirectionalShadow::lightSpaceMatrix() const {
 }
 
 void DirectionalShadow::render(const RenderContext& ctx, const glm::vec3& direction) {
-	const glm::vec3 lightPos = -direction * ConfigManager::instance().shadow.directional.height;
-	const glm::mat4 lightProjection = glm::ortho(
-		 ConfigManager::instance().shadow.directional.left,
-		 ConfigManager::instance().shadow.directional.right,
-		 ConfigManager::instance().shadow.directional.bottom,
-		 ConfigManager::instance().shadow.directional.top,
-		 ConfigManager::instance().shadow.directional.nearPlane,
-		 ConfigManager::instance().shadow.directional.farPlane);
-
+	const glm::vec3 lightPos = -direction * mHeight;
+	const glm::mat4 lightProjection = glm::ortho(mLeft, mRight, mBottom, mTop, mNear, mFar);
 	const glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 
 	mLightSpaceMatrix = lightProjection * lightView;

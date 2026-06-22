@@ -13,6 +13,7 @@ height = 0
 fullscreen = false
 
 [mssaa]
+enabled = false
 sample_count = 4
 
 [camera]

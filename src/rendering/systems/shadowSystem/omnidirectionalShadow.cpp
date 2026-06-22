@@ -11,12 +11,17 @@
 #include "../../../config/configManager.h"
 
 OmnidirectionalShadow::OmnidirectionalShadow(const RenderContext& ctx) {
-	mDepthMap = std::make_unique<FrameBuffer>(ConfigManager::instance().shadow.map_width, ConfigManager::instance().shadow.map_height);
-	mDepthMap->withTextureCubemapDepthArray(ConfigManager::instance().light.max_point, GL_DEPTH_COMPONENT24, true)
+	mWidth = ConfigManager::instance().get<int32_t>("shadow.map_width");
+	mHeight = ConfigManager::instance().get<int32_t>("shadow.map_height");
+	mDepthMap = std::make_unique<FrameBuffer>(mWidth, mHeight);
+	mDepthMap->withTextureCubemapDepthArray(ConfigManager::instance().get<int32_t>("light.max_point"), GL_DEPTH_COMPONENT24, true)
 			.checkStatus();
 	mDepthMap->unbind();
 
 	mDepthShader = ResourceManager::instance().get<Shader>("depthCubemap");
+	mNear = ConfigManager::instance().get<float>("shadow.omnidirectional.nearPlane");
+	mFar = ConfigManager::instance().get<float>("shadow.omnidirectional.farPlane");
+	mFovy = glm::radians(ConfigManager::instance().get<float>("shadow.omnidirectional.fovy"));
 }
 
 OmnidirectionalShadow::~OmnidirectionalShadow() = default;
@@ -36,10 +41,10 @@ void OmnidirectionalShadow::render(
 	constexpr uint32_t faces = 6;
 
 	const glm::mat4 shadowProj = glm::perspective(
-		glm::radians(ConfigManager::instance().shadow.omnidirectional.fovy),
-		static_cast<float>(ConfigManager::instance().shadow.map_width) / static_cast<float>(ConfigManager::instance().shadow.map_height),
-		ConfigManager::instance().shadow.omnidirectional.nearPlane,
-		ConfigManager::instance().shadow.omnidirectional.farPlane);
+		glm::radians(mFovy),
+		static_cast<float>(mWidth) / static_cast<float>(mHeight),
+		mNear,
+		mFar);
 
 	std::vector<glm::mat4> shadowTransforms;
 	for (const auto& [dir, up]: mDirUpPairs) {
@@ -51,7 +56,7 @@ void OmnidirectionalShadow::render(
 		mDepthShader->setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
 	}
 
-	mDepthShader->setFloat("omniFarPlane", ConfigManager::instance().shadow.omnidirectional.farPlane);
+	mDepthShader->setFloat("omniFarPlane", mFar);
 	mDepthShader->setVec3("lightPos", position);
 	mDepthShader->setInt("cubeIndex", layer);
 

@@ -32,4 +32,10 @@ private:
 		{glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)},
 		{glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)}
 	};
+
+	int32_t mWidth{0};
+	int32_t mHeight{0};
+	float mFar{0.0f};
+	float mNear{0.0f};
+	float mFovy{0.0f};
 };

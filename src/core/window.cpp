@@ -18,10 +18,12 @@ void Window::initImpl() {
 		throw std::runtime_error("Failed to initialize SDL_VIDEO");
 	}
 
-	mTitle = ConfigManager::instance().window.title;
+	mTitle = ConfigManager::instance().get<std::string>("window.title");
 
 	int flags = SDL_WINDOW_OPENGL;
-	if (ConfigManager::instance().window.fullscreen)
+
+	const bool isFullscreen = ConfigManager::instance().get<bool>("window.fullscreen");
+	if (isFullscreen)
 		flags |= SDL_WINDOW_FULLSCREEN;
 	else
 		flags |= SDL_WINDOW_RESIZABLE;
@@ -30,7 +32,7 @@ void Window::initImpl() {
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, ConfigManager::instance().msaa.sample_count);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, ConfigManager::instance().get<int32_t>("msaa.sample_count"));
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
@@ -38,8 +40,10 @@ void Window::initImpl() {
 
 	SDL_DisplayMode displayMode;
 	SDL_GetCurrentDisplayMode(0, &displayMode);
-	ConfigManager::instance().window.width = displayMode.w;
-	ConfigManager::instance().window.height = displayMode.h;
+
+	ConfigManager::instance().set<int32_t>("window.width", std::move(displayMode.w));
+	ConfigManager::instance().set<int32_t>("window.height", std::move(displayMode.h));
+
 
 	mWindow = SDL_CreateWindow(
 		mTitle.c_str(),

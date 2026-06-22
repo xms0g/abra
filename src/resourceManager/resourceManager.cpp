@@ -25,12 +25,12 @@ ResourceManager& ResourceManager::instance() {
 void ResourceManager::createShaders() {
 	// Terrain
 	mShaders.emplace("terrain",
-		std::make_unique<Shader>(
-			"models/terrain.vert",
-			"models/terrain.frag",
-			nullptr,
-			"models/terrain.tcs",
-			"models/terrain.tes"));
+	                 std::make_unique<Shader>(
+		                 "models/terrain.vert",
+		                 "models/terrain.frag",
+		                 nullptr,
+		                 "models/terrain.tcs",
+		                 "models/terrain.tes"));
 	// Deferred
 	mShaders.emplace("gBuffer", std::make_unique<Shader>("deferred/gbuffer.vert", "deferred/gbuffer.frag"));
 	mShaders.emplace("deferredLighting", std::make_unique<Shader>("models/quad.vert", "deferred/lighting.frag"));
@@ -49,22 +49,25 @@ void ResourceManager::createShaders() {
 	// Depth
 	mShaders.emplace("depth", std::make_unique<Shader>("depth/depth.vert", "depth/depth.frag"));
 	mShaders.emplace("depthCubemap",
-		std::make_unique<Shader>("depth/depthCubemap.vert", "depth/depthCubemap.frag", "depth/depthCubemap.geom"));
+	                 std::make_unique<Shader>("depth/depthCubemap.vert", "depth/depthCubemap.frag",
+	                                          "depth/depthCubemap.geom"));
 	// Debug
 	mShaders.emplace("debugNormal",
-		std::make_unique<Shader>("debug/normal.vert", "debug/normal.frag", "debug/normal.geom"));
+	                 std::make_unique<Shader>("debug/normal.vert", "debug/normal.frag", "debug/normal.geom"));
 	mShaders.emplace("debugWireframe",
-		std::make_unique<Shader>("debug/wireframe.vert", "debug/wireframe.frag", "debug/wireframe.geom"));
+	                 std::make_unique<Shader>("debug/wireframe.vert", "debug/wireframe.frag", "debug/wireframe.geom"));
 	// PBR
 	mShaders.emplace("equirectangularToCube",
-		std::make_unique<Shader>("pbr/cubemap.vert", "pbr/equirectangularToCube.frag"));
+	                 std::make_unique<Shader>("pbr/cubemap.vert", "pbr/equirectangularToCube.frag"));
 	mShaders.emplace("irradianceConv", std::make_unique<Shader>("pbr/cubemap.vert", "pbr/irradianceConv.frag"));
 	mShaders.emplace("prefilter", std::make_unique<Shader>("pbr/cubemap.vert", "pbr/prefilter.frag"));
 	mShaders.emplace("brdfLUT", std::make_unique<Shader>("pbr/brdfLUT.vert", "pbr/brdfLUT.frag"));
 	// PostFX
-	mShaders.emplace("bloomBF", std::make_unique<Shader>("models/quad.vert", "post-processing/bloom/brightFilter.frag"));
+	mShaders.emplace(
+		"bloomBF", std::make_unique<Shader>("models/quad.vert", "post-processing/bloom/brightFilter.frag"));
 	mShaders.emplace("bloomBlur", std::make_unique<Shader>("models/quad.vert", "post-processing/bloom/blur.frag"));
-	mShaders.emplace("bloomCombine", std::make_unique<Shader>("models/quad.vert", "post-processing/bloom/combine.frag"));
+	mShaders.emplace("bloomCombine",
+	                 std::make_unique<Shader>("models/quad.vert", "post-processing/bloom/combine.frag"));
 	mShaders.emplace("toneMapping", std::make_unique<Shader>("models/quad.vert", "post-processing/toneMapping.frag"));
 	mShaders.emplace("grayscale", std::make_unique<Shader>("models/quad.vert", "post-processing/grayscale.frag"));
 	mShaders.emplace("sepia", std::make_unique<Shader>("models/quad.vert", "post-processing/sepia.frag"));
@@ -85,7 +88,7 @@ void ResourceManager::createBuffers() {
 	glEnable(GL_CULL_FACE);
 }
 
-std::unordered_map<std::string, std::unique_ptr<Shader>>& ResourceManager::getShaders() {
+std::unordered_map<std::string, std::unique_ptr<Shader> >& ResourceManager::getShaders() {
 	return mShaders;
 }
 
@@ -111,7 +114,8 @@ void ResourceManager::uploadModelsToGPU() {
 			if (material.flags & CUBEMAP) {
 				// Handle HDR to Cubemap
 				if (material.textures.size() == 1) {
-					const std::string path = fs::path(ConfigManager::instance().paths.asset_dir + material.textures.front().path);
+					const std::string path = fs::path(
+						ConfigManager::instance().get<std::string>("path.asset") + material.textures.front().path);
 					glDisable(GL_CULL_FACE);
 					uint32_t id = createEnvMap(path);
 					glEnable(GL_CULL_FACE);
@@ -124,7 +128,7 @@ void ResourceManager::uploadModelsToGPU() {
 					paths.reserve(material.textures.size());
 
 					for (auto& [id, type, path]: material.textures) {
-						paths.push_back(fs::path(ConfigManager::instance().paths.asset_dir + path));
+						paths.push_back(fs::path(ConfigManager::instance().get<std::string>("path.asset") + path));
 					}
 
 					material.textures.clear();
@@ -141,10 +145,9 @@ void ResourceManager::uploadModelsToGPU() {
 				}
 
 				id = texture::load(
-					fs::path(ConfigManager::instance().paths.asset_dir + path),
+					fs::path(ConfigManager::instance().get<std::string>("path.asset") + path),
 					material.flags,
-					type == aiTextureType_DIFFUSE || type == aiTextureType_EMISSIVE
-					);
+					type == aiTextureType_DIFFUSE || type == aiTextureType_EMISSIVE);
 				idByPath.emplace(path, id);
 			}
 		}
@@ -159,7 +162,7 @@ void ResourceManager::loadModel(const size_t entityID, const std::string& file) 
 	// read file via ASSIMP
 	Assimp::Importer importer;
 
-	const std::string path = fs::path(ConfigManager::instance().paths.asset_dir + file);
+	const std::string path = fs::path(ConfigManager::instance().get<std::string>("path.asset") + file);
 	const aiScene* scene = importer.ReadFile(
 		path,
 		aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -174,9 +177,7 @@ void ResourceManager::loadModel(const size_t entityID, const std::string& file) 
 	MaterialLoadContext mlCtx{.baseDir = file.substr(0, file.find_last_of('/')).append("/")};
 
 	processMeshes(scene->mRootNode, scene, meshesByMatID, mlCtx);
-	processMaterials(scene, mlCtx);
-
-	{
+	processMaterials(scene, mlCtx); {
 		std::lock_guard<std::mutex> lock(mResourceMutex);
 		mMeshesByEntity.emplace(entityID, std::move(meshesByMatID));
 		mMaterialsByEntity.emplace(entityID, mlCtx.materials);
@@ -327,7 +328,7 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 		aiString str;
 
 		req.mat->GetTexture(req.type, i, &str);
-		std::string path = materialLoadCtx .baseDir + str.C_Str();
+		std::string path = materialLoadCtx.baseDir + str.C_Str();
 
 		if (material.hasTexture(path, req.type))
 			break;
@@ -360,7 +361,10 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 
-	auto envMap = std::make_unique<CubemapBuffer>(ConfigManager::instance().PBR.envMap.size, ConfigManager::instance().PBR.envMap.size, true);
+	auto envMap = std::make_unique<CubemapBuffer>(
+		ConfigManager::instance().get<int32_t>("PBR.envMap.size"),
+		ConfigManager::instance().get<int32_t>("PBR.envMap.size"),
+		true);
 	envMap->checkStatus();
 
 	mBuffers.emplace("envMap", std::move(envMap));
@@ -401,7 +405,9 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 }
 
 void ResourceManager::createIrradianceMap() {
-	auto irradianceMap = std::make_unique<CubemapBuffer>(ConfigManager::instance().PBR.irradianceMap.size, ConfigManager::instance().PBR.irradianceMap.size);
+	auto irradianceMap = std::make_unique<CubemapBuffer>(
+		ConfigManager::instance().get<int32_t>("PBR.irradianceMap.size"),
+		ConfigManager::instance().get<int32_t>("PBR.irradianceMap.size"));
 	irradianceMap->checkStatus();
 
 	mBuffers.emplace("irradianceMap", std::move(irradianceMap));
@@ -436,7 +442,11 @@ void ResourceManager::createIrradianceMap() {
 void ResourceManager::createPrefilterMap() {
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-	auto prefilterMap = std::make_unique<CubemapBuffer>(ConfigManager::instance().PBR.prefilterMap.size, ConfigManager::instance().PBR.prefilterMap.size, true, true);
+	auto prefilterMap = std::make_unique<CubemapBuffer>(
+		ConfigManager::instance().get<int32_t>("PBR.prefilterMap.size"),
+		ConfigManager::instance().get<int32_t>("PBR.prefilterMap.size"),
+		true,
+		true);
 	prefilterMap->checkStatus();
 
 	mBuffers.emplace("prefilterMap", std::move(prefilterMap));
@@ -453,14 +463,17 @@ void ResourceManager::createPrefilterMap() {
 	prefilter->activate();
 	prefilter->setInt("environmentMap", 0);
 	prefilter->setMat4("projection", mCaptureProjection);
-	prefilter->setFloat("resolution", static_cast<float>(ConfigManager::instance().PBR.envMap.size));
+	prefilter->setFloat("resolution",
+		static_cast<float>(ConfigManager::instance().get<int32_t>("PBR.envMap.size")));
 
 	envMapBuffer->bindTexture(0);
 	prefilterMapBuffer->bind();
 
 	constexpr uint32_t mipLevels = 5;
 	for (int32_t i = 0; i < mipLevels; ++i) {
-		const int32_t mipSize = static_cast<int32_t>(ConfigManager::instance().PBR.prefilterMap.size * std::pow(0.5, i));
+		const int32_t mipSize = static_cast<int32_t>(
+			ConfigManager::instance().get<int32_t>("PBR.prefilterMap.size") * std::pow(0.5, i));
+
 		prefilterMapBuffer->resizeRenderBuffer(mipSize, mipSize);
 
 		const float roughness = static_cast<float>(i) / static_cast<float>(mipLevels - 1);
@@ -479,7 +492,9 @@ void ResourceManager::createPrefilterMap() {
 }
 
 void ResourceManager::createBrdfLUT() {
-	auto brdfLUT = std::make_unique<FrameBuffer>(ConfigManager::instance().PBR.brdfLUT.size, ConfigManager::instance().PBR.brdfLUT.size);
+	auto brdfLUT = std::make_unique<FrameBuffer>(
+		ConfigManager::instance().get<int32_t>("PBR.brdfLUT.size"),
+		ConfigManager::instance().get<int32_t>("PBR.brdfLUT.size"));
 	brdfLUT->withTextureFP(GL_RG)
 			.checkStatus();
 

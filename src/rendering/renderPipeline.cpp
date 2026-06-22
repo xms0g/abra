@@ -86,10 +86,14 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mShadowSystem->configure(*mRenderCtx, eventBus);
 
 	// Create framebuffers
-	mSceneBuffer = std::make_unique<FrameBuffer>(ConfigManager::instance().window.width, ConfigManager::instance().window.height);
+	int32_t width = ConfigManager::instance().get<int32_t>("window.width");
+	int32_t height = ConfigManager::instance().get<int32_t>("window.height");
+
+	mSceneBuffer = std::make_unique<FrameBuffer>(width, height);
 #ifdef MSAA
+	int32_t sampleCount = ConfigManager::instance().get<int32_t>("msaa.sample_count");
 	glEnable(GL_MULTISAMPLE);
-	mIntermediateBuffer = std::make_unique<FrameBuffer>(mSceneBuffer->width(), mSceneBuffer->height());
+	mIntermediateBuffer = std::make_unique<FrameBuffer>(width, height);
 # ifdef HDR
 	mIntermediateBuffer->withTextureFP(GL_RGBA)
 			.withRenderBufferDepth(GL_DEPTH_COMPONENT24)
@@ -97,7 +101,7 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mIntermediateBuffer->unbind();
 
 	mSceneBuffer->bind();
-	mSceneBuffer->withTextureFPMultisampled(MULTISAMPLED_COUNT, GL_RGBA)
+	mSceneBuffer->withTextureFPMultisampled(sampleCount, GL_RGBA)
 # else
 	mIntermediateBuffer->withTexture(GL_RGBA)
 			.withRenderBufferDepth(GL_DEPTH_COMPONENT24)
@@ -105,9 +109,9 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mIntermediateBuffer->unbind();
 
 	mSceneBuffer->bind();
-	mSceneBuffer->withTextureMultisampled(MULTISAMPLED_COUNT, GL_RGBA)
+	mSceneBuffer->withTextureMultisampled(sampleCount, GL_RGBA)
 # endif
-			.withRenderBufferDepthMultisampled(MULTISAMPLED_COUNT, GL_DEPTH_COMPONENT24)
+			.withRenderBufferDepthMultisampled(sampleCount, GL_DEPTH_COMPONENT24)
 #else
 # ifdef HDR
 	mSceneBuffer->withTextureFP(GL_RGBA)
@@ -123,7 +127,7 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mCameraUBO = std::make_unique<UniformBuffer>(
 		DYNAMIC,
 		3 * sizeof(glm::mat4) + sizeof(glm::vec4),
-		ConfigManager::instance().camera.ubo_binding);
+		ConfigManager::instance().get<uint32_t>("camera.ubo_binding"));
 
 	// Create render passes
 	mRenderPasses.emplace_back(std::make_unique<CullingPass>());
@@ -165,9 +169,9 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 
 	// Set camera projection matrix
 	const glm::mat4 projectionMat = glm::perspective(
-		glm::radians(ConfigManager::instance().camera.zoom),
-		static_cast<float>(ConfigManager::instance().window.width) / static_cast<float>(ConfigManager::instance().window.height),
-		ConfigManager::instance().camera.znear, ConfigManager::instance().camera.zfar);
+		glm::radians(camera.zoom()),
+		static_cast<float>(width) / static_cast<float>(height),
+		camera.znear(), camera.zfar());
 
 	const glm::mat4 invProjectionMat = glm::inverse(projectionMat);
 
@@ -181,16 +185,17 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 		pass->configure(*mRenderCtx, eventBus);
 	}
 
+
 	const std::vector<UniformBinding> uboBindings = {
-		{ConfigManager::instance().camera.block_name, ConfigManager::instance().camera.ubo_binding, mCameraUBO.get(), &UniformBuffer::configure},
-		{ConfigManager::instance().light.block_name, ConfigManager::instance().light.ubo_binding, mLightSystem->ubo(), &UniformBuffer::configure},
-		{ConfigManager::instance().shadow.block_name, ConfigManager::instance().shadow.ubo_binding, mShadowSystem->ubo(), &UniformBuffer::configure}
+		{ConfigManager::instance().get<std::string>("camera.block_name"), ConfigManager::instance().get<uint32_t>("camera.ubo_binding"), mCameraUBO.get(), &UniformBuffer::configure},
+		{ConfigManager::instance().get<std::string>("light.block_name"), ConfigManager::instance().get<uint32_t>("light.ubo_binding"), mLightSystem->ubo(), &UniformBuffer::configure},
+		{ConfigManager::instance().get<std::string>("shadow.block_name"), ConfigManager::instance().get<uint32_t>("shadow.ubo_binding"), mShadowSystem->ubo(), &UniformBuffer::configure}
 	};
 
 	const std::vector<TextureBinding> shadowMapBindings = {
-		{"shadowMap", ConfigManager::instance().shadow.texture_slot},
-		{"shadowCubemap", ConfigManager::instance().shadow.texture_slot + 1},
-		{"persShadowMap", ConfigManager::instance().shadow.texture_slot + 2}
+		{"shadowMap", ConfigManager::instance().get<int32_t>("shadow.texture_slot")},
+		{"shadowCubemap", ConfigManager::instance().get<int32_t>("shadow.texture_slot") + 1},
+		{"persShadowMap", ConfigManager::instance().get<int32_t>("shadow.texture_slot") + 2}
 	};
 
 	// Configure shaders

@@ -14,7 +14,7 @@ Model::Terrain::Terrain(
 	const char* specularTexture,
 	const char* normalTexture,
 	const char* heightTexture) {
-	std::string path = fs::path(ConfigManager::instance().paths.asset_dir + heightTexture);
+	std::string path = fs::path(ConfigManager::instance().get<std::string>("path.asset") + heightTexture);
 
 	int32_t width, height, channel;
 	stbi_info(path.c_str(), &width, &height, &channel);

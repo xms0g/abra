@@ -123,7 +123,7 @@ void Shader::setMat4(const std::string& name, const glm::mat4& mat) const {
 }
 
 std::string Shader::loadFile(const char* fn) {
-	std::ifstream file(fs::path(ConfigManager::instance().paths.shader_dir + fn));
+	std::ifstream file(fs::path(ConfigManager::instance().get<std::string>("path.shader") + fn));
 	if (!file.is_open()) {
 		throw std::runtime_error(std::string("Failed to open shader file: ") + fn);
 	}

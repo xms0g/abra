@@ -11,12 +11,16 @@
 #include "../../../config/configManager.h"
 
 PerspectiveShadow::PerspectiveShadow(const RenderContext& ctx) {
-	mDepthMap = std::make_unique<FrameBuffer>(ConfigManager::instance().shadow.map_width, ConfigManager::instance().shadow.map_height);
-	mDepthMap->withTextureDepthArray(ConfigManager::instance().light.max_spot, GL_DEPTH_COMPONENT24, true)
+	mWidth = ConfigManager::instance().get<int32_t>("shadow.map_width");
+	mHeight = ConfigManager::instance().get<int32_t>("shadow.map_height");
+	mDepthMap = std::make_unique<FrameBuffer>(mWidth, mHeight);
+	mDepthMap->withTextureDepthArray(ConfigManager::instance().get<int32_t>("light.max_spot"), GL_DEPTH_COMPONENT24, true)
 			.checkStatus();
 	mDepthMap->unbind();
 
 	mDepthShader = ResourceManager::instance().get<Shader>("depth");
+	mNear = ConfigManager::instance().get<float>("shadow.perspective.nearPlane");
+	mFar = ConfigManager::instance().get<float>("shadow.perspective.farPlane");
 }
 
 PerspectiveShadow::~PerspectiveShadow() = default;
@@ -51,9 +55,9 @@ void PerspectiveShadow::render(
 
 	const glm::mat4 lightProjection = glm::perspective(
 		fovy,
-		static_cast<float>(ConfigManager::instance().shadow.map_width) / static_cast<float>(ConfigManager::instance().shadow.map_height),
-		ConfigManager::instance().shadow.perspective.nearPlane,
-		ConfigManager::instance().shadow.perspective.farPlane);
+		static_cast<float>(mWidth) / static_cast<float>(mHeight),
+		mNear,
+		mFar);
 
 	const glm::mat4 lightView = glm::lookAt(position, position + direction, glm::vec3(0.0, 1.0, 0.0));
 	mLightSpaceMatrix[layer] = lightProjection * lightView;

@@ -30,6 +30,15 @@ public:
 	const glm::vec3& front() const;
 
 	[[nodiscard]]
+	float zfar() const;
+
+	[[nodiscard]]
+	float znear() const;
+
+	[[nodiscard]]
+	float zoom() const;
+
+	[[nodiscard]]
 	math::Frustum generateFrustum() const;
 
 	void configure(EventBus& eventBus);
@@ -53,6 +62,7 @@ private:
 	// camera options
 	float mZFar{};
 	float mZNear{};
+	float mZoom{};
 	float mMovementSpeed{};
 	float mMouseSensitivity{};
 

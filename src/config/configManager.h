@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+#include <any>
+#include <unordered_map>
 
 class ConfigManager {
 public:
@@ -9,127 +11,11 @@ public:
 
 	static ConfigManager& instance();
 
-	struct {
-		std::string shader_dir;
-		std::string asset_dir;
-	} paths;
+	template<typename T>
+	T& get(const std::string& key);
 
-	struct {
-		std::string title;
-		bool fullscreen;
-		uint32_t width, height;
-	} window{};
-
-	struct {
-		int32_t sample_count;
-	} msaa{};
-
-	struct {
-		float yaw, pitch, speed, sensitivity, zoom, znear, zfar;
-		uint32_t ubo_binding;
-		std::string block_name;
-	} camera;
-
-	struct {
-		uint32_t max_directional;
-		uint32_t max_point;
-		uint32_t max_spot;
-		uint32_t ubo_binding;
-		std::string block_name;
-	} light;
-
-	struct {
-		uint32_t map_width, map_height;
-		int32_t texture_slot;
-		uint32_t ubo_binding;
-		std::string block_name;
-
-		struct {
-			float height, nearPlane, farPlane, left, right, bottom, top;
-		} directional;
-
-		struct {
-			float nearPlane, farPlane, fovy;
-		} omnidirectional;
-
-		struct {
-			float nearPlane, farPlane;
-		} perspective;
-	} shadow;
-
-	struct {
-		int32_t kernelSize;
-		float radius;
-		float bias;
-		float intensity;
-
-		uint32_t ubo_binding;
-		std::string block_name;
-
-		int32_t textureSlot;
-
-		struct {
-			int32_t textureSize;
-			int32_t textureSlot;
-		} noise;
-
-	} ssao{};
-
-	struct {
-		struct {
-			uint32_t size;
-		} envMap;
-
-		struct {
-			uint32_t size;
-			int32_t textureSlot;
-		} irradianceMap;
-
-		struct {
-			uint32_t size;
-			int32_t textureSlot;
-		} prefilterMap;
-
-		struct {
-			uint32_t size;
-			int32_t textureSlot;
-		} brdfLUT;
-
-		int32_t albedoTextureSlot;
-		int32_t normalTextureSlot;
-		int32_t roughnessMetallicTextureSlot;
-		int32_t aoTextureSlot;
-		int32_t emissiveTextureSlot;
-		int32_t heightTextureSlot;
-	} PBR{};
-
-	struct {
-		struct {
-			int32_t textureIdx;
-			int32_t textureSlot;
-		} position;
-
-		struct {
-			int32_t textureIdx;
-			int32_t textureSlot;
-		} normal;
-
-		struct {
-			int32_t textureIdx;
-			int32_t textureSlot;
-		} albedo;
-
-		struct {
-			int32_t textureIdx;
-			int32_t textureSlot;
-		} orm;
-
-		struct {
-			int32_t textureIdx;
-			int32_t textureSlot;
-		} depth;
-
-	} gBuffer{};
+	template<typename T>
+	void set(const std::string& key, T&& value);
 
 	void load(const std::string& filepath);
 
@@ -137,4 +23,16 @@ private:
 	explicit ConfigManager() = default;
 
 	~ConfigManager() = default;
+
+	std::unordered_map<std::string, std::any> mConfig;
 };
+
+template<typename T>
+T& ConfigManager::get(const std::string& key) {
+	return std::any_cast<T&>(mConfig.at(key));
+}
+
+template<typename T>
+void ConfigManager::set(const std::string& key, T&& value) {
+	mConfig[key] = std::forward<T>(value);
+}

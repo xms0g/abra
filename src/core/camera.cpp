@@ -10,7 +10,7 @@ Camera::Camera(
 	const glm::vec3& up)
 	: mPosition(position),
 	  mFront(0.0f, 0.0f, -1.0f),
-	  mWorldUp(up){
+	  mWorldUp(up) {
 }
 
 glm::mat4 Camera::viewMatrix() const {
@@ -23,6 +23,18 @@ const glm::vec3& Camera::position() const {
 
 const glm::vec3& Camera::front() const {
 	return mFront;
+}
+
+float Camera::zfar() const {
+	return mZFar;
+}
+
+float Camera::znear() const {
+	return mZNear;
+}
+
+float Camera::zoom() const {
+	return mZoom;
 }
 
 math::Frustum Camera::generateFrustum() const {
@@ -40,14 +52,18 @@ math::Frustum Camera::generateFrustum() const {
 }
 
 void Camera::configure(EventBus& eventBus) {
-	mYaw = ConfigManager::instance().camera.yaw;
-	mPitch = ConfigManager::instance().camera.pitch;
-	mMovementSpeed = ConfigManager::instance().camera.speed;
-	mMouseSensitivity = ConfigManager::instance().camera.sensitivity;
-	mZNear = ConfigManager::instance().camera.znear;
-	mZFar = ConfigManager::instance().camera.zfar;
-	mHalfVSide = ConfigManager::instance().camera.zfar * tanf(glm::radians(ConfigManager::instance().camera.zoom) * 0.5f);
-	mHalfHSide =  mHalfVSide * (static_cast<float>(ConfigManager::instance().window.width) / static_cast<float>(ConfigManager::instance().window.height));
+	mYaw = ConfigManager::instance().get<float>("camera.yaw");
+	mPitch = ConfigManager::instance().get<float>("camera.pitch");
+	mMovementSpeed = ConfigManager::instance().get<float>("camera.speed");
+	mMouseSensitivity = ConfigManager::instance().get<float>("camera.sensitivity");
+	mZNear = ConfigManager::instance().get<float>("camera.znear");
+	mZFar = ConfigManager::instance().get<float>("camera.zfar");
+	mZoom = ConfigManager::instance().get<float>("camera.zoom");
+	mHalfVSide = mZFar * tanf(glm::radians(mZoom) * 0.5f);
+
+	const float width = static_cast<float>(ConfigManager::instance().get<int32_t>("window.width"));
+	const float height = static_cast<float>(ConfigManager::instance().get<int32_t>("window.height"));
+	mHalfHSide = mHalfVSide * (width / height);
 
 	update();
 
