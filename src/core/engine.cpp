@@ -8,6 +8,7 @@
 #include "../event/eventBus.hpp"
 #include "../ECS/registry.h"
 #include "../rendering/renderPipeline.h"
+#include "../config/configManager.h"
 
 Engine::Engine() = default;
 
@@ -16,8 +17,15 @@ Engine::~Engine() = default;
 void Engine::init(Registry* registry) {
 	mRegistry = registry;
 
+	const auto title = ConfigManager::instance().get<std::string>("window.title");
+	const auto multisamples = ConfigManager::instance().get<int32_t>("msaa.sample_count");
+	const auto fullscreen = ConfigManager::instance().get<bool>("window.fullscreen");
+
 	mWindow = std::make_unique<Window>();
-	mWindow->init();
+	mWindow->init(title, multisamples, fullscreen);
+
+	ConfigManager::instance().set<int32_t>("window.width", mWindow->width());
+	ConfigManager::instance().set<int32_t>("window.height", mWindow->height());
 
 	mGuiSystem = &registry->addSystem<GuiSystem>();
 	mRenderPipeline = &registry->addSystem<RenderPipeline>(mRegistry, mWindow->nativeHandle(), mWindow->glContext());

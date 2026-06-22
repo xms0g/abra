@@ -15,7 +15,7 @@ public:
     void swapBuffer() override;
 
 protected:
-    void initImpl() override;
+    void initImpl(const std::string& title, int multisamples, bool fullscreen) override;
 
     void clearImpl(float r, float g, float b, float a) override;
 
