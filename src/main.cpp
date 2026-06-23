@@ -18,7 +18,7 @@ int main() {
 
 	try {
 		Engine engine;
-		ConfigManager::instance().load("config.toml");
+		cfg.load("config.toml");
 		engine.init(&registry);
 
 		rm.createShaders();
