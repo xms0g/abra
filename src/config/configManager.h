@@ -3,6 +3,8 @@
 #include <any>
 #include <unordered_map>
 
+#define cfg ConfigManager::instance()
+
 class ConfigManager {
 public:
 	ConfigManager(const ConfigManager&) = delete;

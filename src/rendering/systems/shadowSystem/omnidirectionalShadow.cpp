@@ -11,17 +11,17 @@
 #include "../../../config/configManager.h"
 
 OmnidirectionalShadow::OmnidirectionalShadow(const RenderContext& ctx) {
-	mWidth = ConfigManager::instance().get<int32_t>("shadow.map_width");
-	mHeight = ConfigManager::instance().get<int32_t>("shadow.map_height");
+	mWidth = cfg.get<int32_t>("shadow.map_width");
+	mHeight = cfg.get<int32_t>("shadow.map_height");
 	mDepthMap = std::make_unique<FrameBuffer>(mWidth, mHeight);
-	mDepthMap->withTextureCubemapDepthArray(ConfigManager::instance().get<int32_t>("light.max_point"), GL_DEPTH_COMPONENT24, true)
+	mDepthMap->withTextureCubemapDepthArray(cfg.get<int32_t>("light.max_point"), GL_DEPTH_COMPONENT24, true)
 			.checkStatus();
 	mDepthMap->unbind();
 
 	mDepthShader = ResourceManager::instance().get<Shader>("depthCubemap");
-	mNear = ConfigManager::instance().get<float>("shadow.omnidirectional.nearPlane");
-	mFar = ConfigManager::instance().get<float>("shadow.omnidirectional.farPlane");
-	mFovy = glm::radians(ConfigManager::instance().get<float>("shadow.omnidirectional.fovy"));
+	mNear = cfg.get<float>("shadow.omnidirectional.nearPlane");
+	mFar = cfg.get<float>("shadow.omnidirectional.farPlane");
+	mFovy = glm::radians(cfg.get<float>("shadow.omnidirectional.fovy"));
 }
 
 OmnidirectionalShadow::~OmnidirectionalShadow() = default;

@@ -39,7 +39,7 @@ void ShadowSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mUBO = std::make_unique<UniformBuffer>(
 		DYNAMIC,
 		sizeof(ShadowData),
-		ConfigManager::instance().get<uint32_t>("shadow.ubo_binding"));
+		cfg.get<uint32_t>("shadow.ubo_binding"));
 
 	ctx.renderQueue->shadowMaps = {
 		mDirShadow->depthTexture(),
@@ -49,7 +49,7 @@ void ShadowSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 
 	eventBus.subscribeToEvent<ShadowSystem, UpdateShadowMapEvent>(this, &ShadowSystem::onGuiUpdate);
 
-	gpuData.omniFarPlane = glm::vec4(ConfigManager::instance().get<float>("shadow.omnidirectional.farPlane"), 0.0f, 0.0f, 0.0f);
+	gpuData.omniFarPlane = glm::vec4(cfg.get<float>("shadow.omnidirectional.farPlane"), 0.0f, 0.0f, 0.0f);
 
 	constexpr UpdateShadowMapEvent event;
 	onGuiUpdate(event);
@@ -102,8 +102,8 @@ void ShadowSystem::perspectiveShadowPass() const {
 }
 
 void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
-	const int32_t width = ConfigManager::instance().get<int32_t>("window.width");
-	const int32_t height = ConfigManager::instance().get<int32_t>("window.height");
+	const int32_t width = cfg.get<int32_t>("window.width");
+	const int32_t height = cfg.get<int32_t>("window.height");
 
 	glCullFace(GL_FRONT);
 

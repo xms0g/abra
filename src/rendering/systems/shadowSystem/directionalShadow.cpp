@@ -12,21 +12,21 @@
 
 DirectionalShadow::DirectionalShadow(const RenderContext& ctx) {
 	mDepthMap = std::make_unique<FrameBuffer>(
-		ConfigManager::instance().get<int32_t>("shadow.map_width"),
-		ConfigManager::instance().get<int32_t>("shadow.map_height"));
+		cfg.get<int32_t>("shadow.map_width"),
+		cfg.get<int32_t>("shadow.map_height"));
 	mDepthMap->withTextureDepth(GL_DEPTH_COMPONENT24, true)
 			.checkStatus();
 	mDepthMap->unbind();
 
 	mDepthShader = ResourceManager::instance().get<Shader>("depth");
 
-	mHeight = ConfigManager::instance().get<float>("shadow.directional.height");
-	mRight = ConfigManager::instance().get<float>("shadow.directional.right");
-	mLeft = ConfigManager::instance().get<float>("shadow.directional.left");
-	mTop = ConfigManager::instance().get<float>("shadow.directional.top");
-	mBottom = ConfigManager::instance().get<float>("shadow.directional.bottom");
-	mNear = ConfigManager::instance().get<float>("shadow.directional.nearPlane");
-	mFar = ConfigManager::instance().get<float>("shadow.directional.farPlane");
+	mHeight = cfg.get<float>("shadow.directional.height");
+	mRight = cfg.get<float>("shadow.directional.right");
+	mLeft = cfg.get<float>("shadow.directional.left");
+	mTop = cfg.get<float>("shadow.directional.top");
+	mBottom = cfg.get<float>("shadow.directional.bottom");
+	mNear = cfg.get<float>("shadow.directional.nearPlane");
+	mFar = cfg.get<float>("shadow.directional.farPlane");
 }
 
 DirectionalShadow::~DirectionalShadow() = default;

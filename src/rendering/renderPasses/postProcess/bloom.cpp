@@ -25,11 +25,10 @@ Bloom::Bloom(const std::string& name, const RenderContext& ctx, const bool enabl
 	RenderCommand::setTextureUnits(textureBindings, *mBlur);
 	RenderCommand::setTextureUnits(combineTextureBindings, *mCombine);
 
-	int32_t width = ConfigManager::instance().get<int32_t>("window.width");
-	int32_t height = ConfigManager::instance().get<int32_t>("window.height");
-
 	for (auto& target: mRenderTargets) {
-		target = std::make_unique<FrameBuffer>(width, height);
+		target = std::make_unique<FrameBuffer>(
+			cfg.get<int32_t>("window.width"),
+			cfg.get<int32_t>("window.height"));
 #ifdef HDR
 		target->withTextureFP(GL_RGBA)
 #else

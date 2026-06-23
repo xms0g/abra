@@ -12,11 +12,11 @@ TerrainPass::~TerrainPass() = default;
 void TerrainPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
-	RenderCommand::bindShadowMaps(ctx);
-
 	const auto& [entity, matb] = ctx.renderQueue->terrain.front();
 	matb.shader->activate();
 	matb.shader->setInt("heightMap", 0);
+
+	RenderCommand::bindShadowMaps(ctx);
 }
 
 void TerrainPass::execute(const RenderContext& ctx) {

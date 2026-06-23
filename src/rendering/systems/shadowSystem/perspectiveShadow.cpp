@@ -11,16 +11,16 @@
 #include "../../../config/configManager.h"
 
 PerspectiveShadow::PerspectiveShadow(const RenderContext& ctx) {
-	mWidth = ConfigManager::instance().get<int32_t>("shadow.map_width");
-	mHeight = ConfigManager::instance().get<int32_t>("shadow.map_height");
+	mWidth = cfg.get<int32_t>("shadow.map_width");
+	mHeight = cfg.get<int32_t>("shadow.map_height");
 	mDepthMap = std::make_unique<FrameBuffer>(mWidth, mHeight);
-	mDepthMap->withTextureDepthArray(ConfigManager::instance().get<int32_t>("light.max_spot"), GL_DEPTH_COMPONENT24, true)
+	mDepthMap->withTextureDepthArray(cfg.get<int32_t>("light.max_spot"), GL_DEPTH_COMPONENT24, true)
 			.checkStatus();
 	mDepthMap->unbind();
 
 	mDepthShader = ResourceManager::instance().get<Shader>("depth");
-	mNear = ConfigManager::instance().get<float>("shadow.perspective.nearPlane");
-	mFar = ConfigManager::instance().get<float>("shadow.perspective.farPlane");
+	mNear = cfg.get<float>("shadow.perspective.nearPlane");
+	mFar = cfg.get<float>("shadow.perspective.farPlane");
 }
 
 PerspectiveShadow::~PerspectiveShadow() = default;

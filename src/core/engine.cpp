@@ -17,15 +17,14 @@ Engine::~Engine() = default;
 void Engine::init(Registry* registry) {
 	mRegistry = registry;
 
-	const auto title = ConfigManager::instance().get<std::string>("window.title");
-	const auto multisamples = ConfigManager::instance().get<int32_t>("msaa.sample_count");
-	const auto fullscreen = ConfigManager::instance().get<bool>("window.fullscreen");
-
 	mWindow = std::make_unique<Window>();
-	mWindow->init(title, multisamples, fullscreen);
+	mWindow->init(
+		cfg.get<std::string>("window.title"),
+		cfg.get<int32_t>("msaa.sample_count"),
+		cfg.get<bool>("window.fullscreen"));
 
-	ConfigManager::instance().set<int32_t>("window.width", mWindow->width());
-	ConfigManager::instance().set<int32_t>("window.height", mWindow->height());
+	cfg.set<int32_t>("window.width", mWindow->width());
+	cfg.set<int32_t>("window.height", mWindow->height());
 
 	mGuiSystem = &registry->addSystem<GuiSystem>();
 	mRenderPipeline = &registry->addSystem<RenderPipeline>(mRegistry, mWindow->nativeHandle(), mWindow->glContext());

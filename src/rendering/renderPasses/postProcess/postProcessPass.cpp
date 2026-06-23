@@ -35,11 +35,10 @@ void PostProcessPass::configure(RenderContext& ctx, EventBus& eventBus) {
 		std::make_shared<FXAA>("FXAA", ctx, false),
 	};
 
-	int32_t width = ConfigManager::instance().get<int32_t>("window.width");
-	int32_t height = ConfigManager::instance().get<int32_t>("window.height");
-
 	for (auto& target: mRenderTargets) {
-		target = std::make_unique<FrameBuffer>(width, height);
+		target = std::make_unique<FrameBuffer>(
+			cfg.get<int32_t>("window.width"),
+			cfg.get<int32_t>("window.height"));
 #ifdef HDR
 		target->withTextureFP(GL_RGBA)
 #else

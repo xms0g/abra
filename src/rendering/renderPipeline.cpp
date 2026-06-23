@@ -86,12 +86,12 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mShadowSystem->configure(*mRenderCtx, eventBus);
 
 	// Create framebuffers
-	int32_t width = ConfigManager::instance().get<int32_t>("window.width");
-	int32_t height = ConfigManager::instance().get<int32_t>("window.height");
+	int32_t width = cfg.get<int32_t>("window.width");
+	int32_t height = cfg.get<int32_t>("window.height");
 
 	mSceneBuffer = std::make_unique<FrameBuffer>(width, height);
 #ifdef MSAA
-	int32_t sampleCount = ConfigManager::instance().get<int32_t>("msaa.sample_count");
+	int32_t sampleCount = cfg.get<int32_t>("msaa.sample_count");
 	glEnable(GL_MULTISAMPLE);
 	mIntermediateBuffer = std::make_unique<FrameBuffer>(width, height);
 # ifdef HDR
@@ -127,7 +127,7 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mCameraUBO = std::make_unique<UniformBuffer>(
 		DYNAMIC,
 		3 * sizeof(glm::mat4) + sizeof(glm::vec4),
-		ConfigManager::instance().get<uint32_t>("camera.ubo_binding"));
+		cfg.get<uint32_t>("camera.ubo_binding"));
 
 	// Create render passes
 	mRenderPasses.emplace_back(std::make_unique<CullingPass>());
@@ -187,15 +187,15 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 
 
 	const std::vector<UniformBinding> uboBindings = {
-		{ConfigManager::instance().get<std::string>("camera.block_name"), ConfigManager::instance().get<uint32_t>("camera.ubo_binding"), mCameraUBO.get(), &UniformBuffer::configure},
-		{ConfigManager::instance().get<std::string>("light.block_name"), ConfigManager::instance().get<uint32_t>("light.ubo_binding"), mLightSystem->ubo(), &UniformBuffer::configure},
-		{ConfigManager::instance().get<std::string>("shadow.block_name"), ConfigManager::instance().get<uint32_t>("shadow.ubo_binding"), mShadowSystem->ubo(), &UniformBuffer::configure}
+		{cfg.get<std::string>("camera.block_name"), cfg.get<uint32_t>("camera.ubo_binding"), mCameraUBO.get(), &UniformBuffer::configure},
+		{cfg.get<std::string>("light.block_name"), cfg.get<uint32_t>("light.ubo_binding"), mLightSystem->ubo(), &UniformBuffer::configure},
+		{cfg.get<std::string>("shadow.block_name"), cfg.get<uint32_t>("shadow.ubo_binding"), mShadowSystem->ubo(), &UniformBuffer::configure}
 	};
 
 	const std::vector<TextureBinding> shadowMapBindings = {
-		{"shadowMap", ConfigManager::instance().get<int32_t>("shadow.texture_slot")},
-		{"shadowCubemap", ConfigManager::instance().get<int32_t>("shadow.texture_slot") + 1},
-		{"persShadowMap", ConfigManager::instance().get<int32_t>("shadow.texture_slot") + 2}
+		{"shadowMap", cfg.get<int32_t>("shadow.texture_slot")},
+		{"shadowCubemap", cfg.get<int32_t>("shadow.texture_slot") + 1},
+		{"persShadowMap", cfg.get<int32_t>("shadow.texture_slot") + 2}
 	};
 
 	// Configure shaders
