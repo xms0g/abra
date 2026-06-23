@@ -19,9 +19,6 @@ if(ASSIMP_FOUND)
     include_directories(${ASSIMP_INCLUDE_DIR})
 endif()
 
-option(DEBUG_ENABLED "Enable Debug mode" OFF)
-option(HDR_ENABLED "Enable HDR rendering" OFF)
-
 set(LIBS_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 set(GLAD
         ${CMAKE_CURRENT_SOURCE_DIR}/libs/glad/glad.c
@@ -36,18 +33,6 @@ file(GLOB_RECURSE IMGUI "libs/imgui/*")
 set(COMPILATION_UNIT src/main.cpp ${SOURCES} ${GLAD} ${STB_IMAGE} ${IMGUI})
 
 add_executable(${PROJECT_NAME} ${COMPILATION_UNIT})
-
-if(DEBUG_ENABLED)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG)
-endif()
-
-if(HDR_ENABLED)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE HDR)
-endif()
-
-if(MSAA_ENABLED)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE MSAA)
-endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC
         ${LIBS_INCLUDE_DIRS}

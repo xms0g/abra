@@ -50,7 +50,6 @@ RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLCon
 	RequireComponent<MeshComponent>();
 	RequireComponent<TransformComponent>();
 	// glad: load all OpenGL function pointers
-	// ---------------------------------------
 	if (!gladLoadGLLoader(SDL_GL_GetProcAddress)) {
 		throw std::runtime_error(std::string("ERROR::RENDERER::FAILED_TO_INIT_GLAD"));
 	}
@@ -90,37 +89,42 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	int32_t height = cfg.get<int32_t>("window.height");
 
 	mSceneBuffer = std::make_unique<FrameBuffer>(width, height);
-#ifdef MSAA
-	int32_t sampleCount = cfg.get<int32_t>("msaa.sample_count");
-	glEnable(GL_MULTISAMPLE);
-	mIntermediateBuffer = std::make_unique<FrameBuffer>(width, height);
-# ifdef HDR
-	mIntermediateBuffer->withTextureFP(GL_RGBA)
-			.withRenderBufferDepth(GL_DEPTH_COMPONENT24)
-			.checkStatus();
-	mIntermediateBuffer->unbind();
 
-	mSceneBuffer->bind();
-	mSceneBuffer->withTextureFPMultisampled(sampleCount, GL_RGBA)
-# else
-	mIntermediateBuffer->withTexture(GL_RGBA)
-			.withRenderBufferDepth(GL_DEPTH_COMPONENT24)
-			.checkStatus();
-	mIntermediateBuffer->unbind();
+	if (cfg.get<bool>("msaa.enabled")) {
+		glEnable(GL_MULTISAMPLE);
+		const int32_t sampleCount = cfg.get<int32_t>("msaa.sample_count");
+		mIntermediateBuffer = std::make_unique<FrameBuffer>(width, height);
 
-	mSceneBuffer->bind();
-	mSceneBuffer->withTextureMultisampled(sampleCount, GL_RGBA)
-# endif
-			.withRenderBufferDepthMultisampled(sampleCount, GL_DEPTH_COMPONENT24)
-#else
-# ifdef HDR
-	mSceneBuffer->withTextureFP(GL_RGBA)
-# else
-	mSceneBuffer->withTexture(GL_RGBA)
-# endif
-			.withTextureDepth(GL_DEPTH_COMPONENT24, false)
-#endif
-			.checkStatus();
+		if (cfg.get<bool>("hdr.enabled")) {
+			mIntermediateBuffer->withTextureFP(GL_RGBA)
+					.withRenderBufferDepth(GL_DEPTH_COMPONENT24)
+					.checkStatus();
+
+			mSceneBuffer->bind();
+			mSceneBuffer->withTextureFPMultisampled(sampleCount, GL_RGBA)
+					.withRenderBufferDepthMultisampled(sampleCount, GL_DEPTH_COMPONENT24)
+					.checkStatus();
+		} else {
+			mIntermediateBuffer->withTexture(GL_RGBA)
+					.withRenderBufferDepth(GL_DEPTH_COMPONENT24)
+					.checkStatus();
+
+			mSceneBuffer->bind();
+			mSceneBuffer->withTextureMultisampled(sampleCount, GL_RGBA)
+					.withRenderBufferDepthMultisampled(sampleCount, GL_DEPTH_COMPONENT24)
+					.checkStatus();
+		}
+	} else {
+		if (cfg.get<bool>("hdr.enabled")) {
+			mSceneBuffer->withTextureFP(GL_RGBA)
+					.withTextureDepth(GL_DEPTH_COMPONENT24, false)
+					.checkStatus();
+		} else {
+			mSceneBuffer->withTexture(GL_RGBA)
+					.withTextureDepth(GL_DEPTH_COMPONENT24, false)
+					.checkStatus();
+		}
+	}
 	mSceneBuffer->unbind();
 
 	// Create camera buffer
@@ -155,10 +159,12 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	}
 
 	mRenderPasses.emplace_back(std::make_unique<SkyboxPass>());
-#ifdef MSAA
-	mRenderPasses.emplace_back(std::make_unique<ResolvePass>());
-	mRenderCtx->intermediateBuffer = mIntermediateBuffer.get();
-#endif
+
+	if (cfg.get<bool>("msaa.enabled")) {
+		mRenderPasses.emplace_back(std::make_unique<ResolvePass>());
+		mRenderCtx->intermediateBuffer = mIntermediateBuffer.get();
+	}
+
 	mRenderPasses.emplace_back(std::make_unique<PostProcessPass>());
 
 	mRenderCtx->sceneBuffer = mSceneBuffer.get();
@@ -187,9 +193,18 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 
 
 	const std::vector<UniformBinding> uboBindings = {
-		{cfg.get<std::string>("camera.block_name"), cfg.get<uint32_t>("camera.ubo_binding"), mCameraUBO.get(), &UniformBuffer::configure},
-		{cfg.get<std::string>("light.block_name"), cfg.get<uint32_t>("light.ubo_binding"), mLightSystem->ubo(), &UniformBuffer::configure},
-		{cfg.get<std::string>("shadow.block_name"), cfg.get<uint32_t>("shadow.ubo_binding"), mShadowSystem->ubo(), &UniformBuffer::configure}
+		{
+			cfg.get<std::string>("camera.block_name"), cfg.get<uint32_t>("camera.ubo_binding"), mCameraUBO.get(),
+			&UniformBuffer::configure
+		},
+		{
+			cfg.get<std::string>("light.block_name"), cfg.get<uint32_t>("light.ubo_binding"), mLightSystem->ubo(),
+			&UniformBuffer::configure
+		},
+		{
+			cfg.get<std::string>("shadow.block_name"), cfg.get<uint32_t>("shadow.ubo_binding"), mShadowSystem->ubo(),
+			&UniformBuffer::configure
+		}
 	};
 
 	const std::vector<TextureBinding> shadowMapBindings = {

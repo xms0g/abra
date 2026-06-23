@@ -19,6 +19,8 @@ void ConfigManager::load(const std::string& filepath) {
 		set("window.width", config["window"]["width"].value_or(1280));
 		set("window.height", config["window"]["height"].value_or(720));
 
+		set("hdr.enabled", config["hdr"]["enabled"].value_or(true));
+
 		set("msaa.enabled", config["msaa"]["enabled"].value_or(true));
 		set("msaa.sample_count", config["msaa"]["sample_count"].value_or(4));
 

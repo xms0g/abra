@@ -12,7 +12,10 @@ width = 0
 height = 0
 fullscreen = false
 
-[mssaa]
+[hdr]
+enabled = false
+
+[msaa]
 enabled = false
 sample_count = 4
 
