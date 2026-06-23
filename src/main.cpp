@@ -1,7 +1,7 @@
 #include <iostream>
-#include "config/configManager.h"
 #include "core/engine.h"
 #include "ECS/registry.h"
+#include "config/configManager.h"
 #include "resource/sceneLoader.h"
 #include "resource/resourceManager.h"
 
