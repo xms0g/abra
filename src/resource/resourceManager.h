@@ -9,6 +9,8 @@
 #include "../job/threadPool.h"
 #include "../rendering/types.hpp"
 
+#define rm ResourceManager::instance()
+
 class Shader;
 class BaseFrameBuffer;
 

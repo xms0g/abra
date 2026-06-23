@@ -18,7 +18,7 @@ PerspectiveShadow::PerspectiveShadow(const RenderContext& ctx) {
 			.checkStatus();
 	mDepthMap->unbind();
 
-	mDepthShader = ResourceManager::instance().get<Shader>("depth");
+	mDepthShader = rm.get<Shader>("depth");
 	mNear = cfg.get<float>("shadow.perspective.nearPlane");
 	mFar = cfg.get<float>("shadow.perspective.farPlane");
 }

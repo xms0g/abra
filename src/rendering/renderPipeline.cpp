@@ -163,9 +163,9 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 
 	mRenderCtx->sceneBuffer = mSceneBuffer.get();
 	mRenderCtx->camera.self = &camera;
-	mRenderCtx->PBR.irradianceMap = ResourceManager::instance().get<BaseFrameBuffer>("irradianceMap");
-	mRenderCtx->PBR.prefilterMap = ResourceManager::instance().get<BaseFrameBuffer>("prefilterMap");
-	mRenderCtx->PBR.brdfLUT = ResourceManager::instance().get<BaseFrameBuffer>("brdfLUT");
+	mRenderCtx->PBR.irradianceMap = rm.get<BaseFrameBuffer>("irradianceMap");
+	mRenderCtx->PBR.prefilterMap = rm.get<BaseFrameBuffer>("prefilterMap");
+	mRenderCtx->PBR.brdfLUT = rm.get<BaseFrameBuffer>("brdfLUT");
 
 	// Set camera projection matrix
 	const glm::mat4 projectionMat = glm::perspective(
@@ -199,7 +199,7 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	};
 
 	// Configure shaders
-	for (const auto& [name,shader]: ResourceManager::instance().getShaders()) {
+	for (const auto& [name,shader]: rm.getShaders()) {
 		for (const auto& [blockName, binding, buffer, configure]: uboBindings) {
 			std::invoke(configure, buffer, shader->id(), binding, blockName.c_str());
 		}
@@ -313,24 +313,24 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		// Set shader
 		if (material.flags & OPAQUE) {
 			if (material.flags & UNLIT) {
-				matBatch.shader = ResourceManager::instance().get<Shader>("unlit");
+				matBatch.shader = rm.get<Shader>("unlit");
 			} else {
 				if (entity.hasComponent<InstanceComponent>()) {
-					matBatch.shader = ResourceManager::instance().get<Shader>("instancedOpaque");
+					matBatch.shader = rm.get<Shader>("instancedOpaque");
 				} else {
-					matBatch.shader = ResourceManager::instance().get<Shader>("opaque");
+					matBatch.shader = rm.get<Shader>("opaque");
 				}
 			}
 		} else if (material.flags & BLEND) {
 			if (entity.hasComponent<InstanceComponent>()) {
-				matBatch.shader = ResourceManager::instance().get<Shader>("instancedBlend");
+				matBatch.shader = rm.get<Shader>("instancedBlend");
 			} else {
-				matBatch.shader = ResourceManager::instance().get<Shader>("blend");
+				matBatch.shader = rm.get<Shader>("blend");
 			}
 		} else if (material.flags & CUBEMAP) {
-			matBatch.shader = ResourceManager::instance().get<Shader>("skybox");
+			matBatch.shader = rm.get<Shader>("skybox");
 		} else if (material.flags & TERRAIN) {
-			matBatch.shader = ResourceManager::instance().get<Shader>("terrain");
+			matBatch.shader = rm.get<Shader>("terrain");
 		}
 
 		RenderGroup group;

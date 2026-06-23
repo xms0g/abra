@@ -21,9 +21,9 @@ int main() {
 		ConfigManager::instance().load("config.toml");
 		engine.init(&registry);
 
-		ResourceManager::instance().createShaders();
+		rm.createShaders();
 		SceneLoader::loadScene(registry, "assets/scenes/scene_Sponza_Spotlight.json");
-		ResourceManager::instance().createBuffers();
+		rm.createBuffers();
 
 		registry.update();
 		engine.configure();

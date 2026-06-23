@@ -18,7 +18,7 @@ OmnidirectionalShadow::OmnidirectionalShadow(const RenderContext& ctx) {
 			.checkStatus();
 	mDepthMap->unbind();
 
-	mDepthShader = ResourceManager::instance().get<Shader>("depthCubemap");
+	mDepthShader = rm.get<Shader>("depthCubemap");
 	mNear = cfg.get<float>("shadow.omnidirectional.nearPlane");
 	mFar = cfg.get<float>("shadow.omnidirectional.farPlane");
 	mFovy = glm::radians(cfg.get<float>("shadow.omnidirectional.fovy"));
