@@ -1,4 +1,5 @@
 #include "panels.h"
+#include <span>
 #include "glad/glad.h"
 #include "imgui/imgui.h"
 #include "ui.h"
@@ -16,13 +17,6 @@
 #include "../../event/events/guiTransformEvent.hpp"
 #include "../../event/events/guiLightEvent.hpp"
 #include "../../rendering/material/material.hpp"
-
-struct Effect {
-	const char* name{};
-	bool enabled{};
-	float exposure{1.1f};
-	float intensity{0.01f};
-};
 
 void GuiPanels::renderGraphicsInfoPanel(const uint32_t fps) {
 	if (ImGui::Begin("Graphics")) {
@@ -128,7 +122,6 @@ void GuiPanels::renderDirLight(const Entity& entity, EventBus& eventBus, EntityS
 	}
 }
 
-
 void GuiPanels::renderPointLight(const Entity& entity, EventBus& eventBus, EntityState& entityState) {
 	bool isDirty = entityState.isDirty;
 
@@ -173,7 +166,8 @@ void GuiPanels::renderSpotLight(const Entity& entity, EventBus& eventBus, Entity
 	isDirty |= Ui::colorField3("Specular", entityState.light.specular, 0.01f, 100);
 	isDirty |= Ui::dragFloat("Constant", &entityState.light.constant, 0.01f, 100);
 	isDirty |= Ui::dragFloat("Linear", &entityState.light.linear, 0.01f, 100);
-	isDirty |= Ui::dragFloat("Quadratic", &entityState.light.quadratic, 0.01f, 100);	isDirty |= Ui::dragFloat("Cutoff", &entityState.light.cutOff, 0.01f, 100);
+	isDirty |= Ui::dragFloat("Quadratic", &entityState.light.quadratic, 0.01f, 100);
+	isDirty |= Ui::dragFloat("Cutoff", &entityState.light.cutOff, 0.01f, 100);
 	isDirty |= Ui::dragFloat("OuterCutoff", &entityState.light.outerCutOff, 0.01f, 100);
 	isDirty |= Ui::sliderFloat("Intensity", &entityState.light.intensity, 100.0, 1.0, 30.0);
 	isDirty |= ImGui::Checkbox("Cast Shadow", &entityState.light.castShadow);
@@ -202,23 +196,26 @@ void GuiPanels::renderSpotLight(const Entity& entity, EventBus& eventBus, Entity
 }
 
 void GuiPanels::renderPostProcessPanel(EventBus& eventBus) {
-	static std::array<Effect, 10> effects = {
-		{
-			{"Bloom", false},
-			{"Tone Mapping", false},
-			{"Grayscale", false},
-			{"Sepia", false},
-			{"Blur", false},
-			{"Edge Detection", false},
-			{"Sharpen", false},
-			{"Chromatic Aberration", false},
-			{"Gamma Correction", true},
-			{"FXAA", false}
-		}
+	struct Effect {
+		const char* name{};
+		bool enabled{};
+		float exposure{1.1f};
+		float intensity{0.01f};
+	} static effects[] = {
+		{"Bloom", false},
+		{"Tone Mapping", false},
+		{"Grayscale", false},
+		{"Sepia", false},
+		{"Blur", false},
+		{"Edge Detection", false},
+		{"Sharpen", false},
+		{"Chromatic Aberration", false},
+		{"Gamma Correction", true},
+		{"FXAA", false}
 	};
 
 	if (ImGui::Begin("Post-Processing")) {
-		for (uint32_t i = 0; i < effects.size(); ++i) {
+		for (uint32_t i = 0; i < std::span<Effect>(effects).size(); ++i) {
 			auto& [name, enabled, exposure, intensity] = effects[i];
 			bool isDirty{false};
 
