@@ -121,18 +121,18 @@ T* ResourceManager::get(const KeyType& key) const {
 	} else if constexpr (std::is_same_v<T, std::vector<float>>) {
 		return const_cast<T*>(&mTransformsByEntity.at(key));
 	} else if constexpr (std::is_same_v<T, BaseFrameBuffer>) {
-		return mBuffers.contains(key) ? mBuffers.at(key).get() : nullptr;
+		return mBuffers.at(key).get();
 	} else if constexpr (std::is_same_v<T, Shader>) {
-		return mShaders.contains(key) ? mShaders.at(key).get() : nullptr;
+		return mShaders.at(key).get();
 	} else {
 		static_assert(false, "Unsupported type for get().");
 	}
+
+	return nullptr;
 }
 
 template<typename T>
 void ResourceManager::upload(size_t entityID, T& map) {
-	std::lock_guard<std::mutex> lock(mResourceMutex);
-
 	if constexpr (std::is_same_v<T, MeshMap>) {
 		mMeshesByEntity.emplace(entityID, std::move(map));
 	} else if constexpr (std::is_same_v<T, MaterialMap>) {

@@ -4,7 +4,6 @@
 #include "renderContext/renderQueue.hpp"
 #include "../ECS/system.hpp"
 
-struct Config;
 class SyncStateSystem;
 class EventBus;
 class SSAOPass;
@@ -35,7 +34,7 @@ public:
 
 	void render();
 
-	void drawGui();
+	static void drawGui();
 
 private:
 	void refreshCameraData() const;

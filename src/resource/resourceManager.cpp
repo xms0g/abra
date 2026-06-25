@@ -187,8 +187,7 @@ void ResourceManager::loadModel(const size_t entityID, const std::string& file) 
 	}
 }
 
-void ResourceManager::
-processMeshes(
+void ResourceManager::processMeshes(
 	const aiNode* node,
 	const aiScene* scene,
 	MeshMap& meshesByMatID,
@@ -277,12 +276,7 @@ void ResourceManager::processMaterials(const aiScene* scene, MaterialLoadContext
 		const aiMaterial* material = scene->mMaterials[matID];
 
 		for (const auto& type: textureBindings) {
-			TextureLoadRequest req{
-				.mat = material,
-				.type = type,
-				.materialID = matID
-			};
-
+			TextureLoadRequest req{.mat = material, .type = type, .materialID = matID};
 			loadMaterialTextures(req, materialLoadCtx);
 		}
 	}
@@ -318,11 +312,7 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 			}
 		}
 
-		materialLoadCtx.materials[req.materialID] = {
-			.id = req.materialID,
-			.flags = flags,
-			.alphaCutoff = alphaCutoff
-		};
+		materialLoadCtx.materials[req.materialID] = {.id = req.materialID, .flags = flags, .alphaCutoff = alphaCutoff};
 	}
 
 	auto& material = materialLoadCtx.materials[req.materialID];
