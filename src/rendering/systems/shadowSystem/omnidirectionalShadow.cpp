@@ -13,6 +13,7 @@
 OmnidirectionalShadow::OmnidirectionalShadow(const RenderContext& ctx) {
 	mWidth = cfg.get<int32_t>("shadow.map_width");
 	mHeight = cfg.get<int32_t>("shadow.map_height");
+	mAspect = static_cast<float>(mWidth) / static_cast<float>(mHeight);
 	mDepthMap = std::make_unique<FrameBuffer>(mWidth, mHeight);
 	mDepthMap->withTextureCubemapDepthArray(cfg.get<int32_t>("light.max_point"), GL_DEPTH_COMPONENT24, true)
 			.checkStatus();
@@ -22,6 +23,9 @@ OmnidirectionalShadow::OmnidirectionalShadow(const RenderContext& ctx) {
 	mNear = cfg.get<float>("shadow.omnidirectional.nearPlane");
 	mFar = cfg.get<float>("shadow.omnidirectional.farPlane");
 	mFovy = glm::radians(cfg.get<float>("shadow.omnidirectional.fovy"));
+	mShadowProj = glm::perspective(mFovy, mAspect, mNear, mFar);
+
+	mShadowTransforms.resize(6);
 }
 
 OmnidirectionalShadow::~OmnidirectionalShadow() = default;
@@ -37,23 +41,16 @@ FrameBuffer& OmnidirectionalShadow::depthMap() const {
 void OmnidirectionalShadow::render(
 	const RenderContext& ctx,
 	const glm::vec3& position,
-	const int32_t layer) const {
-	constexpr uint32_t faces = 6;
+	const int32_t layer) {
+	mShadowTransforms.clear();
 
-	const glm::mat4 shadowProj = glm::perspective(
-		glm::radians(mFovy),
-		static_cast<float>(mWidth) / static_cast<float>(mHeight),
-		mNear,
-		mFar);
-
-	std::vector<glm::mat4> shadowTransforms;
-	for (const auto& [dir, up]: mDirUpPairs) {
-		shadowTransforms.push_back(shadowProj * glm::lookAt(position, position + dir, up));
+	for (const auto& [dir, up]: mDirUps) {
+		mShadowTransforms.push_back(mShadowProj * glm::lookAt(position, position + dir, up));
 	}
 
 	mDepthShader->activate();
 	for (uint32_t i = 0; i < faces; ++i) {
-		mDepthShader->setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
+		mDepthShader->setMat4("shadowMatrices[" + std::to_string(i) + "]", mShadowTransforms[i]);
 	}
 
 	mDepthShader->setFloat("omniFarPlane", mFar);
