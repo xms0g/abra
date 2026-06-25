@@ -169,9 +169,6 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 
 	mRenderCtx->sceneBuffer = mSceneBuffer.get();
 	mRenderCtx->camera.self = &camera;
-	mRenderCtx->PBR.irradianceMap = rm.get<BaseFrameBuffer>("irradianceMap");
-	mRenderCtx->PBR.prefilterMap = rm.get<BaseFrameBuffer>("prefilterMap");
-	mRenderCtx->PBR.brdfLUT = rm.get<BaseFrameBuffer>("brdfLUT");
 
 	// Set camera projection matrix
 	const glm::mat4 projectionMat = glm::perspective(
@@ -190,7 +187,6 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	for (const auto& pass: mRenderPasses) {
 		pass->configure(*mRenderCtx, eventBus);
 	}
-
 
 	const std::vector<UniformBinding> uboBindings = {
 		{cfg.get<std::string>("camera.block_name"), cfg.get<uint32_t>("camera.ubo_binding"), mCameraUBO.get(), &UniformBuffer::configure},

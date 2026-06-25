@@ -26,7 +26,10 @@ void DeferredLightingPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	};
 
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
-	RenderCommand::bindShadowMaps(ctx);
+
+	ctx.PBR.irradianceMap = rm.get<BaseFrameBuffer>("irradianceMap");
+	ctx.PBR.prefilterMap = rm.get<BaseFrameBuffer>("prefilterMap");
+	ctx.PBR.brdfLUT = rm.get<BaseFrameBuffer>("brdfLUT");
 
 	ctx.gBuffer->bindTexture(cfg.get<int32_t>("gBuffer.position.textureSlot"), cfg.get<int32_t>("gBuffer.position.textureIdx"));
 	ctx.gBuffer->bindTexture(cfg.get<int32_t>("gBuffer.normal.textureSlot"), cfg.get<int32_t>("gBuffer.normal.textureIdx"));
@@ -36,6 +39,8 @@ void DeferredLightingPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	ctx.PBR.irradianceMap->bindTexture(cfg.get<int32_t>("PBR.irradianceMap.textureSlot"));
 	ctx.PBR.prefilterMap->bindTexture(cfg.get<int32_t>("PBR.prefilterMap.textureSlot"));
 	ctx.PBR.brdfLUT->bindTexture(cfg.get<int32_t>("PBR.brdfLUT.textureSlot"));
+
+	RenderCommand::bindShadowMaps(ctx);
 }
 
 void DeferredLightingPass::execute(const RenderContext& ctx) {
