@@ -3,7 +3,6 @@
 #include "../mesh/vertex.hpp"
 #include "../texture/texture.h"
 #include "../material/material.hpp"
-#include "../../io/filesystem.hpp"
 
 Model::Sphere::Sphere(
 	glm::vec3 color,
