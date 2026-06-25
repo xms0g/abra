@@ -3,8 +3,6 @@
 #include <unordered_set>
 #include "glm/glm.hpp"
 
-struct ShaderResource;
-
 struct ShaderResource {
 	uint32_t handle{0};
 
