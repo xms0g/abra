@@ -3,7 +3,29 @@
 #include <unordered_set>
 #include "glm/glm.hpp"
 
-struct Config;
+struct ShaderResource;
+
+struct ShaderResource {
+	uint32_t handle{0};
+
+	ShaderResource() = default;
+
+	explicit ShaderResource(const char** code, const std::string& fn, uint32_t type);
+
+	ShaderResource(const ShaderResource& other) = delete;
+
+	ShaderResource& operator=(const ShaderResource& other) = delete;
+
+	ShaderResource(ShaderResource&& other) noexcept;
+
+	ShaderResource& operator=(ShaderResource&& other) noexcept;
+
+	~ShaderResource();
+
+	void attach(uint32_t programID) const;
+
+	void checkCompileErrors(const std::string& fn) const;
+};
 
 class Shader {
 public:
@@ -59,20 +81,21 @@ public:
 
 	void setMat4(const std::string& name, const glm::mat4& mat) const;
 
+	static std::string preprocess(const std::string& source, std::unordered_set<std::string>& includedFiles);
+
+	static ShaderResource compileShader(const std::string& source, const std::string& fn, uint32_t type);
+
+	static void linkShader(
+		uint32_t& programID,
+		const ShaderResource& vert,
+		const ShaderResource& frag,
+		const ShaderResource& geo,
+		const ShaderResource& tessControl,
+		const ShaderResource& tessEval);
+
+	static void checkLinkErrors(uint32_t programID);
+
 private:
-	std::string loadFile(const std::string& fn);
-
-	std::string preprocess(const std::string& source, std::unordered_set<std::string>& includedFiles);
-
-	uint32_t compileShader(const std::string& source, const std::string& fn, uint32_t type);
-
-	uint32_t linkShader(
-		uint32_t vertHandle,
-		uint32_t fragHandle,
-		uint32_t geoHandle = 0,
-		uint32_t tessControlHandle = 0,
-		uint32_t tessEvalHandle = 0);
-
 	// the program ID
 	uint32_t mID{};
 };

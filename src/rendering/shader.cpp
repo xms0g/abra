@@ -6,39 +6,89 @@
 #include "../io/filesystem.hpp"
 #include "../config/configManager.h"
 
+ShaderResource::ShaderResource(const char** code, const std::string& fn, const uint32_t type) {
+	handle = glCreateShader(type);
+	glShaderSource(handle, 1, code, nullptr);
+	glCompileShader(handle);
+
+	checkCompileErrors(fn);
+}
+
+ShaderResource::ShaderResource(ShaderResource&& other) noexcept {
+	handle = other.handle;
+	other.handle = 0;
+}
+
+ShaderResource& ShaderResource::operator=(ShaderResource&& other) noexcept {
+	if (this == &other) return *this;
+
+	handle = other.handle;
+	other.handle = 0;
+	return *this;
+}
+
+ShaderResource::~ShaderResource() {
+	if (handle)
+		glDeleteShader(handle);
+}
+
+void ShaderResource::attach(const uint32_t programID) const {
+	if (handle)
+		glAttachShader(programID, handle);
+}
+
+void ShaderResource::checkCompileErrors(const std::string& fn) const {
+	int32_t success;
+	glGetShaderiv(handle, GL_COMPILE_STATUS, &success);
+
+	if (!success) {
+		std::string infoLog;
+		int32_t maxLength = 0;
+
+		glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &maxLength);
+		infoLog.resize(maxLength);
+
+		glGetShaderInfoLog(handle, maxLength, nullptr, infoLog.data());
+
+		// The program is useless now. So delete it.
+		glDeleteShader(handle);
+
+		throw std::runtime_error(std::string("Compilation Error in ") + fn + "\n" + infoLog);
+	}
+}
+
 Shader::Shader(const std::string& vs, const std::string& fs, const std::string& gs, const std::string& tcs, const std::string& tes) {
 	std::unordered_set<std::string> includedFiles{};
 
 	try {
-		const std::string vertex = preprocess(loadFile(vs), includedFiles);
+		const std::string vertex = preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + vs), includedFiles);
 		includedFiles.clear();
-		const std::string fragment = preprocess(loadFile(fs), includedFiles);
+		const std::string fragment = preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + fs), includedFiles);
 		includedFiles.clear();
-		const std::string geometry = !gs.empty() ? preprocess(loadFile(gs), includedFiles) : "";
+		const std::string geometry = !gs.empty() ? preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + gs), includedFiles) : "";
 		includedFiles.clear();
-		const std::string tessControl = !tcs.empty() ? preprocess(loadFile(tcs), includedFiles) : "";
+		const std::string tessControl = !tcs.empty() ? preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + tcs), includedFiles) : "";
 		includedFiles.clear();
-		const std::string tessEvaluation = !tes.empty() ? preprocess(loadFile(tes), includedFiles) : "";
+		const std::string tessEvaluation = !tes.empty() ? preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + tes), includedFiles) : "";
 		includedFiles.clear();
 
-		const uint32_t vertHandle = compileShader(vertex, vs, GL_VERTEX_SHADER);
-		const uint32_t fragHandle = compileShader(fragment, fs, GL_FRAGMENT_SHADER);
+		auto vert = compileShader(vertex, vs, GL_VERTEX_SHADER);
+		auto frag = compileShader(fragment, fs, GL_FRAGMENT_SHADER);
 
-		uint32_t geoHandle = 0, tessControlHandle = 0, tessEvalHandle = 0;
-
+		ShaderResource geo, tessCont, tessEval;
 		if (!geometry.empty()) {
-			geoHandle = compileShader(geometry, gs, GL_GEOMETRY_SHADER);
+			geo = compileShader(geometry, gs, GL_GEOMETRY_SHADER);
 		}
 
 		if (!tessControl.empty()) {
-			tessControlHandle = compileShader(tessControl, tcs, GL_TESS_CONTROL_SHADER);
+			tessCont = compileShader(tessControl, tcs, GL_TESS_CONTROL_SHADER);
 		}
 
 		if (!tessEvaluation.empty()) {
-			tessEvalHandle = compileShader(tessEvaluation, tes, GL_TESS_EVALUATION_SHADER);
+			tessEval = compileShader(tessEvaluation, tes, GL_TESS_EVALUATION_SHADER);
 		}
 
-		linkShader(vertHandle, fragHandle, geoHandle, tessControlHandle, tessEvalHandle);
+		linkShader(mID, vert, frag, geo, tessCont, tessEval);
 	} catch (std::runtime_error& e) {
 		throw std::runtime_error(std::string("Shader ") + e.what());
 	}
@@ -123,16 +173,6 @@ void Shader::setMat4(const std::string& name, const glm::mat4& mat) const {
 	glUniformMatrix4fv(glGetUniformLocation(mID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
-std::string Shader::loadFile(const std::string& fn) {
-	std::ifstream file(fs::path(cfg.get<std::string>("path.shader") + fn));
-	if (!file.is_open()) {
-		throw std::runtime_error(std::string("Failed to open shader file: ") + fn);
-	}
-	std::stringstream ss;
-	ss << file.rdbuf();
-	return ss.str();
-}
-
 std::string Shader::preprocess(
 	const std::string& source,
 	std::unordered_set<std::string>& includedFiles) {
@@ -155,7 +195,7 @@ std::string Shader::preprocess(
 				}
 				includedFiles.insert(includeFile);
 				// Load included file
-				result << preprocess(loadFile(includeFile.c_str()), includedFiles) << "\n";
+				result << preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + includeFile.c_str()), includedFiles) << "\n";
 			}
 		} else {
 			result << line << "\n";
@@ -164,85 +204,49 @@ std::string Shader::preprocess(
 	return result.str();
 }
 
-uint32_t Shader::compileShader(const std::string& source, const std::string& fn, const uint32_t type) {
-	const uint32_t shader = glCreateShader(type);
+ShaderResource Shader::compileShader(const std::string& source, const std::string& fn, const uint32_t type) {
 	const char* code = source.c_str();
 
-	glShaderSource(shader, 1, &code, nullptr);
-	glCompileShader(shader);
-
-	// Check compile errors
-	int32_t success;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-
-	if (!success) {
-		std::string infoLog;
-		int32_t maxLength = 0;
-
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
-		infoLog.resize(maxLength);
-
-		glGetShaderInfoLog(shader, maxLength, nullptr, infoLog.data());
-
-		// The program is useless now. So delete it.
-		glDeleteShader(shader);
-
-		throw std::runtime_error(std::string("Compilation Error in ") + fn + "\n" + infoLog);
-	}
-
-	return shader;
+	ShaderResource resource{&code, fn, type};
+	return std::move(resource);
 }
 
-uint32_t Shader::linkShader(
-	const uint32_t vertHandle,
-	const uint32_t fragHandle,
-	const uint32_t geoHandle,
-	const uint32_t tessControlHandle,
-	const uint32_t tessEvalHandle) {
-	mID = glCreateProgram();
+void Shader::linkShader(
+	uint32_t& programID,
+	const ShaderResource& vert,
+	const ShaderResource& frag,
+	const ShaderResource& geo,
+	const ShaderResource& tessControl,
+	const ShaderResource& tessEval) {
+	programID = glCreateProgram();
 
-	glAttachShader(mID, vertHandle);
-	glAttachShader(mID, fragHandle);
+	vert.attach(programID);
+	frag.attach(programID);
+	geo.attach(programID);
+	tessControl.attach(programID);
+	tessEval.attach(programID);
 
-	if (geoHandle != 0)
-		glAttachShader(mID, geoHandle);
-	if (tessControlHandle != 0)
-		glAttachShader(mID, tessControlHandle);
-	if (tessEvalHandle != 0)
-		glAttachShader(mID, tessEvalHandle);
+	glLinkProgram(programID);
 
-	glLinkProgram(mID);
+	checkLinkErrors(programID);
+}
 
-	// Check linking errors
+void Shader::checkLinkErrors(const uint32_t programID) {
 	int32_t success;
-	glGetProgramiv(mID, GL_LINK_STATUS, &success);
+	glGetProgramiv(programID, GL_LINK_STATUS, &success);
 
 	if (!success) {
 		std::string infoLog;
 		int32_t maxLength = 0;
 
-		glGetProgramiv(mID, GL_INFO_LOG_LENGTH, &maxLength);
+		glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &maxLength);
 		infoLog.resize(maxLength);
 
-		glGetProgramInfoLog(mID, maxLength, nullptr, infoLog.data());
+		glGetProgramInfoLog(programID, maxLength, nullptr, infoLog.data());
 
 		// The program is useless now. So delete it.
-		glDeleteProgram(mID);
+		glDeleteProgram(programID);
 
 		throw std::runtime_error(std::string("Linking error:\n") + infoLog);
 	}
-
-	glDeleteShader(vertHandle);
-	glDeleteShader(fragHandle);
-
-	if (geoHandle)
-		glDeleteShader(geoHandle);
-
-	if (tessControlHandle)
-		glDeleteShader(tessControlHandle);
-
-	if (tessEvalHandle)
-		glDeleteShader(tessEvalHandle);
-
-	return mID;
 }
