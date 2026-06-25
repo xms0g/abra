@@ -6,7 +6,7 @@
 #include "../io/filesystem.hpp"
 #include "../config/configManager.h"
 
-Shader::Shader(const char* vs, const char* fs, const char* gs, const char* tcs, const char* tes) {
+Shader::Shader(const std::string& vs, const std::string& fs, const std::string& gs, const std::string& tcs, const std::string& tes) {
 	std::unordered_set<std::string> includedFiles{};
 
 	try {
@@ -14,30 +14,31 @@ Shader::Shader(const char* vs, const char* fs, const char* gs, const char* tcs, 
 		includedFiles.clear();
 		const std::string fragment = preprocess(loadFile(fs), includedFiles);
 		includedFiles.clear();
-		const std::string geometry = gs ? preprocess(loadFile(gs), includedFiles) : "";
+		const std::string geometry = !gs.empty() ? preprocess(loadFile(gs), includedFiles) : "";
 		includedFiles.clear();
-		const std::string tessControl = tcs ? preprocess(loadFile(tcs), includedFiles) : "";
+		const std::string tessControl = !tcs.empty() ? preprocess(loadFile(tcs), includedFiles) : "";
 		includedFiles.clear();
-		const std::string tessEvaluation = tes ? preprocess(loadFile(tes), includedFiles) : "";
+		const std::string tessEvaluation = !tes.empty() ? preprocess(loadFile(tes), includedFiles) : "";
 		includedFiles.clear();
 
 		const uint32_t vertHandle = compileShader(vertex, vs, GL_VERTEX_SHADER);
 		const uint32_t fragHandle = compileShader(fragment, fs, GL_FRAGMENT_SHADER);
-		uint32_t geoHandle = 0, tcHandle = 0, teHandle = 0;
 
-		if (gs) {
+		uint32_t geoHandle = 0, tessControlHandle = 0, tessEvalHandle = 0;
+
+		if (!geometry.empty()) {
 			geoHandle = compileShader(geometry, gs, GL_GEOMETRY_SHADER);
 		}
 
-		if (tcs) {
-			tcHandle = compileShader(tessControl, tcs, GL_TESS_CONTROL_SHADER);
+		if (!tessControl.empty()) {
+			tessControlHandle = compileShader(tessControl, tcs, GL_TESS_CONTROL_SHADER);
 		}
 
-		if (tes) {
-			teHandle = compileShader(tessEvaluation, tes, GL_TESS_EVALUATION_SHADER);
+		if (!tessEvaluation.empty()) {
+			tessEvalHandle = compileShader(tessEvaluation, tes, GL_TESS_EVALUATION_SHADER);
 		}
 
-		linkShader(vertHandle, fragHandle, geoHandle, tcHandle, teHandle);
+		linkShader(vertHandle, fragHandle, geoHandle, tessControlHandle, tessEvalHandle);
 	} catch (std::runtime_error& e) {
 		throw std::runtime_error(std::string("Shader ") + e.what());
 	}
@@ -122,7 +123,7 @@ void Shader::setMat4(const std::string& name, const glm::mat4& mat) const {
 	glUniformMatrix4fv(glGetUniformLocation(mID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
-std::string Shader::loadFile(const char* fn) {
+std::string Shader::loadFile(const std::string& fn) {
 	std::ifstream file(fs::path(cfg.get<std::string>("path.shader") + fn));
 	if (!file.is_open()) {
 		throw std::runtime_error(std::string("Failed to open shader file: ") + fn);
@@ -163,7 +164,7 @@ std::string Shader::preprocess(
 	return result.str();
 }
 
-uint32_t Shader::compileShader(const std::string& source, const char* fn, const uint32_t type) {
+uint32_t Shader::compileShader(const std::string& source, const std::string& fn, const uint32_t type) {
 	const uint32_t shader = glCreateShader(type);
 	const char* code = source.c_str();
 
@@ -196,8 +197,8 @@ uint32_t Shader::linkShader(
 	const uint32_t vertHandle,
 	const uint32_t fragHandle,
 	const uint32_t geoHandle,
-	const uint32_t tcHandle,
-	const uint32_t teHandle) {
+	const uint32_t tessControlHandle,
+	const uint32_t tessEvalHandle) {
 	mID = glCreateProgram();
 
 	glAttachShader(mID, vertHandle);
@@ -205,10 +206,10 @@ uint32_t Shader::linkShader(
 
 	if (geoHandle != 0)
 		glAttachShader(mID, geoHandle);
-	if (tcHandle != 0)
-		glAttachShader(mID, tcHandle);
-	if (teHandle != 0)
-		glAttachShader(mID, teHandle);
+	if (tessControlHandle != 0)
+		glAttachShader(mID, tessControlHandle);
+	if (tessEvalHandle != 0)
+		glAttachShader(mID, tessEvalHandle);
 
 	glLinkProgram(mID);
 
@@ -237,11 +238,11 @@ uint32_t Shader::linkShader(
 	if (geoHandle)
 		glDeleteShader(geoHandle);
 
-	if (tcHandle)
-		glDeleteShader(tcHandle);
+	if (tessControlHandle)
+		glDeleteShader(tessControlHandle);
 
-	if (teHandle)
-		glDeleteShader(teHandle);
+	if (tessEvalHandle)
+		glDeleteShader(tessEvalHandle);
 
 	return mID;
 }
