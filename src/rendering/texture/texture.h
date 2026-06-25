@@ -30,6 +30,8 @@ Texture generate(int32_t width, int32_t height, const float* data);
 
 uint32_t load(const std::string& path, uint32_t flags, bool isSRGB);
 
+void info(const std::string& path, int32_t& width, int32_t& height);
+
 uint32_t loadCubemap(const std::vector<std::string>& faces);
 
 Texture loadHDR(const std::string& path);

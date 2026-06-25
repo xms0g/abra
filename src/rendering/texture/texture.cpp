@@ -64,6 +64,11 @@ uint32_t texture::load(const std::string& path, const uint32_t flags, const bool
 	return textureID;
 }
 
+void texture::info(const std::string& path, int32_t& width, int32_t& height) {
+	int32_t channel;
+	stbi_info(path.c_str(), &width, &height, &channel);
+}
+
 uint32_t texture::loadCubemap(const std::vector<std::string>& faces) {
 	uint32_t textureID;
 
