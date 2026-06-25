@@ -81,6 +81,7 @@ public:
 
 	void setMat4(const std::string& name, const glm::mat4& mat) const;
 
+	static std::string preprocess(const std::string& source);
 	static std::string preprocess(const std::string& source, std::unordered_set<std::string>& includedFiles);
 
 	static ShaderResource compileShader(const std::string& source, const std::string& fn, uint32_t type);

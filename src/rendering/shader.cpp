@@ -58,37 +58,30 @@ void ShaderResource::checkCompileErrors(const std::string& fn) const {
 }
 
 Shader::Shader(const std::string& vs, const std::string& fs, const std::string& gs, const std::string& tcs, const std::string& tes) {
-	std::unordered_set<std::string> includedFiles{};
-
 	try {
-		const std::string vertex = preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + vs), includedFiles);
-		includedFiles.clear();
-		const std::string fragment = preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + fs), includedFiles);
-		includedFiles.clear();
-		const std::string geometry = !gs.empty() ? preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + gs), includedFiles) : "";
-		includedFiles.clear();
-		const std::string tessControl = !tcs.empty() ? preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + tcs), includedFiles) : "";
-		includedFiles.clear();
-		const std::string tessEvaluation = !tes.empty() ? preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + tes), includedFiles) : "";
-		includedFiles.clear();
+		const std::string vertexSource = preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + vs));
+		const std::string fragmentSource = preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + fs));
+		const std::string geometrySource = preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + gs));
+		const std::string tessControlSource = preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + tcs));
+		const std::string tessEvalSource = preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + tes));
 
-		auto vert = compileShader(vertex, vs, GL_VERTEX_SHADER);
-		auto frag = compileShader(fragment, fs, GL_FRAGMENT_SHADER);
+		auto vert = compileShader(vertexSource, vs, GL_VERTEX_SHADER);
+		auto frag = compileShader(fragmentSource, fs, GL_FRAGMENT_SHADER);
 
-		ShaderResource geo, tessCont, tessEval;
-		if (!geometry.empty()) {
-			geo = compileShader(geometry, gs, GL_GEOMETRY_SHADER);
+		ShaderResource geo, tessControl, tessEval;
+		if (!geometrySource.empty()) {
+			geo = compileShader(geometrySource, gs, GL_GEOMETRY_SHADER);
 		}
 
-		if (!tessControl.empty()) {
-			tessCont = compileShader(tessControl, tcs, GL_TESS_CONTROL_SHADER);
+		if (!tessControlSource.empty()) {
+			tessControl = compileShader(tessControlSource, tcs, GL_TESS_CONTROL_SHADER);
 		}
 
-		if (!tessEvaluation.empty()) {
-			tessEval = compileShader(tessEvaluation, tes, GL_TESS_EVALUATION_SHADER);
+		if (!tessEvalSource.empty()) {
+			tessEval = compileShader(tessEvalSource, tes, GL_TESS_EVALUATION_SHADER);
 		}
 
-		linkShader(mID, vert, frag, geo, tessCont, tessEval);
+		linkShader(mID, vert, frag, geo, tessControl, tessEval);
 	} catch (std::runtime_error& e) {
 		throw std::runtime_error(std::string("Shader ") + e.what());
 	}
@@ -173,9 +166,16 @@ void Shader::setMat4(const std::string& name, const glm::mat4& mat) const {
 	glUniformMatrix4fv(glGetUniformLocation(mID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
+std::string Shader::preprocess(const std::string& source) {
+	std::unordered_set<std::string> includedFiles{};
+	return preprocess(source, includedFiles);
+}
+
 std::string Shader::preprocess(
 	const std::string& source,
 	std::unordered_set<std::string>& includedFiles) {
+	if (source.empty()) return "";
+
 	std::stringstream result;
 	std::istringstream stream(source);
 	std::string line;
