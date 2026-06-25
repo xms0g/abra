@@ -67,11 +67,11 @@ private:
 	uint32_t compileShader(const std::string& source, const char* fn, uint32_t type);
 
 	uint32_t linkShader(
-		uint32_t vertex,
-		uint32_t fragment,
-		uint32_t geometry = 0,
-		uint32_t tessControl = 0,
-		uint32_t tessEvaluation = 0);
+		uint32_t vertHandle,
+		uint32_t fragHandle,
+		uint32_t geoHandle = 0,
+		uint32_t tcHandle = 0,
+		uint32_t teHandle = 0);
 
 	// the program ID
 	uint32_t mID{};

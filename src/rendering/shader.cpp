@@ -10,34 +10,34 @@ Shader::Shader(const char* vs, const char* fs, const char* gs, const char* tcs, 
 	std::unordered_set<std::string> includedFiles{};
 
 	try {
-		const std::string vertexCode = preprocess(loadFile(vs), includedFiles);
+		const std::string vertex = preprocess(loadFile(vs), includedFiles);
 		includedFiles.clear();
-		const std::string fragmentCode = preprocess(loadFile(fs), includedFiles);
+		const std::string fragment = preprocess(loadFile(fs), includedFiles);
 		includedFiles.clear();
-		const std::string geometryCode = gs ? preprocess(loadFile(gs), includedFiles) : "";
+		const std::string geometry = gs ? preprocess(loadFile(gs), includedFiles) : "";
 		includedFiles.clear();
-		const std::string tessControlCode = tcs ? preprocess(loadFile(tcs), includedFiles) : "";
+		const std::string tessControl = tcs ? preprocess(loadFile(tcs), includedFiles) : "";
 		includedFiles.clear();
-		const std::string tessEvaluationCode = tes ? preprocess(loadFile(tes), includedFiles) : "";
+		const std::string tessEvaluation = tes ? preprocess(loadFile(tes), includedFiles) : "";
 		includedFiles.clear();
 
-		const uint32_t vertex = compileShader(vertexCode, vs, GL_VERTEX_SHADER);
-		const uint32_t fragment = compileShader(fragmentCode, fs, GL_FRAGMENT_SHADER);
-		uint32_t geometry = 0, tessControl = 0, tessEvaluation = 0;
+		const uint32_t vertHandle = compileShader(vertex, vs, GL_VERTEX_SHADER);
+		const uint32_t fragHandle = compileShader(fragment, fs, GL_FRAGMENT_SHADER);
+		uint32_t geoHandle = 0, tcHandle = 0, teHandle = 0;
 
 		if (gs) {
-			geometry = compileShader(geometryCode, gs, GL_GEOMETRY_SHADER);
+			geoHandle = compileShader(geometry, gs, GL_GEOMETRY_SHADER);
 		}
 
 		if (tcs) {
-			tessControl = compileShader(tessControlCode, tcs, GL_TESS_CONTROL_SHADER);
+			tcHandle = compileShader(tessControl, tcs, GL_TESS_CONTROL_SHADER);
 		}
 
 		if (tes) {
-			tessEvaluation = compileShader(tessEvaluationCode, tes, GL_TESS_EVALUATION_SHADER);
+			teHandle = compileShader(tessEvaluation, tes, GL_TESS_EVALUATION_SHADER);
 		}
 
-		linkShader(vertex, fragment, geometry, tessControl, tessEvaluation);
+		linkShader(vertHandle, fragHandle, geoHandle, tcHandle, teHandle);
 	} catch (std::runtime_error& e) {
 		throw std::runtime_error(std::string("Shader ") + e.what());
 	}
@@ -193,22 +193,22 @@ uint32_t Shader::compileShader(const std::string& source, const char* fn, const 
 }
 
 uint32_t Shader::linkShader(
-	const uint32_t vertex,
-	const uint32_t fragment,
-	const uint32_t geometry,
-	const uint32_t tessControl,
-	const uint32_t tessEvaluation) {
+	const uint32_t vertHandle,
+	const uint32_t fragHandle,
+	const uint32_t geoHandle,
+	const uint32_t tcHandle,
+	const uint32_t teHandle) {
 	mID = glCreateProgram();
 
-	glAttachShader(mID, vertex);
-	glAttachShader(mID, fragment);
+	glAttachShader(mID, vertHandle);
+	glAttachShader(mID, fragHandle);
 
-	if (geometry != 0)
-		glAttachShader(mID, geometry);
-	if (tessControl != 0)
-		glAttachShader(mID, tessControl);
-	if (tessEvaluation != 0)
-		glAttachShader(mID, tessEvaluation);
+	if (geoHandle != 0)
+		glAttachShader(mID, geoHandle);
+	if (tcHandle != 0)
+		glAttachShader(mID, tcHandle);
+	if (teHandle != 0)
+		glAttachShader(mID, teHandle);
 
 	glLinkProgram(mID);
 
@@ -231,11 +231,17 @@ uint32_t Shader::linkShader(
 		throw std::runtime_error(std::string("Linking error:\n") + infoLog);
 	}
 
-	glDeleteShader(vertex);
-	glDeleteShader(fragment);
+	glDeleteShader(vertHandle);
+	glDeleteShader(fragHandle);
 
-	if (geometry)
-		glDeleteShader(geometry);
+	if (geoHandle)
+		glDeleteShader(geoHandle);
+
+	if (tcHandle)
+		glDeleteShader(tcHandle);
+
+	if (teHandle)
+		glDeleteShader(teHandle);
 
 	return mID;
 }
