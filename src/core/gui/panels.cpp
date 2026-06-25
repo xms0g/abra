@@ -199,36 +199,34 @@ void GuiPanels::renderPostProcessPanel(EventBus& eventBus) {
 	struct Effect {
 		const char* name{};
 		bool enabled{};
-		float exposure{1.1f};
-		float intensity{0.01f};
+		float exposure{};
+		float intensity{};
+
+		bool (* renderExtraControls)(Effect&){nullptr};
 	} static effects[] = {
-		{"Bloom", false},
-		{"Tone Mapping", false},
-		{"Grayscale", false},
-		{"Sepia", false},
-		{"Blur", false},
-		{"Edge Detection", false},
-		{"Sharpen", false},
-		{"Chromatic Aberration", false},
-		{"Gamma Correction", true},
-		{"FXAA", false}
+		{"Bloom", false, 1.1f, 0.01f, [](Effect& self) { return false; }},
+		{"Tone Mapping", false, 1.1f, 0.01f, [](Effect& self) { return Ui::sliderFloat("Exposure", &self.exposure, 100.0f); }},
+		{"Grayscale", false, 1.1f, 0.01f, [](Effect& self) { return false; }},
+		{"Sepia", false, 1.1f, 0.01f, [](Effect& self) { return false; }},
+		{"Blur", false, 1.1f, 0.01f, [](Effect& self) { return false; }},
+		{"Edge Detection", false, 1.1f, 0.01f, [](Effect& self) { return false; }},
+		{"Sharpen", false, 1.1f, 0.01f, [](Effect& self) { return false; }},
+		{"Chromatic Aberration", false, 1.1f, 0.01f,[](Effect& self) { return Ui::sliderFloat("Intensity", &self.intensity, 100.0f, 0.01f, 0.1f); }},
+		{"Gamma Correction", true, 1.1f, 0.01f, [](Effect& self) { return false; }},
+		{"FXAA", false, 1.1f, 0.01f, [](Effect& self) { return false; }}
 	};
 
 	if (ImGui::Begin("Post-Processing")) {
-		for (uint32_t i = 0; i < std::span<Effect>(effects).size(); ++i) {
-			auto& [name, enabled, exposure, intensity] = effects[i];
-			bool isDirty{false};
+		std::span<Effect> effectsSpan{effects};
 
-			isDirty |= ImGui::Checkbox(name, &enabled);
+		for (uint32_t i = 0; i < effectsSpan.size(); ++i) {
+			auto& fx = effectsSpan[i];
 
-			if (i == 1) {
-				isDirty |= Ui::sliderFloat("Exposure", &exposure, 100.0f);
-			} else if (i == 7) {
-				isDirty |= Ui::sliderFloat("Intensity", &intensity, 100.0f, 0.01f, 0.1f);
-			}
+			bool isDirty = ImGui::Checkbox(fx.name, &fx.enabled);
+			isDirty |= fx.renderExtraControls(fx);
 
 			if (isDirty) {
-				eventBus.emitEvent<GuiPostProcessEvent>(i, enabled, exposure, intensity);
+				eventBus.emitEvent<GuiPostProcessEvent>(i, fx.enabled, fx.exposure, fx.intensity);
 			}
 		}
 	}
