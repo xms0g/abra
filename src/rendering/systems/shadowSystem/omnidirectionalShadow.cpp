@@ -25,7 +25,7 @@ OmnidirectionalShadow::OmnidirectionalShadow(const RenderContext& ctx) {
 	mFovy = glm::radians(cfg.get<float>("shadow.omnidirectional.fovy"));
 	mShadowProj = glm::perspective(mFovy, mAspect, mNear, mFar);
 
-	mShadowTransforms.resize(6);
+	mShadowTransforms.resize(faces);
 }
 
 OmnidirectionalShadow::~OmnidirectionalShadow() = default;
@@ -49,10 +49,7 @@ void OmnidirectionalShadow::render(
 	}
 
 	mDepthShader->activate();
-	for (uint32_t i = 0; i < faces; ++i) {
-		mDepthShader->setMat4("shadowMatrices[" + std::to_string(i) + "]", mShadowTransforms[i]);
-	}
-
+	mDepthShader->setMat4Array("shadowMatrices", mShadowTransforms.data(), mShadowTransforms.size());
 	mDepthShader->setFloat("omniFarPlane", mFar);
 	mDepthShader->setVec3("lightPos", position);
 	mDepthShader->setInt("cubeIndex", layer);

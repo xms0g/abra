@@ -5,6 +5,7 @@
 #include "glad/glad.h"
 #include "../io/filesystem.hpp"
 #include "../config/configManager.h"
+#include "glm/gtc/type_ptr.hpp"
 
 ShaderResource::ShaderResource(const char** code, const std::string& fn, const uint32_t type) {
 	handle = glCreateShader(type);
@@ -164,6 +165,10 @@ void Shader::setMat3(const std::string& name, const glm::mat3& mat) const {
 
 void Shader::setMat4(const std::string& name, const glm::mat4& mat) const {
 	glUniformMatrix4fv(glGetUniformLocation(mID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
+
+void Shader::setMat4Array(const std::string& name, const glm::mat4* matrices, const size_t count) const {
+	glUniformMatrix4fv(glGetUniformLocation(mID, name.c_str()), count, GL_FALSE, glm::value_ptr(matrices[0]));
 }
 
 std::string Shader::preprocess(const std::string& source) {

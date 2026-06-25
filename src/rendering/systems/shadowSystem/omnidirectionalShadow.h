@@ -40,7 +40,7 @@ private:
 	};
 
 	static constexpr uint32_t faces = 6;
-	static constexpr DirUpPair mDirUps[] = {
+	static constexpr DirUpPair mDirUps[faces] = {
 		{glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)},
 		{glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)},
 		{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)},
