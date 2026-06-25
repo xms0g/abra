@@ -13,6 +13,7 @@
 PerspectiveShadow::PerspectiveShadow(const RenderContext& ctx) {
 	mWidth = cfg.get<int32_t>("shadow.map_width");
 	mHeight = cfg.get<int32_t>("shadow.map_height");
+	mAspect = static_cast<float>(mWidth) / static_cast<float>(mHeight);
 	mDepthMap = std::make_unique<FrameBuffer>(mWidth, mHeight);
 	mDepthMap->withTextureDepthArray(cfg.get<int32_t>("light.max_spot"), GL_DEPTH_COMPONENT24, true)
 			.checkStatus();
@@ -53,12 +54,7 @@ void PerspectiveShadow::render(
 
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	const glm::mat4 lightProjection = glm::perspective(
-		fovy,
-		static_cast<float>(mWidth) / static_cast<float>(mHeight),
-		mNear,
-		mFar);
-
+	const glm::mat4 lightProjection = glm::perspective(fovy, mAspect, mNear, mFar);
 	const glm::mat4 lightView = glm::lookAt(position, position + direction, glm::vec3(0.0, 1.0, 0.0));
 	mLightSpaceMatrix[layer] = lightProjection * lightView;
 
