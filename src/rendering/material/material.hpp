@@ -32,13 +32,6 @@ struct Material {
 	glm::vec3 color{0.0f};
 	float alphaCutoff{0.0f};
 	std::vector<Texture> textures;
-
-	[[nodiscard]]
-	bool hasTexture(const std::string_view p, uint32_t desiredType) const {
-		return std::ranges::any_of(textures, [p, desiredType](const Texture& tex) {
-			return tex.path == p && tex.type == desiredType;
-		});
-	}
 };
 
 struct MaterialBatch {

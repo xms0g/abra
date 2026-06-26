@@ -48,9 +48,9 @@ private:
 
 	struct MaterialLoadContext {
 		MaterialMap materials;
-		std::vector<uint32_t> materialsToLoad;
 		std::string baseDir;
 		std::string roughMetalPath;
+		std::unordered_set<uint32_t> materialsToLoad;
 	};
 
 	struct TextureLoadRequest {

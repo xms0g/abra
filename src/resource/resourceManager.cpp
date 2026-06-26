@@ -200,7 +200,7 @@ void ResourceManager::processMeshes(
 		Mesh mesh = processMesh(aMesh);
 
 		meshesByMatID[aMesh->mMaterialIndex].emplace_back(std::move(mesh));
-		materialLoadCtx.materialsToLoad.push_back(aMesh->mMaterialIndex);
+		materialLoadCtx.materialsToLoad.emplace(aMesh->mMaterialIndex);
 	}
 
 	// after we've processed all of the mMeshes (if any) we then recursively process each of the children nodes
@@ -322,9 +322,6 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 
 		req.mat->GetTexture(req.type, i, &str);
 		std::string path = materialLoadCtx.baseDir + str.C_Str();
-
-		if (material.hasTexture(path, req.type))
-			break;
 
 		switch (req.type) {
 			case aiTextureType_HEIGHT:
