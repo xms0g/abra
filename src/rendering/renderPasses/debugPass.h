@@ -13,5 +13,5 @@ public:
 	void execute(const RenderContext& ctx) override;
 
 private:
-	std::array<const Shader*, 3> mDebugShaders;
+	std::array<const Shader*, 3> mDebugShaders{};
 };

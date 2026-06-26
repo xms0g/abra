@@ -1,9 +1,9 @@
 #pragma once
-#include "IRenderPass.hpp"
 #include <vector>
+#include "IRenderPass.hpp"
 
 namespace math {
-	class Frustum;
+struct Frustum;
 }
 
 struct RenderGroup;
@@ -18,9 +18,9 @@ public:
 	void execute(const RenderContext& ctx) override;
 
 private:
-	void cullScene(
+	static void cullScene(
 		const RenderContext& ctx,
 		const math::Frustum& frustum,
 		const std::vector<RenderGroup>& groups,
-		std::vector<RenderableObject>& outQueue) const;
+		std::vector<RenderableObject>& outQueue);
 };

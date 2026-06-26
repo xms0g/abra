@@ -10,8 +10,10 @@
 #include "systems/shadowSystem/shadowSystem.h"
 #include "buffers/frameBuffer.h"
 #include "buffers/uniformBuffer.h"
+#include "models/quad.h"
 #include "mesh/mesh.h"
 #include "mesh/vertex.hpp"
+#include "mesh/vertexArray.h"
 #include "renderContext/renderContext.hpp"
 #include "renderContext/renderFlags.hpp"
 #include "renderContext/renderGroup.hpp"
@@ -30,7 +32,6 @@
 #include "renderPasses/postProcess/postProcessPass.h"
 #include "gui/backend.h"
 #include "material/material.hpp"
-#include "mesh/vertexArray.h"
 #include "../config/configManager.h"
 #include "../core/camera.h"
 #include "../ECS/registry.h"
@@ -137,9 +138,9 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mRenderPasses.emplace_back(std::make_unique<CullingPass>());
 
 	if (!mRenderQueue.deferredGroups.empty()) {
-		mRenderPasses.push_back(std::make_unique<DeferredGeometryPass>());
-		mRenderPasses.push_back(std::make_unique<SSAOPass>());
-		mRenderPasses.push_back(std::make_unique<DeferredLightingPass>());
+		mRenderPasses.emplace_back(std::make_unique<DeferredGeometryPass>());
+		mRenderPasses.emplace_back(std::make_unique<SSAOPass>());
+		mRenderPasses.emplace_back(std::make_unique<DeferredLightingPass>());
 	}
 
 	if (!mRenderQueue.opaqueGroups.empty() || !mRenderQueue.blendGroups.empty()) {

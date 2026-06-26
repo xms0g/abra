@@ -24,12 +24,12 @@ private:
 		float padding[3];
 	};
 
-	void prepareInstanceBuffer(
+	static void prepareInstanceBuffer(
 		const std::vector<InstanceGroup>& groups,
 		const std::vector<uint32_t>& vaos,
 		std::unique_ptr<VertexBuffer>& vbo);
 
-	void uploadInstanceData(const std::vector<InstanceGroup>& groups, const VertexBuffer& vbo);
+	static void uploadInstanceData(const std::vector<InstanceGroup>& groups, const VertexBuffer& vbo);
 
 	std::unique_ptr<VertexBuffer> mOpaqueVBO;
 	std::unique_ptr<VertexBuffer> mBlendVBO;

@@ -1,8 +1,6 @@
 #pragma once
 #include <cstdint>
 #include <memory>
-#include <vector>
-#include "glm/glm.hpp"
 #include "IRenderPass.hpp"
 
 class UniformBuffer;

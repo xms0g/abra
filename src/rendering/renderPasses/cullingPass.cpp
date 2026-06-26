@@ -26,7 +26,7 @@ void CullingPass::cullScene(
 	const RenderContext& ctx,
 	const math::Frustum& frustum,
 	const std::vector<RenderGroup>& groups,
-	std::vector<RenderableObject>& outQueue) const {
+	std::vector<RenderableObject>& outQueue) {
 	outQueue.clear();
 
 	for (const auto& [entityID, matBatch]: groups) {
