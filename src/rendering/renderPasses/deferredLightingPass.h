@@ -1,10 +1,10 @@
 #pragma once
 #include <memory>
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 #include "IRenderPass.hpp"
-#include "../models/quad.h"
-#include "../models/cube.h"
+
+namespace Model {
+class SingleQuad;
+}
 
 class CubemapBuffer;
 class FrameBuffer;
@@ -19,6 +19,6 @@ public:
 	void execute(const RenderContext& ctx) override;
 
 private:
-	const Shader* mShader;
+	const Shader* mShader{nullptr};
 	std::unique_ptr<Model::SingleQuad> mQuad;
 };

@@ -1,10 +1,11 @@
 #include "deferredLightingPass.h"
 #include "glad/glad.h"
 #include "../shader.h"
+#include "../renderCommand.h"
 #include "../buffers/frameBuffer.h"
 #include "../buffers/uniformBuffer.h"
 #include "../mesh/mesh.h"
-#include "../renderCommand.h"
+#include "../models/quad.h"
 #include "../renderContext/renderContext.hpp"
 #include "../../config/configManager.h"
 

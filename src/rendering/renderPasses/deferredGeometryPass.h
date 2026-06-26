@@ -15,5 +15,5 @@ public:
 
 private:
 	std::unique_ptr<FrameBuffer> mGBuffer;
-	const Shader* mShader;
+	const Shader* mShader{nullptr};
 };
