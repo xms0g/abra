@@ -4,7 +4,12 @@
 #include "image/stb_image.h"
 #include "../material/material.hpp"
 
-Texture texture::generate(const int32_t width, const int32_t height, const float* data) {
+void Texture::bind(const uint32_t slot) const {
+	glActiveTexture(GL_TEXTURE0 + slot);
+	glBindTexture(GL_TEXTURE_2D, id);
+}
+
+Texture Texture::generate(const int32_t width, const int32_t height, const float* data) {
 	uint32_t textureID;
 
 	glGenTextures(1, &textureID);
@@ -29,7 +34,7 @@ Texture texture::generate(const int32_t width, const int32_t height, const float
 	return {textureID, GL_TEXTURE_2D, ""};
 }
 
-uint32_t texture::load(const std::string& path, const uint32_t flags, const bool isSRGB) {
+uint32_t Texture::load(const std::string& path, const uint32_t flags, const bool isSRGB) {
 	uint32_t textureID;
 
 	int32_t width, height, channel;
@@ -53,23 +58,18 @@ uint32_t texture::load(const std::string& path, const uint32_t flags, const bool
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	if (channel == 1) {
-		constexpr GLint swizzleMask[] = {GL_RED, GL_RED, GL_RED, GL_ONE};
-		glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-	}
-
 	stbi_image_free(data);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	return textureID;
 }
 
-void texture::info(const std::string& path, int32_t& width, int32_t& height) {
+void Texture::info(const std::string& path, int32_t& width, int32_t& height) {
 	int32_t channel;
 	stbi_info(path.c_str(), &width, &height, &channel);
 }
 
-uint32_t texture::loadCubemap(const std::vector<std::string>& faces) {
+uint32_t Texture::loadCubemap(const std::vector<std::string>& faces) {
 	uint32_t textureID;
 
 	glGenTextures(1, &textureID);
@@ -100,7 +100,7 @@ uint32_t texture::loadCubemap(const std::vector<std::string>& faces) {
 	return textureID;
 }
 
-Texture texture::loadHDR(const std::string& path) {
+Texture Texture::loadHDR(const std::string& path) {
 	uint32_t texID;
 	int32_t width, height, channel;
 
@@ -126,9 +126,4 @@ Texture texture::loadHDR(const std::string& path) {
 	stbi_set_flip_vertically_on_load(false);
 
 	return {texID, GL_TEXTURE_2D, ""};
-}
-
-void Texture::bind(const uint32_t slot) const {
-	glActiveTexture(GL_TEXTURE0 + slot);
-	glBindTexture(GL_TEXTURE_2D, id);
 }

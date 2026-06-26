@@ -54,7 +54,7 @@ void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	noise.resize(textureSize * textureSize);
 	noise = math::random::generateNoise(textureSize * textureSize);
 
-	const Texture noiseTexture = texture::generate(textureSize, textureSize, noise.data());
+	const Texture noiseTexture = Texture::generate(textureSize, textureSize, noise.data());
 	noiseTexture.bind(cfg.get<int32_t>("ssao.noise.textureSlot"));
 
 	int32_t kernelSize = cfg.get<int32_t>("ssao.kernelSize");

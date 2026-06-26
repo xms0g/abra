@@ -17,7 +17,7 @@ Model::Terrain::Terrain(
 	std::string path = fs::path(cfg.get<std::string>("path.asset") + heightTexture);
 
 	int32_t width, height;
-	texture::info(path.c_str(), width, height);
+	Texture::info(path.c_str(), width, height);
 
 	std::vector<float> v;
 

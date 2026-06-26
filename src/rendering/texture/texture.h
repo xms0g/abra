@@ -12,27 +12,25 @@ enum TextureType {
 	ROUGHNESS_METALLIC = 18
 };
 
+struct TextureBinding {
+	std::string name;
+	int32_t slot;
+};
+
 struct Texture {
     uint32_t id;
 	uint32_t type;
     std::string path;
 
 	void bind(uint32_t slot) const;
+
+	static Texture generate(int32_t width, int32_t height, const float* data);
+
+	static uint32_t load(const std::string& path, uint32_t flags, bool isSRGB);
+
+	static void info(const std::string& path, int32_t& width, int32_t& height);
+
+	static uint32_t loadCubemap(const std::vector<std::string>& faces);
+
+	static Texture loadHDR(const std::string& path);
 };
-
-struct TextureBinding {
-	std::string name;
-	int32_t slot;
-};
-
-namespace texture {
-Texture generate(int32_t width, int32_t height, const float* data);
-
-uint32_t load(const std::string& path, uint32_t flags, bool isSRGB);
-
-void info(const std::string& path, int32_t& width, int32_t& height);
-
-uint32_t loadCubemap(const std::vector<std::string>& faces);
-
-Texture loadHDR(const std::string& path);
-}
