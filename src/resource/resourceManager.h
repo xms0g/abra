@@ -61,17 +61,17 @@ private:
 
 	void loadModel(size_t entityID, const std::string& file);
 
-	void processMeshes(
+	static void processMeshes(
 		const aiNode* node,
 		const aiScene* scene,
 		MeshMap& meshesByMatID,
 		MaterialLoadContext& materialLoadCtx);
 
-	Mesh processMesh(aiMesh* mesh) const;
+	static Mesh processMesh(aiMesh* mesh);
 
-	void processMaterials(const aiScene* scene, MaterialLoadContext& materialLoadCtx) const;
+	static void processMaterials(const aiScene* scene, MaterialLoadContext& materialLoadCtx);
 
-	void loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& materialLoadCtx) const;
+	static void loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& materialLoadCtx);
 
 	uint32_t createEnvMap(const std::string& path);
 

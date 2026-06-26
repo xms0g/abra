@@ -209,7 +209,7 @@ void ResourceManager::processMeshes(
 	}
 }
 
-Mesh ResourceManager::processMesh(aiMesh* mesh) const {
+Mesh ResourceManager::processMesh(aiMesh* mesh) {
 	// data to fill
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
@@ -270,7 +270,7 @@ Mesh ResourceManager::processMesh(aiMesh* mesh) const {
 	return {vertices, indices};
 }
 
-void ResourceManager::processMaterials(const aiScene* scene, MaterialLoadContext& materialLoadCtx) const {
+void ResourceManager::processMaterials(const aiScene* scene, MaterialLoadContext& materialLoadCtx) {
 	// process materials
 	for (const auto& matID: materialLoadCtx.materialsToLoad) {
 		const aiMaterial* material = scene->mMaterials[matID];
@@ -282,7 +282,7 @@ void ResourceManager::processMaterials(const aiScene* scene, MaterialLoadContext
 	}
 }
 
-void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& materialLoadCtx) const {
+void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& materialLoadCtx) {
 	if (!materialLoadCtx.materials.contains(req.materialID)) {
 		uint32_t flags{0};
 
