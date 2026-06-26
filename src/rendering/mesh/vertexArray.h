@@ -12,9 +12,9 @@ public:
 
 	void bind() const;
 
-	void unbind() const;
+	static void unbind();
 
-	void setAttribute(
+	static void setAttribute(
 		uint32_t index,
 		int32_t size,
 		int32_t type,

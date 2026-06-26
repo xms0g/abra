@@ -176,9 +176,7 @@ std::string Shader::preprocess(const std::string& source) {
 	return preprocess(source, includedFiles);
 }
 
-std::string Shader::preprocess(
-	const std::string& source,
-	std::unordered_set<std::string>& includedFiles) {
+std::string Shader::preprocess(const std::string& source, std::unordered_set<std::string>& includedFiles) {
 	if (source.empty()) return "";
 
 	std::stringstream result;
