@@ -12,7 +12,7 @@ void UniformBuffer::setData(const void* data, const size_t size, const size_t of
 	glBufferSubData(mTarget, static_cast<long>(offset), static_cast<long>(size), data);
 }
 
-void UniformBuffer::configure(const uint32_t program, const uint32_t uniformBlockBinding, const char* uniformBlockName) const {
+void UniformBuffer::configure(const uint32_t program, const uint32_t uniformBlockBinding, const char* uniformBlockName) {
 	const uint32_t ubidx = glGetUniformBlockIndex(program, uniformBlockName);
 	glUniformBlockBinding(program, ubidx, uniformBlockBinding);
 }

@@ -8,8 +8,8 @@ class UniformBuffer;
 struct UniformBinding {
 	std::string name;
 	uint32_t binding;
-	const UniformBuffer* buffer;
-	void (UniformBuffer::* configure)(uint32_t, uint32_t, const char*) const;
+
+	void (*configure)(uint32_t, uint32_t, const char*);
 };
 
 class UniformBuffer : public Buffer {
@@ -18,5 +18,5 @@ public:
 
 	void setData(const void* data, size_t size, size_t offset = 0) const;
 
-	void configure(uint32_t program, uint32_t uniformBlockBinding, const char* uniformBlockName) const;
+	static void configure(uint32_t program, uint32_t uniformBlockBinding, const char* uniformBlockName);
 };

@@ -190,9 +190,9 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	}
 
 	const std::vector<UniformBinding> uboBindings = {
-		{cfg.get<std::string>("camera.block_name"), cfg.get<uint32_t>("camera.ubo_binding"), mCameraUBO.get(), &UniformBuffer::configure},
-		{cfg.get<std::string>("light.block_name"), cfg.get<uint32_t>("light.ubo_binding"), mLightSystem->ubo(), &UniformBuffer::configure},
-		{cfg.get<std::string>("shadow.block_name"), cfg.get<uint32_t>("shadow.ubo_binding"), mShadowSystem->ubo(), &UniformBuffer::configure}
+		{cfg.get<std::string>("camera.block_name"), cfg.get<uint32_t>("camera.ubo_binding"), UniformBuffer::configure},
+		{cfg.get<std::string>("light.block_name"), cfg.get<uint32_t>("light.ubo_binding"), UniformBuffer::configure},
+		{cfg.get<std::string>("shadow.block_name"), cfg.get<uint32_t>("shadow.ubo_binding"), UniformBuffer::configure}
 	};
 
 	const std::vector<TextureBinding> shadowMapBindings = {
@@ -203,8 +203,8 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 
 	// Configure shaders
 	for (const auto& [name,shader]: rm.getShaders()) {
-		for (const auto& [blockName, binding, buffer, configure]: uboBindings) {
-			std::invoke(configure, buffer, shader->id(), binding, blockName.c_str());
+		for (const auto& [blockName, binding, configure]: uboBindings) {
+			configure(shader->id(), binding, blockName.c_str());
 		}
 
 		RenderCommand::setTextureUnits(shadowMapBindings, *shader);

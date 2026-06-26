@@ -21,7 +21,7 @@ public:
 
 	void bind() const;
 
-	void unbind() const;
+	static void unbind();
 
 	void bindTexture(const uint32_t slot, const uint32_t index = 0) const {
 		bindTextureImpl(slot, index);
@@ -29,7 +29,7 @@ public:
 
 	void resizeRenderBuffer(int32_t width, int32_t height) const;
 
-	void checkStatus();
+	static void checkStatus();
 
 	virtual void generateMipmaps() = 0;
 
@@ -93,9 +93,9 @@ protected:
 private:
 	void setAttachment(uint32_t textureID, uint32_t target);
 
-	void setDepthTextureParameters(uint32_t target, int32_t dim);
+	static void setDepthTextureParameters(uint32_t target, int32_t dim);
 
-	int32_t getInternalFormat(uint32_t format, bool isFloat = false);
+	static int32_t getInternalFormat(uint32_t format, bool isFloat = false);
 
 	struct TextureDescription {
 		uint32_t id{0};
