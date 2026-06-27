@@ -14,7 +14,6 @@
 #include "../ECS/components/directionalLight.hpp"
 #include "../ECS/components/pointLight.hpp"
 #include "../ECS/components/spotLight.hpp"
-#include "../ECS/components/skybox.hpp"
 #include "../ECS/components/instance.hpp"
 #include "../math/boundingVolume.h"
 #include "../rendering/material/material.hpp"
@@ -24,6 +23,7 @@
 #include "../rendering/models/cubemap.h"
 #include "../rendering/models/sphere.h"
 #include "../rendering/models/terrain.h"
+#include "../rendering/renderContext/renderFlags.hpp"
 
 #define TEXTURE_PTR(tex) (!(tex).empty() ? (tex).c_str() : nullptr)
 
@@ -207,31 +207,16 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 
 		// Bounding Volume Component
 		if (comps.contains("BoundingVolumeComponent")) {
-			auto bvType = comps["BoundingVolumeComponent"]["type"];
+			auto bvType = comps["BoundingVolumeComponent"]["type"].get<std::string>();
 			if (bvType == "AABB") {
 				auto meshComp = entity.getComponent<MeshComponent>();
 
 				entity.addComponent<BoundingVolumeComponent>(
 					std::make_shared<math::AABB>(math::generateAABB(*meshComp.meshes))
 				);
+			} else if (bvType == "Dummy") {
+				entity.addComponent<BoundingVolumeComponent>(std::make_shared<math::DummyBV>());
 			}
-		}
-
-		// Material Component
-		if (comps.contains("MaterialComponent")) {
-			float heightScale{1.0f};
-			if (comps["MaterialComponent"].contains("height_scale")) {
-				heightScale = comps["MaterialComponent"]["height_scale"].get<float>();
-			}
-
-			entity.addComponent<MaterialComponent>(
-				rm.get<MaterialMap>(entity.id()),
-				heightScale);
-		}
-
-		// Debug Component
-		if (comps.contains("DebugComponent")) {
-			entity.addComponent<DebugComponent>();
 		}
 
 		// Instance Component
@@ -242,9 +227,26 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 			entity.addComponent<InstanceComponent>(rm.get<decltype(transforms)>(entity.id()));
 		}
 
-		// Skybox Component
-		if (comps.contains("SkyboxComponent")) {
-			entity.addComponent<SkyboxComponent>();
+		// Material Component
+		if (comps.contains("MaterialComponent")) {
+			float heightScale{1.0f};
+			if (comps["MaterialComponent"].contains("height_scale")) {
+				heightScale = comps["MaterialComponent"]["height_scale"].get<float>();
+			}
+
+			uint32_t flags = entity.hasComponent<InstanceComponent>() ? INSTANCED_PASS :
+							primType == "Terrain" ? TERRAIN_PASS :
+							primType == "Cubemap" ? SKYBOX_PASS : 0;
+
+			entity.addComponent<MaterialComponent>(
+				rm.get<MaterialMap>(entity.id()),
+				heightScale,
+				flags);
+		}
+
+		// Debug Component
+		if (comps.contains("DebugComponent")) {
+			entity.addComponent<DebugComponent>();
 		}
 
 		// Directional Light Component

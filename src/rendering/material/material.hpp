@@ -1,6 +1,5 @@
 #pragma once
 #include <cstdint>
-#include <unordered_set>
 #include <vector>
 #include "glm/glm.hpp"
 #include "../texture/texture.h"
@@ -18,7 +17,6 @@ enum MaterialFlag: uint32_t {
 	HAS_ORM = 1 << 9,
 	ALPHACUTOFF = 1 << 10,
 	HAS_SOLID_COLOR = 1 << 11,
-	TERRAIN = 1 << 12
 };
 
 class Shader;

@@ -9,8 +9,10 @@ namespace math {
 struct Plane;
 struct Frustum;
 
+// Base class
 class BoundingVolume {
 public:
+	BoundingVolume() = default;
 	BoundingVolume(const glm::vec3& min, const glm::vec3& max)
 		: mCenter{(max + min) * 0.5f}, mExtents{max.x - mCenter.x, max.y - mCenter.y, max.z - mCenter.z} {
 	}
@@ -37,6 +39,18 @@ protected:
 
 	glm::vec3 mCenter{0.f};
 	glm::vec3 mExtents{0.f};
+};
+
+// Dummy
+class DummyBV final: public BoundingVolume {
+	public:
+		~DummyBV() override = default;
+
+protected:
+	[[nodiscard]]
+	bool isOnOrForwardPlane(const Plane& plane) const override {
+		return true;
+	}
 };
 
 // Sphere

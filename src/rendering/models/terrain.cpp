@@ -71,7 +71,7 @@ Model::Terrain::Terrain(
 		textures.emplace_back(0, HEIGHT, heightTexture);
 	}
 
-	mMaterial[0] = {.flags = flags | TERRAIN, .textureTarget = GL_TEXTURE_2D, .textures = textures};
+	mMaterial[0] = {.flags = flags, .textureTarget = GL_TEXTURE_2D, .textures = textures};
 }
 
 Model::Terrain::~Terrain() = default;

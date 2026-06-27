@@ -21,7 +21,8 @@
             "skybox/front.jpg",
             "skybox/back.jpg"
           ]
-        }
+        },
+        "BoundingVolumeComponent": { "type": "Dummy" }
       }
     },
     {

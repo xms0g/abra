@@ -41,7 +41,6 @@
 #include "../ECS/components/material.hpp"
 #include "../ECS/components/mesh.hpp"
 #include "../ECS/components/instance.hpp"
-#include "../ECS/components/skybox.hpp"
 #include "../math/boundingVolume.h"
 #include "../math/matrix.h"
 #include "../event/eventBus.hpp"
@@ -269,17 +268,8 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 	mRenderQueue.entity.scales.push_back(scale);
 	mRenderQueue.entity.models.push_back(modelMat);
 	mRenderQueue.entity.normals.push_back(normalMat);
-
-	mRenderQueue.entity.centers.push_back(
-		!entity.hasComponent<SkyboxComponent>()
-			? entity.getComponent<BoundingVolumeComponent>().bv->center()
-			: glm::vec3(0.0f)
-	);
-	mRenderQueue.entity.extents.push_back(
-		!entity.hasComponent<SkyboxComponent>()
-			? entity.getComponent<BoundingVolumeComponent>().bv->extents()
-			: glm::vec3(0.0f)
-	);
+	mRenderQueue.entity.centers.push_back(entity.getComponent<BoundingVolumeComponent>().bv->center());
+	mRenderQueue.entity.extents.push_back(entity.getComponent<BoundingVolumeComponent>().bv->extents());
 
 	mRenderQueue.entity.debugModes.emplace_back(0);
 	mRenderQueue.entity.heightScales.emplace_back(entity.getComponent<MaterialComponent>().heightScale);
@@ -319,28 +309,28 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			if (material.flags & UNLIT) {
 				matBatch.shader = rm.get<Shader>("unlit");
 			} else {
-				if (entity.hasComponent<InstanceComponent>()) {
+				if (matComponent.renderFlag == INSTANCED_PASS) {
 					matBatch.shader = rm.get<Shader>("instancedOpaque");
 				} else {
 					matBatch.shader = rm.get<Shader>("opaque");
 				}
 			}
 		} else if (material.flags & BLEND) {
-			if (entity.hasComponent<InstanceComponent>()) {
+			if (matComponent.renderFlag == INSTANCED_PASS) {
 				matBatch.shader = rm.get<Shader>("instancedBlend");
 			} else {
 				matBatch.shader = rm.get<Shader>("blend");
 			}
-		} else if (material.textureTarget == GL_TEXTURE_CUBE_MAP) {
+		} else if (matComponent.renderFlag == SKYBOX_PASS) {
 			matBatch.shader = rm.get<Shader>("skybox");
-		} else if (material.flags & TERRAIN) {
+		} else if (matComponent.renderFlag == TERRAIN_PASS) {
 			matBatch.shader = rm.get<Shader>("terrain");
 		}
 
 		RenderGroup group;
 		InstanceGroup instance;
 
-		if (entity.hasComponent<InstanceComponent>()) {
+		if (matComponent.renderFlag == INSTANCED_PASS) {
 			const auto& instComponent = entity.getComponent<InstanceComponent>();
 			instance = {entity.id(), matBatch, *instComponent.transforms};
 		} else {
@@ -358,20 +348,20 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		if (material.flags & PBR) {
 			mRenderQueue.deferredGroups.push_back(group);
 		} else if (material.flags & OPAQUE) {
-			if (entity.hasComponent<InstanceComponent>()) {
+			if (matComponent.renderFlag == INSTANCED_PASS) {
 				mRenderQueue.opaqueInstancedGroups.push_back(instance);
 			} else {
 				mRenderQueue.opaqueGroups.push_back(group);
 			}
 		} else if (material.flags & BLEND) {
-			if (entity.hasComponent<InstanceComponent>()) {
+			if (matComponent.renderFlag == INSTANCED_PASS) {
 				mRenderQueue.blendInstancedGroups.push_back(instance);
 			} else {
 				mRenderQueue.blendGroups.push_back(group);
 			}
-		} else if (material.textureTarget == GL_TEXTURE_CUBE_MAP) {
+		} else if (matComponent.renderFlag == SKYBOX_PASS) {
 			mRenderQueue.skybox.push_back(group);
-		} else if (material.flags & TERRAIN) {
+		} else if (matComponent.renderFlag == TERRAIN_PASS) {
 			mRenderQueue.terrain.push_back(group);
 		}
 	}
