@@ -13,7 +13,7 @@ enum TextureType {
 };
 
 struct TextureBinding {
-	std::string name;
+	const char* name;
 	int32_t slot;
 };
 

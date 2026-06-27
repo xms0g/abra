@@ -9,7 +9,7 @@ FXAA::FXAA(const std::string& name, const RenderContext& ctx, const bool enabled
 	: BasePostEffect(name, enabled) {
 	mShader = rm.get<Shader>("fxaa");
 
-	const std::vector<TextureBinding> textureBindings = {
+	constexpr TextureBinding textureBindings[] = {
 		{"screenTexture", 0},
 	};
 

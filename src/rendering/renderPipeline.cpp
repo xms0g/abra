@@ -189,13 +189,13 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 		pass->configure(*mRenderCtx, eventBus);
 	}
 
-	const std::vector<UniformBinding> uboBindings = {
+	const UniformBinding uboBindings[] = {
 		{cfg.get<std::string>("camera.block_name"), cfg.get<uint32_t>("camera.ubo_binding"), UniformBuffer::configure},
 		{cfg.get<std::string>("light.block_name"), cfg.get<uint32_t>("light.ubo_binding"), UniformBuffer::configure},
 		{cfg.get<std::string>("shadow.block_name"), cfg.get<uint32_t>("shadow.ubo_binding"), UniformBuffer::configure}
 	};
 
-	const std::vector<TextureBinding> shadowMapBindings = {
+	const TextureBinding shadowMapBindings[] = {
 		{"shadowMap", cfg.get<int32_t>("shadow.texture_slot")},
 		{"shadowCubemap", cfg.get<int32_t>("shadow.texture_slot") + 1},
 		{"persShadowMap", cfg.get<int32_t>("shadow.texture_slot") + 2}

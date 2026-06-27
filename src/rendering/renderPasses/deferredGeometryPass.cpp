@@ -32,7 +32,7 @@ void DeferredGeometryPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	ctx.gBuffer = mGBuffer.get();
 	mShader = rm.get<Shader>("gBuffer");
 
-	const std::vector<TextureBinding> textureBindings = {
+	const TextureBinding textureBindings[] = {
 		{"material.texture_albedo", cfg.get<int32_t>("PBR.albedo.textureSlot")},
 		{"material.texture_normal", cfg.get<int32_t>("PBR.normal.textureSlot")},
 		{"material.texture_roughnessMetallic", cfg.get<int32_t>("PBR.roughnessMetallic.textureSlot")},

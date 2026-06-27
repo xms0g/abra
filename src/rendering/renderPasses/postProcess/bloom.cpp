@@ -12,11 +12,11 @@ Bloom::Bloom(const std::string& name, const RenderContext& ctx, const bool enabl
 	mBlur = rm.get<Shader>("bloomBlur");
 	mCombine = rm.get<Shader>("bloomCombine");
 
-	const std::vector<TextureBinding> textureBindings = {
+	constexpr TextureBinding textureBindings[] = {
 		{"screenTexture", 0},
 	};
 
-	const std::vector<TextureBinding> combineTextureBindings = {
+	constexpr TextureBinding combineTextureBindings[] = {
 		{"screenTexture", 0},
 		{"bloomBlur", 1}
 	};

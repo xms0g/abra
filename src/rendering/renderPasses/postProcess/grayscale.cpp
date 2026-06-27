@@ -9,7 +9,7 @@ Grayscale::Grayscale(const std::string& name, const RenderContext& ctx, const bo
 	: BasePostEffect(name, enabled) {
 	mShader = rm.get<Shader>("grayscale");
 
-	const std::vector<TextureBinding> textureBindings = {
+	constexpr TextureBinding textureBindings[] = {
 		{"screenTexture", 0},
 	};
 

@@ -1,6 +1,7 @@
 #include "skyboxPass.h"
 #include "glad/glad.h"
 #include "../shader.h"
+#include "../renderCommand.h"
 #include "../buffers/frameBuffer.h"
 #include "../material/material.hpp"
 #include "../renderContext/renderContext.hpp"
@@ -12,8 +13,12 @@ SkyboxPass::~SkyboxPass() = default;
 
 void SkyboxPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	const auto& [entity, matb] = ctx.renderQueue->skybox.front();
-	matb.shader->activate();
-	matb.shader->setInt("skybox", 0);
+
+	constexpr TextureBinding textureBindings[] = {
+		{"skybox", 0},
+	};
+
+	RenderCommand::setTextureUnits(textureBindings, *matb.shader);
 }
 
 void SkyboxPass::execute(const RenderContext& ctx) {

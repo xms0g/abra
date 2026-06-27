@@ -10,7 +10,7 @@ Kernel::Kernel(const std::string& name, const float* kernel, const RenderContext
 	  mKernel(kernel) {
 	mShader = rm.get<Shader>("kernel");
 
-	const std::vector<TextureBinding> textureBindings = {
+	constexpr TextureBinding textureBindings[] = {
 		{"screenTexture", 0},
 	};
 

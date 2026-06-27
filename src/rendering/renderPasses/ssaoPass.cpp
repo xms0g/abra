@@ -31,14 +31,14 @@ void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	mShader = rm.get<Shader>("ssao");
 	mBlurShader = rm.get<Shader>("ssaoBlur");
 
-	const std::vector<TextureBinding> ssaoTextureBindings = {
+	const TextureBinding ssaoTextureBindings[] = {
 		{"gDepthMap", cfg.get<int32_t>("gBuffer.depth.textureSlot")},
 		{"gNormal", cfg.get<int32_t>("gBuffer.normal.textureSlot")},
 		{"texNoise", cfg.get<int32_t>("ssao.noise.textureSlot")},
 		{"kernelSize", cfg.get<int32_t>("ssao.kernelSize")}
 	};
 
-	const std::vector<TextureBinding> blurTextureBindings = {
+	const TextureBinding blurTextureBindings[] = {
 		{"ssaoTexture", 0}
 	};
 

@@ -9,7 +9,7 @@ ToneMapping::ToneMapping(const std::string& name, const RenderContext& ctx, cons
 	: BasePostEffect(name, enabled) {
 	mShader = rm.get<Shader>("toneMapping");
 
-	const std::vector<TextureBinding> textureBindings = {
+	constexpr TextureBinding textureBindings[] = {
 		{"screenTexture", 0},
 	};
 

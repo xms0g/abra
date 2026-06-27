@@ -9,7 +9,7 @@ Sepia::Sepia(const std::string& name, const RenderContext& ctx, const bool enabl
 	: BasePostEffect(name, enabled) {
 	mShader = rm.get<Shader>("sepia");
 
-	const std::vector<TextureBinding> textureBindings = {
+	constexpr TextureBinding textureBindings[] = {
 		{"screenTexture", 0},
 	};
 

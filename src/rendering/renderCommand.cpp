@@ -115,7 +115,7 @@ void RenderCommand::setupMaterial(
 	}
 }
 
-void RenderCommand::setTextureUnits(const std::vector<TextureBinding>& textures, const Shader& shader) {
+void RenderCommand::setTextureUnits(std::span< const TextureBinding> textures, const Shader& shader) {
 	shader.activate();
 
 	for (const auto& [name, slot]: textures) {
