@@ -18,8 +18,7 @@ enum MaterialFlag: uint32_t {
 	HAS_ORM = 1 << 9,
 	ALPHACUTOFF = 1 << 10,
 	HAS_SOLID_COLOR = 1 << 11,
-	CUBEMAP = 1 << 12,
-	TERRAIN = 1 << 13
+	TERRAIN = 1 << 12
 };
 
 class Shader;
@@ -29,6 +28,7 @@ struct Material {
 	uint32_t id{0};
 	uint32_t idx{0};
 	uint32_t flags{0};
+	uint32_t textureTarget{0};
 	glm::vec3 color{0.0f};
 	float alphaCutoff{0.0f};
 	std::vector<Texture> textures;

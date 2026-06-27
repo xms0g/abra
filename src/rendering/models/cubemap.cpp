@@ -1,4 +1,5 @@
 #include "cubemap.h"
+#include "glad/glad.h"
 #include "../mesh/mesh.h"
 #include "../mesh/vertex.hpp"
 #include "../texture/texture.h"
@@ -65,7 +66,7 @@ Model::Cubemap::Cubemap(std::vector<std::string>& faces) {
 		textures.emplace_back(0, ALBEDO,  face);
 	}
 
-	mMaterial[0] = {.flags = CUBEMAP, .textures = textures};
+	mMaterial[0] = {.textureTarget = GL_TEXTURE_CUBE_MAP, .textures = textures};
 }
 
 Model::Cubemap::~Cubemap() = default;

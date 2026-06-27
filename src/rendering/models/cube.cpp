@@ -1,4 +1,5 @@
 #include "cube.h"
+#include "glad/glad.h"
 #include "../mesh/mesh.h"
 #include "../mesh/vertex.hpp"
 #include "../texture/texture.h"
@@ -149,7 +150,7 @@ Model::Cube::Cube(
 	if (color != glm::vec3(0.0f)) {
 		flags |= HAS_SOLID_COLOR;
 	}
-	mMaterial[0] = {.id = 0, .flags = flags, .color = color, .textures = textures};
+	mMaterial[0] = {.id = 0, .flags = flags, .textureTarget = GL_TEXTURE_2D, .color = color, .textures = textures};
 }
 
 Model::Cube::~Cube() = default;

@@ -22,23 +22,15 @@ void SkyboxPass::configure(RenderContext& ctx, EventBus& eventBus) {
 }
 
 void SkyboxPass::execute(const RenderContext& ctx) {
-	const auto& [entity, matb] = ctx.renderQueue->skybox.front();
-	const auto [materialIdx, textureOffset, textureCount, shader, meshes] = matb;
+	const auto& [entityID, matb] = ctx.renderQueue->skybox.front();
+	const auto& [materialIdx, textureOffset, textureCount, shader, meshes] = matb;
 	const uint32_t meshIdx = meshes.front();
 	const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
-	const uint32_t textureId = ctx.renderQueue->material.textures[textureOffset];
 
 	ctx.sceneBuffer->bind();
 	shader->activate();
 	shader->setMat4("skyView", ctx.camera.skyView);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
-	// Draw
-	glDepthMask(GL_FALSE);
-	glDepthFunc(GL_LEQUAL);
-	glBindVertexArray(vao);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glDepthFunc(GL_LESS);
-	glDepthMask(GL_TRUE);
+	RenderCommand::setupMaterial(entityID, materialIdx, textureOffset, textureCount, ctx, *shader);
+	RenderCommand::drawSkybox(vao);
 }

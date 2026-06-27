@@ -1,4 +1,5 @@
 #include "terrain.h"
+#include "glad/glad.h"
 #include "image/stb_image.h"
 #include "../mesh/mesh.h"
 #include "../mesh/vertex.hpp"
@@ -6,6 +7,7 @@
 #include "../material/material.hpp"
 #include "../../io/filesystem.hpp"
 #include "../../config/configManager.h"
+
 
 Model::Terrain::Terrain(
 	glm::vec3 color,
@@ -69,7 +71,7 @@ Model::Terrain::Terrain(
 		textures.emplace_back(0, HEIGHT, heightTexture);
 	}
 
-	mMaterial[0] = {.id = 0, .flags = flags | TERRAIN, .color = glm::vec3(0.0f), .textures = textures};
+	mMaterial[0] = {.flags = flags | TERRAIN, .textureTarget = GL_TEXTURE_2D, .textures = textures};
 }
 
 Model::Terrain::~Terrain() = default;

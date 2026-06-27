@@ -99,10 +99,12 @@ void RenderCommand::setupMaterial(
 		const glm::vec3& color = ctx.renderQueue->material.colors[materialIdx];
 		shader.setVec3("material.color", color);
 	} else {
+		const uint32_t target = ctx.renderQueue->material.textureTargets[materialIdx];
+
 		int slot{0};
 		for (uint32_t i = textureOffset; i < textureOffset + textureCount; ++i) {
 			glActiveTexture(GL_TEXTURE0 + slot++);
-			glBindTexture(GL_TEXTURE_2D, ctx.renderQueue->material.textures[i]);
+			glBindTexture(target, ctx.renderQueue->material.textures[i]);
 		}
 	}
 
@@ -115,7 +117,7 @@ void RenderCommand::setupMaterial(
 	}
 }
 
-void RenderCommand::setTextureUnits(std::span< const TextureBinding> textures, const Shader& shader) {
+void RenderCommand::setTextureUnits(std::span<const TextureBinding> textures, const Shader& shader) {
 	shader.activate();
 
 	for (const auto& [name, slot]: textures) {
@@ -155,9 +157,18 @@ void RenderCommand::drawQuad(const uint32_t vao, std::span<const uint32_t> textu
 	glEnable(GL_DEPTH_TEST);
 }
 
-void RenderCommand::drawPatch(uint32_t vao, int32_t patchCount) {
+void RenderCommand::drawPatch(const uint32_t vao, const int32_t patchCount) {
 	glBindVertexArray(vao);
 	glDrawArrays(GL_PATCHES, 0, patchCount);
+}
+
+void RenderCommand::drawSkybox(const uint32_t vao) {
+	glDepthMask(GL_FALSE);
+	glDepthFunc(GL_LEQUAL);
+	glBindVertexArray(vao);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glDepthFunc(GL_LESS);
+	glDepthMask(GL_TRUE);
 }
 
 void RenderCommand::bindShadowMaps(const RenderContext& ctx) {

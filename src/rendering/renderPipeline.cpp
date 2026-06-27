@@ -301,9 +301,10 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		auto& material = matComponent.materials->at(matID);
 		material.idx = materialIndex++;
 
-		mRenderQueue.material.flags.emplace_back(material.flags);
-		mRenderQueue.material.alphaCutoffs.emplace_back(material.alphaCutoff);
-		mRenderQueue.material.colors.emplace_back(material.color);
+		mRenderQueue.material.flags.push_back(material.flags);
+		mRenderQueue.material.textureTargets.push_back(material.textureTarget);
+		mRenderQueue.material.alphaCutoffs.push_back(material.alphaCutoff);
+		mRenderQueue.material.colors.push_back(material.color);
 
 		for (const auto& texture: material.textures) {
 			mRenderQueue.material.textures.push_back(texture.id);
@@ -330,7 +331,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			} else {
 				matBatch.shader = rm.get<Shader>("blend");
 			}
-		} else if (material.flags & CUBEMAP) {
+		} else if (material.textureTarget == GL_TEXTURE_CUBE_MAP) {
 			matBatch.shader = rm.get<Shader>("skybox");
 		} else if (material.flags & TERRAIN) {
 			matBatch.shader = rm.get<Shader>("terrain");
@@ -368,7 +369,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			} else {
 				mRenderQueue.blendGroups.push_back(group);
 			}
-		} else if (material.flags & CUBEMAP) {
+		} else if (material.textureTarget == GL_TEXTURE_CUBE_MAP) {
 			mRenderQueue.skybox.push_back(group);
 		} else if (material.flags & TERRAIN) {
 			mRenderQueue.terrain.push_back(group);

@@ -112,7 +112,7 @@ void ResourceManager::uploadModelsToGPU() {
 
 	for (auto& [entityID, materials]: mMaterialsByEntity) {
 		for (auto& [matID, material]: materials) {
-			if (material.flags & CUBEMAP) {
+			if (material.textureTarget == GL_TEXTURE_CUBE_MAP) {
 				// Handle HDR to Cubemap
 				if (material.textures.size() == 1) {
 					const std::string path = fs::path(
@@ -312,7 +312,12 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 			}
 		}
 
-		materialLoadCtx.materials[req.materialID] = {.id = req.materialID, .flags = flags, .alphaCutoff = alphaCutoff};
+		materialLoadCtx.materials[req.materialID] = {
+				.id = req.materialID,
+				.flags = flags,
+				.textureTarget = GL_TEXTURE_2D,
+				.alphaCutoff = alphaCutoff
+			};
 	}
 
 	auto& material = materialLoadCtx.materials[req.materialID];

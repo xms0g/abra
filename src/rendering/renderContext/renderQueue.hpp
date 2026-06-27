@@ -39,6 +39,7 @@ struct RenderQueue {
 	struct {
 		std::vector<float> alphaCutoffs;
 		std::vector<uint32_t> flags;
+		std::vector<uint32_t> textureTargets;
 		std::vector<uint32_t> textures;
 		std::vector<glm::vec3> colors;
 	} material;
