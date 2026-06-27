@@ -141,7 +141,7 @@ void RenderCommand::drawQuad(const uint32_t vao) {
 	glEnable(GL_DEPTH_TEST);
 }
 
-void RenderCommand::drawQuad(const uint32_t vao, const std::span<const uint32_t> textures) {
+void RenderCommand::drawQuad(const uint32_t vao, std::span<const uint32_t> textures) {
 	glDisable(GL_DEPTH_TEST);
 	glBindVertexArray(vao);
 
@@ -153,6 +153,11 @@ void RenderCommand::drawQuad(const uint32_t vao, const std::span<const uint32_t>
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 	glEnable(GL_DEPTH_TEST);
+}
+
+void RenderCommand::drawPatch(uint32_t vao, int32_t patchCount) {
+	glBindVertexArray(vao);
+	glDrawArrays(GL_PATCHES, 0, patchCount);
 }
 
 void RenderCommand::bindShadowMaps(const RenderContext& ctx) {

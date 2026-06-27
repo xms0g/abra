@@ -34,5 +34,7 @@ void drawQuad(uint32_t vao);
 
 void drawQuad(uint32_t vao, std::span<const uint32_t> textures);
 
+void drawPatch(uint32_t vao, int32_t patchCount);
+
 void bindShadowMaps(const RenderContext& ctx);
 }
