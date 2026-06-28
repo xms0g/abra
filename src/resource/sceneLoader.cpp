@@ -113,7 +113,7 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 				heightTexture = matCom["height_texture"].get<std::string>();
 			}
 
-			auto uploadPrimitives = [&entity]<typename T>(
+			auto uploadPrimitives = [&entity, &shaderName]<typename T>(
 				const glm::vec3& c,
 				bool u,
 				const std::string& albedo,
@@ -121,6 +121,9 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 				const std::string& normal,
 				const std::string& height) {
 				T model{c, u, TEXTURE_PTR(albedo), TEXTURE_PTR(specular), TEXTURE_PTR(normal), TEXTURE_PTR(height)};
+
+				auto& mat = model.material();
+				mat[0].shader = rm.get<Shader>(shaderName);
 
 				rm.upload<MeshMap>(entity.id(), model.meshes());
 				rm.upload<MaterialMap>(entity.id(), model.material());
@@ -157,6 +160,9 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 
 			Model::Cubemap cubemap{faces};
 
+			auto& mat = cubemap.material();
+			mat[0].shader = rm.get<Shader>(shaderName);
+
 			rm.upload<MeshMap>(entity.id(), cubemap.meshes());
 			rm.upload<MaterialMap>(entity.id(), cubemap.material());
 		} else if (isPrimitive && primType == "Sphere") {
@@ -191,13 +197,11 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 				TEXTURE_PTR(orm)
 			};
 
+			auto& mat = sphere.material();
+			mat[0].shader = rm.get<Shader>(shaderName);
+
 			rm.upload<MeshMap>(entity.id(), sphere.meshes());
 			rm.upload<MaterialMap>(entity.id(), sphere.material());
-		}
-
-		// Set shader
-		for (auto& [id, material]: *rm.get<MaterialMap>(entity.id())) {
-			material.shader = rm.get<Shader>(shaderName);
 		}
 
 		// Transform Component

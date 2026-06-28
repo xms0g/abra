@@ -316,7 +316,10 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 				.id = req.materialID,
 				.flags = flags,
 				.textureTarget = GL_TEXTURE_2D,
-				.alphaCutoff = alphaCutoff
+				.alphaCutoff = alphaCutoff,
+				.shader = flags & PBR ? rm.get<Shader>("gBuffer") :
+					      flags & OPAQUE ? rm.get<Shader>("opaque") :
+				          flags & BLEND ? rm.get<Shader>("blend") : nullptr
 			};
 	}
 
