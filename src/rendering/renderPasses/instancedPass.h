@@ -3,13 +3,13 @@
 #include <vector>
 #include "glm/glm.hpp"
 #include "IRenderPass.hpp"
-#include "../buffers/vertexBuffer.h"
 
 class VertexBuffer;
 struct InstanceGroup;
 
 class InstancedPass final : public IRenderPass {
 public:
+	InstancedPass();
 	~InstancedPass() override;
 
 	void configure(RenderContext& ctx, EventBus& eventBus) override;

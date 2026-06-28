@@ -7,9 +7,11 @@
 #include "../renderContext/renderQueue.hpp"
 #include "../material/material.hpp"
 #include "../buffers/frameBuffer.h"
+#include "../buffers/vertexBuffer.h"
 #include "../mesh/mesh.h"
 #include "../../math/matrix.h"
 
+InstancedPass::InstancedPass() = default;
 InstancedPass::~InstancedPass() = default;
 
 void InstancedPass::configure(RenderContext& ctx, EventBus& eventBus) {
