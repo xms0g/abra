@@ -4,6 +4,7 @@
     {
       "name": "Skybox",
       "primitive": "Cubemap",
+      "shader": "skybox",
       "components": {
         "TransformComponent": {
           "position": [0.0, 0.0, 0.0],
@@ -28,6 +29,7 @@
     {
       "name": "Cube",
       "primitive": "Cube",
+      "shader": "opaque",
       "components": {
         "TransformComponent": {
           "position": [0.0, 0.0, 0.0],
@@ -47,6 +49,7 @@
     {
       "name": "Directional Light",
       "primitive": "Cube",
+      "shader": "unlit",
       "components": {
         "TransformComponent": {
           "position": [-3.2, 5.0, 0.0],

@@ -38,8 +38,8 @@ void ResourceManager::createShaders() {
 	mShaders.emplace("blend", std::make_unique<Shader>("object.vert", "blend.frag"));
 	mShaders.emplace("unlit", std::make_unique<Shader>("unlit.vert", "unlit.frag"));
 	// Instanced
-	mShaders.emplace("instancedOpaque", std::make_unique<Shader>("instanced.vert", "opaque.frag"));
-	mShaders.emplace("instancedBlend", std::make_unique<Shader>("instanced.vert", "blend.frag"));
+	mShaders.emplace("opaqueInstanced", std::make_unique<Shader>("instanced.vert", "opaque.frag"));
+	mShaders.emplace("blendInstanced", std::make_unique<Shader>("instanced.vert", "blend.frag"));
 	// Skybox
 	mShaders.emplace("skybox", std::make_unique<Shader>("skybox.vert", "skybox.frag"));
 	// Depth
@@ -316,7 +316,8 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 				.id = req.materialID,
 				.flags = flags,
 				.textureTarget = GL_TEXTURE_2D,
-				.alphaCutoff = alphaCutoff
+				.alphaCutoff = alphaCutoff,
+				.shader = rm.get<Shader>("opaque")
 			};
 	}
 

@@ -48,6 +48,7 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 		json componentsJson;
 		bool isPrimitive{false};
 		std::string primitiveType;
+		std::string shader;
 	};
 
 	std::vector<DeferredEntity> deferredEntities;
@@ -67,6 +68,10 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 			deferred.isPrimitive = true;
 			deferred.primitiveType = entityData["primitive"];
 		}
+
+		if (entityData.contains("shader")) {
+			deferred.shader = entityData["shader"];
+		}
 		deferredEntities.push_back(deferred);
 	}
 
@@ -74,7 +79,7 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 	rm.waitForAll();
 
 	// Assemble Components
-	for (auto& [entity, comps, isPrimitive, primType]: deferredEntities) {
+	for (auto& [entity, comps, isPrimitive, primType, shaderName]: deferredEntities) {
 		if (isPrimitive && (primType == "Cube" || primType == "Plane" || primType == "Terrain")) {
 			glm::vec3 color{0.0f};
 			bool unlit{false};
@@ -114,8 +119,11 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 				const std::string& albedo,
 				const std::string& specular,
 				const std::string& normal,
-				const std::string& height) {
+				const std::string& height,
+				const std::string& shader) {
 				T model{c, u, TEXTURE_PTR(albedo), TEXTURE_PTR(specular), TEXTURE_PTR(normal), TEXTURE_PTR(height)};
+				auto& mat = model.material();
+				mat[0].shader = rm.get<Shader>(shader);
 
 				rm.upload<MeshMap>(entity.id(), model.meshes());
 				rm.upload<MaterialMap>(entity.id(), model.material());
@@ -128,7 +136,8 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 					albedoTexture,
 					specularTexture,
 					normalTexture,
-					heightTexture);
+					heightTexture,
+					shaderName);
 			} else if (primType == "Plane") {
 				uploadPrimitives.operator()<Model::Plane>(
 					color,
@@ -136,7 +145,8 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 					albedoTexture,
 					specularTexture,
 					normalTexture,
-					heightTexture);
+					heightTexture,
+					shaderName);
 			} else if (primType == "Terrain") {
 				uploadPrimitives.operator()<Model::Terrain>(
 					color,
@@ -144,13 +154,17 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 					albedoTexture,
 					specularTexture,
 					normalTexture,
-					heightTexture
+					heightTexture,
+					shaderName
 				);
 			}
 		} else if (isPrimitive && primType == "Cubemap") {
 			auto faces = comps["SkyboxComponent"]["faces"].get<std::vector<std::string> >();
 
 			Model::Cubemap cubemap{faces};
+
+			auto& mat = cubemap.material();
+			mat[0].shader = rm.get<Shader>(shaderName);
 
 			rm.upload<MeshMap>(entity.id(), cubemap.meshes());
 			rm.upload<MaterialMap>(entity.id(), cubemap.material());
@@ -185,6 +199,9 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 				TEXTURE_PTR(normal),
 				TEXTURE_PTR(orm)
 			};
+
+			auto& mat = sphere.material();
+			mat[0].shader = rm.get<Shader>(shaderName);
 
 			rm.upload<MeshMap>(entity.id(), sphere.meshes());
 			rm.upload<MaterialMap>(entity.id(), sphere.material());
@@ -234,9 +251,13 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 				heightScale = comps["MaterialComponent"]["height_scale"].get<float>();
 			}
 
-			uint32_t flags = entity.hasComponent<InstanceComponent>() ? INSTANCED_PASS :
-							primType == "Terrain" ? TERRAIN_PASS :
-							primType == "Cubemap" ? SKYBOX_PASS : 0;
+			uint32_t flags = entity.hasComponent<InstanceComponent>()
+				                 ? INSTANCED_PASS
+				                 : primType == "Terrain"
+					                   ? TERRAIN_PASS
+					                   : primType == "Cubemap"
+						                     ? SKYBOX_PASS
+						                     : 0;
 
 			entity.addComponent<MaterialComponent>(
 				rm.get<MaterialMap>(entity.id()),

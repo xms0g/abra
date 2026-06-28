@@ -29,6 +29,7 @@ struct Material {
 	uint32_t textureTarget{0};
 	glm::vec3 color{0.0f};
 	float alphaCutoff{0.0f};
+	const Shader* shader{nullptr};
 	std::vector<Texture> textures;
 };
 

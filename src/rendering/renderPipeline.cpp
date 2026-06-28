@@ -322,27 +322,7 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		textureOffset += textureCount;
 
 		// Set shader
-		if (material.flags & OPAQUE) {
-			if (material.flags & UNLIT) {
-				matBatch.shader = rm.get<Shader>("unlit");
-			} else {
-				if (matComponent.renderFlag == INSTANCED_PASS) {
-					matBatch.shader = rm.get<Shader>("instancedOpaque");
-				} else {
-					matBatch.shader = rm.get<Shader>("opaque");
-				}
-			}
-		} else if (material.flags & BLEND) {
-			if (matComponent.renderFlag == INSTANCED_PASS) {
-				matBatch.shader = rm.get<Shader>("instancedBlend");
-			} else {
-				matBatch.shader = rm.get<Shader>("blend");
-			}
-		} else if (matComponent.renderFlag == SKYBOX_PASS) {
-			matBatch.shader = rm.get<Shader>("skybox");
-		} else if (matComponent.renderFlag == TERRAIN_PASS) {
-			matBatch.shader = rm.get<Shader>("terrain");
-		}
+		matBatch.shader = material.shader;
 
 		RenderGroup group;
 		InstanceGroup instance;
@@ -366,13 +346,13 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 			mRenderQueue.get<std::vector<RenderGroup>>("deferred").push_back(group);
 		} else if (material.flags & OPAQUE) {
 			if (matComponent.renderFlag == INSTANCED_PASS) {
-				mRenderQueue.get<std::vector<RenderGroup>>("opaqueInstanced").push_back(instance);
+				mRenderQueue.get<std::vector<InstanceGroup>>("opaqueInstanced").push_back(instance);
 			} else {
 				mRenderQueue.get<std::vector<RenderGroup>>("opaque").push_back(group);
 			}
 		} else if (material.flags & BLEND) {
 			if (matComponent.renderFlag == INSTANCED_PASS) {
-				mRenderQueue.get<std::vector<RenderGroup>>("blendInstanced").push_back(instance);
+				mRenderQueue.get<std::vector<InstanceGroup>>("blendInstanced").push_back(instance);
 			} else {
 				mRenderQueue.get<std::vector<RenderGroup>>("blend").push_back(group);
 			}
