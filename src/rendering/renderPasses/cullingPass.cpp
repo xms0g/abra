@@ -1,6 +1,6 @@
 #include "cullingPass.h"
 #include "../mesh/mesh.h"
-#include "../renderContext/renderQueue.hpp"
+#include "../renderContext/renderData.hpp"
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderGroup.hpp"
 #include "../renderContext/renderableObject.hpp"
@@ -16,10 +16,10 @@ void CullingPass::configure(RenderContext& ctx, EventBus& eventBus) {
 void CullingPass::execute(const RenderContext& ctx) {
 	const auto frustum = ctx.camera.self->generateFrustum();
 
-	cullScene(ctx, frustum, ctx.renderQueue->opaqueGroups, ctx.renderQueue->opaqueObjects);
-	cullScene(ctx, frustum, ctx.renderQueue->deferredGroups, ctx.renderQueue->deferredObjects);
-	cullScene(ctx, frustum, ctx.renderQueue->blendGroups, ctx.renderQueue->blendObjects);
-	cullScene(ctx, frustum, ctx.renderQueue->debugGroups, ctx.renderQueue->dbgObjects);
+	cullScene(ctx, frustum, ctx.renderData->opaqueGroups, ctx.renderData->opaqueObjects);
+	cullScene(ctx, frustum, ctx.renderData->deferredGroups, ctx.renderData->deferredObjects);
+	cullScene(ctx, frustum, ctx.renderData->blendGroups, ctx.renderData->blendObjects);
+	cullScene(ctx, frustum, ctx.renderData->debugGroups, ctx.renderData->dbgObjects);
 }
 
 void CullingPass::cullScene(
@@ -30,9 +30,9 @@ void CullingPass::cullScene(
 	outQueue.clear();
 
 	for (const auto& [entityID, matBatch]: groups) {
-		const auto& model = ctx.renderQueue->entity.models[entityID];
-		const auto& center= ctx.renderQueue->entity.centers[entityID];
-		const auto& extents = ctx.renderQueue->entity.extents[entityID];
+		const auto& model = ctx.renderData->entity.models[entityID];
+		const auto& center= ctx.renderData->entity.centers[entityID];
+		const auto& extents = ctx.renderData->entity.extents[entityID];
 
 		if (!math::AABB::isOnFrustum(frustum, model, center, extents)) {
 			continue;
@@ -40,8 +40,8 @@ void CullingPass::cullScene(
 
 		const auto& [matIdx, textureOffset, textureCount, shader, meshes] = matBatch;
 		for (const auto& meshIdx: meshes) {
-			const glm::vec3& max = ctx.renderQueue->mesh.maxCounts[meshIdx];
-			const glm::vec3& min = ctx.renderQueue->mesh.minCounts[meshIdx];
+			const glm::vec3& max = ctx.renderData->mesh.maxCounts[meshIdx];
+			const glm::vec3& min = ctx.renderData->mesh.minCounts[meshIdx];
 
 			const bool isVisible = math::AABB::isMeshInFrustum(frustum, min, max, model);
 

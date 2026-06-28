@@ -3,7 +3,7 @@
 #include "../renderCommand.h"
 #include "../buffers/frameBuffer.h"
 #include "../renderContext/renderContext.hpp"
-#include "../renderContext/renderQueue.hpp"
+#include "../renderContext/renderData.hpp"
 
 ForwardPass::~ForwardPass() = default;
 
@@ -14,16 +14,16 @@ void ForwardPass::configure(RenderContext& ctx, EventBus& eventBus) {
 void ForwardPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
 
-	if (!ctx.renderQueue->blendObjects.empty()) {
+	if (!ctx.renderData->blendObjects.empty()) {
 		glDepthMask(GL_FALSE);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		RenderCommand::forward(ctx, ctx.renderQueue->blendObjects);
+		RenderCommand::forward(ctx, ctx.renderData->blendObjects);
 
 		glDepthMask(GL_TRUE);
 		glDisable(GL_BLEND);
 	}
 
-	RenderCommand::forward(ctx, ctx.renderQueue->opaqueObjects);
+	RenderCommand::forward(ctx, ctx.renderData->opaqueObjects);
 }

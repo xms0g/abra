@@ -5,7 +5,7 @@
 #include "../../shader.h"
 #include "../../renderContext/renderContext.hpp"
 #include "../../renderContext/renderGroup.hpp"
-#include "../../renderContext/renderQueue.hpp"
+#include "../../renderContext/renderData.hpp"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderCommand.h"
 #include "../../../config/configManager.h"
@@ -53,13 +53,13 @@ void DirectionalShadow::render(const RenderContext& ctx, const glm::vec3& direct
 	mDepthMap->bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	for (const auto& [entityID, matBatch]: ctx.renderQueue->shadowGroups) {
+	for (const auto& [entityID, matBatch]: ctx.renderData->shadowGroups) {
 		RenderCommand::setupTransform(entityID, ctx, *mDepthShader);
 
 		for (const auto& meshIdx: matBatch.meshIndices) {
-			const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
-			const size_t vertexCount = ctx.renderQueue->mesh.vertexCounts[meshIdx];
-			const size_t indexCount = ctx.renderQueue->mesh.indexCounts[meshIdx];
+			const uint32_t vao = ctx.renderData->mesh.vaos[meshIdx];
+			const size_t vertexCount = ctx.renderData->mesh.vertexCounts[meshIdx];
+			const size_t indexCount = ctx.renderData->mesh.indexCounts[meshIdx];
 
 			RenderCommand::drawMesh(vao, vertexCount, indexCount);
 		}

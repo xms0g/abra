@@ -2,28 +2,7 @@
 #include <vector>
 #include "glm/glm.hpp"
 
-struct InstanceGroup;
-struct RenderGroup;
-struct RenderableObject;
-
-struct RenderQueue {
-	// Instance groups
-	std::vector<InstanceGroup> opaqueInstancedGroups;
-	std::vector<InstanceGroup> blendInstancedGroups;
-	// Render groups
-	std::vector<RenderGroup> debugGroups;
-	std::vector<RenderGroup> opaqueGroups;
-	std::vector<RenderGroup> deferredGroups;
-	std::vector<RenderGroup> blendGroups;
-	std::vector<RenderGroup> shadowGroups;
-	std::vector<RenderGroup> skybox;
-	std::vector<RenderGroup> terrain;
-	// Renderable Objects
-	std::vector<RenderableObject> deferredObjects;
-	std::vector<RenderableObject> opaqueObjects;
-	std::vector<RenderableObject> blendObjects;
-	std::vector<RenderableObject> dbgObjects;
-
+struct RenderData {
 	struct {
 		std::vector<glm::vec3> positions;
 		std::vector<glm::vec3> rotations;

@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "renderContext/renderQueue.hpp"
+#include "renderContext/renderData.hpp"
 #include "../ECS/system.hpp"
 
 class SyncStateSystem;
@@ -52,7 +52,8 @@ private:
 	// Uniform Buffers
 	std::unique_ptr<UniformBuffer> mCameraUBO;
 	// Render queue
-	RenderQueue mRenderQueue;
+	RenderData mRenderData;
+
 	// Render context
 	std::unique_ptr<RenderContext> mRenderCtx;
 	// Render passes

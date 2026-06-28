@@ -5,7 +5,7 @@
 #include "perspectiveShadow.h"
 #include "../../../config/configManager.h"
 #include "../../renderContext/renderContext.hpp"
-#include "../../renderContext/renderQueue.hpp"
+#include "../../renderContext/renderData.hpp"
 #include "../../buffers/uniformBuffer.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../../ECS/components/directionalLight.hpp"
@@ -41,7 +41,7 @@ void ShadowSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 		sizeof(ShadowData),
 		cfg.get<uint32_t>("shadow.ubo_binding"));
 
-	ctx.renderQueue->shadowMaps = {
+	ctx.renderData->shadowMaps = {
 		mDirShadow->depthTexture(),
 		mOmnidirShadow->depthTexture(),
 		mPersShadow->depthTexture()

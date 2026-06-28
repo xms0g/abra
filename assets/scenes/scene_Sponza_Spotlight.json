@@ -22,6 +22,7 @@
     },
     {
       "name": "Helmet",
+      "renderQueue": "Deferred",
       "model_path": "DamagedHelmet/glTF/DamagedHelmet.gltf",
       "components": {
         "TransformComponent": {
@@ -37,6 +38,7 @@
     },
     {
       "name": "Sponza",
+      "renderQueue": "Deferred",
       "model_path": "Sponza/glTF/Sponza.gltf",
       "components": {
         "TransformComponent": {
@@ -52,6 +54,7 @@
     },
     {
       "name": "Spot Light",
+      "renderQueue": "Opaque",
       "primitive": "Cube",
       "components": {
         "TransformComponent": {

@@ -4,7 +4,7 @@
 #include "../buffers/uniformBuffer.h"
 #include "../buffers/frameBuffer.h"
 #include "../renderContext/renderContext.hpp"
-#include "../renderContext/renderQueue.hpp"
+#include "../renderContext/renderData.hpp"
 #include "../renderContext/renderableObject.hpp"
 #include "../../ECS/components/debug.hpp"
 
@@ -21,8 +21,8 @@ void DebugPass::configure(RenderContext& ctx, EventBus& eventBus) {
 void DebugPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
 
-	for (const auto& object: ctx.renderQueue->dbgObjects) {
-		const uint32_t mode = ctx.renderQueue->entity.debugModes[object.entityID];
+	for (const auto& object: ctx.renderData->dbgObjects) {
+		const uint32_t mode = ctx.renderData->entity.debugModes[object.entityID];
 
 		if (mode == None)
 			continue;
@@ -32,9 +32,9 @@ void DebugPass::execute(const RenderContext& ctx) {
 
 		RenderCommand::setupTransform(object.entityID, ctx, *dbgShader);
 
-		const uint32_t vao = ctx.renderQueue->mesh.vaos[object.meshIndex];
-		const size_t vertexCount = ctx.renderQueue->mesh.vertexCounts[object.meshIndex];
-		const size_t indexCount = ctx.renderQueue->mesh.indexCounts[object.meshIndex];
+		const uint32_t vao = ctx.renderData->mesh.vaos[object.meshIndex];
+		const size_t vertexCount = ctx.renderData->mesh.vertexCounts[object.meshIndex];
+		const size_t indexCount = ctx.renderData->mesh.indexCounts[object.meshIndex];
 
 		RenderCommand::drawMesh(vao, vertexCount, indexCount);
 	}

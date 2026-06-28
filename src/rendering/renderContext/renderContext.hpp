@@ -12,13 +12,13 @@ class BaseFrameBuffer;
 class FrameBuffer;
 class UniformBuffer;
 class Camera;
-struct RenderQueue;
+struct RenderData;
 struct DirectionalLightComponent;
 struct PointLightComponent;
 struct SpotLightComponent;
 
 struct RenderContext {
-	RenderQueue* renderQueue{};
+	RenderData* renderData{};
 	mutable const FrameBuffer* sceneBuffer{};
 	const FrameBuffer* intermediateBuffer{};
 	mutable MaterialCache materialCache;

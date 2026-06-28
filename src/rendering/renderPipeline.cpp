@@ -61,7 +61,7 @@ RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLCon
 	glFrontFace(GL_CCW);
 
 	mRenderCtx = std::make_unique<RenderContext>();
-	mRenderCtx->renderQueue = &mRenderQueue;
+	mRenderCtx->renderData = &mRenderData;
 
 	mLightSystem = &registry->addSystem<LightSystem>();
 
@@ -136,25 +136,25 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	// Create render passes
 	mRenderPasses.emplace_back(std::make_unique<CullingPass>());
 
-	if (!mRenderQueue.deferredGroups.empty()) {
+	if (!mRenderData.deferredGroups.empty()) {
 		mRenderPasses.emplace_back(std::make_unique<DeferredGeometryPass>());
 		mRenderPasses.emplace_back(std::make_unique<SSAOPass>());
 		mRenderPasses.emplace_back(std::make_unique<DeferredLightingPass>());
 	}
 
-	if (!mRenderQueue.opaqueGroups.empty() || !mRenderQueue.blendGroups.empty()) {
+	if (!mRenderData.opaqueGroups.empty() || !mRenderData.blendGroups.empty()) {
 		mRenderPasses.emplace_back(std::make_unique<ForwardPass>());
 	}
 
-	if (!mRenderQueue.debugGroups.empty()) {
+	if (!mRenderData.debugGroups.empty()) {
 		mRenderPasses.emplace_back(std::make_unique<DebugPass>());
 	}
 
-	if (!mRenderQueue.opaqueInstancedGroups.empty() || !mRenderQueue.blendInstancedGroups.empty()) {
+	if (!mRenderData.opaqueInstancedGroups.empty() || !mRenderData.blendInstancedGroups.empty()) {
 		mRenderPasses.emplace_back(std::make_unique<InstancedPass>());
 	}
 
-	if (!mRenderQueue.terrain.empty()) {
+	if (!mRenderData.terrain.empty()) {
 		mRenderPasses.emplace_back(std::make_unique<TerrainPass>());
 	}
 
@@ -263,16 +263,16 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 	auto modelMat = math::modelMatrix(pos, rot, scale);
 	auto normalMat = math::normalMatrix(modelMat);
 
-	mRenderQueue.entity.positions.push_back(pos);
-	mRenderQueue.entity.rotations.push_back(rot);
-	mRenderQueue.entity.scales.push_back(scale);
-	mRenderQueue.entity.models.push_back(modelMat);
-	mRenderQueue.entity.normals.push_back(normalMat);
-	mRenderQueue.entity.centers.push_back(entity.getComponent<BoundingVolumeComponent>().bv->center());
-	mRenderQueue.entity.extents.push_back(entity.getComponent<BoundingVolumeComponent>().bv->extents());
+	mRenderData.entity.positions.push_back(pos);
+	mRenderData.entity.rotations.push_back(rot);
+	mRenderData.entity.scales.push_back(scale);
+	mRenderData.entity.models.push_back(modelMat);
+	mRenderData.entity.normals.push_back(normalMat);
+	mRenderData.entity.centers.push_back(entity.getComponent<BoundingVolumeComponent>().bv->center());
+	mRenderData.entity.extents.push_back(entity.getComponent<BoundingVolumeComponent>().bv->extents());
 
-	mRenderQueue.entity.debugModes.emplace_back(0);
-	mRenderQueue.entity.heightScales.emplace_back(entity.getComponent<MaterialComponent>().heightScale);
+	mRenderData.entity.debugModes.emplace_back(0);
+	mRenderData.entity.heightScales.emplace_back(entity.getComponent<MaterialComponent>().heightScale);
 
 	auto& matComponent = entity.getComponent<MaterialComponent>();
 
@@ -281,23 +281,23 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 
 		for (const auto& mesh: meshes) {
 			meshIndices.push_back(meshIndex++);
-			mRenderQueue.mesh.vaos.push_back(mesh.vao().id());
-			mRenderQueue.mesh.vertexCounts.push_back(mesh.vertices().size());
-			mRenderQueue.mesh.indexCounts.push_back(mesh.indices().size());
-			mRenderQueue.mesh.maxCounts.push_back(mesh.max());
-			mRenderQueue.mesh.minCounts.push_back(mesh.min());
+			mRenderData.mesh.vaos.push_back(mesh.vao().id());
+			mRenderData.mesh.vertexCounts.push_back(mesh.vertices().size());
+			mRenderData.mesh.indexCounts.push_back(mesh.indices().size());
+			mRenderData.mesh.maxCounts.push_back(mesh.max());
+			mRenderData.mesh.minCounts.push_back(mesh.min());
 		}
 
 		auto& material = matComponent.materials->at(matID);
 		material.idx = materialIndex++;
 
-		mRenderQueue.material.flags.push_back(material.flags);
-		mRenderQueue.material.textureTargets.push_back(material.textureTarget);
-		mRenderQueue.material.alphaCutoffs.push_back(material.alphaCutoff);
-		mRenderQueue.material.colors.push_back(material.color);
+		mRenderData.material.flags.push_back(material.flags);
+		mRenderData.material.textureTargets.push_back(material.textureTarget);
+		mRenderData.material.alphaCutoffs.push_back(material.alphaCutoff);
+		mRenderData.material.colors.push_back(material.color);
 
 		for (const auto& texture: material.textures) {
-			mRenderQueue.material.textures.push_back(texture.id);
+			mRenderData.material.textures.push_back(texture.id);
 		}
 
 		size_t textureCount = material.textures.size();
@@ -338,31 +338,31 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		}
 
 		if (entity.hasComponent<DebugComponent>()) {
-			mRenderQueue.debugGroups.push_back(group);
+			mRenderData.debugGroups.push_back(group);
 		}
 
 		if (material.flags & CASTSHADOW) {
-			mRenderQueue.shadowGroups.push_back(group);
+			mRenderData.shadowGroups.push_back(group);
 		}
 
 		if (material.flags & PBR) {
-			mRenderQueue.deferredGroups.push_back(group);
+			mRenderData.deferredGroups.push_back(group);
 		} else if (material.flags & OPAQUE) {
 			if (matComponent.renderFlag == INSTANCED_PASS) {
-				mRenderQueue.opaqueInstancedGroups.push_back(instance);
+				mRenderData.opaqueInstancedGroups.push_back(instance);
 			} else {
-				mRenderQueue.opaqueGroups.push_back(group);
+				mRenderData.opaqueGroups.push_back(group);
 			}
 		} else if (material.flags & BLEND) {
 			if (matComponent.renderFlag == INSTANCED_PASS) {
-				mRenderQueue.blendInstancedGroups.push_back(instance);
+				mRenderData.blendInstancedGroups.push_back(instance);
 			} else {
-				mRenderQueue.blendGroups.push_back(group);
+				mRenderData.blendGroups.push_back(group);
 			}
 		} else if (matComponent.renderFlag == SKYBOX_PASS) {
-			mRenderQueue.skybox.push_back(group);
+			mRenderData.skybox.push_back(group);
 		} else if (matComponent.renderFlag == TERRAIN_PASS) {
-			mRenderQueue.terrain.push_back(group);
+			mRenderData.terrain.push_back(group);
 		}
 	}
 }
@@ -375,8 +375,8 @@ void RenderPipeline::sortEntities() {
 			batch.begin(),
 			batch.end(),
 			[&camPos, &transparent, this](const RenderGroup& a, const RenderGroup& b) {
-				const auto aPos = mRenderQueue.entity.positions[a.entityID];
-				const auto bPos = mRenderQueue.entity.positions[b.entityID];
+				const auto aPos = mRenderData.entity.positions[a.entityID];
+				const auto bPos = mRenderData.entity.positions[b.entityID];
 
 				const float da = glm::length2(camPos - aPos);
 				const float db = glm::length2(camPos - bPos);
@@ -389,9 +389,9 @@ void RenderPipeline::sortEntities() {
 	};
 
 	// Sort opaque objects front to back
-	sortBatches(mRenderQueue.deferredGroups, false);
-	sortBatches(mRenderQueue.opaqueGroups, false);
-	sortBatches(mRenderQueue.blendGroups, true);
+	sortBatches(mRenderData.deferredGroups, false);
+	sortBatches(mRenderData.opaqueGroups, false);
+	sortBatches(mRenderData.blendGroups, true);
 
 	// for (auto& [entity, transforms, materials]: renderQueues.blendInstancedGroup) {
 	// 	auto transform = *transforms;

@@ -4,7 +4,7 @@
 #include "../renderCommand.h"
 #include "../buffers/frameBuffer.h"
 #include "../material/material.hpp"
-#include "../renderContext/renderQueue.hpp"
+#include "../renderContext/renderData.hpp"
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderableObject.hpp"
 #include "../../ECS/components/bv.hpp"
@@ -50,13 +50,13 @@ void DeferredGeometryPass::execute(const RenderContext& ctx) {
 
 	mShader->activate();
 
-	for (const auto& [entityID, materialIdx, textureOffset, textureCount, meshIdx, shader]: ctx.renderQueue->deferredObjects) {
+	for (const auto& [entityID, materialIdx, textureOffset, textureCount, meshIdx, shader]: ctx.renderData->deferredObjects) {
 		RenderCommand::setupMaterial(entityID, materialIdx, textureOffset, textureCount, ctx, *mShader);
 		RenderCommand::setupTransform(entityID, ctx, *mShader);
 
-		const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
-		const size_t vertexCount = ctx.renderQueue->mesh.vertexCounts[meshIdx];
-		const size_t indexCount = ctx.renderQueue->mesh.indexCounts[meshIdx];
+		const uint32_t vao = ctx.renderData->mesh.vaos[meshIdx];
+		const size_t vertexCount = ctx.renderData->mesh.vertexCounts[meshIdx];
+		const size_t indexCount = ctx.renderData->mesh.indexCounts[meshIdx];
 
 		RenderCommand::drawMesh(vao, vertexCount, indexCount);
 	}

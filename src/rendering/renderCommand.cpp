@@ -5,7 +5,7 @@
 #include "texture/texture.h"
 #include "renderContext/renderContext.hpp"
 #include "renderContext/renderableObject.hpp"
-#include "renderContext/renderQueue.hpp"
+#include "renderContext/renderData.hpp"
 #include "renderContext/renderGroup.hpp"
 #include "../ECS/components/mesh.hpp"
 #include "../config/configManager.h"
@@ -22,9 +22,9 @@ void RenderCommand::forward(const RenderContext& ctx, const std::vector<Renderab
 		setupMaterial(entityID, materialIdx, textureOffset, textureCount, ctx, *lastShader);
 		setupTransform(entityID, ctx, *lastShader);
 
-		const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
-		const size_t vertexCount = ctx.renderQueue->mesh.vertexCounts[meshIdx];
-		const size_t indexCount = ctx.renderQueue->mesh.indexCounts[meshIdx];
+		const uint32_t vao = ctx.renderData->mesh.vaos[meshIdx];
+		const size_t vertexCount = ctx.renderData->mesh.vertexCounts[meshIdx];
+		const size_t indexCount = ctx.renderData->mesh.indexCounts[meshIdx];
 
 		drawMesh(vao, vertexCount, indexCount);
 	}
@@ -40,8 +40,8 @@ void RenderCommand::instanced(const RenderContext& ctx, const std::vector<Instan
 		setupMaterial(obj.entityID, materialIdx, textureOffset, textureCount, ctx, *shader);
 
 		for (const auto& meshIdx: meshes) {
-			const uint32_t vao = ctx.renderQueue->mesh.vaos[meshIdx];
-			const size_t indexCount = ctx.renderQueue->mesh.indexCounts[meshIdx];
+			const uint32_t vao = ctx.renderData->mesh.vaos[meshIdx];
+			const size_t indexCount = ctx.renderData->mesh.indexCounts[meshIdx];
 
 			glBindVertexArray(vao);
 			glDrawElementsInstanced(
@@ -55,8 +55,8 @@ void RenderCommand::instanced(const RenderContext& ctx, const std::vector<Instan
 }
 
 void RenderCommand::setupTransform(const size_t entityID, const RenderContext& ctx, const Shader& shader) {
-	const auto& model = ctx.renderQueue->entity.models[entityID];
-	const auto& normal = ctx.renderQueue->entity.normals[entityID];
+	const auto& model = ctx.renderData->entity.models[entityID];
+	const auto& normal = ctx.renderData->entity.normals[entityID];
 
 	shader.setMat4("model", model);
 	shader.setMat3("normalMatrix", normal);
@@ -77,7 +77,7 @@ void RenderCommand::setupMaterial(
 
 	ctx.materialCache.lastMaterialIdx = materialIdx;
 
-	const uint32_t flags = ctx.renderQueue->material.flags[materialIdx];
+	const uint32_t flags = ctx.renderData->material.flags[materialIdx];
 
 	if (ctx.materialCache.lastMatFlags != flags || ctx.materialCache.lastShader != &shader) {
 		ctx.materialCache.lastMatFlags = flags;
@@ -86,25 +86,25 @@ void RenderCommand::setupMaterial(
 	}
 
 	if (flags & HAS_HEIGHT_MAP) {
-		const float heightScale = ctx.renderQueue->entity.heightScales[entityID];
+		const float heightScale = ctx.renderData->entity.heightScales[entityID];
 		shader.setFloat("material.heightScale", heightScale);
 	}
 
 	if (flags & ALPHACUTOFF) {
-		const float alphaCutoff = ctx.renderQueue->material.alphaCutoffs[materialIdx];
+		const float alphaCutoff = ctx.renderData->material.alphaCutoffs[materialIdx];
 		shader.setFloat("material.alphaCutoff", alphaCutoff);
 	}
 
 	if (flags & HAS_SOLID_COLOR) [[unlikely]] {
-		const glm::vec3& color = ctx.renderQueue->material.colors[materialIdx];
+		const glm::vec3& color = ctx.renderData->material.colors[materialIdx];
 		shader.setVec3("material.color", color);
 	} else {
-		const uint32_t target = ctx.renderQueue->material.textureTargets[materialIdx];
+		const uint32_t target = ctx.renderData->material.textureTargets[materialIdx];
 
 		int slot{0};
 		for (uint32_t i = textureOffset; i < textureOffset + textureCount; ++i) {
 			glActiveTexture(GL_TEXTURE0 + slot++);
-			glBindTexture(target, ctx.renderQueue->material.textures[i]);
+			glBindTexture(target, ctx.renderData->material.textures[i]);
 		}
 	}
 
@@ -175,11 +175,11 @@ void RenderCommand::bindShadowMaps(const RenderContext& ctx) {
 	const int32_t slot = GL_TEXTURE0 + cfg.get<int32_t>("shadow.texture_slot");
 
 	glActiveTexture(slot);
-	glBindTexture(GL_TEXTURE_2D, ctx.renderQueue->shadowMaps[0]);
+	glBindTexture(GL_TEXTURE_2D, ctx.renderData->shadowMaps[0]);
 
 	glActiveTexture(slot + 1);
-	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, ctx.renderQueue->shadowMaps[1]);
+	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, ctx.renderData->shadowMaps[1]);
 
 	glActiveTexture(slot + 2);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, ctx.renderQueue->shadowMaps[2]);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, ctx.renderData->shadowMaps[2]);
 }

@@ -1,5 +1,5 @@
 #include "syncStateSystem.h"
-#include "../renderContext/renderQueue.hpp"
+#include "../renderContext/renderData.hpp"
 #include "../renderContext/renderContext.hpp"
 #include "../../math/matrix.h"
 #include "../../event/eventBus.hpp"
@@ -19,16 +19,16 @@ void SyncStateSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 }
 
 void SyncStateSystem::onDebugUpdate(const GuiDebugEvent& event) {
-	uint32_t& mode = mCtx->renderQueue->entity.debugModes[event.entityID];
+	uint32_t& mode = mCtx->renderData->entity.debugModes[event.entityID];
 	mode = event.mode;
 }
 
 void SyncStateSystem::onTransformUpdate(const GuiTransformEvent& event) {
-	auto& position = mCtx->renderQueue->entity.positions[event.entityID];
-	auto& rotation = mCtx->renderQueue->entity.rotations[event.entityID];
-	auto& scale = mCtx->renderQueue->entity.scales[event.entityID];
-	auto& model = mCtx->renderQueue->entity.models[event.entityID];
-	auto& normal = mCtx->renderQueue->entity.normals[event.entityID];
+	auto& position = mCtx->renderData->entity.positions[event.entityID];
+	auto& rotation = mCtx->renderData->entity.rotations[event.entityID];
+	auto& scale = mCtx->renderData->entity.scales[event.entityID];
+	auto& model = mCtx->renderData->entity.models[event.entityID];
+	auto& normal = mCtx->renderData->entity.normals[event.entityID];
 
 	position = event.position;
 	rotation = event.rotation;
@@ -40,6 +40,6 @@ void SyncStateSystem::onTransformUpdate(const GuiTransformEvent& event) {
 }
 
 void SyncStateSystem::onLightUpdate(const GuiLightEvent& event) {
-	auto& color = mCtx->renderQueue->material.colors[event.matIdx];
+	auto& color = mCtx->renderData->material.colors[event.matIdx];
 	color = event.diffuse;
 }
