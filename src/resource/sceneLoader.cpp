@@ -119,11 +119,8 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 				const std::string& albedo,
 				const std::string& specular,
 				const std::string& normal,
-				const std::string& height,
-				const std::string& shader) {
+				const std::string& height) {
 				T model{c, u, TEXTURE_PTR(albedo), TEXTURE_PTR(specular), TEXTURE_PTR(normal), TEXTURE_PTR(height)};
-				auto& mat = model.material();
-				mat[0].shader = rm.get<Shader>(shader);
 
 				rm.upload<MeshMap>(entity.id(), model.meshes());
 				rm.upload<MaterialMap>(entity.id(), model.material());
@@ -136,8 +133,7 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 					albedoTexture,
 					specularTexture,
 					normalTexture,
-					heightTexture,
-					shaderName);
+					heightTexture);
 			} else if (primType == "Plane") {
 				uploadPrimitives.operator()<Model::Plane>(
 					color,
@@ -145,8 +141,7 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 					albedoTexture,
 					specularTexture,
 					normalTexture,
-					heightTexture,
-					shaderName);
+					heightTexture);
 			} else if (primType == "Terrain") {
 				uploadPrimitives.operator()<Model::Terrain>(
 					color,
@@ -154,17 +149,13 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 					albedoTexture,
 					specularTexture,
 					normalTexture,
-					heightTexture,
-					shaderName
+					heightTexture
 				);
 			}
 		} else if (isPrimitive && primType == "Cubemap") {
 			auto faces = comps["SkyboxComponent"]["faces"].get<std::vector<std::string> >();
 
 			Model::Cubemap cubemap{faces};
-
-			auto& mat = cubemap.material();
-			mat[0].shader = rm.get<Shader>(shaderName);
 
 			rm.upload<MeshMap>(entity.id(), cubemap.meshes());
 			rm.upload<MaterialMap>(entity.id(), cubemap.material());
@@ -200,11 +191,13 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 				TEXTURE_PTR(orm)
 			};
 
-			auto& mat = sphere.material();
-			mat[0].shader = rm.get<Shader>(shaderName);
-
 			rm.upload<MeshMap>(entity.id(), sphere.meshes());
 			rm.upload<MaterialMap>(entity.id(), sphere.material());
+		}
+
+		// Set shader
+		for (auto& [id, material]: *rm.get<MaterialMap>(entity.id())) {
+			material.shader = rm.get<Shader>(shaderName);
 		}
 
 		// Transform Component

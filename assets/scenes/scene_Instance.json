@@ -1,5 +1,5 @@
 {
-  "scene_name": "Suzanne Instance",
+  "scene_name": "Cube Instance",
   "entities": [
     {
       "name": "Skybox",

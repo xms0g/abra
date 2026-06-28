@@ -316,8 +316,7 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 				.id = req.materialID,
 				.flags = flags,
 				.textureTarget = GL_TEXTURE_2D,
-				.alphaCutoff = alphaCutoff,
-				.shader = rm.get<Shader>("opaque")
+				.alphaCutoff = alphaCutoff
 			};
 	}
 

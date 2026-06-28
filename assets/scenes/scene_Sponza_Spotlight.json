@@ -23,6 +23,7 @@
     },
     {
       "name": "Helmet",
+      "shader": "opaque",
       "model_path": "DamagedHelmet/glTF/DamagedHelmet.gltf",
       "components": {
         "TransformComponent": {
@@ -38,6 +39,7 @@
     },
     {
       "name": "Sponza",
+      "shader": "opaque",
       "model_path": "Sponza/glTF/Sponza.gltf",
       "components": {
         "TransformComponent": {
