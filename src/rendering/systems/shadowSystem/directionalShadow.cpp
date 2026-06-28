@@ -6,6 +6,7 @@
 #include "../../renderContext/renderContext.hpp"
 #include "../../renderContext/renderGroup.hpp"
 #include "../../renderContext/renderData.hpp"
+#include "../../renderContext/renderQueue.hpp"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderCommand.h"
 #include "../../../config/configManager.h"
@@ -19,6 +20,7 @@ DirectionalShadow::DirectionalShadow(const RenderContext& ctx) {
 	mDepthMap->unbind();
 
 	mDepthShader = rm.get<Shader>("depth");
+	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("shadow");
 
 	mHeight = cfg.get<float>("shadow.directional.height");
 	mRight = cfg.get<float>("shadow.directional.right");
@@ -53,7 +55,7 @@ void DirectionalShadow::render(const RenderContext& ctx, const glm::vec3& direct
 	mDepthMap->bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	for (const auto& [entityID, matBatch]: ctx.renderData->shadowGroups) {
+	for (const auto& [entityID, matBatch]: *mObjects) {
 		RenderCommand::setupTransform(entityID, ctx, *mDepthShader);
 
 		for (const auto& meshIdx: matBatch.meshIndices) {

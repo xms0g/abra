@@ -8,6 +8,7 @@ namespace math {
 struct Frustum;
 }
 
+class RenderQueue;
 class BaseFrameBuffer;
 class FrameBuffer;
 class UniformBuffer;
@@ -19,6 +20,7 @@ struct SpotLightComponent;
 
 struct RenderContext {
 	RenderData* renderData{};
+	RenderQueue* renderQueue{};
 	mutable const FrameBuffer* sceneBuffer{};
 	const FrameBuffer* intermediateBuffer{};
 	mutable MaterialCache materialCache;

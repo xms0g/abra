@@ -6,6 +6,7 @@
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderData.hpp"
 #include "../renderContext/renderableObject.hpp"
+#include "../renderContext/renderQueue.hpp"
 #include "../../ECS/components/debug.hpp"
 
 DebugPass::~DebugPass() = default;
@@ -16,12 +17,14 @@ void DebugPass::configure(RenderContext& ctx, EventBus& eventBus) {
 		rm.get<Shader>("debugNormal"),
 		rm.get<Shader>("debugWireframe")
 	};
+
+	mObjects = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleDebug");
 }
 
 void DebugPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
 
-	for (const auto& object: ctx.renderData->dbgObjects) {
+	for (const auto& object: *mObjects) {
 		const uint32_t mode = ctx.renderData->entity.debugModes[object.entityID];
 
 		if (mode == None)

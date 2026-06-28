@@ -3,6 +3,7 @@
 #include <vector>
 #include "glm/glm.hpp"
 
+struct RenderGroup;
 struct RenderContext;
 class Shader;
 class FrameBuffer;
@@ -30,6 +31,7 @@ private:
 	float mFovy{0.0f};
 
 	std::vector<glm::mat4> mShadowTransforms;
+	std::vector<RenderGroup>* mObjects;
 	std::unique_ptr<FrameBuffer> mDepthMap;
 	const Shader* mDepthShader;
 	glm::mat4 mShadowProj;

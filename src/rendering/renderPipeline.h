@@ -2,6 +2,7 @@
 #include <memory>
 #include <vector>
 #include "renderContext/renderData.hpp"
+#include "renderContext/renderQueue.hpp"
 #include "../ECS/system.hpp"
 
 class SyncStateSystem;
@@ -51,9 +52,10 @@ private:
 	std::unique_ptr<FrameBuffer> mIntermediateBuffer;
 	// Uniform Buffers
 	std::unique_ptr<UniformBuffer> mCameraUBO;
-	// Render queue
+	// Render Data
 	RenderData mRenderData;
-
+	// Render Queue
+	RenderQueue mRenderQueue;
 	// Render context
 	std::unique_ptr<RenderContext> mRenderCtx;
 	// Render passes

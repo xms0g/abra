@@ -1,7 +1,9 @@
 #pragma once
 #include <memory>
+#include <vector>
 #include "IRenderPass.hpp"
 
+struct RenderableObject;
 class Shader;
 class FrameBuffer;
 
@@ -16,4 +18,5 @@ public:
 private:
 	std::unique_ptr<FrameBuffer> mGBuffer;
 	const Shader* mShader{nullptr};
+	std::vector<RenderableObject>* mObjects{nullptr};
 };

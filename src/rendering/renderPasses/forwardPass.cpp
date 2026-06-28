@@ -3,27 +3,31 @@
 #include "../renderCommand.h"
 #include "../buffers/frameBuffer.h"
 #include "../renderContext/renderContext.hpp"
-#include "../renderContext/renderData.hpp"
+#include "../renderContext/renderQueue.hpp"
+#include "../renderContext/renderableObject.hpp"
 
 ForwardPass::~ForwardPass() = default;
 
 void ForwardPass::configure(RenderContext& ctx, EventBus& eventBus) {
+	mOpaqueObjects = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleOpaque");
+	mTransparentObjects = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleBlend");
+
 	RenderCommand::bindShadowMaps(ctx);
 }
 
 void ForwardPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
 
-	if (!ctx.renderData->blendObjects.empty()) {
+	if (!mOpaqueObjects->empty()) {
 		glDepthMask(GL_FALSE);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		RenderCommand::forward(ctx, ctx.renderData->blendObjects);
+		RenderCommand::forward(ctx, *mTransparentObjects);
 
 		glDepthMask(GL_TRUE);
 		glDisable(GL_BLEND);
 	}
 
-	RenderCommand::forward(ctx, ctx.renderData->opaqueObjects);
+	RenderCommand::forward(ctx, *mOpaqueObjects);
 }

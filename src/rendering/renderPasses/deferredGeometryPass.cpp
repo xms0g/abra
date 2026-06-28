@@ -7,6 +7,7 @@
 #include "../renderContext/renderData.hpp"
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderableObject.hpp"
+#include "../renderContext/renderQueue.hpp"
 #include "../../ECS/components/bv.hpp"
 #include "../../config/configManager.h"
 
@@ -31,6 +32,7 @@ void DeferredGeometryPass::configure(RenderContext& ctx, EventBus& eventBus) {
 
 	ctx.gBuffer = mGBuffer.get();
 	mShader = rm.get<Shader>("gBuffer");
+	mObjects = &ctx.renderQueue->get<std::vector<RenderableObject>>("visibleDeferred");
 
 	const TextureBinding textureBindings[] = {
 		{"material.texture_albedo", cfg.get<int32_t>("PBR.albedo.textureSlot")},
@@ -50,7 +52,7 @@ void DeferredGeometryPass::execute(const RenderContext& ctx) {
 
 	mShader->activate();
 
-	for (const auto& [entityID, materialIdx, textureOffset, textureCount, meshIdx, shader]: ctx.renderData->deferredObjects) {
+	for (const auto& [entityID, materialIdx, textureOffset, textureCount, meshIdx, shader]: *mObjects) {
 		RenderCommand::setupMaterial(entityID, materialIdx, textureOffset, textureCount, ctx, *mShader);
 		RenderCommand::setupTransform(entityID, ctx, *mShader);
 

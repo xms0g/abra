@@ -2,7 +2,7 @@
 #include <vector>
 #include "buffer.hpp"
 
-class VertexBuffer : public Buffer {
+class VertexBuffer final : public Buffer {
 public:
 	explicit VertexBuffer(BufferUsage usage);
 

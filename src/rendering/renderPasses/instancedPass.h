@@ -3,14 +3,13 @@
 #include <vector>
 #include "glm/glm.hpp"
 #include "IRenderPass.hpp"
+#include "../buffers/vertexBuffer.h"
 
 class VertexBuffer;
 struct InstanceGroup;
 
 class InstancedPass final : public IRenderPass {
 public:
-	InstancedPass();
-
 	~InstancedPass() override;
 
 	void configure(RenderContext& ctx, EventBus& eventBus) override;
@@ -33,4 +32,7 @@ private:
 
 	std::unique_ptr<VertexBuffer> mOpaqueVBO;
 	std::unique_ptr<VertexBuffer> mBlendVBO;
+
+	std::vector<InstanceGroup>* mOpaqueObjects{nullptr};
+	std::vector<InstanceGroup>* mTransparentObjects{nullptr};
 };

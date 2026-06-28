@@ -6,6 +6,7 @@
 #include "../../renderContext/renderGroup.hpp"
 #include "../../renderContext/renderData.hpp"
 #include "../../renderContext/renderContext.hpp"
+#include "../../renderContext/renderQueue.hpp"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderCommand.h"
 #include "../../../config/configManager.h"
@@ -20,6 +21,8 @@ OmnidirectionalShadow::OmnidirectionalShadow(const RenderContext& ctx) {
 	mDepthMap->unbind();
 
 	mDepthShader = rm.get<Shader>("depthCubemap");
+	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("shadow");
+
 	mNear = cfg.get<float>("shadow.omnidirectional.nearPlane");
 	mFar = cfg.get<float>("shadow.omnidirectional.farPlane");
 	mFovy = glm::radians(cfg.get<float>("shadow.omnidirectional.fovy"));
@@ -54,7 +57,7 @@ void OmnidirectionalShadow::render(
 	mDepthShader->setVec3("lightPos", position);
 	mDepthShader->setInt("cubeIndex", layer);
 
-	for (const auto& [entityID, matBatch]: ctx.renderData->shadowGroups) {
+	for (const auto& [entityID, matBatch]: *mObjects) {
 		RenderCommand::setupTransform(entityID, ctx, *mDepthShader);
 
 		for (const auto& meshIdx: matBatch.meshIndices) {

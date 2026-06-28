@@ -7,12 +7,14 @@
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderData.hpp"
 #include "../renderContext/renderGroup.hpp"
+#include "../renderContext/renderQueue.hpp"
 #include "../texture/texture.h"
 
 SkyboxPass::~SkyboxPass() = default;
 
 void SkyboxPass::configure(RenderContext& ctx, EventBus& eventBus) {
-	const auto& [entity, matb] = ctx.renderData->skybox.front();
+	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("skybox");
+	const auto& [entity, matb] = mObjects->front();
 
 	constexpr TextureBinding textureBindings[] = {
 		{"skybox", 0},
@@ -22,7 +24,7 @@ void SkyboxPass::configure(RenderContext& ctx, EventBus& eventBus) {
 }
 
 void SkyboxPass::execute(const RenderContext& ctx) {
-	const auto& [entityID, matb] = ctx.renderData->skybox.front();
+	const auto& [entityID, matb] = mObjects->front();
 	const auto& [materialIdx, textureOffset, textureCount, shader, meshes] = matb;
 	const uint32_t meshIdx = meshes.front();
 	const uint32_t vao = ctx.renderData->mesh.vaos[meshIdx];

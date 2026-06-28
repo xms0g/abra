@@ -6,6 +6,7 @@
 #include "../../renderContext/renderGroup.hpp"
 #include "../../renderContext/renderContext.hpp"
 #include "../../renderContext/renderData.hpp"
+#include "../../renderContext/renderQueue.hpp"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderCommand.h"
 #include "../../../config/configManager.h"
@@ -20,6 +21,8 @@ PerspectiveShadow::PerspectiveShadow(const RenderContext& ctx) {
 	mDepthMap->unbind();
 
 	mDepthShader = rm.get<Shader>("depth");
+	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("shadow");
+
 	mNear = cfg.get<float>("shadow.perspective.nearPlane");
 	mFar = cfg.get<float>("shadow.perspective.farPlane");
 }
@@ -44,7 +47,6 @@ void PerspectiveShadow::render(
 	const glm::vec3& position,
 	const float fovy,
 	const int32_t layer) {
-
 	glFramebufferTextureLayer(
 		GL_FRAMEBUFFER,
 		GL_DEPTH_ATTACHMENT,
@@ -61,7 +63,7 @@ void PerspectiveShadow::render(
 	mDepthShader->activate();
 	mDepthShader->setMat4("lightSpaceMatrix", mLightSpaceMatrix[layer]);
 
-	for (const auto& [entityID, matBatch]: ctx.renderData->shadowGroups) {
+	for (const auto& [entityID, matBatch]: *mObjects) {
 		RenderCommand::setupTransform(entityID, ctx, *mDepthShader);
 
 		for (const auto& meshIdx: matBatch.meshIndices) {

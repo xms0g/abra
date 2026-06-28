@@ -4,25 +4,26 @@
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderGroup.hpp"
 #include "../renderContext/renderData.hpp"
+#include "../renderContext/renderQueue.hpp"
 #include "../material/material.hpp"
-#include "../mesh/mesh.h"
 #include "../buffers/frameBuffer.h"
-#include "../buffers/vertexBuffer.h"
+#include "../mesh/mesh.h"
 #include "../../math/matrix.h"
-
-InstancedPass::InstancedPass() = default;
 
 InstancedPass::~InstancedPass() = default;
 
 void InstancedPass::configure(RenderContext& ctx, EventBus& eventBus) {
-	if (!ctx.renderData->opaqueInstancedGroups.empty()) {
-		prepareInstanceBuffer(ctx.renderData->opaqueInstancedGroups, ctx.renderData->mesh.vaos, mOpaqueVBO);
-		uploadInstanceData(ctx.renderData->opaqueInstancedGroups, *mOpaqueVBO);
+	mOpaqueObjects = &ctx.renderQueue->get<std::vector<InstanceGroup> >("opaqueInstanced");
+	mTransparentObjects = &ctx.renderQueue->get<std::vector<InstanceGroup> >("blendInstanced");
+
+	if (!mOpaqueObjects->empty()) {
+		prepareInstanceBuffer(*mOpaqueObjects, ctx.renderData->mesh.vaos, mOpaqueVBO);
+		uploadInstanceData(*mOpaqueObjects, *mOpaqueVBO);
 	}
 
-	if (!ctx.renderData->blendInstancedGroups.empty()) {
-		prepareInstanceBuffer(ctx.renderData->blendInstancedGroups, ctx.renderData->mesh.vaos, mBlendVBO);
-		uploadInstanceData(ctx.renderData->blendInstancedGroups, *mBlendVBO);
+	if (!mTransparentObjects->empty()) {
+		prepareInstanceBuffer(*mTransparentObjects, ctx.renderData->mesh.vaos, mBlendVBO);
+		uploadInstanceData(*mTransparentObjects, *mBlendVBO);
 	}
 
 	RenderCommand::bindShadowMaps(ctx);
@@ -31,18 +32,18 @@ void InstancedPass::configure(RenderContext& ctx, EventBus& eventBus) {
 void InstancedPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
 
-	if (!ctx.renderData->blendInstancedGroups.empty()) {
+	if (!mTransparentObjects->empty()) {
 		glDepthMask(GL_FALSE);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		RenderCommand::instanced(ctx, ctx.renderData->blendInstancedGroups);
+		RenderCommand::instanced(ctx, *mTransparentObjects);
 
 		glDepthMask(GL_TRUE);
 		glDisable(GL_BLEND);
 	}
 
-	RenderCommand::instanced(ctx, ctx.renderData->opaqueInstancedGroups);
+	RenderCommand::instanced(ctx, *mOpaqueObjects);
 }
 
 void InstancedPass::prepareInstanceBuffer(

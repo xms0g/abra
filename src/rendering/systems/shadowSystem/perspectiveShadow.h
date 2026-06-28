@@ -1,7 +1,9 @@
 #pragma once
 #include <memory>
+#include <vector>
 #include "glm/glm.hpp"
 
+struct RenderGroup;
 struct RenderContext;
 class Shader;
 class FrameBuffer;
@@ -37,4 +39,5 @@ private:
 	glm::mat4 mLightSpaceMatrix[4]{};
 	std::unique_ptr<FrameBuffer> mDepthMap;
 	const Shader* mDepthShader;
+	std::vector<RenderGroup>* mObjects;
 };

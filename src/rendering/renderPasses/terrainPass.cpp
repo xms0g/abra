@@ -5,13 +5,16 @@
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderGroup.hpp"
 #include "../renderContext/renderData.hpp"
+#include "../renderContext/renderQueue.hpp"
 #include "../../rendering/shader.h"
 
 TerrainPass::~TerrainPass() = default;
 
 void TerrainPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
-	const auto& [entity, matb] = ctx.renderData->terrain.front();
+
+	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("terrain");
+	const auto& [entity, matb] = mObjects->front();
 
 	constexpr TextureBinding textureBindings[] = {
 		{"heightMap", 0},
@@ -24,7 +27,7 @@ void TerrainPass::configure(RenderContext& ctx, EventBus& eventBus) {
 void TerrainPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
 
-	const auto& [entityID, matb] = ctx.renderData->terrain.front();
+	const auto& [entityID, matb] = mObjects->front();
 	const auto [materialIdx, textureOffset, textureCount, shader, meshes] = matb;
 	const uint32_t meshIdx = meshes.front();
 	const uint32_t vao = ctx.renderData->mesh.vaos[meshIdx];
