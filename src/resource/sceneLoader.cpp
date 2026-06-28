@@ -248,13 +248,9 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 				heightScale = comps["MaterialComponent"]["height_scale"].get<float>();
 			}
 
-			uint32_t flags = entity.hasComponent<InstanceComponent>()
-				                 ? INSTANCED_PASS
-				                 : primType == "Terrain"
-					                   ? TERRAIN_PASS
-					                   : primType == "Cubemap"
-						                     ? SKYBOX_PASS
-						                     : 0;
+			uint32_t flags = entity.hasComponent<InstanceComponent>() ? INSTANCED_PASS :
+							primType == "Terrain" ? TERRAIN_PASS :
+							primType == "Cubemap" ? SKYBOX_PASS : 0;
 
 			entity.addComponent<MaterialComponent>(
 				rm.get<MaterialMap>(entity.id()),

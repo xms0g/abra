@@ -151,27 +151,27 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	// Create render passes
 	mRenderPasses.emplace_back(std::make_unique<CullingPass>());
 
-	if (!mRenderQueue.get<std::vector<RenderGroup>>("deferred").empty()) {
+	if (!mRenderQueue.get<std::vector<RenderGroup> >("deferred").empty()) {
 		mRenderPasses.emplace_back(std::make_unique<DeferredGeometryPass>());
 		mRenderPasses.emplace_back(std::make_unique<SSAOPass>());
 		mRenderPasses.emplace_back(std::make_unique<DeferredLightingPass>());
 	}
 
-	if (!mRenderQueue.get<std::vector<RenderGroup>>("opaque").empty() ||
-		!mRenderQueue.get<std::vector<RenderGroup>>("blend").empty()) {
+	if (!mRenderQueue.get<std::vector<RenderGroup> >("opaque").empty() ||
+	    !mRenderQueue.get<std::vector<RenderGroup> >("blend").empty()) {
 		mRenderPasses.emplace_back(std::make_unique<ForwardPass>());
 	}
 
-	if (!mRenderQueue.get<std::vector<RenderGroup>>("debug").empty()) {
+	if (!mRenderQueue.get<std::vector<RenderGroup> >("debug").empty()) {
 		mRenderPasses.emplace_back(std::make_unique<DebugPass>());
 	}
 
-	if (!mRenderQueue.get<std::vector<InstanceGroup>>("opaqueInstanced").empty() ||
-		!mRenderQueue.get<std::vector<InstanceGroup>>("blendInstanced").empty()) {
+	if (!mRenderQueue.get<std::vector<InstanceGroup> >("opaqueInstanced").empty() ||
+	    !mRenderQueue.get<std::vector<InstanceGroup> >("blendInstanced").empty()) {
 		mRenderPasses.emplace_back(std::make_unique<InstancedPass>());
 	}
 
-	if (!mRenderQueue.get<std::vector<RenderGroup>>("terrain").empty()) {
+	if (!mRenderQueue.get<std::vector<RenderGroup> >("terrain").empty()) {
 		mRenderPasses.emplace_back(std::make_unique<TerrainPass>());
 	}
 
@@ -293,6 +293,17 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 
 	auto& matComponent = entity.getComponent<MaterialComponent>();
 
+	struct PassRule {
+		uint32_t flags;
+		std::string queue;
+		std::string instancedQueue;
+	} rules[] = {
+		{CASTSHADOW, "shadow", "shadow"},
+		{PBR, "deferred", "deferred"},
+		{OPAQUE, "opaque", "opaqueInstanced"},
+		{BLEND, "blend", "blendInstanced"},
+	};
+
 	for (auto& [matID, meshes]: *entity.getComponent<MeshComponent>().meshes) {
 		std::vector<uint32_t> meshIndices;
 
@@ -327,39 +338,33 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		RenderGroup group;
 		InstanceGroup instance;
 
-		if (matComponent.renderFlag == INSTANCED_PASS) {
+		bool isInstanced = matComponent.renderFlag == INSTANCED_PASS;
+
+		if (isInstanced) {
 			const auto& instComponent = entity.getComponent<InstanceComponent>();
 			instance = {entity.id(), matBatch, *instComponent.transforms};
 		} else {
 			group = {entity.id(), matBatch};
 		}
 
-		if (entity.hasComponent<DebugComponent>()) {
-			mRenderQueue.get<std::vector<RenderGroup>>("debug").push_back(group);
-		}
-
-		if (material.flags & CASTSHADOW) {
-			mRenderQueue.get<std::vector<RenderGroup>>("shadow").push_back(group);
-		}
-
-		if (material.flags & PBR) {
-			mRenderQueue.get<std::vector<RenderGroup>>("deferred").push_back(group);
-		} else if (material.flags & OPAQUE) {
-			if (matComponent.renderFlag == INSTANCED_PASS) {
-				mRenderQueue.get<std::vector<InstanceGroup>>("opaqueInstanced").push_back(instance);
-			} else {
-				mRenderQueue.get<std::vector<RenderGroup>>("opaque").push_back(group);
-			}
-		} else if (material.flags & BLEND) {
-			if (matComponent.renderFlag == INSTANCED_PASS) {
-				mRenderQueue.get<std::vector<InstanceGroup>>("blendInstanced").push_back(instance);
-			} else {
-				mRenderQueue.get<std::vector<RenderGroup>>("blend").push_back(group);
-			}
-		} else if (matComponent.renderFlag == SKYBOX_PASS) {
-			mRenderQueue.get<std::vector<RenderGroup>>("skybox").push_back(group);
+		if (matComponent.renderFlag == SKYBOX_PASS) {
+			mRenderQueue.get<std::vector<RenderGroup> >("skybox").push_back(group);
 		} else if (matComponent.renderFlag == TERRAIN_PASS) {
-			mRenderQueue.get<std::vector<RenderGroup>>("terrain").push_back(group);
+			mRenderQueue.get<std::vector<RenderGroup> >("terrain").push_back(group);
+		}
+
+		if (entity.hasComponent<DebugComponent>()) {
+			mRenderQueue.get<std::vector<RenderGroup> >("debug").push_back(group);
+		}
+
+		for (const auto& [flags, queue, instancedQueue]: rules) {
+			if (material.flags & flags) {
+				if (isInstanced) {
+					mRenderQueue.get<std::vector<InstanceGroup> >(instancedQueue).push_back(instance);
+				} else {
+					mRenderQueue.get<std::vector<RenderGroup> >(queue).push_back(group);
+				}
+			}
 		}
 	}
 }
@@ -386,9 +391,9 @@ void RenderPipeline::sortEntities() {
 	};
 
 	// Sort opaque objects front to back
-	sortBatches(mRenderQueue.get<std::vector<RenderGroup>>("deferred"), false);
-	sortBatches(mRenderQueue.get<std::vector<RenderGroup>>("opaque"), false);
-	sortBatches(mRenderQueue.get<std::vector<RenderGroup>>("blend"), true);
+	sortBatches(mRenderQueue.get<std::vector<RenderGroup> >("deferred"), false);
+	sortBatches(mRenderQueue.get<std::vector<RenderGroup> >("opaque"), false);
+	sortBatches(mRenderQueue.get<std::vector<RenderGroup> >("blend"), true);
 
 	// for (auto& [entity, transforms, materials]: renderQueues.blendInstancedGroup) {
 	// 	auto transform = *transforms;
