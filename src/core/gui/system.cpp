@@ -24,7 +24,7 @@ void GuiSystem::update(const float dt) {
 	updateFpsCounter(dt);
 }
 
-void GuiSystem::render(EventBus& eventBus) {
+void GuiSystem::render(EventBus& eventBus) const {
 	GuiPanels::renderGraphicsInfoPanel(mFPS);
 	GuiPanels::renderPostProcessPanel(eventBus);
 

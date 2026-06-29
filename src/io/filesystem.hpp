@@ -15,7 +15,7 @@ inline std::string loadFile(const std::string& p) {
 	std::ifstream file(path(p));
 
 	if (!file.is_open()) {
-		throw std::runtime_error(std::string("Failed to open shader file: ") + p);
+		throw std::runtime_error(std::string("Failed to open the file: ") + p);
 	}
 
 	std::stringstream ss;

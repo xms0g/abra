@@ -11,7 +11,7 @@ public:
 
 	void update(float dt);
 
-	void render(EventBus& eventBus);
+	void render(EventBus& eventBus) const;
 
 private:
 	void updateFpsCounter(float dt);
