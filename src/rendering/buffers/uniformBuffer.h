@@ -12,7 +12,7 @@ struct UniformBinding {
 	void (*configure)(uint32_t, uint32_t, const char*);
 };
 
-class UniformBuffer : public Buffer {
+class UniformBuffer final : public Buffer {
 public:
 	UniformBuffer(BufferUsage usage, int32_t size, uint32_t binding);
 

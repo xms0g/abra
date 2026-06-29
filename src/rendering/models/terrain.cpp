@@ -8,7 +8,6 @@
 #include "../../io/filesystem.hpp"
 #include "../../config/configManager.h"
 
-
 Model::Terrain::Terrain(
 	glm::vec3 color,
 	bool unlit,
