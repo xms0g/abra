@@ -30,6 +30,8 @@ private:
 
 	void onGuiUpdate(const UpdateShadowMapEvent& event);
 
+	int32_t mWidth{0};
+	int32_t mHeight{0};
 	const RenderContext* mCtx{};
 	std::unique_ptr<UniformBuffer> mUBO;
 	std::unique_ptr<DirectionalShadow> mDirShadow;

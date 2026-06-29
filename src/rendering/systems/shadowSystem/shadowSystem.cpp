@@ -32,6 +32,9 @@ const UniformBuffer* ShadowSystem::ubo() const {
 
 void ShadowSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mCtx = &ctx;
+	mWidth= cfg.get<int32_t>("window.width");
+	mHeight = cfg.get<int32_t>("window.height");
+
 	mDirShadow = std::make_unique<DirectionalShadow>(ctx);
 	mOmnidirShadow = std::make_unique<OmnidirectionalShadow>(ctx);
 	mPersShadow = std::make_unique<PerspectiveShadow>(ctx);
@@ -102,9 +105,6 @@ void ShadowSystem::perspectiveShadowPass() const {
 }
 
 void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
-	const int32_t width = cfg.get<int32_t>("window.width");
-	const int32_t height = cfg.get<int32_t>("window.height");
-
 	glCullFace(GL_FRONT);
 
 	directionalShadowPass();
@@ -112,7 +112,7 @@ void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
 	perspectiveShadowPass();
 
 	glCullFace(GL_BACK);
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, mWidth, mHeight);
 
 	mUBO->bind();
 	mUBO->setData(&gpuData, sizeof(ShadowData), 0);
