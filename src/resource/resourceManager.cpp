@@ -285,6 +285,7 @@ void ResourceManager::processMaterials(const aiScene* scene, MaterialLoadContext
 void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& materialLoadCtx) {
 	if (!materialLoadCtx.materials.contains(req.materialID)) {
 		uint32_t flags{0};
+		flags |= CASTSHADOW;
 
 		if (int twoSided{0};
 			req.mat->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
@@ -303,9 +304,15 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 		if (aiString alphaMode;
 			req.mat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode) == AI_SUCCESS) {
 			if (std::strcmp(alphaMode.C_Str(), "OPAQUE") == 0) {
-				flags |= OPAQUE | CASTSHADOW;
+				if (!(flags & PBR)) {
+					flags |= OPAQUE;
+				}
 			} else if (std::strcmp(alphaMode.C_Str(), "MASK") == 0) {
-				flags |= OPAQUE | ALPHACUTOFF | CASTSHADOW;
+				if (flags & PBR) {
+					flags |= ALPHACUTOFF;
+				} else {
+					flags |= OPAQUE | ALPHACUTOFF;
+				}
 				req.mat->Get(AI_MATKEY_GLTF_ALPHACUTOFF, alphaCutoff);
 			} else if (std::strcmp(alphaMode.C_Str(), "BLEND") == 0) {
 				flags |= BLEND;
