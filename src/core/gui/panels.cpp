@@ -117,18 +117,17 @@ void GuiPanels::renderDirLight(const Entity& entity, EventBus& eventBus) {
 void GuiPanels::renderPointLight(const Entity& entity, EventBus& eventBus) {
 	auto& transform = entity.getComponent<TransformComponent>();
 	auto& pointLight = entity.getComponent<PointLightComponent>();
-	bool isDirty = transform.isDirty;
 
-	isDirty |= Ui::colorField3("Ambient", pointLight.ambient, 0.01f, 100);
-	isDirty |= Ui::colorField3("Diffuse", pointLight.diffuse, 0.01f, 100);
-	isDirty |= Ui::colorField3("Specular", pointLight.specular, 0.01f, 100);
-	isDirty |= Ui::dragFloat("Constant", &pointLight.constant, 0.01f, 100);
-	isDirty |= Ui::dragFloat("Linear", &pointLight.linear, 0.01f, 100);
-	isDirty |= Ui::dragFloat("Quadratic", &pointLight.quadratic, 0.01f, 100);
-	isDirty |= Ui::sliderFloat("Intensity", &pointLight.intensity, 100.0, 1.0, 30.0);
-	isDirty |= ImGui::Checkbox("Cast Shadow", &pointLight.castShadow);
+	transform.isDirty |= Ui::colorField3("Ambient", pointLight.ambient, 0.01f, 100);
+	transform.isDirty |= Ui::colorField3("Diffuse", pointLight.diffuse, 0.01f, 100);
+	transform.isDirty |= Ui::colorField3("Specular", pointLight.specular, 0.01f, 100);
+	transform.isDirty |= Ui::dragFloat("Constant", &pointLight.constant, 0.01f, 100);
+	transform.isDirty |= Ui::dragFloat("Linear", &pointLight.linear, 0.01f, 100);
+	transform.isDirty |= Ui::dragFloat("Quadratic", &pointLight.quadratic, 0.01f, 100);
+	transform.isDirty |= Ui::sliderFloat("Intensity", &pointLight.intensity, 100.0, 1.0, 30.0);
+	transform.isDirty |= ImGui::Checkbox("Cast Shadow", &pointLight.castShadow);
 
-	if (isDirty) {
+	if (transform.isDirty) {
 		uint32_t matIdx = entity.getComponent<MaterialComponent>().materials[0].at(0).idx;
 
 		eventBus.emitEvent<GuiLightEvent>(
@@ -155,21 +154,20 @@ void GuiPanels::renderPointLight(const Entity& entity, EventBus& eventBus) {
 void GuiPanels::renderSpotLight(const Entity& entity, EventBus& eventBus) {
 	auto& transform = entity.getComponent<TransformComponent>();
 	auto& spotLight = entity.getComponent<SpotLightComponent>();
-	bool isDirty = transform.isDirty;
 
-	isDirty |= Ui::dragFloat3("Direction", spotLight.direction, 0.01f, 100);
-	isDirty |= Ui::colorField3("Ambient", spotLight.ambient, 0.01f, 100);
-	isDirty |= Ui::colorField3("Diffuse", spotLight.diffuse, 0.01f, 100);
-	isDirty |= Ui::colorField3("Specular", spotLight.specular, 0.01f, 100);
-	isDirty |= Ui::dragFloat("Constant", &spotLight.constant, 0.01f, 100);
-	isDirty |= Ui::dragFloat("Linear", &spotLight.linear, 0.01f, 100);
-	isDirty |= Ui::dragFloat("Quadratic", &spotLight.quadratic, 0.01f, 100);
-	isDirty |= Ui::dragFloat("Cutoff", &spotLight.cutOff, 0.01f, 100);
-	isDirty |= Ui::dragFloat("OuterCutoff", &spotLight.outerCutOff, 0.01f, 100);
-	isDirty |= Ui::sliderFloat("Intensity", &spotLight.intensity, 100.0, 1.0, 30.0);
-	isDirty |= ImGui::Checkbox("Cast Shadow", &spotLight.castShadow);
+	transform.isDirty |= Ui::dragFloat3("Direction", spotLight.direction, 0.01f, 100);
+	transform.isDirty |= Ui::colorField3("Ambient", spotLight.ambient, 0.01f, 100);
+	transform.isDirty |= Ui::colorField3("Diffuse", spotLight.diffuse, 0.01f, 100);
+	transform.isDirty |= Ui::colorField3("Specular", spotLight.specular, 0.01f, 100);
+	transform.isDirty |= Ui::dragFloat("Constant", &spotLight.constant, 0.01f, 100);
+	transform.isDirty |= Ui::dragFloat("Linear", &spotLight.linear, 0.01f, 100);
+	transform.isDirty |= Ui::dragFloat("Quadratic", &spotLight.quadratic, 0.01f, 100);
+	transform.isDirty |= Ui::dragFloat("Cutoff", &spotLight.cutOff, 0.01f, 100);
+	transform.isDirty |= Ui::dragFloat("OuterCutoff", &spotLight.outerCutOff, 0.01f, 100);
+	transform.isDirty |= Ui::sliderFloat("Intensity", &spotLight.intensity, 100.0, 1.0, 30.0);
+	transform.isDirty |= ImGui::Checkbox("Cast Shadow", &spotLight.castShadow);
 
-	if (isDirty) {
+	if (transform.isDirty) {
 		uint32_t matIdx = entity.getComponent<MaterialComponent>().materials[0].at(0).idx;
 
 		eventBus.emitEvent<GuiLightEvent>(
