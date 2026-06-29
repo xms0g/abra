@@ -275,7 +275,7 @@ void RenderPipeline::refreshCameraData() const {
 	mCameraUBO->setData(&packed, sizeof(PackedView), 0);
 }
 
-void RenderPipeline::batchEntity(const Entity& entity) {
+void RenderPipeline::batchEntity(const Entity& entity) const {
 	static uint32_t materialIndex{0}, textureOffset{0}, meshIndex{0};
 
 	auto transform = entity.getComponent<TransformComponent>();
