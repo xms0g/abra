@@ -274,24 +274,25 @@ void RenderPipeline::refreshCameraData() const {
 void RenderPipeline::batchEntity(const Entity& entity) {
 	static uint32_t materialIndex{0}, textureOffset{0}, meshIndex{0};
 
-	auto pos = entity.getComponent<TransformComponent>().position;
-	auto rot = entity.getComponent<TransformComponent>().rotation;
-	auto scale = entity.getComponent<TransformComponent>().scale;
-	auto modelMat = math::modelMatrix(pos, rot, scale);
+	auto transform = entity.getComponent<TransformComponent>();
+	auto modelMat = math::modelMatrix(transform.position, transform.rotation, transform.scale);
 	auto normalMat = math::normalMatrix(modelMat);
 
-	mRenderData.entity.positions.push_back(pos);
-	mRenderData.entity.rotations.push_back(rot);
-	mRenderData.entity.scales.push_back(scale);
+	mRenderData.entity.positions.push_back(transform.position);
+	mRenderData.entity.rotations.push_back(transform.rotation);
+	mRenderData.entity.scales.push_back(transform.scale);
 	mRenderData.entity.models.push_back(modelMat);
 	mRenderData.entity.normals.push_back(normalMat);
-	mRenderData.entity.centers.push_back(entity.getComponent<BoundingVolumeComponent>().bv->center());
-	mRenderData.entity.extents.push_back(entity.getComponent<BoundingVolumeComponent>().bv->extents());
+
+	auto bv = entity.getComponent<BoundingVolumeComponent>().bv;
+	mRenderData.entity.centers.push_back(bv->center());
+	mRenderData.entity.extents.push_back(bv->extents());
 
 	mRenderData.entity.debugModes.emplace_back(0);
-	mRenderData.entity.heightScales.emplace_back(entity.getComponent<MaterialComponent>().heightScale);
 
 	auto& matComponent = entity.getComponent<MaterialComponent>();
+	mRenderData.entity.heightScales.emplace_back(matComponent.heightScale);
+
 
 	struct PassRule {
 		uint32_t flags;
