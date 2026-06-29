@@ -278,9 +278,9 @@ void RenderPipeline::refreshCameraData() const {
 void RenderPipeline::batchEntity(const Entity& entity) const {
 	static uint32_t materialIndex{0}, textureOffset{0}, meshIndex{0};
 
-	auto transform = entity.getComponent<TransformComponent>();
-	auto modelMat = math::modelMatrix(transform.position, transform.rotation, transform.scale);
-	auto normalMat = math::normalMatrix(modelMat);
+	const auto& transform = entity.getComponent<TransformComponent>();
+	const auto modelMat = math::modelMatrix(transform.position, transform.rotation, transform.scale);
+	const auto normalMat = math::normalMatrix(modelMat);
 
 	mRenderData->entity.positions.push_back(transform.position);
 	mRenderData->entity.rotations.push_back(transform.rotation);
@@ -288,7 +288,7 @@ void RenderPipeline::batchEntity(const Entity& entity) const {
 	mRenderData->entity.models.push_back(modelMat);
 	mRenderData->entity.normals.push_back(normalMat);
 
-	auto bv = entity.getComponent<BoundingVolumeComponent>().bv;
+	const auto& bv = entity.getComponent<BoundingVolumeComponent>().bv;
 	mRenderData->entity.centers.push_back(bv->center());
 	mRenderData->entity.extents.push_back(bv->extents());
 
@@ -343,7 +343,7 @@ void RenderPipeline::batchEntity(const Entity& entity) const {
 		RenderGroup group;
 		InstanceGroup instance;
 
-		bool isInstanced = matComponent.renderFlag == INSTANCED_PASS;
+		const bool isInstanced = matComponent.renderFlag == INSTANCED_PASS;
 
 		if (isInstanced) {
 			const auto& instComponent = entity.getComponent<InstanceComponent>();
