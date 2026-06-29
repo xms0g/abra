@@ -333,7 +333,7 @@ void RenderPipeline::batchEntity(const Entity& entity) const {
 			mRenderData->material.textures.push_back(texture.id);
 		}
 
-		size_t textureCount = material.textures.size();
+		const size_t textureCount = material.textures.size();
 		MaterialBatch matBatch{material.idx, textureOffset, textureCount, nullptr, meshIndices};
 		textureOffset += textureCount;
 
