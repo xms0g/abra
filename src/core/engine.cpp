@@ -38,7 +38,6 @@ void Engine::configure() const {
 	mCamera->configure(*mEventBus);
 	mRenderPipeline->batchEntities();
 	mRenderPipeline->configure(*mCamera, *mEventBus);
-	mGuiSystem->configure();
 }
 
 void Engine::run() {

@@ -1,7 +1,6 @@
 #include "system.h"
 #include "panels.h"
 #include "ui.h"
-#include "entityState.hpp"
 #include "../../ECS/registry.h"
 #include "../../ECS/components/debug.hpp"
 #include "../../ECS/components/directionalLight.hpp"
@@ -25,69 +24,6 @@ void GuiSystem::update(const float dt) {
 	updateFpsCounter(dt);
 }
 
-void GuiSystem::configure() {
-	for (const auto& entity: getSystemEntities()) {
-		const auto& transform = entity.getComponent<TransformComponent>();
-		glm::vec3 direction{0.0f}, ambient{0.0f}, diffuse{0.0f}, specular{0.0f};
-		float kc{0.0f}, kl{0.0f}, kq{0.0f}, cutOff{0.0f}, outerCutOff{0.0f}, intensity{1.0f};
-		bool castShadow{false};
-		uint32_t idx{0};
-
-		if (entity.hasComponent<DirectionalLightComponent>()) {
-			direction = entity.getComponent<DirectionalLightComponent>().direction;
-			ambient = entity.getComponent<DirectionalLightComponent>().ambient;
-			diffuse = entity.getComponent<DirectionalLightComponent>().diffuse;
-			specular = entity.getComponent<DirectionalLightComponent>().specular;
-			intensity = entity.getComponent<DirectionalLightComponent>().intensity;
-		} else if (entity.hasComponent<PointLightComponent>()) {
-			ambient = entity.getComponent<PointLightComponent>().ambient;
-			diffuse = entity.getComponent<PointLightComponent>().diffuse;
-			specular = entity.getComponent<PointLightComponent>().specular;
-			kc = entity.getComponent<PointLightComponent>().constant;
-			kl = entity.getComponent<PointLightComponent>().linear;
-			kq = entity.getComponent<PointLightComponent>().quadratic;
-			intensity = entity.getComponent<PointLightComponent>().intensity;
-			castShadow = entity.getComponent<PointLightComponent>().castShadow;
-			idx = entity.getComponent<PointLightComponent>().idx;
-		} else if (entity.hasComponent<SpotLightComponent>()) {
-			direction = entity.getComponent<SpotLightComponent>().direction;
-			ambient = entity.getComponent<SpotLightComponent>().ambient;
-			diffuse = entity.getComponent<SpotLightComponent>().diffuse;
-			specular = entity.getComponent<SpotLightComponent>().specular;
-			kc = entity.getComponent<SpotLightComponent>().constant;
-			kl = entity.getComponent<SpotLightComponent>().linear;
-			kq = entity.getComponent<SpotLightComponent>().quadratic;
-			cutOff = entity.getComponent<SpotLightComponent>().cutOff;
-			outerCutOff = entity.getComponent<SpotLightComponent>().outerCutOff;
-			intensity = entity.getComponent<SpotLightComponent>().intensity;
-			castShadow = entity.getComponent<SpotLightComponent>().castShadow;
-			idx = entity.getComponent<SpotLightComponent>().idx;
-		}
-
-		mEntityStates.push_back({
-			entity.id(),
-			0,
-			false,
-			{transform.position, transform.rotation, transform.scale},
-			{
-				idx,
-				direction,
-				glm::vec4(transform.position, 1.0f),
-				ambient,
-				diffuse,
-				specular,
-				kc,
-				kl,
-				kq,
-				cutOff,
-				outerCutOff,
-				intensity,
-				castShadow
-			}
-		});
-	}
-}
-
 void GuiSystem::render(EventBus& eventBus) {
 	GuiPanels::renderGraphicsInfoPanel(mFPS);
 	GuiPanels::renderPostProcessPanel(eventBus);
@@ -97,9 +33,9 @@ void GuiSystem::render(EventBus& eventBus) {
 			continue;
 
 		if (Ui::beginEntity(entity.name())) {
-			GuiPanels::renderTransformPanel(entity, eventBus, mEntityStates);
-			GuiPanels::renderDebugViewsPanel(entity, eventBus, mEntityStates);
-			GuiPanels::renderLightPanel(entity, eventBus, mEntityStates);
+			GuiPanels::renderTransformPanel(entity, eventBus);
+			GuiPanels::renderDebugViewsPanel(entity, eventBus);
+			GuiPanels::renderLightPanel(entity, eventBus);
 			Ui::endEntity();
 		}
 	}
