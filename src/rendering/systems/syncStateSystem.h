@@ -17,8 +17,6 @@ private:
 
 	void onTransformUpdate(const GuiTransformEvent& event);
 
-	void onLightUpdate(const GuiLightEvent& event);
-
 	EventBus* mEventBus{nullptr};
 	const RenderContext* mCtx{nullptr};
 };

@@ -2,6 +2,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "../buffers/uniformBuffer.h"
 #include "../renderContext/renderContext.hpp"
+#include "../renderContext/renderData.hpp"
 #include "../../ECS/registry.h"
 #include "../../ECS/components/directionalLight.hpp"
 #include "../../ECS/components/pointLight.hpp"
@@ -58,6 +59,7 @@ void LightSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mPointLights.reserve(cfg.get<int32_t>("light.max_point"));
 	mSpotLights.reserve(cfg.get<int32_t>("light.max_spot"));
 
+	mCtx = &ctx;
 	mEventBus = &eventBus;
 	eventBus.subscribeToEvent<LightSystem, GuiLightEvent>(this, &LightSystem::onGuiUpdate);
 
@@ -155,6 +157,8 @@ void LightSystem::updateLightUBO() const {
 }
 
 void LightSystem::onGuiUpdate(const GuiLightEvent& event) {
+	mCtx->renderData->material.colors[event.matIdx] = event.diffuse;
+
 	for (auto& entity: getSystemEntities()) {
 		if (entity.id() == event.entityID) {
 			if (entity.hasComponent<DirectionalLightComponent>()) {

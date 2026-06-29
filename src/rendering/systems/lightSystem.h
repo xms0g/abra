@@ -30,6 +30,7 @@ private:
 	void onGuiUpdate(const GuiLightEvent& event);
 
 	EventBus* mEventBus{};
+	const RenderContext* mCtx{};
 	std::unique_ptr<UniformBuffer> mUBO;
 	std::vector<DirectionalLightComponent*> mDirLights{};
 	std::vector<PointLightComponent*> mPointLights{};
