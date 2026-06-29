@@ -1,12 +1,9 @@
 #include "random.h"
 #include <random>
+#include "glm/ext/quaternion_common.hpp"
 
 static std::uniform_real_distribution<float> randomFloats(0.0, 1.0);
 static std::default_random_engine generator;
-
-inline float lerp(const float a, const float b, const float t) {
-	return a + (b - a) * t;
-}
 
 std::vector<glm::vec4> math::random::generateKernel(const uint32_t sampleCount) {
 	std::vector<glm::vec4> kernel;
@@ -22,7 +19,7 @@ std::vector<glm::vec4> math::random::generateKernel(const uint32_t sampleCount) 
 
 		float scale = static_cast<float>(i) / static_cast<float>(sampleCount);
 		// scale samples s.t. they're more aligned to center of kernel
-		scale = lerp(0.1f, 1.0f, scale * scale);
+		scale = glm::mix(0.1f, 1.0f, scale * scale);
 		sample *= scale;
 		kernel.emplace_back(sample, 1.0);
 	}
