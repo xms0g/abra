@@ -18,6 +18,8 @@
 #include "renderContext/renderFlags.hpp"
 #include "renderContext/renderGroup.hpp"
 #include "renderContext/renderableObject.hpp"
+#include "renderContext/renderQueue.hpp"
+#include "renderContext/renderData.hpp"
 #include "renderPasses/IRenderPass.hpp"
 #include "renderPasses/deferredGeometryPass.h"
 #include "renderPasses/deferredLightingPass.h"
@@ -60,23 +62,25 @@ RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLCon
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
 
-	mRenderQueue.set("opaqueInstanced", std::vector<InstanceGroup>());
-	mRenderQueue.set("blendInstanced", std::vector<InstanceGroup>());
-	mRenderQueue.set("opaque", std::vector<RenderGroup>());
-	mRenderQueue.set("blend", std::vector<RenderGroup>());
-	mRenderQueue.set("debug", std::vector<RenderGroup>());
-	mRenderQueue.set("shadow", std::vector<RenderGroup>());
-	mRenderQueue.set("terrain", std::vector<RenderGroup>());
-	mRenderQueue.set("skybox", std::vector<RenderGroup>());
-	mRenderQueue.set("deferred", std::vector<RenderGroup>());
-	mRenderQueue.set("visibleDeferred", std::vector<RenderableObject>());
-	mRenderQueue.set("visibleOpaque", std::vector<RenderableObject>());
-	mRenderQueue.set("visibleBlend", std::vector<RenderableObject>());
-	mRenderQueue.set("visibleDebug", std::vector<RenderableObject>());
+	mRenderQueue = std::make_unique<RenderQueue>();
+	mRenderQueue->set("opaqueInstanced", std::vector<InstanceGroup>());
+	mRenderQueue->set("blendInstanced", std::vector<InstanceGroup>());
+	mRenderQueue->set("opaque", std::vector<RenderGroup>());
+	mRenderQueue->set("blend", std::vector<RenderGroup>());
+	mRenderQueue->set("debug", std::vector<RenderGroup>());
+	mRenderQueue->set("shadow", std::vector<RenderGroup>());
+	mRenderQueue->set("terrain", std::vector<RenderGroup>());
+	mRenderQueue->set("skybox", std::vector<RenderGroup>());
+	mRenderQueue->set("deferred", std::vector<RenderGroup>());
+	mRenderQueue->set("visibleDeferred", std::vector<RenderableObject>());
+	mRenderQueue->set("visibleOpaque", std::vector<RenderableObject>());
+	mRenderQueue->set("visibleBlend", std::vector<RenderableObject>());
+	mRenderQueue->set("visibleDebug", std::vector<RenderableObject>());
 
 	mRenderCtx = std::make_unique<RenderContext>();
-	mRenderCtx->renderData = &mRenderData;
-	mRenderCtx->renderQueue = &mRenderQueue;
+	mRenderData = std::make_unique<RenderData>();
+	mRenderCtx->renderData = mRenderData.get();
+	mRenderCtx->renderQueue = mRenderQueue.get();
 
 	mLightSystem = &registry->addSystem<LightSystem>();
 
@@ -151,27 +155,27 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	// Create render passes
 	mRenderPasses.emplace_back(std::make_unique<CullingPass>());
 
-	if (!mRenderQueue.get<std::vector<RenderGroup> >("deferred").empty()) {
+	if (!mRenderQueue->get<std::vector<RenderGroup> >("deferred").empty()) {
 		mRenderPasses.emplace_back(std::make_unique<DeferredGeometryPass>());
 		mRenderPasses.emplace_back(std::make_unique<SSAOPass>());
 		mRenderPasses.emplace_back(std::make_unique<DeferredLightingPass>());
 	}
 
-	if (!mRenderQueue.get<std::vector<RenderGroup> >("opaque").empty() ||
-	    !mRenderQueue.get<std::vector<RenderGroup> >("blend").empty()) {
+	if (!mRenderQueue->get<std::vector<RenderGroup> >("opaque").empty() ||
+	    !mRenderQueue->get<std::vector<RenderGroup> >("blend").empty()) {
 		mRenderPasses.emplace_back(std::make_unique<ForwardPass>());
 	}
 
-	if (!mRenderQueue.get<std::vector<RenderGroup> >("debug").empty()) {
+	if (!mRenderQueue->get<std::vector<RenderGroup> >("debug").empty()) {
 		mRenderPasses.emplace_back(std::make_unique<DebugPass>());
 	}
 
-	if (!mRenderQueue.get<std::vector<InstanceGroup> >("opaqueInstanced").empty() ||
-	    !mRenderQueue.get<std::vector<InstanceGroup> >("blendInstanced").empty()) {
+	if (!mRenderQueue->get<std::vector<InstanceGroup> >("opaqueInstanced").empty() ||
+	    !mRenderQueue->get<std::vector<InstanceGroup> >("blendInstanced").empty()) {
 		mRenderPasses.emplace_back(std::make_unique<InstancedPass>());
 	}
 
-	if (!mRenderQueue.get<std::vector<RenderGroup> >("terrain").empty()) {
+	if (!mRenderQueue->get<std::vector<RenderGroup> >("terrain").empty()) {
 		mRenderPasses.emplace_back(std::make_unique<TerrainPass>());
 	}
 
@@ -278,20 +282,20 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 	auto modelMat = math::modelMatrix(transform.position, transform.rotation, transform.scale);
 	auto normalMat = math::normalMatrix(modelMat);
 
-	mRenderData.entity.positions.push_back(transform.position);
-	mRenderData.entity.rotations.push_back(transform.rotation);
-	mRenderData.entity.scales.push_back(transform.scale);
-	mRenderData.entity.models.push_back(modelMat);
-	mRenderData.entity.normals.push_back(normalMat);
+	mRenderData->entity.positions.push_back(transform.position);
+	mRenderData->entity.rotations.push_back(transform.rotation);
+	mRenderData->entity.scales.push_back(transform.scale);
+	mRenderData->entity.models.push_back(modelMat);
+	mRenderData->entity.normals.push_back(normalMat);
 
 	auto bv = entity.getComponent<BoundingVolumeComponent>().bv;
-	mRenderData.entity.centers.push_back(bv->center());
-	mRenderData.entity.extents.push_back(bv->extents());
+	mRenderData->entity.centers.push_back(bv->center());
+	mRenderData->entity.extents.push_back(bv->extents());
 
-	mRenderData.entity.debugModes.emplace_back(0);
+	mRenderData->entity.debugModes.emplace_back(0);
 
 	auto& matComponent = entity.getComponent<MaterialComponent>();
-	mRenderData.entity.heightScales.emplace_back(matComponent.heightScale);
+	mRenderData->entity.heightScales.emplace_back(matComponent.heightScale);
 
 
 	struct PassRule {
@@ -310,23 +314,23 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 
 		for (const auto& mesh: meshes) {
 			meshIndices.push_back(meshIndex++);
-			mRenderData.mesh.vaos.push_back(mesh.vao().id());
-			mRenderData.mesh.vertexCounts.push_back(mesh.vertices().size());
-			mRenderData.mesh.indexCounts.push_back(mesh.indices().size());
-			mRenderData.mesh.maxCounts.push_back(mesh.max());
-			mRenderData.mesh.minCounts.push_back(mesh.min());
+			mRenderData->mesh.vaos.push_back(mesh.vao().id());
+			mRenderData->mesh.vertexCounts.push_back(mesh.vertices().size());
+			mRenderData->mesh.indexCounts.push_back(mesh.indices().size());
+			mRenderData->mesh.maxCounts.push_back(mesh.max());
+			mRenderData->mesh.minCounts.push_back(mesh.min());
 		}
 
 		auto& material = matComponent.materials->at(matID);
 		material.idx = materialIndex++;
 
-		mRenderData.material.flags.push_back(material.flags);
-		mRenderData.material.textureTargets.push_back(material.textureTarget);
-		mRenderData.material.alphaCutoffs.push_back(material.alphaCutoff);
-		mRenderData.material.colors.push_back(material.color);
+		mRenderData->material.flags.push_back(material.flags);
+		mRenderData->material.textureTargets.push_back(material.textureTarget);
+		mRenderData->material.alphaCutoffs.push_back(material.alphaCutoff);
+		mRenderData->material.colors.push_back(material.color);
 
 		for (const auto& texture: material.textures) {
-			mRenderData.material.textures.push_back(texture.id);
+			mRenderData->material.textures.push_back(texture.id);
 		}
 
 		size_t textureCount = material.textures.size();
@@ -349,21 +353,21 @@ void RenderPipeline::batchEntity(const Entity& entity) {
 		}
 
 		if (matComponent.renderFlag == SKYBOX_PASS) {
-			mRenderQueue.get<std::vector<RenderGroup> >("skybox").push_back(group);
+			mRenderQueue->get<std::vector<RenderGroup> >("skybox").push_back(group);
 		} else if (matComponent.renderFlag == TERRAIN_PASS) {
-			mRenderQueue.get<std::vector<RenderGroup> >("terrain").push_back(group);
+			mRenderQueue->get<std::vector<RenderGroup> >("terrain").push_back(group);
 		}
 
 		if (entity.hasComponent<DebugComponent>()) {
-			mRenderQueue.get<std::vector<RenderGroup> >("debug").push_back(group);
+			mRenderQueue->get<std::vector<RenderGroup> >("debug").push_back(group);
 		}
 
 		for (const auto& [flags, queue, instancedQueue]: rules) {
 			if (material.flags & flags) {
 				if (isInstanced) {
-					mRenderQueue.get<std::vector<InstanceGroup> >(instancedQueue).push_back(instance);
+					mRenderQueue->get<std::vector<InstanceGroup> >(instancedQueue).push_back(instance);
 				} else {
-					mRenderQueue.get<std::vector<RenderGroup> >(queue).push_back(group);
+					mRenderQueue->get<std::vector<RenderGroup> >(queue).push_back(group);
 				}
 			}
 		}
@@ -378,8 +382,8 @@ void RenderPipeline::sortEntities() {
 			batch.begin(),
 			batch.end(),
 			[&camPos, &transparent, this](const RenderGroup& a, const RenderGroup& b) {
-				const auto aPos = mRenderData.entity.positions[a.entityID];
-				const auto bPos = mRenderData.entity.positions[b.entityID];
+				const auto aPos = mRenderData->entity.positions[a.entityID];
+				const auto bPos = mRenderData->entity.positions[b.entityID];
 
 				const float da = glm::length2(camPos - aPos);
 				const float db = glm::length2(camPos - bPos);
@@ -392,9 +396,9 @@ void RenderPipeline::sortEntities() {
 	};
 
 	// Sort opaque objects front to back
-	sortBatches(mRenderQueue.get<std::vector<RenderGroup> >("deferred"), false);
-	sortBatches(mRenderQueue.get<std::vector<RenderGroup> >("opaque"), false);
-	sortBatches(mRenderQueue.get<std::vector<RenderGroup> >("blend"), true);
+	sortBatches(mRenderQueue->get<std::vector<RenderGroup> >("deferred"), false);
+	sortBatches(mRenderQueue->get<std::vector<RenderGroup> >("opaque"), false);
+	sortBatches(mRenderQueue->get<std::vector<RenderGroup> >("blend"), true);
 
 	// for (auto& [entity, transforms, materials]: renderQueues.blendInstancedGroup) {
 	// 	auto transform = *transforms;

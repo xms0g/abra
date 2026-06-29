@@ -1,10 +1,10 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "renderContext/renderData.hpp"
-#include "renderContext/renderQueue.hpp"
 #include "../ECS/system.hpp"
 
+class RenderQueue;
+struct RenderData;
 class SyncStateSystem;
 class EventBus;
 class SSAOPass;
@@ -53,9 +53,9 @@ private:
 	// Uniform Buffers
 	std::unique_ptr<UniformBuffer> mCameraUBO;
 	// Render Data
-	RenderData mRenderData;
+	std::unique_ptr<RenderData> mRenderData;
 	// Render Queue
-	RenderQueue mRenderQueue;
+	std::unique_ptr<RenderQueue> mRenderQueue;
 	// Render context
 	std::unique_ptr<RenderContext> mRenderCtx;
 	// Render passes
