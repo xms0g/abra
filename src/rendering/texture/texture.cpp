@@ -45,7 +45,7 @@ uint32_t Texture::load(const std::string& path, const uint32_t flags, const bool
 		exit(1);
 	}
 
-	const uint32_t internalFormat = isSRGB ? GL_SRGB8_ALPHA8 : GL_RGBA8;
+	const int32_t internalFormat = isSRGB ? GL_SRGB8_ALPHA8 : GL_RGBA8;
 
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
