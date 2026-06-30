@@ -22,7 +22,7 @@ int main() {
 		engine.init(&registry);
 
 		rm.createShaders();
-		SceneLoader::loadScene(registry, "assets/scenes/scene_Sponza_Spotlight.json");
+		SceneLoader::loadScene(registry, "scenes/scene_Sponza_Spotlight.json");
 		rm.createBuffers();
 
 		registry.update();
