@@ -5,7 +5,6 @@ class RenderPipeline;
 class GuiSystem;
 class Window;
 class Registry;
-class Input;
 class Camera;
 class EventBus;
 
@@ -32,6 +31,5 @@ private:
 	RenderPipeline* mRenderPipeline{};
 	std::unique_ptr<Window> mWindow;
 	std::unique_ptr<Camera> mCamera;
-	std::unique_ptr<Input> mInput;
 	std::unique_ptr<EventBus> mEventBus;
 };

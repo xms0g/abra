@@ -30,7 +30,6 @@ void Engine::init(Registry* registry) {
 	mRenderPipeline = &registry->addSystem<RenderPipeline>(mRegistry, mWindow->nativeHandle(), mWindow->glContext());
 
 	mCamera = std::make_unique<Camera>(glm::vec3(0.0f, 2.0f, 5.0f));
-	mInput = std::make_unique<Input>();
 	mEventBus = std::make_unique<EventBus>();
 }
 
@@ -47,13 +46,13 @@ void Engine::run() {
 		mDeltaTime = static_cast<float>(SDL_GetTicks() - mMillisecsPreviousFrame) / 1000.0f;
 		mMillisecsPreviousFrame = SDL_GetTicks();
 
-		mInput->process(*mEventBus, mWindow->nativeHandle(), mDeltaTime, isRunning);
+		Input::process(*mEventBus, mWindow->nativeHandle(), mDeltaTime, isRunning);
 		mCamera->update();
 		mGuiSystem->update(mDeltaTime);
 
 		mRenderPipeline->render();
 		mGuiSystem->render(*mEventBus);
-		mRenderPipeline->drawGui();
+		RenderPipeline::drawGui();
 
 		// SDL swap buffers
 		mWindow->swapBuffer();
