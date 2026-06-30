@@ -13,6 +13,7 @@ void ConfigManager::load(const std::string& filepath) {
 
 		set("path.shader", std::string(config["paths"]["shader_dir"].value_or("")));
 		set("path.asset", std::string(config["paths"]["asset_dir"].value_or("")));
+		set("path.scene", std::string(config["paths"]["scene_dir"].value_or("")));
 
 		set("window.title", std::string(config["window"]["title"].value_or("Test Engine")));
 		set("window.fullscreen", config["window"]["fullscreen"].value_or(false));

@@ -4,6 +4,7 @@
 #include "glm/glm.hpp"
 #include "nlohmann/json.hpp"
 #include "resourceManager.h"
+#include "../config/configManager.h"
 #include "../io/filesystem.hpp"
 #include "../ECS/registry.h"
 #include "../ECS/components/transform.hpp"
@@ -34,7 +35,7 @@ glm::vec3 parseVec3(const json& j) {
 }
 
 void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
-	std::ifstream file(fs::path(filePath));
+	std::ifstream file(fs::path(cfg.get<std::string>("path.scene") + filePath));
 	if (!file.is_open()) {
 		throw std::runtime_error(std::format("Failed to open scene file: {}", filePath));
 	}

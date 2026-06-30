@@ -74,12 +74,16 @@ It’s designed for clarity, experimentation, and real-time graphics research �
 ![Screenshot4](assets/screenshot4.png)
 ![Tessellation](assets/screenshot6.png)
 
-
 ## Controls
 | Key  | Action                   |
 |------|--------------------------|
 | WASD | Move                     |
 | RMB  | enable/disable Free Look |
+
+## RUN
+```bash
+➜  ~ ./abra scene_Sponza_Spotlight.json
+```
 ## Roadmap
 - [ ] Cascaded shadow maps
 ## License

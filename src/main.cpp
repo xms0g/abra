@@ -13,16 +13,23 @@
 #define STRINGIFY(s) STRINGIFY0(s)
 #define VERSION STRINGIFY(VERSION_MAJOR) "." STRINGIFY(VERSION_MINOR) "." STRINGIFY(VERSION_PATCH)
 
-int main() {
-	Registry registry;
-
+int main(int argc, char **argv) {
 	try {
+		std::string sceneName;
+		if (argc > 1) {
+			sceneName = argv[1];
+		} else {
+			throw std::runtime_error("No scene specified");
+		}
+
+		Registry registry;
 		Engine engine;
+
 		cfg.load("config.toml");
 		engine.init(&registry);
 
 		rm.createShaders();
-		SceneLoader::loadScene(registry, "scenes/scene_Sponza_Spotlight.json");
+		SceneLoader::loadScene(registry, sceneName);
 		rm.createBuffers();
 
 		registry.update();
