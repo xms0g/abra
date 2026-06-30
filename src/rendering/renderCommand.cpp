@@ -31,13 +31,18 @@ void RenderCommand::forward(const RenderContext& ctx, const std::vector<Renderab
 }
 
 void RenderCommand::instanced(const RenderContext& ctx, const std::vector<InstanceGroup>& objects) {
+	const Shader* lastShader{nullptr};
+
 	for (const auto& obj: objects) {
 		const size_t count = obj.transforms.size() / 9;
 
 		const auto& [materialIdx, textureOffset, textureCount, shader, meshes] = obj.matBatch;
-		shader->activate();
+		if (lastShader != shader) {
+			lastShader = shader;
+			lastShader->activate();
+		}
 
-		setupMaterial(obj.entityID, materialIdx, textureOffset, textureCount, ctx, *shader);
+		setupMaterial(obj.entityID, materialIdx, textureOffset, textureCount, ctx, *lastShader);
 
 		for (const auto& meshIdx: meshes) {
 			const uint32_t vao = ctx.renderData->mesh.vaos[meshIdx];
