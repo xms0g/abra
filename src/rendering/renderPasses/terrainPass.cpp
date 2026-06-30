@@ -39,6 +39,6 @@ void TerrainPass::execute(const RenderContext& ctx) {
 	const size_t count = ctx.renderData->mesh.vertexCounts[meshIdx];
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	RenderCommand::drawPatch(vao, count);
+	RenderCommand::drawPatch(vao, static_cast<int32_t>(count));
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
