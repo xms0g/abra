@@ -48,7 +48,6 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 		json componentsJson;
 		bool isPrimitive{false};
 		std::string primitiveType;
-		std::string shader;
 	};
 
 	std::vector<DeferredEntity> deferredEntities;
@@ -69,9 +68,6 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 			deferred.primitiveType = entityData["primitive"];
 		}
 
-		if (entityData.contains("shader")) {
-			deferred.shader = entityData["shader"];
-		}
 		deferredEntities.push_back(deferred);
 	}
 
@@ -79,7 +75,7 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 	rm.waitForAll();
 
 	// Assemble Components
-	for (auto& [entity, comps, isPrimitive, primType, shaderName]: deferredEntities) {
+	for (auto& [entity, comps, isPrimitive, primType]: deferredEntities) {
 		if (isPrimitive && (primType == "Cube" || primType == "Plane" || primType == "Terrain")) {
 			glm::vec3 color{0.0f};
 			bool unlit{false};
@@ -87,6 +83,7 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 			std::string specularTexture;
 			std::string normalTexture;
 			std::string heightTexture;
+			std::string shaderName;
 
 			auto matCom = comps["MaterialComponent"];
 
@@ -113,14 +110,18 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 				heightTexture = matCom["height_texture"].get<std::string>();
 			}
 
-			auto uploadPrimitives = [&entity, &shaderName]<typename T>(
-				const glm::vec3& c,
-				bool u,
-				const std::string& albedo,
-				const std::string& specular,
-				const std::string& normal,
-				const std::string& height) {
-				T model{c, u, TEXTURE_PTR(albedo), TEXTURE_PTR(specular), TEXTURE_PTR(normal), TEXTURE_PTR(height)};
+			if (matCom.contains("shader")) {
+				shaderName = matCom["shader"].get<std::string>();
+			}
+
+			auto uploadPrimitives = [&]<typename T>() {
+				T model{
+					color,
+					unlit,
+					TEXTURE_PTR(albedoTexture),
+					TEXTURE_PTR(specularTexture),
+					TEXTURE_PTR(normalTexture),
+					TEXTURE_PTR(heightTexture)};
 
 				auto& mat = model.material();
 				mat[0].shader = rm.get<Shader>(shaderName);
@@ -130,33 +131,20 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 			};
 
 			if (primType == "Cube") {
-				uploadPrimitives.operator()<Model::Cube>(
-					color,
-					unlit,
-					albedoTexture,
-					specularTexture,
-					normalTexture,
-					heightTexture);
+				uploadPrimitives.operator()<Model::Cube>();
 			} else if (primType == "Plane") {
-				uploadPrimitives.operator()<Model::Plane>(
-					color,
-					unlit,
-					albedoTexture,
-					specularTexture,
-					normalTexture,
-					heightTexture);
+				uploadPrimitives.operator()<Model::Plane>();
 			} else if (primType == "Terrain") {
-				uploadPrimitives.operator()<Model::Terrain>(
-					color,
-					unlit,
-					albedoTexture,
-					specularTexture,
-					normalTexture,
-					heightTexture
-				);
+				uploadPrimitives.operator()<Model::Terrain>();
 			}
 		} else if (isPrimitive && primType == "Cubemap") {
+			std::string shaderName;
 			auto faces = comps["SkyboxComponent"]["faces"].get<std::vector<std::string> >();
+			auto matCom = comps["MaterialComponent"];
+
+			if (matCom.contains("shader")) {
+				shaderName = matCom["shader"].get<std::string>();
+			}
 
 			Model::Cubemap cubemap{faces};
 
@@ -173,6 +161,7 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 			std::string orm;
 
 			auto matCom = comps["MaterialComponent"];
+
 			if (matCom.contains("color")) {
 				color = parseVec3(matCom["color"]);
 			}
@@ -196,9 +185,6 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 				TEXTURE_PTR(normal),
 				TEXTURE_PTR(orm)
 			};
-
-			auto& mat = sphere.material();
-			mat[0].shader = rm.get<Shader>(shaderName);
 
 			rm.upload<MeshMap>(entity.id(), sphere.meshes());
 			rm.upload<MaterialMap>(entity.id(), sphere.material());

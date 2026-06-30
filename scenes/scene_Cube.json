@@ -4,7 +4,6 @@
     {
       "name": "Skybox",
       "primitive": "Cubemap",
-      "shader": "skybox",
       "components": {
         "TransformComponent": {
           "position": [0.0, 0.0, 0.0],
@@ -12,7 +11,10 @@
           "scale": [1.0, 1.0, 1.0]
         },
         "MeshComponent": { "from_resource_manager": true },
-        "MaterialComponent": { "from_resource_manager": true },
+        "MaterialComponent": {
+          "shader": "skybox",
+          "from_resource_manager": true
+        },
         "SkyboxComponent": {
           "faces": [
             "skybox/right.jpg",
@@ -29,7 +31,6 @@
     {
       "name": "Cube",
       "primitive": "Cube",
-      "shader": "opaque",
       "components": {
         "TransformComponent": {
           "position": [-3.2, 5.0, 0.0],
@@ -39,7 +40,8 @@
         "MeshComponent": { "from_resource_manager": true },
         "MaterialComponent": {
           "color": [0.0, 1.0, 1.0, 1.0],
-          "unlit": true,
+          "unlit": false,
+          "shader": "opaque",
           "from_resource_manager": true
         },
         "BoundingVolumeComponent": { "type": "AABB" }
@@ -48,7 +50,6 @@
     {
       "name": "Directional Light",
       "primitive": "Cube",
-      "shader": "unlit",
       "components": {
         "TransformComponent": {
           "position": [-3.2, 5.0, 0.0],
@@ -59,6 +60,7 @@
         "MaterialComponent": {
           "color": [1.0, 1.0, 1.0],
           "unlit": true,
+          "shader": "unlit",
           "from_resource_manager": true
         },
         "DirectionalLightComponent": {

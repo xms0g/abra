@@ -4,7 +4,6 @@
     {
       "name": "Skybox",
       "primitive": "Cubemap",
-      "shader": "skybox",
       "components": {
         "TransformComponent": {
           "position": [0.0, 0.0, 0.0],
@@ -12,7 +11,10 @@
           "scale": [1.0, 1.0, 1.0]
         },
         "MeshComponent": { "from_resource_manager": true },
-        "MaterialComponent": { "from_resource_manager": true },
+        "MaterialComponent": {
+          "shader": "skybox",
+          "from_resource_manager": true
+        },
         "SkyboxComponent": {
           "faces": [
             "skybox/right.jpg",
@@ -29,7 +31,6 @@
     {
       "name": "Terrain",
       "primitive": "Terrain",
-      "shader": "terrain",
       "components": {
         "TransformComponent": {
           "position": [0.0, 0.0, 0.0],
@@ -40,6 +41,7 @@
         "MaterialComponent": {
           "height_texture": "textures/iceland_heightmap.png",
           "height_scale": 64.0,
+          "shader": "terrain",
           "from_resource_manager": true
         },
         "BoundingVolumeComponent": { "type": "AABB" },
@@ -49,7 +51,6 @@
     {
       "name": "Directional Light",
       "primitive": "Cube",
-      "shader": "unlit",
       "components": {
         "TransformComponent": {
           "position": [-3.2, 5.0, 0.0],
@@ -60,6 +61,7 @@
         "MaterialComponent": {
           "color": [1.0, 1.0, 1.0],
           "unlit": true,
+          "shader": "unlit",
           "from_resource_manager": true
         },
         "DirectionalLightComponent": {

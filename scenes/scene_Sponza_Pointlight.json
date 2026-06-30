@@ -4,7 +4,6 @@
     {
       "name": "Skybox",
       "primitive": "Cubemap",
-      "shader": "skybox",
       "components": {
         "TransformComponent": {
           "position": [0.0, 0.0, 0.0],
@@ -12,7 +11,10 @@
           "scale": [1.0, 1.0, 1.0]
         },
         "MeshComponent": { "from_resource_manager": true },
-        "MaterialComponent": { "from_resource_manager": true },
+        "MaterialComponent": {
+          "shader": "skybox",
+          "from_resource_manager": true
+        },
         "SkyboxComponent": {
           "faces": [
             "textures/hdr/newport_loft.hdr"
@@ -23,7 +25,6 @@
     },
     {
       "name": "Helmet",
-      "shader": "opaque",
       "model_path": "DamagedHelmet/glTF/DamagedHelmet.gltf",
       "components": {
         "TransformComponent": {
@@ -39,7 +40,6 @@
     },
     {
       "name": "Sponza",
-      "shader": "opaque",
       "model_path": "Sponza/glTF/Sponza.gltf",
       "components": {
         "TransformComponent": {
@@ -56,7 +56,6 @@
     {
       "name": "Point Light",
       "primitive": "Cube",
-      "shader": "unlit",
       "components": {
         "TransformComponent": {
           "position": [-3.2, 5.0, 0.0],
@@ -67,6 +66,7 @@
         "MaterialComponent": {
           "color": [1.0, 1.0, 1.0],
           "unlit": true,
+          "shader": "unlit",
           "from_resource_manager": true
         },
         "PointLightComponent": {
