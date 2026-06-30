@@ -3,12 +3,16 @@
 #include "../shader.h"
 #include "../buffers/frameBuffer.h"
 #include "../buffers/uniformBuffer.h"
+#include "../buffers/vertexBuffer.h"
 #include "../texture/texture.h"
 #include "../models/quad.h"
+#include "../mesh/vertexArray.h"
 #include "../renderContext/renderContext.hpp"
 #include "../renderCommand.h"
 #include "../../config/configManager.h"
 #include "../../math/random.h"
+
+SSAOPass::SSAOPass() = default;
 
 SSAOPass::~SSAOPass() = default;
 

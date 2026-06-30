@@ -13,6 +13,7 @@ class SingleQuad;
 
 class SSAOPass final : public IRenderPass {
 public:
+	SSAOPass();
 	~SSAOPass() override;
 
 	void configure(RenderContext& ctx, EventBus& eventBus) override;

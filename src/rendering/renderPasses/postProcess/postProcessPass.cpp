@@ -12,11 +12,15 @@
 #include "../../shader.h"
 #include "../../renderCommand.h"
 #include "../../buffers/frameBuffer.h"
+#include "../../buffers/vertexBuffer.h"
 #include "../../models/quad.h"
+#include "../../mesh/vertexArray.h"
 #include "../../renderContext/renderContext.hpp"
 #include "../../../event/eventBus.hpp"
 #include "../../../event/events/guiPostProcessEvent.hpp"
 #include "../../../config/configManager.h"
+
+PostProcessPass::PostProcessPass() = default;
 
 PostProcessPass::~PostProcessPass() = default;
 

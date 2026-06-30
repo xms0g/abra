@@ -75,8 +75,8 @@ void Mesh::enableInstanceAttributes(const uint32_t vao, const size_t offset) {
 
 	VertexLayout instancingLayout;
 
-	instancingLayout.pushMatrix<glm::mat4>(7, 1); // Model Matrix (slots 7-10)
-	instancingLayout.pushMatrix<glm::mat3>(11, 1); // Normal Matrix (slots 11-13)
+	instancingLayout.pushMatrix<glm::mat4>(7); // Model Matrix (slots 7-10)
+	instancingLayout.pushMatrix<glm::mat3>(11); // Normal Matrix (slots 11-13)
 	instancingLayout.addPadding(sizeof(glm::vec3)); // padding
 
 	for (const auto& [type, index, size, normalized, attrOffset, divisor]: instancingLayout.attributes()) {

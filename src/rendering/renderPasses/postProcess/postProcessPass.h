@@ -16,6 +16,7 @@ class Shader;
 
 class PostProcessPass final : public IRenderPass {
 public:
+	PostProcessPass();
 	~PostProcessPass() override;
 
 	void configure(RenderContext& ctx, EventBus& eventBus) override;

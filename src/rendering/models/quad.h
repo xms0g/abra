@@ -1,6 +1,8 @@
 #pragma once
 #include <memory>
 
+class VertexArray;
+class VertexBuffer;
 class Shader;
 
 class IQuad {
@@ -10,10 +12,11 @@ public:
 	virtual ~IQuad();
 
 	[[nodiscard]]
-	uint32_t vao() const { return mVAO; }
+	uint32_t vao() const;
 
 protected:
-	uint32_t mVAO{0}, mVBO{0};
+	std::unique_ptr<VertexArray> mVAO;
+	std::unique_ptr<VertexBuffer> mVBO;
 };
 
 namespace Model {

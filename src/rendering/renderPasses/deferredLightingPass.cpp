@@ -4,10 +4,14 @@
 #include "../renderCommand.h"
 #include "../buffers/frameBuffer.h"
 #include "../buffers/uniformBuffer.h"
+#include "../buffers//vertexBuffer.h"
 #include "../mesh/mesh.h"
+#include "../mesh/vertexArray.h"
 #include "../models/quad.h"
 #include "../renderContext/renderContext.hpp"
 #include "../../config/configManager.h"
+
+DeferredLightingPass::DeferredLightingPass()= default;
 
 DeferredLightingPass::~DeferredLightingPass() = default;
 

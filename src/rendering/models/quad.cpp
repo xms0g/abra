@@ -1,5 +1,7 @@
 #include "quad.h"
 #include "glad/glad.h"
+#include "../mesh/vertexArray.h"
+#include "../buffers/vertexBuffer.h"
 #include "../../rendering/shader.h"
 
 IQuad::IQuad() {
@@ -14,21 +16,30 @@ IQuad::IQuad() {
 		 1.0f,  1.0f,  1.0f, 1.0f
 	};
 
-	glGenVertexArrays(1, &mVAO);
-	glBindVertexArray(mVAO);
+	mVAO = std::make_unique<VertexArray>();
+	mVAO->bind();
 
-	glGenBuffers(1, &mVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), reinterpret_cast<void*>(2 * sizeof(float)));
+	mVBO = std::make_unique<VertexBuffer>(STATIC);
+	mVBO->bind();
+
+	mVBO->setData(&vertices[0], sizeof(vertices), 0);
+
+	VertexLayout layout;
+	layout.pushVector<glm::vec2>(0);	// Position
+	layout.pushVector<glm::vec2>(1);	// TexCoords
+
+	for (const auto& [type, index, size, normalized, offset, divisor]: layout.attributes()) {
+		const auto pointer = reinterpret_cast<void*>(offset);
+		mVAO->setAttribute(index, size, type, normalized ? GL_TRUE : GL_FALSE, layout.stride(), pointer);
+	}
+
+	mVAO->unbind();
 }
 
-IQuad::~IQuad() {
-	glDeleteBuffers(1, &mVBO);
-	glDeleteVertexArrays(1, &mVAO);
+IQuad::~IQuad() = default;
+
+uint32_t IQuad::vao() const {
+	return mVAO->id();
 }
 
 Model::Quad::Quad() {
