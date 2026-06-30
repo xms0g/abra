@@ -40,8 +40,8 @@
         "MeshComponent": { "from_resource_manager": true },
         "MaterialComponent": {
           "color": [0.0, 1.0, 1.0, 1.0],
-          "unlit": false,
-          "shader": "opaque",
+          "unlit": true,
+          "shader": "unlit",
           "from_resource_manager": true
         },
         "BoundingVolumeComponent": { "type": "AABB" }

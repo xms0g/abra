@@ -31,7 +31,7 @@ public:
 
 	void configure(const Camera& camera, EventBus& eventBus);
 
-	void batchEntities();
+	void batchEntities() const;
 
 	void render();
 

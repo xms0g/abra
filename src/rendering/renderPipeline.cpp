@@ -231,7 +231,7 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	}
 }
 
-void RenderPipeline::batchEntities() {
+void RenderPipeline::batchEntities() const {
 	for (const auto& entity: getSystemEntities()) {
 		batchEntity(entity);
 	}
