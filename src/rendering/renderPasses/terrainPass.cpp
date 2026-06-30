@@ -28,7 +28,7 @@ void TerrainPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
 
 	const auto& [entityID, matb] = mObjects->front();
-	const auto [materialIdx, textureOffset, textureCount, shader, meshes] = matb;
+	const auto& [materialIdx, textureOffset, textureCount, shader, meshes] = matb;
 	const uint32_t meshIdx = meshes.front();
 	const uint32_t vao = ctx.renderData->mesh.vaos[meshIdx];
 
