@@ -109,7 +109,7 @@ void GuiPanels::renderDirLight(const Entity& entity, EventBus& eventBus) {
 			0.0f,
 			0.0f,
 			0.0f,
-			0.0f,
+			dirLight.intensity,
 			true);
 	}
 }

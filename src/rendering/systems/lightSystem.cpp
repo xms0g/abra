@@ -170,7 +170,7 @@ void LightSystem::onGuiUpdate(const GuiLightEvent& event) {
 				light.specular = event.specular;
 				light.intensity = event.intensity;
 
-				mDirLights[0] = &light;
+				mDirLights[event.lightIdx] = &light;
 			} else if (entity.hasComponent<PointLightComponent>()) {
 				auto& light = entity.getComponent<PointLightComponent>();
 
