@@ -39,7 +39,7 @@ public:
 
 	void bind() const;
 
-	void unbind() const;
+	static void unbind();
 
 	static void enableInstanceAttributes(uint32_t vao, size_t offset);
 

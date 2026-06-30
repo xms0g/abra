@@ -20,7 +20,8 @@ public:
 		int32_t type,
 		bool normalized,
 		int32_t stride,
-		const void* offset);
+		const void* offset,
+		uint32_t divisor);
 
 private:
 	uint32_t mID{};

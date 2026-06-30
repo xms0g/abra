@@ -21,8 +21,7 @@ struct VertexAttribute {
 // Vertex Layout
 class VertexLayout {
 public:
-	VertexLayout() : mStride(0) {
-	}
+	VertexLayout() = default;
 
 	[[nodiscard]]
 	const std::vector<VertexAttribute>& attributes() const;
@@ -43,7 +42,7 @@ public:
 
 private:
 	std::vector<VertexAttribute> mAttributes;
-	int32_t mStride;
+	int32_t mStride{0};
 };
 
 template<typename T>

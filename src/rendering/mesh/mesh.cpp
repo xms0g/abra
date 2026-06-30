@@ -66,8 +66,8 @@ void Mesh::bind() const {
 	mVAO->bind();
 }
 
-void Mesh::unbind() const {
-	mVAO->unbind();
+void Mesh::unbind() {
+	VertexArray::unbind();
 }
 
 void Mesh::enableInstanceAttributes(const uint32_t vao, const size_t offset) {
@@ -81,9 +81,8 @@ void Mesh::enableInstanceAttributes(const uint32_t vao, const size_t offset) {
 
 	for (const auto& [type, index, size, normalized, attrOffset, divisor]: instancingLayout.attributes()) {
 		const auto finalPointer = reinterpret_cast<void*>(offset + attrOffset);
-		glEnableVertexAttribArray(index);
-		glVertexAttribPointer(index, size, type, normalized ? GL_TRUE : GL_FALSE, instancingLayout.stride(), finalPointer);
-		glVertexAttribDivisor(index, divisor);
+
+		VertexArray::setAttribute(index, size, type, normalized ? GL_TRUE : GL_FALSE, instancingLayout.stride(), finalPointer, divisor);
 	}
 }
 
@@ -114,8 +113,8 @@ void Mesh::uploadToGPU() {
 
 	for (const auto& [type, index, size, normalized, offset, divisor]: layout.attributes()) {
 		const auto pointer = reinterpret_cast<void*>(offset);
-		mVAO->setAttribute(index, size, type, normalized ? GL_TRUE : GL_FALSE, layout.stride(), pointer);
+		VertexArray::setAttribute(index, size, type, normalized ? GL_TRUE : GL_FALSE, layout.stride(), pointer, divisor);
 	}
 
-	mVAO->unbind();
+	VertexArray::unbind();
 }

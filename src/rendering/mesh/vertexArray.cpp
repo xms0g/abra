@@ -27,7 +27,11 @@ void VertexArray::setAttribute(
 	const int32_t type,
 	const bool normalized,
 	const int32_t stride,
-	const void* offset) {
+	const void* offset,
+	const uint32_t divisor) {
 	glEnableVertexAttribArray(index);
 	glVertexAttribPointer(index, size, type, normalized, stride, offset);
+
+	if (divisor > 0)
+		glVertexAttribDivisor(index, divisor);
 }

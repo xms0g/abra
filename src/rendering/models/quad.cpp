@@ -30,10 +30,10 @@ IQuad::IQuad() {
 
 	for (const auto& [type, index, size, normalized, offset, divisor]: layout.attributes()) {
 		const auto pointer = reinterpret_cast<void*>(offset);
-		mVAO->setAttribute(index, size, type, normalized ? GL_TRUE : GL_FALSE, layout.stride(), pointer);
+		VertexArray::setAttribute(index, size, type, normalized ? GL_TRUE : GL_FALSE, layout.stride(), pointer, divisor);
 	}
 
-	mVAO->unbind();
+	VertexArray::unbind();
 }
 
 IQuad::~IQuad() = default;
