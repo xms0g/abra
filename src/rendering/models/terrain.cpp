@@ -11,10 +11,10 @@
 Model::Terrain::Terrain(
 	glm::vec3 color,
 	bool unlit,
-	const char* diffuseTexture,
-	const char* specularTexture,
-	const char* normalTexture,
-	const char* heightTexture) {
+	const std::string& diffuseTexture,
+	const std::string& specularTexture,
+	const std::string& normalTexture,
+	const std::string& heightTexture) {
 	std::string path = fs::path(cfg.get<std::string>("path.asset") + heightTexture);
 
 	int32_t width, height;
@@ -24,7 +24,7 @@ Model::Terrain::Terrain(
 
 	uint32_t rez = 20;
 	auto rezf = static_cast<float>(rez);
-	
+
 	for (uint32_t i = 0; i <= rez - 1; ++i) {
 		for (uint32_t j = 0; j <= rez - 1; ++j) {
 			v.push_back(-width / 2.0f + width * i / rezf); // v.x
@@ -65,7 +65,7 @@ Model::Terrain::Terrain(
 
 	uint32_t flags{0};
 	std::vector<Texture> textures;
-	if (heightTexture) {
+	if (!heightTexture.empty()) {
 		flags |= HAS_HEIGHT_MAP;
 		textures.emplace_back(0, HEIGHT, heightTexture);
 	}

@@ -10,9 +10,9 @@ public:
 	explicit Sphere(
 		glm::vec3 color = glm::vec3(1.0f),
 		bool unlit = false,
-		const char* albedo = nullptr,
-		const char* normal = nullptr,
-		const char* orm = nullptr);
+		const std::string& albedo = "",
+		const std::string& normal = "",
+		const std::string& orm = "");
 
 	~Sphere();
 

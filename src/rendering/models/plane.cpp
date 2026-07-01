@@ -8,10 +8,10 @@
 Model::Plane::Plane(
 	glm::vec3 color,
 	bool unlit,
-	const char* diffuseTexture,
-	const char* specularTexture,
-	const char* normalTexture,
-	const char* heightTexture) {
+	const std::string& diffuseTexture,
+	const std::string& specularTexture,
+	const std::string& normalTexture,
+	const std::string& heightTexture) {
 	constexpr float v[] = {
 		// Positions        // Normals		   // Texture Coords
 		5.0f, -0.5f, 5.0f, 0.0f, 1.0f, 0.0f, 2.0f, 0.0f, // top right
@@ -76,19 +76,19 @@ Model::Plane::Plane(
 
 	std::vector<Texture> textures;
 
-	if (diffuseTexture) {
-		textures.emplace_back(0, ALBEDO,diffuseTexture);
+	if (!diffuseTexture.empty()) {
+		textures.emplace_back(0, ALBEDO, diffuseTexture);
 	}
 
-	if (specularTexture) {
+	if (!specularTexture.empty()) {
 		textures.emplace_back(0, SPECULAR, specularTexture);
 	}
 
-	if (normalTexture) {
-		textures.emplace_back(0, NORMAL,  normalTexture);
+	if (!normalTexture.empty()) {
+		textures.emplace_back(0, NORMAL, normalTexture);
 	}
 
-	if (heightTexture) {
+	if (!heightTexture.empty()) {
 		textures.emplace_back(0, HEIGHT, heightTexture);
 	}
 

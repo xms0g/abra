@@ -8,9 +8,9 @@
 Model::Sphere::Sphere(
 	glm::vec3 color,
 	bool unlit,
-	const char* albedo,
-	const char* normal,
-	const char* orm) {
+	const std::string& albedo,
+	const std::string& normal,
+	const std::string& orm) {
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec2> uv;
@@ -116,15 +116,15 @@ Model::Sphere::Sphere(
 
 	uint32_t flags{0};
 	std::vector<Texture> textures;
-	if (albedo) {
+	if (!albedo.empty()) {
 		textures.emplace_back(0, ALBEDO, albedo);
 	}
 
-	if (normal) {
+	if (!normal.empty()) {
 		textures.emplace_back(0,NORMAL,  normal);
 	}
 
-	if (orm) {
+	if (!orm.empty()) {
 		textures.emplace_back(0, ROUGHNESS_METALLIC,  orm);
 		flags |= PBR;
 		flags |= HAS_ORM;

@@ -8,10 +8,10 @@
 Model::Cube::Cube(
 	glm::vec3 color,
 	bool unlit,
-	const char* diffuseTexture,
-	const char* specularTexture,
-	const char* normalTexture,
-	const char* heightTexture) {
+	const std::string& diffuseTexture,
+	const std::string& specularTexture,
+	const std::string& normalTexture,
+	const std::string& heightTexture) {
 	constexpr float v[] = {
 		// Back face (-Z)
 		-0.5f, -0.5f, -0.5f, 0, 0, -1, 0, 0,
@@ -122,19 +122,19 @@ Model::Cube::Cube(
 
 	std::vector<Texture> textures;
 
-	if (diffuseTexture) {
+	if (!diffuseTexture.empty()) {
 		textures.emplace_back(0, ALBEDO, diffuseTexture);
 	}
 
-	if (specularTexture) {
+	if (!specularTexture.empty()) {
 		textures.emplace_back(0, SPECULAR, specularTexture);
 	}
 
-	if (normalTexture) {
+	if (!normalTexture.empty()) {
 		textures.emplace_back(0, NORMAL, normalTexture);
 	}
 
-	if (heightTexture) {
+	if (!heightTexture.empty()) {
 		textures.emplace_back(0, HEIGHT, heightTexture);
 	}
 

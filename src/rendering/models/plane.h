@@ -10,10 +10,10 @@ public:
 	explicit Plane(
 		glm::vec3 color = glm::vec3(1.0f),
 		bool unlit = false,
-		const char* diffuseTexture = nullptr,
-		const char* specularTexture = nullptr,
-		const char* normalTexture = nullptr,
-		const char* heightTexture = nullptr);
+		const std::string& diffuseTexture = "",
+		const std::string& specularTexture = "",
+		const std::string& normalTexture = "",
+		const std::string& heightTexture = "");
 
 	~Plane();
 

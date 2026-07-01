@@ -26,8 +26,6 @@
 #include "../rendering/models/terrain.h"
 #include "../rendering/renderContext/renderFlags.hpp"
 
-#define TEXTURE_PTR(tex) (!(tex).empty() ? (tex).c_str() : nullptr)
-
 using json = nlohmann::json;
 
 glm::vec3 parseVec3(const json& j) {
@@ -116,13 +114,7 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 			}
 
 			auto uploadPrimitives = [&]<typename T>() {
-				T model{
-					color,
-					unlit,
-					TEXTURE_PTR(albedoTexture),
-					TEXTURE_PTR(specularTexture),
-					TEXTURE_PTR(normalTexture),
-					TEXTURE_PTR(heightTexture)};
+				T model{color, unlit, albedoTexture, specularTexture, normalTexture, heightTexture};
 
 				auto& mat = model.material();
 				mat[0].shader = rm.get<Shader>(shaderName);
@@ -179,13 +171,7 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 				orm = matCom["orm"].get<std::string>();
 			}
 
-			Model::Sphere sphere{
-				color,
-				unlit,
-				TEXTURE_PTR(albedo),
-				TEXTURE_PTR(normal),
-				TEXTURE_PTR(orm)
-			};
+			Model::Sphere sphere{color, unlit, albedo, normal, orm};
 
 			rm.upload<MeshMap>(entity.id(), sphere.meshes());
 			rm.upload<MaterialMap>(entity.id(), sphere.material());
