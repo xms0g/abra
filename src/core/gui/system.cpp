@@ -26,7 +26,6 @@ void GuiSystem::update(const float dt) {
 
 void GuiSystem::render(EventBus& eventBus) const {
 	GuiPanels::renderGraphicsInfoPanel(mFPS);
-	GuiPanels::renderPostProcessPanel(eventBus);
 
 	for (const auto& entity: getSystemEntities()) {
 		if (ui::beginEntity(entity.name())) {
@@ -36,6 +35,7 @@ void GuiSystem::render(EventBus& eventBus) const {
 			ui::endEntity();
 		}
 	}
+	GuiPanels::renderPostProcessPanel(eventBus);
 }
 
 void GuiSystem::updateFpsCounter(const float dt) {

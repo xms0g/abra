@@ -18,19 +18,18 @@
 #include "../../rendering/material/material.hpp"
 
 void GuiPanels::renderGraphicsInfoPanel(const uint32_t fps) {
-	if (ImGui::Begin("Graphics")) {
+	if (ImGui::TreeNodeEx("Graphics", ImGuiTreeNodeFlags_DefaultOpen)) {
 		ImGui::Text("%s FPS", std::to_string(fps).c_str());
 		ImGui::Text("OpenGL version: %s", glGetString(GL_VERSION));
 		ImGui::Text("GLSL Version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 		ImGui::Text("OpenGL Driver Vendor: %s", glGetString(GL_VENDOR));
 		ImGui::Text("OpenGL Renderer: %s", glGetString(GL_RENDERER));
+
+		ImGui::TreePop();
 	}
-	ImGui::End();
 }
 
 void GuiPanels::renderTransformPanel(const Entity& entity, EventBus& eventBus) {
-	if (!entity.hasComponent<TransformComponent>()) return;
-
 	ImGui::PushID(static_cast<int>(entity.id()));
 	if (ImGui::TreeNodeEx("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
 		auto& transform = entity.getComponent<TransformComponent>();
@@ -49,8 +48,6 @@ void GuiPanels::renderTransformPanel(const Entity& entity, EventBus& eventBus) {
 }
 
 void GuiPanels::renderDebugViewsPanel(const Entity& entity, EventBus& eventBus) {
-	if (!entity.hasComponent<DebugComponent>()) return;
-
 	ImGui::PushID(static_cast<int>(entity.id()));
 	if (ImGui::TreeNodeEx("Debug Views", ImGuiTreeNodeFlags_DefaultOpen)) {
 		const auto& debug = entity.getComponent<DebugComponent>();
@@ -212,7 +209,7 @@ void GuiPanels::renderPostProcessPanel(EventBus& eventBus) {
 		{"FXAA", false, 1.1f, 0.01f, [](Effect& self) { return false; }}
 	};
 
-	if (ImGui::Begin("Post-Processing")) {
+	if (ImGui::TreeNodeEx("Post-Processing", ImGuiTreeNodeFlags_DefaultOpen)) {
 		std::span<Effect> effectsSpan{effects};
 
 		for (uint32_t i = 0; i < effectsSpan.size(); ++i) {
@@ -225,6 +222,6 @@ void GuiPanels::renderPostProcessPanel(EventBus& eventBus) {
 				eventBus.emitEvent<GuiPostProcessEvent>(i, fx.enabled, fx.exposure, fx.intensity);
 			}
 		}
+		ImGui::TreePop();
 	}
-	ImGui::End();
 }
