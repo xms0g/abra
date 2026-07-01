@@ -131,18 +131,9 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 				uploadPrimitives.operator()<Model::Terrain>();
 			}
 		} else if (isPrimitive && primType == "Cubemap") {
-			std::string shaderName;
 			auto faces = comps["SkyboxComponent"]["faces"].get<std::vector<std::string> >();
-			auto matCom = comps["MaterialComponent"];
-
-			if (matCom.contains("shader")) {
-				shaderName = matCom["shader"].get<std::string>();
-			}
 
 			Model::Cubemap cubemap{faces};
-
-			auto& mat = cubemap.material();
-			mat[0].shader = rm.get<Shader>(shaderName);
 
 			rm.upload<MeshMap>(entity.id(), cubemap.meshes());
 			rm.upload<MaterialMap>(entity.id(), cubemap.material());

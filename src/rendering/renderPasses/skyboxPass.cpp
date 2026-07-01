@@ -13,26 +13,26 @@
 SkyboxPass::~SkyboxPass() = default;
 
 void SkyboxPass::configure(RenderContext& ctx, EventBus& eventBus) {
+	mShader = rm.get<Shader>("skybox");
 	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("skybox");
-	const auto& [entity, matb] = mObjects->front();
 
 	constexpr TextureBinding textureBindings[] = {
 		{"skybox", 0},
 	};
 
-	RenderCommand::setTextureUnits(textureBindings, *matb.shader);
+	RenderCommand::setTextureUnits(textureBindings, *mShader);
 }
 
 void SkyboxPass::execute(const RenderContext& ctx) {
 	const auto& [entityID, matb] = mObjects->front();
-	const auto& [materialIdx, textureOffset, textureCount, shader, meshes] = matb;
+	const auto& [materialIdx, textureOffset, textureCount, s, meshes] = matb;
 	const uint32_t meshIdx = meshes.front();
 	const uint32_t vao = ctx.renderData->mesh.vaos[meshIdx];
 
 	ctx.sceneBuffer->bind();
-	shader->activate();
-	shader->setMat4("skyView", ctx.camera.skyView);
+	mShader->activate();
+	mShader->setMat4("skyView", ctx.camera.skyView);
 
-	RenderCommand::setupMaterial(entityID, materialIdx, textureOffset, textureCount, ctx, *shader);
+	RenderCommand::setupMaterial(entityID, materialIdx, textureOffset, textureCount, ctx, *mShader);
 	RenderCommand::drawSkybox(vao);
 }

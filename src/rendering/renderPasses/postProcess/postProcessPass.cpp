@@ -52,7 +52,6 @@ void PostProcessPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	}
 
 	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessEvent>(this, &PostProcessPass::onGuiUpdate);
-
 }
 
 void PostProcessPass::execute(const RenderContext& ctx) {

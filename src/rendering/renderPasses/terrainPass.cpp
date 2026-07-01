@@ -13,14 +13,14 @@ TerrainPass::~TerrainPass() = default;
 void TerrainPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
+	mShader = rm.get<Shader>("terrain");
 	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("terrain");
-	const auto& [entity, matb] = mObjects->front();
 
 	constexpr TextureBinding textureBindings[] = {
 		{"heightMap", 0},
 	};
 
-	RenderCommand::setTextureUnits(textureBindings, *matb.shader);
+	RenderCommand::setTextureUnits(textureBindings, *mShader);
 	RenderCommand::bindShadowMaps(ctx);
 }
 
@@ -28,13 +28,13 @@ void TerrainPass::execute(const RenderContext& ctx) {
 	ctx.sceneBuffer->bind();
 
 	const auto& [entityID, matb] = mObjects->front();
-	const auto& [materialIdx, textureOffset, textureCount, shader, meshes] = matb;
+	const auto& [materialIdx, textureOffset, textureCount, s, meshes] = matb;
 	const uint32_t meshIdx = meshes.front();
 	const uint32_t vao = ctx.renderData->mesh.vaos[meshIdx];
 
-	shader->activate();
-	RenderCommand::setupTransform(entityID, ctx, *shader);
-	RenderCommand::setupMaterial(entityID, materialIdx, textureOffset, textureCount, ctx, *shader);
+	mShader->activate();
+	RenderCommand::setupTransform(entityID, ctx, *mShader);
+	RenderCommand::setupMaterial(entityID, materialIdx, textureOffset, textureCount, ctx, *mShader);
 
 	const size_t count = ctx.renderData->mesh.vertexCounts[meshIdx];
 

@@ -2,6 +2,7 @@
 #include <vector>
 #include "IRenderPass.hpp"
 
+class Shader;
 struct RenderGroup;
 
 class TerrainPass final: public IRenderPass {
@@ -13,5 +14,6 @@ public:
 	void execute(const RenderContext& ctx) override;
 
 private:
+	const Shader* mShader{nullptr};
 	std::vector<RenderGroup>* mObjects{nullptr};
 };
