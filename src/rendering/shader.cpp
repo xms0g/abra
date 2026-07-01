@@ -3,9 +3,9 @@
 #include <sstream>
 #include <stdexcept>
 #include "glad/glad.h"
+#include "glm/gtc/type_ptr.hpp"
 #include "../io/filesystem.hpp"
 #include "../config/configManager.h"
-#include "glm/gtc/type_ptr.hpp"
 
 ShaderResource::ShaderResource(const char** code, const std::string& fn, const uint32_t type) {
 	handle = glCreateShader(type);
