@@ -35,9 +35,9 @@ void GuiPanels::renderTransformPanel(const Entity& entity, EventBus& eventBus) {
 	if (ImGui::TreeNodeEx("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
 		auto& transform = entity.getComponent<TransformComponent>();
 
-		transform.isDirty |= Ui::dragFloat3("Position", transform.position);
-		transform.isDirty |= Ui::dragFloat3("Rotation", transform.rotation, 1.0f);
-		transform.isDirty |= Ui::dragFloat3("Scale", transform.scale);
+		transform.isDirty |= ui::dragFloat3("Position", transform.position);
+		transform.isDirty |= ui::dragFloat3("Rotation", transform.rotation, 1.0f);
+		transform.isDirty |= ui::dragFloat3("Scale", transform.scale);
 
 		if (transform.isDirty) {
 			eventBus.emitEvent<GuiTransformEvent>(entity.id(), transform.position, transform.rotation, transform.scale);
@@ -86,11 +86,11 @@ void GuiPanels::renderDirLight(const Entity& entity, EventBus& eventBus) {
 	bool isDirty{false};
 	auto& dirLight = entity.getComponent<DirectionalLightComponent>();
 
-	isDirty |= Ui::dragFloat3("Direction", dirLight.direction, 0.01f, 100);
-	isDirty |= Ui::colorField3("Ambient", dirLight.ambient, 0.01f, 100);
-	isDirty |= Ui::colorField3("Diffuse", dirLight.diffuse, 0.01f, 100);
-	isDirty |= Ui::colorField3("Specular", dirLight.specular, 0.01f, 100);
-	isDirty |= Ui::sliderFloat("Intensity", &dirLight.intensity, 100.0, 1.0, 30.0);
+	isDirty |= ui::dragFloat3("Direction", dirLight.direction, 0.01f, 100);
+	isDirty |= ui::colorField3("Ambient", dirLight.ambient, 0.01f, 100);
+	isDirty |= ui::colorField3("Diffuse", dirLight.diffuse, 0.01f, 100);
+	isDirty |= ui::colorField3("Specular", dirLight.specular, 0.01f, 100);
+	isDirty |= ui::sliderFloat("Intensity", &dirLight.intensity, 100.0, 1.0, 30.0);
 
 	if (isDirty) {
 		uint32_t matIdx = entity.getComponent<MaterialComponent>().materials[0].at(0).idx;
@@ -118,13 +118,13 @@ void GuiPanels::renderPointLight(const Entity& entity, EventBus& eventBus) {
 	auto& transform = entity.getComponent<TransformComponent>();
 	auto& pointLight = entity.getComponent<PointLightComponent>();
 
-	transform.isDirty |= Ui::colorField3("Ambient", pointLight.ambient, 0.01f, 100);
-	transform.isDirty |= Ui::colorField3("Diffuse", pointLight.diffuse, 0.01f, 100);
-	transform.isDirty |= Ui::colorField3("Specular", pointLight.specular, 0.01f, 100);
-	transform.isDirty |= Ui::dragFloat("Constant", &pointLight.constant, 0.01f, 100);
-	transform.isDirty |= Ui::dragFloat("Linear", &pointLight.linear, 0.01f, 100);
-	transform.isDirty |= Ui::dragFloat("Quadratic", &pointLight.quadratic, 0.01f, 100);
-	transform.isDirty |= Ui::sliderFloat("Intensity", &pointLight.intensity, 100.0, 1.0, 30.0);
+	transform.isDirty |= ui::colorField3("Ambient", pointLight.ambient, 0.01f, 100);
+	transform.isDirty |= ui::colorField3("Diffuse", pointLight.diffuse, 0.01f, 100);
+	transform.isDirty |= ui::colorField3("Specular", pointLight.specular, 0.01f, 100);
+	transform.isDirty |= ui::dragFloat("Constant", &pointLight.constant, 0.01f, 100);
+	transform.isDirty |= ui::dragFloat("Linear", &pointLight.linear, 0.01f, 100);
+	transform.isDirty |= ui::dragFloat("Quadratic", &pointLight.quadratic, 0.01f, 100);
+	transform.isDirty |= ui::sliderFloat("Intensity", &pointLight.intensity, 100.0, 1.0, 30.0);
 	transform.isDirty |= ImGui::Checkbox("Cast Shadow", &pointLight.castShadow);
 
 	if (transform.isDirty) {
@@ -155,16 +155,16 @@ void GuiPanels::renderSpotLight(const Entity& entity, EventBus& eventBus) {
 	auto& transform = entity.getComponent<TransformComponent>();
 	auto& spotLight = entity.getComponent<SpotLightComponent>();
 
-	transform.isDirty |= Ui::dragFloat3("Direction", spotLight.direction, 0.01f, 100);
-	transform.isDirty |= Ui::colorField3("Ambient", spotLight.ambient, 0.01f, 100);
-	transform.isDirty |= Ui::colorField3("Diffuse", spotLight.diffuse, 0.01f, 100);
-	transform.isDirty |= Ui::colorField3("Specular", spotLight.specular, 0.01f, 100);
-	transform.isDirty |= Ui::dragFloat("Constant", &spotLight.constant, 0.01f, 100);
-	transform.isDirty |= Ui::dragFloat("Linear", &spotLight.linear, 0.01f, 100);
-	transform.isDirty |= Ui::dragFloat("Quadratic", &spotLight.quadratic, 0.01f, 100);
-	transform.isDirty |= Ui::dragFloat("Cutoff", &spotLight.cutOff, 0.01f, 100);
-	transform.isDirty |= Ui::dragFloat("OuterCutoff", &spotLight.outerCutOff, 0.01f, 100);
-	transform.isDirty |= Ui::sliderFloat("Intensity", &spotLight.intensity, 100.0, 1.0, 30.0);
+	transform.isDirty |= ui::dragFloat3("Direction", spotLight.direction, 0.01f, 100);
+	transform.isDirty |= ui::colorField3("Ambient", spotLight.ambient, 0.01f, 100);
+	transform.isDirty |= ui::colorField3("Diffuse", spotLight.diffuse, 0.01f, 100);
+	transform.isDirty |= ui::colorField3("Specular", spotLight.specular, 0.01f, 100);
+	transform.isDirty |= ui::dragFloat("Constant", &spotLight.constant, 0.01f, 100);
+	transform.isDirty |= ui::dragFloat("Linear", &spotLight.linear, 0.01f, 100);
+	transform.isDirty |= ui::dragFloat("Quadratic", &spotLight.quadratic, 0.01f, 100);
+	transform.isDirty |= ui::dragFloat("Cutoff", &spotLight.cutOff, 0.01f, 100);
+	transform.isDirty |= ui::dragFloat("OuterCutoff", &spotLight.outerCutOff, 0.01f, 100);
+	transform.isDirty |= ui::sliderFloat("Intensity", &spotLight.intensity, 100.0, 1.0, 30.0);
 	transform.isDirty |= ImGui::Checkbox("Cast Shadow", &spotLight.castShadow);
 
 	if (transform.isDirty) {
@@ -201,13 +201,13 @@ void GuiPanels::renderPostProcessPanel(EventBus& eventBus) {
 		bool (* renderExtraControls)(Effect&){nullptr};
 	} static effects[] = {
 		{"Bloom", false, 1.1f, 0.01f, [](Effect& self) { return false; }},
-		{"Tone Mapping", false, 1.1f, 0.01f, [](Effect& self) { return Ui::sliderFloat("Exposure", &self.exposure, 100.0f); }},
+		{"Tone Mapping", false, 1.1f, 0.01f, [](Effect& self) { return ui::sliderFloat("Exposure", &self.exposure, 100.0f); }},
 		{"Grayscale", false, 1.1f, 0.01f, [](Effect& self) { return false; }},
 		{"Sepia", false, 1.1f, 0.01f, [](Effect& self) { return false; }},
 		{"Blur", false, 1.1f, 0.01f, [](Effect& self) { return false; }},
 		{"Edge Detection", false, 1.1f, 0.01f, [](Effect& self) { return false; }},
 		{"Sharpen", false, 1.1f, 0.01f, [](Effect& self) { return false; }},
-		{"Chromatic Aberration", false, 1.1f, 0.01f,[](Effect& self) { return Ui::sliderFloat("Intensity", &self.intensity, 100.0f, 0.01f, 0.1f); }},
+		{"Chromatic Aberration", false, 1.1f, 0.01f,[](Effect& self) { return ui::sliderFloat("Intensity", &self.intensity, 100.0f, 0.01f, 0.1f); }},
 		{"Gamma Correction", true, 1.1f, 0.01f, [](Effect& self) { return false; }},
 		{"FXAA", false, 1.1f, 0.01f, [](Effect& self) { return false; }}
 	};

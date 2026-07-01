@@ -3,46 +3,46 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "imgui/imgui.h"
 
-bool Ui::beginEntity(const char* label) {
-	return ImGui::CollapsingHeader(label, ImGuiTreeNodeFlags_DefaultOpen);
+bool ui::beginEntity(const std::string& label) {
+	return ImGui::CollapsingHeader(label.c_str(), ImGuiTreeNodeFlags_DefaultOpen);
 }
 
-void Ui::endEntity() {
+void ui::endEntity() {
 	ImGui::Separator();
 }
 
-bool Ui::colorField3(const char* label, glm::vec3& value, const float speed, const float sameLineOffset) {
+bool ui::colorField3(const std::string& label, glm::vec3& value, const float speed, const float sameLineOffset) {
 	bool isDirty{false};
-	ImGui::Text("%s", label);
+	ImGui::Text("%s", label.c_str());
 	ImGui::SameLine(sameLineOffset);
-	isDirty |= ImGui::DragFloat3(("##" + std::string(label) + "v").c_str(), glm::value_ptr(value), speed);
+	isDirty |= ImGui::DragFloat3(("##" + label + "v").c_str(), glm::value_ptr(value), speed);
 	ImGui::SameLine();
-	isDirty |= ImGui::ColorEdit3(("##" + std::string(label) + "c").c_str(), glm::value_ptr(value),
+	isDirty |= ImGui::ColorEdit3(("##" + label + "c").c_str(), glm::value_ptr(value),
 					  ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
 	return isDirty;
 }
 
-bool Ui::dragFloat(const char* label, float* value, const float speed, const float sameLineOffset) {
-	ImGui::Text("%s", label);
+bool ui::dragFloat(const std::string& label, float* value, const float speed, const float sameLineOffset) {
+	ImGui::Text("%s", label.c_str());
 	ImGui::SameLine(sameLineOffset);
-	return ImGui::DragFloat(("##" + std::string(label) + "v").c_str(), value, speed);
+	return ImGui::DragFloat(("##" + label + "v").c_str(), value, speed);
 }
 
-bool Ui::dragFloat3(const char* label, glm::vec3& value, const float speed, const float sameLineOffset) {
-	ImGui::Text("%s", label);
+bool ui::dragFloat3(const std::string& label, glm::vec3& value, const float speed, const float sameLineOffset) {
+	ImGui::Text("%s", label.c_str());
 	ImGui::SameLine(sameLineOffset);
-	return ImGui::DragFloat3(("##" + std::string(label) + "v").c_str(), glm::value_ptr(value), speed);
+	return ImGui::DragFloat3(("##" + label + "v").c_str(), glm::value_ptr(value), speed);
 }
 
-bool Ui::dragFloat4(const char* label, glm::vec4& value, const float speed, const float sameLineOffset) {
-	ImGui::Text("%s", label);
+bool ui::dragFloat4(const std::string& label, glm::vec4& value, const float speed, const float sameLineOffset) {
+	ImGui::Text("%s", label.c_str());
 	ImGui::SameLine(sameLineOffset);
-	return ImGui::DragFloat4(("##" + std::string(label) + "v").c_str(), glm::value_ptr(value), speed);
+	return ImGui::DragFloat4(("##" + label + "v").c_str(), glm::value_ptr(value), speed);
 }
 
-bool Ui::sliderFloat(const char* label, float* value, const float sameLineOffset, const float min, const float max) {
-	ImGui::Text("%s", label);
+bool ui::sliderFloat(const std::string& label, float* value, const float sameLineOffset, const float min, const float max) {
+	ImGui::Text("%s", label.c_str());
 	ImGui::SameLine(sameLineOffset);
 
-	return ImGui::SliderFloat(("##" + std::string(label) + "v").c_str(), value, min, max);
+	return ImGui::SliderFloat(("##" + label + "v").c_str(), value, min, max);
 }

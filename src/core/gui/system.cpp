@@ -29,14 +29,11 @@ void GuiSystem::render(EventBus& eventBus) const {
 	GuiPanels::renderPostProcessPanel(eventBus);
 
 	for (const auto& entity: getSystemEntities()) {
-		if (entity.hasComponent<InstanceComponent>())
-			continue;
-
-		if (Ui::beginEntity(entity.name())) {
+		if (ui::beginEntity(entity.name())) {
 			GuiPanels::renderTransformPanel(entity, eventBus);
 			GuiPanels::renderDebugViewsPanel(entity, eventBus);
 			GuiPanels::renderLightPanel(entity, eventBus);
-			Ui::endEntity();
+			ui::endEntity();
 		}
 	}
 }
