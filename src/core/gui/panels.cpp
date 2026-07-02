@@ -70,10 +70,10 @@ void GuiPanels::renderLightPanel(const Entity& entity, EventBus& eventBus) {
 
 	if (entity.hasComponent<DirectionalLightComponent>()) {
 		renderDirLight(entity, eventBus);
-	} else if (entity.hasComponent<SpotLightComponent>()) {
-		renderSpotLight(entity, eventBus);
 	} else if (entity.hasComponent<PointLightComponent>()) {
 		renderPointLight(entity, eventBus);
+	} else if (entity.hasComponent<SpotLightComponent>()) {
+		renderSpotLight(entity, eventBus);
 	}
 
 	ImGui::PopID();
@@ -81,7 +81,7 @@ void GuiPanels::renderLightPanel(const Entity& entity, EventBus& eventBus) {
 
 void GuiPanels::renderDirLight(const Entity& entity, EventBus& eventBus) {
 	bool isDirty{false};
-	auto& dirLight = entity.getComponent<DirectionalLightComponent>();
+	static auto& dirLight = entity.getComponent<DirectionalLightComponent>();
 
 	isDirty |= ui::dragFloat3("Direction", dirLight.direction, 0.01f, 100);
 	isDirty |= ui::colorField3("Ambient", dirLight.ambient, 0.01f, 100);
@@ -112,8 +112,8 @@ void GuiPanels::renderDirLight(const Entity& entity, EventBus& eventBus) {
 }
 
 void GuiPanels::renderPointLight(const Entity& entity, EventBus& eventBus) {
-	auto& transform = entity.getComponent<TransformComponent>();
-	auto& pointLight = entity.getComponent<PointLightComponent>();
+	static auto& transform = entity.getComponent<TransformComponent>();
+	static auto& pointLight = entity.getComponent<PointLightComponent>();
 
 	transform.isDirty |= ui::colorField3("Ambient", pointLight.ambient, 0.01f, 100);
 	transform.isDirty |= ui::colorField3("Diffuse", pointLight.diffuse, 0.01f, 100);
@@ -149,8 +149,8 @@ void GuiPanels::renderPointLight(const Entity& entity, EventBus& eventBus) {
 }
 
 void GuiPanels::renderSpotLight(const Entity& entity, EventBus& eventBus) {
-	auto& transform = entity.getComponent<TransformComponent>();
-	auto& spotLight = entity.getComponent<SpotLightComponent>();
+	static auto& transform = entity.getComponent<TransformComponent>();
+	static auto& spotLight = entity.getComponent<SpotLightComponent>();
 
 	transform.isDirty |= ui::dragFloat3("Direction", spotLight.direction, 0.01f, 100);
 	transform.isDirty |= ui::colorField3("Ambient", spotLight.ambient, 0.01f, 100);
@@ -210,7 +210,7 @@ void GuiPanels::renderPostProcessPanel(EventBus& eventBus) {
 	};
 
 	if (ImGui::TreeNodeEx("Post-Processing", ImGuiTreeNodeFlags_DefaultOpen)) {
-		std::span<Effect> effectsSpan{effects};
+		static std::span<Effect> effectsSpan{effects};
 
 		for (uint32_t i = 0; i < effectsSpan.size(); ++i) {
 			auto& fx = effectsSpan[i];
