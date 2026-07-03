@@ -115,11 +115,9 @@ void ResourceManager::uploadModelsToGPU() {
 			if (material.textureTarget == GL_TEXTURE_CUBE_MAP) {
 				// Handle HDR to Cubemap
 				if (material.textures.size() == 1) {
-					const std::string path = fs::path(
-						cfg.get<std::string>("path.asset") + material.textures.front().path);
-					glDisable(GL_CULL_FACE);
+					const std::string path = fs::path(cfg.get<std::string>("path.asset") + material.textures.front().path);
+
 					uint32_t id = createEnvMap(path);
-					glEnable(GL_CULL_FACE);
 
 					material.textures.clear();
 					material.textures.emplace_back(id, 0, "");
@@ -149,6 +147,7 @@ void ResourceManager::uploadModelsToGPU() {
 					fs::path(cfg.get<std::string>("path.asset") + path),
 					material.flags,
 					type == aiTextureType_DIFFUSE || type == aiTextureType_EMISSIVE);
+
 				idByPath.emplace(path, id);
 			}
 		}
@@ -320,7 +319,6 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 		}
 
 		materialLoadCtx.materials[req.materialID] = {
-				.id = req.materialID,
 				.flags = flags,
 				.textureTarget = GL_TEXTURE_2D,
 				.alphaCutoff = alphaCutoff,
@@ -362,6 +360,7 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 }
 
 uint32_t ResourceManager::createEnvMap(const std::string& path) {
+	glDisable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 
@@ -404,6 +403,7 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 	envMapBuffer->generateMipmaps();
 
 	glDepthFunc(GL_LESS);
+	glEnable(GL_CULL_FACE);
 
 	return envMapBuffer->texture();
 }

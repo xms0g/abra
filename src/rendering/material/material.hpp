@@ -23,7 +23,6 @@ class Shader;
 class Mesh;
 
 struct Material {
-	uint32_t id{0};
 	uint32_t idx{0};
 	uint32_t flags{0};
 	uint32_t textureTarget{0};
