@@ -20,14 +20,10 @@ void Engine::init(Registry* registry) {
 	mCamera = std::make_unique<Camera>(glm::vec3(0.0f, 2.0f, 5.0f));
 	mEventBus = std::make_unique<EventBus>();
 
-	mWindow = std::make_unique<Window>();
-	mWindow->init(
+	mWindow = std::make_unique<Window>(
 		cfg.get<std::string>("window.title"),
 		cfg.get<int32_t>("msaa.sample_count"),
 		cfg.get<bool>("window.fullscreen"));
-
-	cfg.set<int32_t>("window.width", mWindow->width());
-	cfg.set<int32_t>("window.height", mWindow->height());
 
 	mGuiSystem = &registry->addSystem<GuiSystem>();
 	mRenderPipeline = &registry->addSystem<RenderPipeline>(mRegistry, *mCamera, mWindow->nativeHandle(), mWindow->glContext());

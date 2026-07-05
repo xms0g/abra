@@ -1,18 +1,9 @@
 #include "window.h"
 #include <iostream>
 #include "glad/glad.h"
+#include "../config/configManager.h"
 
-Window::~Window() {
-	SDL_GL_DeleteContext(mGlContext);
-	SDL_DestroyWindow(mWindow);
-	SDL_Quit();
-}
-
-SDL_GLContext Window::glContext() const {
-	return mGlContext;
-}
-
-void Window::initImpl(const std::string& title, const int multisamples, const bool fullscreen) {
+Window::Window(const std::string& title, int multisamples, bool fullscreen) {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		throw std::runtime_error("Failed to initialize SDL_VIDEO");
 	}
@@ -39,8 +30,8 @@ void Window::initImpl(const std::string& title, const int multisamples, const bo
 	SDL_DisplayMode displayMode;
 	SDL_GetCurrentDisplayMode(0, &displayMode);
 
-	mWidth = displayMode.w;
-	mHeight = displayMode.h;
+	cfg.set<int32_t>("window.width", std::move(displayMode.w));
+	cfg.set<int32_t>("window.height", std::move(displayMode.h));
 
 	mWindow = SDL_CreateWindow(
 		mTitle.c_str(),
@@ -57,6 +48,16 @@ void Window::initImpl(const std::string& title, const int multisamples, const bo
 	SDL_SetWindowFullscreen(mWindow, flags);
 
 	mGlContext = SDL_GL_CreateContext(mWindow);
+}
+
+Window::~Window() {
+	SDL_GL_DeleteContext(mGlContext);
+	SDL_DestroyWindow(mWindow);
+	SDL_Quit();
+}
+
+SDL_GLContext Window::glContext() const {
+	return mGlContext;
 }
 
 void Window::clearImpl(const float r, const float g, const float b, const float a) {
