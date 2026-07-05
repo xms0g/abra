@@ -25,20 +25,36 @@ typedef void* SDL_GLContext;
 
 class RenderPipeline final : public System {
 public:
-	explicit RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLContext context);
+	explicit RenderPipeline(Registry* registry, const Camera& camera, SDL_Window* window, SDL_GLContext context);
 
 	~RenderPipeline() override;
 
 	void configure(const Camera& camera, EventBus& eventBus);
-
-	void batchEntities() const;
 
 	void render();
 
 	static void drawGui();
 
 private:
+	void createSystems(Registry* registry);
+
+	void createUniformBuffers(const Camera& camera);
+
+	void createRenderQueues();
+
+	void createRenderPasses(EventBus& eventBus);
+
+	void createFrameBuffers();
+
+	void createRenderContext(const Camera& camera);
+
+	void configureSystems(EventBus& eventBus) const;
+
+	void configureShaders();
+
 	void refreshCameraData() const;
+
+	void batchEntities() const;
 
 	void batchEntity(const Entity& entity) const;
 

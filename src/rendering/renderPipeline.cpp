@@ -48,7 +48,7 @@
 #include "../event/eventBus.hpp"
 #include "../resource/resourceManager.h"
 
-RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLContext context) {
+RenderPipeline::RenderPipeline(Registry* registry, const Camera& camera, SDL_Window* window, SDL_GLContext context) {
 	RequireComponent<MeshComponent>();
 	RequireComponent<TransformComponent>();
 	// glad: load all OpenGL function pointers
@@ -62,7 +62,75 @@ RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLCon
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
 
+	createRenderQueues();
+	createSystems(registry);
+	createFrameBuffers();
+	createRenderContext(camera);
+
+	GuiBackend::init(window, context, "#version 410");
+}
+
+RenderPipeline::~RenderPipeline() {
+	GuiBackend::shutdown();
+}
+
+void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
+	batchEntities();
+	createRenderPasses(eventBus);
+	configureSystems(eventBus);
+	createUniformBuffers(camera);
+	configureShaders();
+}
+
+void RenderPipeline::render() {
+	GuiBackend::newFrame();
+	refreshCameraData();
+	sortEntities();
+
+	mRenderCtx->materialCache.reset();
+
+	mSceneBuffer->bind();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	for (const auto& pass: mRenderPasses) {
+		pass->execute(*mRenderCtx);
+	}
+
+	mRenderCtx->sceneBuffer = mSceneBuffer.get();
+}
+
+void RenderPipeline::drawGui() {
+	GuiBackend::renderFrame();
+}
+
+void RenderPipeline::createSystems(Registry* registry) {
+	mLightSystem = &registry->addSystem<LightSystem>();
+	mShadowSystem = std::make_unique<ShadowSystem>();
+	mSyncStateSystem = std::make_unique<SyncStateSystem>();
+}
+
+void RenderPipeline::createUniformBuffers(const Camera& camera) {
+	// Create camera buffer
+	mCameraUBO = std::make_unique<UniformBuffer>(
+		DYNAMIC,
+		3 * sizeof(glm::mat4) + sizeof(glm::vec4),
+		cfg.get<uint32_t>("camera.ubo_binding"));
+
+	const glm::mat4 projectionMat = glm::perspective(
+		glm::radians(camera.zoom()),
+		static_cast<float>(cfg.get<int32_t>("window.width")) / static_cast<float>(cfg.get<int32_t>("window.height")),
+		camera.znear(), camera.zfar());
+
+	const glm::mat4 invProjectionMat = glm::inverse(projectionMat);
+
+	mCameraUBO->setData(glm::value_ptr(projectionMat), sizeof(glm::mat4), sizeof(glm::mat4) + sizeof(glm::vec4));
+	mCameraUBO->setData(glm::value_ptr(invProjectionMat), sizeof(glm::mat4), 2 * sizeof(glm::mat4) + sizeof(glm::vec4));
+	mCameraUBO->unbind();
+}
+
+void RenderPipeline::createRenderQueues() {
 	mRenderQueue = std::make_unique<RenderQueue>();
+
 	mRenderQueue->set("opaqueInstanced", std::vector<InstanceGroup>());
 	mRenderQueue->set("blendInstanced", std::vector<InstanceGroup>());
 	mRenderQueue->set("opaque", std::vector<RenderGroup>());
@@ -76,43 +144,60 @@ RenderPipeline::RenderPipeline(Registry* registry, SDL_Window* window, SDL_GLCon
 	mRenderQueue->set("visibleOpaque", std::vector<RenderableObject>());
 	mRenderQueue->set("visibleBlend", std::vector<RenderableObject>());
 	mRenderQueue->set("visibleDebug", std::vector<RenderableObject>());
-
-	mRenderCtx = std::make_unique<RenderContext>();
-	mRenderData = std::make_unique<RenderData>();
-	mRenderCtx->renderData = mRenderData.get();
-	mRenderCtx->renderQueue = mRenderQueue.get();
-
-	mLightSystem = &registry->addSystem<LightSystem>();
-
-	mRenderCtx->light.dirLights = &mLightSystem->dirLights();
-	mRenderCtx->light.pointLights = &mLightSystem->pointLights();
-	mRenderCtx->light.spotLights = &mLightSystem->spotLights();
-
-	mShadowSystem = std::make_unique<ShadowSystem>();
-	mSyncStateSystem = std::make_unique<SyncStateSystem>();
-
-	GuiBackend::init(window, context, "#version 410");
 }
 
-RenderPipeline::~RenderPipeline() {
-	GuiBackend::shutdown();
+void RenderPipeline::createRenderPasses(EventBus& eventBus) {
+	mRenderPasses.emplace_back(std::make_unique<CullingPass>());
+
+	if (!mRenderQueue->get<std::vector<RenderGroup> >("deferred").empty()) {
+		mRenderPasses.emplace_back(std::make_unique<DeferredGeometryPass>());
+		mRenderPasses.emplace_back(std::make_unique<SSAOPass>());
+		mRenderPasses.emplace_back(std::make_unique<DeferredLightingPass>());
+	}
+
+	if (!mRenderQueue->get<std::vector<RenderGroup> >("opaque").empty() ||
+		!mRenderQueue->get<std::vector<RenderGroup> >("blend").empty()) {
+		mRenderPasses.emplace_back(std::make_unique<ForwardPass>());
+		}
+
+	if (!mRenderQueue->get<std::vector<RenderGroup> >("debug").empty()) {
+		mRenderPasses.emplace_back(std::make_unique<DebugPass>());
+	}
+
+	if (!mRenderQueue->get<std::vector<InstanceGroup> >("opaqueInstanced").empty() ||
+		!mRenderQueue->get<std::vector<InstanceGroup> >("blendInstanced").empty()) {
+		mRenderPasses.emplace_back(std::make_unique<InstancedPass>());
+		}
+
+	if (!mRenderQueue->get<std::vector<RenderGroup> >("terrain").empty()) {
+		mRenderPasses.emplace_back(std::make_unique<TerrainPass>());
+	}
+
+	mRenderPasses.emplace_back(std::make_unique<SkyboxPass>());
+
+	if (cfg.get<bool>("msaa.enabled")) {
+		mRenderPasses.emplace_back(std::make_unique<ResolvePass>());
+		mRenderCtx->intermediateBuffer = mIntermediateBuffer.get();
+	}
+
+	mRenderPasses.emplace_back(std::make_unique<PostProcessPass>());
+
+	for (const auto& pass: mRenderPasses) {
+		pass->configure(*mRenderCtx, eventBus);
+	}
 }
 
-void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
-	mLightSystem->configure(*mRenderCtx, eventBus);
-	mSyncStateSystem->configure(*mRenderCtx, eventBus);
-	mShadowSystem->configure(*mRenderCtx, eventBus);
-
-	// Create framebuffers
-	int32_t width = cfg.get<int32_t>("window.width");
-	int32_t height = cfg.get<int32_t>("window.height");
-
-	mSceneBuffer = std::make_unique<FrameBuffer>(width, height);
+void RenderPipeline::createFrameBuffers() {
+	mSceneBuffer = std::make_unique<FrameBuffer>(
+		cfg.get<int32_t>("window.width"),
+		cfg.get<int32_t>("window.height"));
 
 	if (cfg.get<bool>("msaa.enabled")) {
 		glEnable(GL_MULTISAMPLE);
 		const int32_t sampleCount = cfg.get<int32_t>("msaa.sample_count");
-		mIntermediateBuffer = std::make_unique<FrameBuffer>(width, height);
+		mIntermediateBuffer = std::make_unique<FrameBuffer>(
+			cfg.get<int32_t>("window.width"),
+			cfg.get<int32_t>("window.height"));
 
 		if (cfg.get<bool>("hdr.enabled")) {
 			mIntermediateBuffer->withTextureFP(GL_RGBA)
@@ -145,68 +230,27 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 		}
 	}
 	mSceneBuffer->unbind();
+}
 
-	// Create render passes
-	mRenderPasses.emplace_back(std::make_unique<CullingPass>());
-
-	if (!mRenderQueue->get<std::vector<RenderGroup> >("deferred").empty()) {
-		mRenderPasses.emplace_back(std::make_unique<DeferredGeometryPass>());
-		mRenderPasses.emplace_back(std::make_unique<SSAOPass>());
-		mRenderPasses.emplace_back(std::make_unique<DeferredLightingPass>());
-	}
-
-	if (!mRenderQueue->get<std::vector<RenderGroup> >("opaque").empty() ||
-	    !mRenderQueue->get<std::vector<RenderGroup> >("blend").empty()) {
-		mRenderPasses.emplace_back(std::make_unique<ForwardPass>());
-	}
-
-	if (!mRenderQueue->get<std::vector<RenderGroup> >("debug").empty()) {
-		mRenderPasses.emplace_back(std::make_unique<DebugPass>());
-	}
-
-	if (!mRenderQueue->get<std::vector<InstanceGroup> >("opaqueInstanced").empty() ||
-	    !mRenderQueue->get<std::vector<InstanceGroup> >("blendInstanced").empty()) {
-		mRenderPasses.emplace_back(std::make_unique<InstancedPass>());
-	}
-
-	if (!mRenderQueue->get<std::vector<RenderGroup> >("terrain").empty()) {
-		mRenderPasses.emplace_back(std::make_unique<TerrainPass>());
-	}
-
-	mRenderPasses.emplace_back(std::make_unique<SkyboxPass>());
-
-	if (cfg.get<bool>("msaa.enabled")) {
-		mRenderPasses.emplace_back(std::make_unique<ResolvePass>());
-		mRenderCtx->intermediateBuffer = mIntermediateBuffer.get();
-	}
-
-	mRenderPasses.emplace_back(std::make_unique<PostProcessPass>());
-
+void RenderPipeline::createRenderContext(const Camera& camera) {
+	mRenderCtx = std::make_unique<RenderContext>();
+	mRenderData = std::make_unique<RenderData>();
+	mRenderCtx->renderData = mRenderData.get();
+	mRenderCtx->renderQueue = mRenderQueue.get();
+	mRenderCtx->light.dirLights = &mLightSystem->dirLights();
+	mRenderCtx->light.pointLights = &mLightSystem->pointLights();
+	mRenderCtx->light.spotLights = &mLightSystem->spotLights();
 	mRenderCtx->sceneBuffer = mSceneBuffer.get();
 	mRenderCtx->camera.self = &camera;
+}
 
-	// Create camera buffer
-	mCameraUBO = std::make_unique<UniformBuffer>(
-		DYNAMIC,
-		3 * sizeof(glm::mat4) + sizeof(glm::vec4),
-		cfg.get<uint32_t>("camera.ubo_binding"));
+void RenderPipeline::configureSystems(EventBus& eventBus) const {
+	mLightSystem->configure(*mRenderCtx, eventBus);
+	mSyncStateSystem->configure(*mRenderCtx, eventBus);
+	mShadowSystem->configure(*mRenderCtx, eventBus);
+}
 
-	const glm::mat4 projectionMat = glm::perspective(
-		glm::radians(camera.zoom()),
-		static_cast<float>(width) / static_cast<float>(height),
-		camera.znear(), camera.zfar());
-
-	const glm::mat4 invProjectionMat = glm::inverse(projectionMat);
-
-	mCameraUBO->setData(glm::value_ptr(projectionMat), sizeof(glm::mat4), sizeof(glm::mat4) + sizeof(glm::vec4));
-	mCameraUBO->setData(glm::value_ptr(invProjectionMat), sizeof(glm::mat4), 2 * sizeof(glm::mat4) + sizeof(glm::vec4));
-	mCameraUBO->unbind();
-
-	// Configure render passes
-	for (const auto& pass: mRenderPasses) {
-		pass->configure(*mRenderCtx, eventBus);
-	}
-
+void RenderPipeline::configureShaders() {
 	const UniformBinding uboBindings[] = {
 		{cfg.get<std::string>("camera.block_name"), cfg.get<uint32_t>("camera.ubo_binding"), UniformBuffer::configure},
 		{cfg.get<std::string>("light.block_name"), cfg.get<uint32_t>("light.ubo_binding"), UniformBuffer::configure},
@@ -229,33 +273,6 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	}
 }
 
-void RenderPipeline::batchEntities() const {
-	for (const auto& entity: getSystemEntities()) {
-		batchEntity(entity);
-	}
-}
-
-void RenderPipeline::render() {
-	GuiBackend::newFrame();
-	refreshCameraData();
-	sortEntities();
-
-	mRenderCtx->materialCache.reset();
-
-	mSceneBuffer->bind();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	for (const auto& pass: mRenderPasses) {
-		pass->execute(*mRenderCtx);
-	}
-
-	mRenderCtx->sceneBuffer = mSceneBuffer.get();
-}
-
-void RenderPipeline::drawGui() {
-	GuiBackend::renderFrame();
-}
-
 void RenderPipeline::refreshCameraData() const {
 	mRenderCtx->camera.skyView = glm::mat4(glm::mat3(mRenderCtx->camera.self->viewMatrix()));
 
@@ -271,6 +288,12 @@ void RenderPipeline::refreshCameraData() const {
 
 	mCameraUBO->bind();
 	mCameraUBO->setData(&packed, sizeof(PackedView), 0);
+}
+
+void RenderPipeline::batchEntities() const {
+	for (const auto& entity: getSystemEntities()) {
+		batchEntity(entity);
+	}
 }
 
 void RenderPipeline::batchEntity(const Entity& entity) const {

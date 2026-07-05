@@ -17,6 +17,9 @@ Engine::~Engine() = default;
 void Engine::init(Registry* registry) {
 	mRegistry = registry;
 
+	mCamera = std::make_unique<Camera>(glm::vec3(0.0f, 2.0f, 5.0f));
+	mEventBus = std::make_unique<EventBus>();
+
 	mWindow = std::make_unique<Window>();
 	mWindow->init(
 		cfg.get<std::string>("window.title"),
@@ -27,15 +30,11 @@ void Engine::init(Registry* registry) {
 	cfg.set<int32_t>("window.height", mWindow->height());
 
 	mGuiSystem = &registry->addSystem<GuiSystem>();
-	mRenderPipeline = &registry->addSystem<RenderPipeline>(mRegistry, mWindow->nativeHandle(), mWindow->glContext());
-
-	mCamera = std::make_unique<Camera>(glm::vec3(0.0f, 2.0f, 5.0f));
-	mEventBus = std::make_unique<EventBus>();
+	mRenderPipeline = &registry->addSystem<RenderPipeline>(mRegistry, *mCamera, mWindow->nativeHandle(), mWindow->glContext());
 }
 
 void Engine::configure() const {
 	mCamera->configure(*mEventBus);
-	mRenderPipeline->batchEntities();
 	mRenderPipeline->configure(*mCamera, *mEventBus);
 }
 
