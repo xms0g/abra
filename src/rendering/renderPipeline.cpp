@@ -146,12 +146,6 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	}
 	mSceneBuffer->unbind();
 
-	// Create camera buffer
-	mCameraUBO = std::make_unique<UniformBuffer>(
-		DYNAMIC,
-		3 * sizeof(glm::mat4) + sizeof(glm::vec4),
-		cfg.get<uint32_t>("camera.ubo_binding"));
-
 	// Create render passes
 	mRenderPasses.emplace_back(std::make_unique<CullingPass>());
 
@@ -191,7 +185,12 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	mRenderCtx->sceneBuffer = mSceneBuffer.get();
 	mRenderCtx->camera.self = &camera;
 
-	// Set camera projection matrix
+	// Create camera buffer
+	mCameraUBO = std::make_unique<UniformBuffer>(
+		DYNAMIC,
+		3 * sizeof(glm::mat4) + sizeof(glm::vec4),
+		cfg.get<uint32_t>("camera.ubo_binding"));
+
 	const glm::mat4 projectionMat = glm::perspective(
 		glm::radians(camera.zoom()),
 		static_cast<float>(width) / static_cast<float>(height),
@@ -199,7 +198,6 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 
 	const glm::mat4 invProjectionMat = glm::inverse(projectionMat);
 
-	mCameraUBO->bind();
 	mCameraUBO->setData(glm::value_ptr(projectionMat), sizeof(glm::mat4), sizeof(glm::mat4) + sizeof(glm::vec4));
 	mCameraUBO->setData(glm::value_ptr(invProjectionMat), sizeof(glm::mat4), 2 * sizeof(glm::mat4) + sizeof(glm::vec4));
 	mCameraUBO->unbind();

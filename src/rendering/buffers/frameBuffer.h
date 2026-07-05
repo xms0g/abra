@@ -21,7 +21,7 @@ public:
 
 	void bind() const;
 
-	static void unbind();
+	void unbind();
 
 	void bindTexture(const uint32_t slot, const uint32_t index = 0) const {
 		bindTextureImpl(slot, index);
@@ -29,7 +29,7 @@ public:
 
 	void resizeRenderBuffer(int32_t width, int32_t height) const;
 
-	static void checkStatus();
+	void checkStatus();
 
 	virtual void generateMipmaps() = 0;
 
