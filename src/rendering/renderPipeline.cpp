@@ -77,8 +77,8 @@ RenderPipeline::~RenderPipeline() {
 void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	batchEntities();
 	createRenderPasses(eventBus);
-	configureSystems(eventBus);
 	createUniformBuffers(camera);
+	configureSystems(eventBus);
 	configureShaders();
 }
 
