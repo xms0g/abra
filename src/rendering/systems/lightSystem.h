@@ -1,10 +1,8 @@
 #pragma once
 #include "glm/glm.hpp"
-#include "../renderContext/renderContext.hpp"
-#include "../renderContext/renderData.hpp"
 #include "../../ECS/system.hpp"
-#include "../../event/events/guiLightEvent.hpp"
 
+struct RenderContext;
 struct GuiLightEvent;
 class EventBus;
 class UniformBuffer;
@@ -28,9 +26,6 @@ private:
 	void updateLightUBO();
 
 	void onGuiUpdate(const GuiLightEvent& event);
-
-	template<typename TLightComponent, typename TLightPtr>
-	void tryProcessLight(const Entity& entity, const GuiLightEvent& event, std::vector<TLightPtr*>& lightList);
 
 	EventBus* mEventBus{};
 	const RenderContext* mCtx{};
@@ -75,12 +70,3 @@ private:
 
 	PackedLights mGPUData;
 };
-
-template<typename TLightComponent, typename TLightPtr>
-void LightSystem::tryProcessLight(const Entity& entity, const GuiLightEvent& event, std::vector<TLightPtr*>& lightList) {
-	if (entity.hasComponent<TLightComponent>()) {
-		auto& light = entity.getComponent<TLightComponent>();
-		mCtx->renderData->material.colors[event.matIdx] = light.diffuse;
-		lightList[event.lightIdx] = &light;
-	}
-}
