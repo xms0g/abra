@@ -42,7 +42,7 @@ void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 		{"kernelSize", cfg.get<int32_t>("ssao.kernelSize")}
 	};
 
-	const TextureBinding blurTextureBindings[] = {
+	constexpr TextureBinding blurTextureBindings[] = {
 		{"ssaoTexture", 0}
 	};
 

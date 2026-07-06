@@ -49,7 +49,6 @@
 #include "../event/eventBus.hpp"
 #include "../resource/resourceManager.h"
 
-
 RenderPipeline::RenderPipeline(Registry& registry, const Camera& camera, Window& window) {
 	RequireComponent<MeshComponent>();
 	RequireComponent<TransformComponent>();
