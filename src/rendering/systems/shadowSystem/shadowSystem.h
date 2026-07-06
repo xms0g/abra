@@ -16,9 +16,6 @@ public:
 
 	~ShadowSystem();
 
-	[[nodiscard]]
-	const UniformBuffer* ubo() const;
-
 	void configure(const RenderContext& ctx, EventBus& eventBus);
 
 private:

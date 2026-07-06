@@ -15,9 +15,6 @@ public:
 
 	void configure(const RenderContext& ctx, EventBus& eventBus);
 
-	[[nodiscard]]
-	const UniformBuffer* ubo() const;
-
 	std::vector<DirectionalLightComponent*>& dirLights();
 
 	std::vector<PointLightComponent*>& pointLights();

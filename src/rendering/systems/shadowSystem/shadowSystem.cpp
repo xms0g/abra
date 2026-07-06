@@ -26,10 +26,6 @@ ShadowSystem::ShadowSystem() = default;
 
 ShadowSystem::~ShadowSystem() = default;
 
-const UniformBuffer* ShadowSystem::ubo() const {
-	return mUBO.get();
-}
-
 void ShadowSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mCtx = &ctx;
 	mWidth= cfg.get<int32_t>("window.width");

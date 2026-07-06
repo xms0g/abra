@@ -83,10 +83,6 @@ void LightSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 	updateLightUBO();
 }
 
-const UniformBuffer* LightSystem::ubo() const {
-	return mUBO.get();
-}
-
 std::vector<DirectionalLightComponent*>& LightSystem::dirLights() {
 	return mDirLights;
 }
