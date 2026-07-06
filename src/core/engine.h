@@ -14,7 +14,7 @@ public:
 
 	~Engine();
 
-	void init(Registry* registry);
+	void init(Registry& registry);
 
 	void configure() const;
 
@@ -26,7 +26,6 @@ private:
 	// Engine
 	bool isRunning{true};
 
-	Registry* mRegistry{};
 	GuiSystem* mGuiSystem{};
 	RenderPipeline* mRenderPipeline{};
 	std::unique_ptr<Window> mWindow;

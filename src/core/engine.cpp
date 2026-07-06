@@ -14,9 +14,7 @@ Engine::Engine() = default;
 
 Engine::~Engine() = default;
 
-void Engine::init(Registry* registry) {
-	mRegistry = registry;
-
+void Engine::init(Registry& registry) {
 	mCamera = std::make_unique<Camera>(glm::vec3(0.0f, 2.0f, 5.0f));
 	mEventBus = std::make_unique<EventBus>();
 
@@ -25,8 +23,8 @@ void Engine::init(Registry* registry) {
 		cfg.get<int32_t>("msaa.sample_count"),
 		cfg.get<bool>("window.fullscreen"));
 
-	mGuiSystem = &registry->addSystem<GuiSystem>();
-	mRenderPipeline = &registry->addSystem<RenderPipeline>(mRegistry, *mCamera, mWindow->nativeHandle(), mWindow->glContext());
+	mGuiSystem = &registry.addSystem<GuiSystem>();
+	mRenderPipeline = &registry.addSystem<RenderPipeline>(registry, *mCamera, mWindow->nativeHandle(), mWindow->glContext());
 }
 
 void Engine::configure() const {

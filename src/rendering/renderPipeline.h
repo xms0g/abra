@@ -25,7 +25,7 @@ typedef void* SDL_GLContext;
 
 class RenderPipeline final : public System {
 public:
-	explicit RenderPipeline(Registry* registry, const Camera& camera, SDL_Window* window, SDL_GLContext context);
+	explicit RenderPipeline(Registry& registry, const Camera& camera, SDL_Window* window, SDL_GLContext context);
 
 	~RenderPipeline() override;
 
@@ -36,7 +36,7 @@ public:
 	static void drawGui();
 
 private:
-	void createSystems(Registry* registry);
+	void createSystems(Registry& registry);
 
 	void createUniformBuffers(const Camera& camera);
 

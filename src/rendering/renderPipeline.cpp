@@ -48,7 +48,7 @@
 #include "../event/eventBus.hpp"
 #include "../resource/resourceManager.h"
 
-RenderPipeline::RenderPipeline(Registry* registry, const Camera& camera, SDL_Window* window, SDL_GLContext context) {
+RenderPipeline::RenderPipeline(Registry& registry, const Camera& camera, SDL_Window* window, SDL_GLContext context) {
 	RequireComponent<MeshComponent>();
 	RequireComponent<TransformComponent>();
 	// glad: load all OpenGL function pointers
@@ -103,8 +103,8 @@ void RenderPipeline::drawGui() {
 	GuiBackend::renderFrame();
 }
 
-void RenderPipeline::createSystems(Registry* registry) {
-	mLightSystem = &registry->addSystem<LightSystem>();
+void RenderPipeline::createSystems(Registry& registry) {
+	mLightSystem = &registry.addSystem<LightSystem>();
 	mShadowSystem = std::make_unique<ShadowSystem>();
 	mSyncStateSystem = std::make_unique<SyncStateSystem>();
 }

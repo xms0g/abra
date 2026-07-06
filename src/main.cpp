@@ -26,15 +26,15 @@ int main(int argc, char **argv) {
 		Engine engine;
 
 		cfg.load("config.toml");
-		engine.init(&registry);
+		engine.init(registry);
 
 		rm.createShaders();
 		SceneLoader::loadScene(registry, sceneName);
 		rm.createBuffers();
 
 		registry.update();
-		engine.configure();
 
+		engine.configure();
 		engine.run();
 	} catch (std::exception& e) {
 		std::cerr << e.what() << std::endl;
