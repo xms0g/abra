@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <array>
+#include "glm/glm.hpp"
 
 class EventBus;
 struct UpdateShadowMapEvent;
@@ -19,11 +20,11 @@ public:
 	void configure(const RenderContext& ctx, EventBus& eventBus);
 
 private:
-	void directionalShadowPass() const;
+	void directionalShadowPass();
 
 	void omnidirectionalShadowPass() const;
 
-	void perspectiveShadowPass() const;
+	void perspectiveShadowPass();
 
 	void onGuiUpdate(const UpdateShadowMapEvent& event);
 
@@ -34,4 +35,12 @@ private:
 	std::unique_ptr<DirectionalShadow> mDirShadow;
 	std::unique_ptr<OmnidirectionalShadow> mOmnidirShadow;
 	std::unique_ptr<PerspectiveShadow> mPersShadow;
+
+	struct alignas(16) ShadowData {
+		glm::mat4 lightSpaceMatrix{};
+		glm::mat4 persLightSpaceMatrix[4]{};
+		glm::vec4 omniFarPlane{};
+	};
+
+	ShadowData mGPUData;
 };

@@ -12,42 +12,6 @@
 #include "../../event/events/updateShadowMapEvent.hpp"
 #include "../../config/configManager.h"
 
-struct alignas(16) DirectionalLight {
-	glm::vec4 direction;
-	glm::vec4 ambient;
-	glm::vec4 diffuse;
-	glm::vec4 specular;
-	glm::vec4 intensity;
-};
-
-struct alignas(16) PointLight {
-	glm::vec4 position;
-	glm::vec4 ambient;
-	glm::vec4 diffuse;
-	glm::vec4 specular;
-	glm::vec4 attenuation;
-	glm::vec4 intensity;
-};
-
-struct alignas(16) SpotLight {
-	glm::vec4 position;
-	glm::vec4 direction;
-	glm::vec4 ambient;
-	glm::vec4 diffuse;
-	glm::vec4 specular;
-	glm::vec4 attenuation;
-	glm::vec4 cutOff;
-};
-
-struct alignas(16) PackedLights {
-	DirectionalLight dirLights[1]{};
-	PointLight pointLights[4]{};
-	SpotLight spotLights[4]{};
-	glm::ivec4 lightCount{};
-};
-
-static PackedLights gpuData;
-
 LightSystem::LightSystem() {
 	RequireComponent<DirectionalLightComponent>(true);
 	RequireComponent<PointLightComponent>(true);
@@ -95,61 +59,61 @@ std::vector<SpotLightComponent*>& LightSystem::spotLights() {
 	return mSpotLights;
 }
 
-void LightSystem::updateLightUBO() const {
+void LightSystem::updateLightUBO() {
 	uint32_t dirLightCount{0}, pointLightCount{0}, spotLightCount{0};
 
 	for (size_t i = 0; i < mDirLights.size(); ++i) {
 		if (!mDirLights[i]) continue;
 
 		++dirLightCount;
-		gpuData.dirLights[i].direction = glm::vec4(mDirLights[i]->direction, 0.0f);
-		gpuData.dirLights[i].ambient = glm::vec4(mDirLights[i]->ambient, 0.0f);
-		gpuData.dirLights[i].diffuse = glm::vec4(mDirLights[i]->diffuse, 0.0f);
-		gpuData.dirLights[i].specular = glm::vec4(mDirLights[i]->specular, 0.0f);
-		gpuData.dirLights[i].intensity = glm::vec4(mDirLights[i]->intensity, 0.0f, 0.0f, 0.0f);
+		mGPUData.dirLights[i].direction = glm::vec4(mDirLights[i]->direction, 0.0f);
+		mGPUData.dirLights[i].ambient = glm::vec4(mDirLights[i]->ambient, 0.0f);
+		mGPUData.dirLights[i].diffuse = glm::vec4(mDirLights[i]->diffuse, 0.0f);
+		mGPUData.dirLights[i].specular = glm::vec4(mDirLights[i]->specular, 0.0f);
+		mGPUData.dirLights[i].intensity = glm::vec4(mDirLights[i]->intensity, 0.0f, 0.0f, 0.0f);
 	}
 
 	for (size_t i = 0; i < mPointLights.size(); ++i) {
 		if (!mPointLights[i]) continue;
 
 		++pointLightCount;
-		gpuData.pointLights[i].position = glm::vec4(mPointLights[i]->position, 0.0f);
-		gpuData.pointLights[i].ambient = glm::vec4(mPointLights[i]->ambient, 0.0f);
-		gpuData.pointLights[i].diffuse = glm::vec4(mPointLights[i]->diffuse, 0.0f);
-		gpuData.pointLights[i].specular = glm::vec4(mPointLights[i]->specular, 0.0f);
-		gpuData.pointLights[i].attenuation = glm::vec4(
+		mGPUData.pointLights[i].position = glm::vec4(mPointLights[i]->position, 0.0f);
+		mGPUData.pointLights[i].ambient = glm::vec4(mPointLights[i]->ambient, 0.0f);
+		mGPUData.pointLights[i].diffuse = glm::vec4(mPointLights[i]->diffuse, 0.0f);
+		mGPUData.pointLights[i].specular = glm::vec4(mPointLights[i]->specular, 0.0f);
+		mGPUData.pointLights[i].attenuation = glm::vec4(
 			mPointLights[i]->constant,
 			mPointLights[i]->linear,
 			mPointLights[i]->quadratic,
 			static_cast<float>(mPointLights[i]->castShadow));
-		gpuData.pointLights[i].intensity = glm::vec4(mPointLights[i]->intensity, 0.0f, 0.0f, 0.0f);
+		mGPUData.pointLights[i].intensity = glm::vec4(mPointLights[i]->intensity, 0.0f, 0.0f, 0.0f);
 	}
 
 	for (size_t i = 0; i < mSpotLights.size(); ++i) {
 		if (!mSpotLights[i]) continue;
 
 		++spotLightCount;
-		gpuData.spotLights[i].direction = glm::vec4(mSpotLights[i]->direction, 0.0f);
-		gpuData.spotLights[i].position = glm::vec4(mSpotLights[i]->position, 0.0f);
-		gpuData.spotLights[i].ambient = glm::vec4(mSpotLights[i]->ambient, 0.0f);
-		gpuData.spotLights[i].diffuse = glm::vec4(mSpotLights[i]->diffuse, 0.0f);
-		gpuData.spotLights[i].specular = glm::vec4(mSpotLights[i]->specular, 0.0f);
-		gpuData.spotLights[i].attenuation = glm::vec4(
+		mGPUData.spotLights[i].direction = glm::vec4(mSpotLights[i]->direction, 0.0f);
+		mGPUData.spotLights[i].position = glm::vec4(mSpotLights[i]->position, 0.0f);
+		mGPUData.spotLights[i].ambient = glm::vec4(mSpotLights[i]->ambient, 0.0f);
+		mGPUData.spotLights[i].diffuse = glm::vec4(mSpotLights[i]->diffuse, 0.0f);
+		mGPUData.spotLights[i].specular = glm::vec4(mSpotLights[i]->specular, 0.0f);
+		mGPUData.spotLights[i].attenuation = glm::vec4(
 			mSpotLights[i]->constant,
 			mSpotLights[i]->linear,
 			mSpotLights[i]->quadratic,
 			static_cast<float>(mSpotLights[i]->castShadow));
-		gpuData.spotLights[i].cutOff = glm::vec4(
+		mGPUData.spotLights[i].cutOff = glm::vec4(
 			mSpotLights[i]->cutOff,
 			mSpotLights[i]->outerCutOff,
 			mSpotLights[i]->intensity,
 			0.0f);
 	}
 
-	gpuData.lightCount = glm::ivec4(dirLightCount, pointLightCount, spotLightCount, 0);
+	mGPUData.lightCount = glm::ivec4(dirLightCount, pointLightCount, spotLightCount, 0);
 
 	mUBO->bind();
-	mUBO->setData(&gpuData, sizeof(PackedLights), 0);
+	mUBO->setData(&mGPUData, sizeof(PackedLights), 0);
 }
 
 void LightSystem::onGuiUpdate(const GuiLightEvent& event) {

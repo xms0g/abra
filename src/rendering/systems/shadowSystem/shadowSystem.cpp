@@ -14,14 +14,6 @@
 #include "../../../event/eventBus.hpp"
 #include "../../../event/events/updateShadowMapEvent.hpp"
 
-struct alignas(16) ShadowData {
-	glm::mat4 lightSpaceMatrix{};
-	glm::mat4 persLightSpaceMatrix[4]{};
-	glm::vec4 omniFarPlane{};
-};
-
-static ShadowData gpuData{};
-
 ShadowSystem::ShadowSystem() = default;
 
 ShadowSystem::~ShadowSystem() = default;
@@ -48,20 +40,20 @@ void ShadowSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 
 	eventBus.subscribeToEvent<ShadowSystem, UpdateShadowMapEvent>(this, &ShadowSystem::onGuiUpdate);
 
-	gpuData.omniFarPlane = glm::vec4(cfg.get<float>("shadow.omnidirectional.farPlane"), 0.0f, 0.0f, 0.0f);
+	mGPUData.omniFarPlane = glm::vec4(cfg.get<float>("shadow.omnidirectional.farPlane"), 0.0f, 0.0f, 0.0f);
 
 	constexpr UpdateShadowMapEvent event;
 	onGuiUpdate(event);
 }
 
-void ShadowSystem::directionalShadowPass() const {
+void ShadowSystem::directionalShadowPass() {
 	const auto& lights = *mCtx->light.dirLights;
 
 	if (!lights[0])
 		return;
 
 	mDirShadow->render(*mCtx, lights[0]->direction);
-	gpuData.lightSpaceMatrix = mDirShadow->lightSpaceMatrix();
+	mGPUData.lightSpaceMatrix = mDirShadow->lightSpaceMatrix();
 }
 
 void ShadowSystem::omnidirectionalShadowPass() const {
@@ -82,7 +74,7 @@ void ShadowSystem::omnidirectionalShadowPass() const {
 	mOmnidirShadow->depthMap().unbind();
 }
 
-void ShadowSystem::perspectiveShadowPass() const {
+void ShadowSystem::perspectiveShadowPass() {
 	const auto& lights = *mCtx->light.spotLights;
 
 	mPersShadow->depthMap().bind();
@@ -94,7 +86,7 @@ void ShadowSystem::perspectiveShadowPass() const {
 			continue;
 
 		mPersShadow->render(*mCtx, light->direction, light->position, light->outerCutOff, i);
-		gpuData.persLightSpaceMatrix[i] = mPersShadow->lightSpaceMatrix(i);
+		mGPUData.persLightSpaceMatrix[i] = mPersShadow->lightSpaceMatrix(i);
 	}
 
 	mPersShadow->depthMap().unbind();
@@ -111,5 +103,5 @@ void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
 	glViewport(0, 0, mWidth, mHeight);
 
 	mUBO->bind();
-	mUBO->setData(&gpuData, sizeof(ShadowData), 0);
+	mUBO->setData(&mGPUData, sizeof(ShadowData), 0);
 }
