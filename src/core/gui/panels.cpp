@@ -92,22 +92,7 @@ void GuiPanels::renderDirLight(const Entity& entity, EventBus& eventBus) {
 	if (isDirty) {
 		uint32_t matIdx = entity.getComponent<MaterialComponent>().materials[0].at(0).idx;
 
-		eventBus.emitEvent<GuiLightEvent>(
-			entity.id(),
-			matIdx,
-			0u,
-			dirLight.direction,
-			glm::vec3(0.0f),
-			dirLight.ambient,
-			dirLight.diffuse,
-			dirLight.specular,
-			0.0f,
-			0.0f,
-			0.0f,
-			0.0f,
-			0.0f,
-			dirLight.intensity,
-			true);
+		eventBus.emitEvent<GuiLightEvent>(entity.id(), matIdx, 0u);
 	}
 }
 
@@ -126,23 +111,9 @@ void GuiPanels::renderPointLight(const Entity& entity, EventBus& eventBus) {
 
 	if (transform.isDirty) {
 		uint32_t matIdx = entity.getComponent<MaterialComponent>().materials[0].at(0).idx;
+		pointLight.position = transform.position;
 
-		eventBus.emitEvent<GuiLightEvent>(
-			entity.id(),
-			matIdx,
-			pointLight.idx,
-			glm::vec3(0.0f),
-			transform.position,
-			pointLight.ambient,
-			pointLight.diffuse,
-			pointLight.specular,
-			pointLight.constant,
-			pointLight.linear,
-			pointLight.quadratic,
-			0.0f,
-			0.0f,
-			pointLight.intensity,
-			pointLight.castShadow);
+		eventBus.emitEvent<GuiLightEvent>(entity.id(), matIdx, pointLight.idx);
 	}
 
 	transform.isDirty = false;
@@ -166,23 +137,9 @@ void GuiPanels::renderSpotLight(const Entity& entity, EventBus& eventBus) {
 
 	if (transform.isDirty) {
 		uint32_t matIdx = entity.getComponent<MaterialComponent>().materials[0].at(0).idx;
+		spotLight.position = transform.position;
 
-		eventBus.emitEvent<GuiLightEvent>(
-			entity.id(),
-			matIdx,
-			spotLight.idx,
-			spotLight.direction,
-			transform.position,
-			spotLight.ambient,
-			spotLight.diffuse,
-			spotLight.specular,
-			spotLight.constant,
-			spotLight.linear,
-			spotLight.quadratic,
-			spotLight.cutOff,
-			spotLight.outerCutOff,
-			spotLight.intensity,
-			spotLight.castShadow);
+		eventBus.emitEvent<GuiLightEvent>(entity.id(), matIdx, spotLight.idx);
 	}
 
 	transform.isDirty = false;

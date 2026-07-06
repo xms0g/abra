@@ -44,6 +44,7 @@ void LightSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 		DYNAMIC,
 		sizeof(PackedLights),
 		cfg.get<uint32_t>("light.ubo_binding"));
+
 	updateLightUBO();
 }
 
@@ -117,56 +118,13 @@ void LightSystem::updateLightUBO() {
 }
 
 void LightSystem::onGuiUpdate(const GuiLightEvent& event) {
-	mCtx->renderData->material.colors[event.matIdx] = event.diffuse;
+	const auto entityIt = std::ranges::find_if(getSystemEntities(), [event](const Entity& e) {
+		return e.id() == event.entityID;
+	});
 
-	for (auto& entity: getSystemEntities()) {
-		if (entity.id() == event.entityID) {
-			if (entity.hasComponent<DirectionalLightComponent>()) {
-				auto& light = entity.getComponent<DirectionalLightComponent>();
-
-				light.direction = event.direction;
-				light.ambient = event.ambient;
-				light.diffuse = event.diffuse;
-				light.specular = event.specular;
-				light.intensity = event.intensity;
-
-				mDirLights[event.lightIdx] = &light;
-			} else if (entity.hasComponent<PointLightComponent>()) {
-				auto& light = entity.getComponent<PointLightComponent>();
-
-				light.position = event.position;
-				light.ambient = event.ambient;
-				light.diffuse = event.diffuse;
-				light.specular = event.specular;
-				light.constant = event.constant;
-				light.linear = event.linear;
-				light.quadratic = event.quadratic;
-				light.intensity = event.intensity;
-				light.castShadow = event.castShadow;
-
-				mPointLights[event.lightIdx] = &light;
-			} else if (entity.hasComponent<SpotLightComponent>()) {
-				auto& light = entity.getComponent<SpotLightComponent>();
-
-				light.position = event.position;
-				light.direction = event.direction;
-				light.ambient = event.ambient;
-				light.diffuse = event.diffuse;
-				light.specular = event.specular;
-				light.constant = event.constant;
-				light.linear = event.linear;
-				light.quadratic = event.quadratic;
-				light.cutOff = event.cutOff;
-				light.outerCutOff = event.outerCutOff;
-				light.intensity = event.intensity;
-				light.castShadow = event.castShadow;
-
-				mSpotLights[event.lightIdx] = &light;
-			}
-
-			break;
-		}
-	}
+	tryProcessLight<DirectionalLightComponent>(*entityIt, event, mDirLights);
+	tryProcessLight<PointLightComponent>(*entityIt, event, mPointLights);
+	tryProcessLight<SpotLightComponent>(*entityIt, event, mSpotLights);
 
 	updateLightUBO();
 	mEventBus->emitEvent<UpdateShadowMapEvent>();
