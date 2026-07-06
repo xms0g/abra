@@ -3,7 +3,7 @@
 #include "glad/glad.h"
 #include "../config/configManager.h"
 
-Window::Window(const std::string& title, int multisamples, bool fullscreen) {
+Window::Window(const std::string& title, const int multisamples, const bool fullscreen) {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		throw std::runtime_error("Failed to initialize SDL_VIDEO");
 	}

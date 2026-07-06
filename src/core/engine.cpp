@@ -24,7 +24,7 @@ void Engine::init(Registry& registry) {
 		cfg.get<bool>("window.fullscreen"));
 
 	mGuiSystem = &registry.addSystem<GuiSystem>();
-	mRenderPipeline = &registry.addSystem<RenderPipeline>(registry, *mCamera, mWindow->nativeHandle(), mWindow->glContext());
+	mRenderPipeline = &registry.addSystem<RenderPipeline>(registry, *mCamera, *mWindow);
 }
 
 void Engine::configure() const {
@@ -39,7 +39,7 @@ void Engine::run() {
 		mDeltaTime = static_cast<float>(SDL_GetTicks() - mMillisecsPreviousFrame) / 1000.0f;
 		mMillisecsPreviousFrame = SDL_GetTicks();
 
-		Input::process(*mEventBus, mWindow->nativeHandle(), mDeltaTime, isRunning);
+		Input::process(*mEventBus, &**mWindow, mDeltaTime, isRunning);
 		mCamera->update();
 		mGuiSystem->update(mDeltaTime);
 

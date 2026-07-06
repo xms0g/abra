@@ -3,6 +3,7 @@
 #include <vector>
 #include "../ECS/system.hpp"
 
+class Window;
 class RenderQueue;
 struct RenderData;
 class SyncStateSystem;
@@ -19,13 +20,10 @@ class Registry;
 class LightSystem;
 class PostProcessPass;
 struct RenderContext;
-struct SDL_Window;
-
-typedef void* SDL_GLContext;
 
 class RenderPipeline final : public System {
 public:
-	explicit RenderPipeline(Registry& registry, const Camera& camera, SDL_Window* window, SDL_GLContext context);
+	explicit RenderPipeline(Registry& registry, const Camera& camera, Window& window);
 
 	~RenderPipeline() override;
 

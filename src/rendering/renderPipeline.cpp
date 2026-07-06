@@ -36,6 +36,7 @@
 #include "material/material.hpp"
 #include "../config/configManager.h"
 #include "../core/camera.h"
+#include "../core/window.h"
 #include "../ECS/registry.h"
 #include "../ECS/components/bv.hpp"
 #include "../ECS/components/debug.hpp"
@@ -48,7 +49,8 @@
 #include "../event/eventBus.hpp"
 #include "../resource/resourceManager.h"
 
-RenderPipeline::RenderPipeline(Registry& registry, const Camera& camera, SDL_Window* window, SDL_GLContext context) {
+
+RenderPipeline::RenderPipeline(Registry& registry, const Camera& camera, Window& window) {
 	RequireComponent<MeshComponent>();
 	RequireComponent<TransformComponent>();
 	// glad: load all OpenGL function pointers
@@ -67,7 +69,7 @@ RenderPipeline::RenderPipeline(Registry& registry, const Camera& camera, SDL_Win
 	createFrameBuffers();
 	createRenderContext(camera);
 
-	GuiBackend::init(window, context, "#version 410");
+	GuiBackend::init(&*window, window.glContext(), "#version 410");
 }
 
 RenderPipeline::~RenderPipeline() {
