@@ -30,6 +30,9 @@ public:
 	[[nodiscard]]
 	bool hasComponent() const;
 
+	template<typename T>
+	T* tryGetComponent() const;
+
 private:
 	size_t mID{};
 	std::string mName;

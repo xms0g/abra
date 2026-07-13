@@ -1,5 +1,5 @@
 #pragma once
-#include <cstdint>
+#include <cassert>
 #include <typeindex>
 #include <unordered_map>
 #include <vector>
@@ -33,16 +33,31 @@ public:
 
 	template<typename T>
 	T& getComponent(const Entity& e) {
-		const auto componentID = Component<T>::getID();
-		auto& pool = componentPools[componentID];
+		auto* component = tryGetComponent<T>(e);
+		assert(component && "Component does not exist");
 
-		return static_cast<Pool<T>*>(pool.get())->data[e.id()];
+		return *component;
 	}
 
 	template<typename T>
 	bool hasComponent(const Entity& e) {
 		const auto componentID = Component<T>::getID();
 		return entityComponentSignatures[e.id()].test(componentID);
+	}
+
+	template<typename T>
+	T* tryGetComponent(const Entity& e) const {
+		const auto componentID = Component<T>::getID();
+
+		const auto& poolIt = componentPools.find(componentID);
+		if (poolIt == componentPools.end()) {
+			return nullptr;
+		}
+
+		auto& pool = static_cast<Pool<T>*>(poolIt->second.get())->data;
+
+		const auto& compIt = pool.find(e.id());
+		return compIt != pool.end() ? &compIt->second : nullptr;
 	}
 
 	template<typename T, typename ...Args>
@@ -96,6 +111,11 @@ template<typename T>
 [[nodiscard]]
 bool Entity::hasComponent() const {
 	return registry->hasComponent<T>(*this);
+}
+
+template<typename T>
+T* Entity::tryGetComponent() const {
+	return registry->tryGetComponent<T>(*this);
 }
 
 

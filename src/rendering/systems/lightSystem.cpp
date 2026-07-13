@@ -109,10 +109,9 @@ void LightSystem::onGuiUpdate(const GuiLightEvent& event) {
 		const Entity& entity,
 		const GuiLightEvent& e,
 		std::vector<TLightComponent*>& lightList) {
-		if (entity.hasComponent<TLightComponent>()) {
-			auto& light = entity.getComponent<TLightComponent>();
-			mCtx->renderData->material.colors[e.matIdx] = light.diffuse;
-			lightList[e.lightIdx] = &light;
+		if (const auto& light= entity.tryGetComponent<TLightComponent>()) {
+			mCtx->renderData->material.colors[e.matIdx] = light->diffuse;
+			lightList[e.lightIdx] = light;
 		}
 	};
 
