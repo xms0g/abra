@@ -20,7 +20,8 @@
             "textures/hdr/newport_loft.hdr"
           ]
         },
-        "BoundingVolumeComponent": { "type": "Dummy" }
+        "BoundingVolumeComponent": { "type": "Dummy" },
+        "DebugComponent": {}
       }
     },
     {
@@ -84,7 +85,8 @@
           "intensity": 2.1,
           "cast_shadows": true
         },
-        "BoundingVolumeComponent": { "type": "AABB" }
+        "BoundingVolumeComponent": { "type": "AABB" },
+        "DebugComponent": {}
       }
     }
   ]

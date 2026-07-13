@@ -50,15 +50,16 @@ void GuiPanels::renderTransformPanel(const Entity& entity, EventBus& eventBus) {
 void GuiPanels::renderDebugViewsPanel(const Entity& entity, EventBus& eventBus) {
 	ImGui::PushID(static_cast<int>(entity.id()));
 	if (ImGui::TreeNodeEx("Debug Views", ImGuiTreeNodeFlags_DefaultOpen)) {
-		const auto& debug = entity.getComponent<DebugComponent>();
+		auto& debug = entity.getComponent<DebugComponent>();
 		static constexpr const char* modes[] = {"None", "Normals", "Wireframe"};
 
-		static int32_t currentMode = static_cast<int32_t>(debug.mode);
+		int32_t currentMode = static_cast<int32_t>(debug.mode);
 
 		ImGui::Text("Mode");
 		ImGui::SameLine(70);
 		if (ImGui::Combo("##mode", &currentMode, modes, IM_ARRAYSIZE(modes))) {
-			eventBus.emitEvent<GuiDebugEvent>(entity.id(), static_cast<DebugMode>(currentMode));
+			debug.mode = static_cast<DebugMode>(currentMode);
+			eventBus.emitEvent<GuiDebugEvent>(entity.id(), debug.mode);
 		}
 		ImGui::TreePop();
 	}
