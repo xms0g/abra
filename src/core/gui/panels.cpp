@@ -165,7 +165,7 @@ void GuiPanels::renderPostProcessPanel(EventBus& eventBus) {
 	};
 
 	if (ImGui::TreeNodeEx("Post-Processing", ImGuiTreeNodeFlags_DefaultOpen)) {
-		static std::span<Effect> effectsSpan{effects};
+		std::span<Effect> effectsSpan{effects};
 
 		for (uint32_t i = 0; i < effectsSpan.size(); ++i) {
 			auto& fx = effectsSpan[i];
