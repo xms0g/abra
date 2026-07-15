@@ -12,19 +12,19 @@
 #include "../../../config/configManager.h"
 
 PerspectiveShadow::PerspectiveShadow(const RenderContext& ctx) {
-	mWidth = cfg.get<int32_t>("shadow.map_width");
-	mHeight = cfg.get<int32_t>("shadow.map_height");
+	mWidth = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_width");
+	mHeight = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_height");
 	mAspect = static_cast<float>(mWidth) / static_cast<float>(mHeight);
 	mDepthMap = std::make_unique<FrameBuffer>(mWidth, mHeight);
-	mDepthMap->withTextureDepthArray(cfg.get<int32_t>("light.max_spot"), GL_DEPTH_COMPONENT24, true)
+	mDepthMap->withTextureDepthArray(CONFIG_MANAGER_INSTANCE.get<int32_t>("light.max_spot"), GL_DEPTH_COMPONENT24, true)
 			.checkStatus();
 	mDepthMap->unbind();
 
-	mDepthShader = rm.get<Shader>("depth");
+	mDepthShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("depth");
 	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("shadow");
 
-	mNear = cfg.get<float>("shadow.perspective.nearPlane");
-	mFar = cfg.get<float>("shadow.perspective.farPlane");
+	mNear = CONFIG_MANAGER_INSTANCE.get<float>("shadow.perspective.nearPlane");
+	mFar = CONFIG_MANAGER_INSTANCE.get<float>("shadow.perspective.farPlane");
 }
 
 PerspectiveShadow::~PerspectiveShadow() = default;

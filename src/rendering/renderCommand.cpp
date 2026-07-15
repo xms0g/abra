@@ -177,7 +177,7 @@ void RenderCommand::drawSkybox(const uint32_t vao) {
 }
 
 void RenderCommand::bindShadowMaps(const RenderContext& ctx) {
-	const int32_t slot = GL_TEXTURE0 + cfg.get<int32_t>("shadow.texture_slot");
+	const int32_t slot = GL_TEXTURE0 + CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot");
 
 	glActiveTexture(slot);
 	glBindTexture(GL_TEXTURE_2D, ctx.renderData->shadowMaps[0]);

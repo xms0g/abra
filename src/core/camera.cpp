@@ -52,17 +52,17 @@ math::Frustum Camera::generateFrustum() const {
 }
 
 void Camera::configure(EventBus& eventBus) {
-	mYaw = cfg.get<float>("camera.yaw");
-	mPitch = cfg.get<float>("camera.pitch");
-	mMovementSpeed = cfg.get<float>("camera.speed");
-	mMouseSensitivity = cfg.get<float>("camera.sensitivity");
-	mZNear = cfg.get<float>("camera.znear");
-	mZFar = cfg.get<float>("camera.zfar");
-	mZoom = cfg.get<float>("camera.zoom");
+	mYaw = CONFIG_MANAGER_INSTANCE.get<float>("camera.yaw");
+	mPitch = CONFIG_MANAGER_INSTANCE.get<float>("camera.pitch");
+	mMovementSpeed = CONFIG_MANAGER_INSTANCE.get<float>("camera.speed");
+	mMouseSensitivity = CONFIG_MANAGER_INSTANCE.get<float>("camera.sensitivity");
+	mZNear = CONFIG_MANAGER_INSTANCE.get<float>("camera.znear");
+	mZFar = CONFIG_MANAGER_INSTANCE.get<float>("camera.zfar");
+	mZoom = CONFIG_MANAGER_INSTANCE.get<float>("camera.zoom");
 	mHalfVSide = mZFar * tanf(glm::radians(mZoom) * 0.5f);
 
-	const float width = static_cast<float>(cfg.get<int32_t>("window.width"));
-	const float height = static_cast<float>(cfg.get<int32_t>("window.height"));
+	const float width = static_cast<float>(CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"));
+	const float height = static_cast<float>(CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"));
 	mHalfHSide = mHalfVSide * (width / height);
 
 	update();

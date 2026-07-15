@@ -115,11 +115,11 @@ void RenderPipeline::createUniformBuffers(const Camera& camera) {
 	mCameraUBO = std::make_unique<UniformBuffer>(
 		DYNAMIC,
 		3 * sizeof(glm::mat4) + sizeof(glm::vec4),
-		cfg.get<uint32_t>("camera.ubo_binding"));
+		CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"));
 
 	const glm::mat4 projectionMat = glm::perspective(
 		glm::radians(camera.zoom()),
-		static_cast<float>(cfg.get<int32_t>("window.width")) / static_cast<float>(cfg.get<int32_t>("window.height")),
+		static_cast<float>(CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width")) / static_cast<float>(CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height")),
 		camera.znear(), camera.zfar());
 
 	const glm::mat4 invProjectionMat = glm::inverse(projectionMat);
@@ -176,7 +176,7 @@ void RenderPipeline::createRenderPasses(EventBus& eventBus) {
 
 	mRenderPasses.emplace_back(std::make_unique<SkyboxPass>());
 
-	if (cfg.get<bool>("msaa.enabled")) {
+	if (CONFIG_MANAGER_INSTANCE.get<bool>("msaa.enabled")) {
 		mRenderPasses.emplace_back(std::make_unique<ResolvePass>());
 		mRenderCtx->intermediateBuffer = mIntermediateBuffer.get();
 	}
@@ -190,17 +190,17 @@ void RenderPipeline::createRenderPasses(EventBus& eventBus) {
 
 void RenderPipeline::createFrameBuffers() {
 	mSceneBuffer = std::make_unique<FrameBuffer>(
-		cfg.get<int32_t>("window.width"),
-		cfg.get<int32_t>("window.height"));
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"));
 
-	if (cfg.get<bool>("msaa.enabled")) {
+	if (CONFIG_MANAGER_INSTANCE.get<bool>("msaa.enabled")) {
 		glEnable(GL_MULTISAMPLE);
-		const int32_t sampleCount = cfg.get<int32_t>("msaa.sample_count");
+		const int32_t sampleCount = CONFIG_MANAGER_INSTANCE.get<int32_t>("msaa.sample_count");
 		mIntermediateBuffer = std::make_unique<FrameBuffer>(
-			cfg.get<int32_t>("window.width"),
-			cfg.get<int32_t>("window.height"));
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"));
 
-		if (cfg.get<bool>("hdr.enabled")) {
+		if (CONFIG_MANAGER_INSTANCE.get<bool>("hdr.enabled")) {
 			mIntermediateBuffer->withTextureFP(GL_RGBA)
 					.withRenderBufferDepth(GL_DEPTH_COMPONENT24)
 					.checkStatus();
@@ -220,7 +220,7 @@ void RenderPipeline::createFrameBuffers() {
 					.checkStatus();
 		}
 	} else {
-		if (cfg.get<bool>("hdr.enabled")) {
+		if (CONFIG_MANAGER_INSTANCE.get<bool>("hdr.enabled")) {
 			mSceneBuffer->withTextureFP(GL_RGBA)
 					.withTextureDepth(GL_DEPTH_COMPONENT24, false)
 					.checkStatus();
@@ -253,19 +253,19 @@ void RenderPipeline::configureSystems(EventBus& eventBus) const {
 
 void RenderPipeline::configureShaders() {
 	const UniformBinding uboBindings[] = {
-		{cfg.get<std::string>("camera.block_name"), cfg.get<uint32_t>("camera.ubo_binding"), UniformBuffer::configure},
-		{cfg.get<std::string>("light.block_name"), cfg.get<uint32_t>("light.ubo_binding"), UniformBuffer::configure},
-		{cfg.get<std::string>("shadow.block_name"), cfg.get<uint32_t>("shadow.ubo_binding"), UniformBuffer::configure}
+		{CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name"), CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"), UniformBuffer::configure},
+		{CONFIG_MANAGER_INSTANCE.get<std::string>("light.block_name"), CONFIG_MANAGER_INSTANCE.get<uint32_t>("light.ubo_binding"), UniformBuffer::configure},
+		{CONFIG_MANAGER_INSTANCE.get<std::string>("shadow.block_name"), CONFIG_MANAGER_INSTANCE.get<uint32_t>("shadow.ubo_binding"), UniformBuffer::configure}
 	};
 
 	const TextureBinding shadowMapBindings[] = {
-		{"shadowMap", cfg.get<int32_t>("shadow.texture_slot")},
-		{"shadowCubemap", cfg.get<int32_t>("shadow.texture_slot") + 1},
-		{"persShadowMap", cfg.get<int32_t>("shadow.texture_slot") + 2}
+		{"shadowMap", CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot")},
+		{"shadowCubemap", CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot") + 1},
+		{"persShadowMap", CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot") + 2}
 	};
 
 	// Configure shaders
-	for (const auto& [name,shader]: rm.getShaders()) {
+	for (const auto& [name,shader]: RESOURCE_MANAGER_INSTANCE.getShaders()) {
 		for (const auto& [blockName, binding, configure]: uboBindings) {
 			configure(shader->id(), binding, blockName.c_str());
 		}

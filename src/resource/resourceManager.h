@@ -9,7 +9,7 @@
 #include "../job/threadPool.h"
 #include "../rendering/types.hpp"
 
-#define rm ResourceManager::instance()
+#define RESOURCE_MANAGER_INSTANCE ResourceManager::instance()
 
 class Shader;
 class BaseFrameBuffer;

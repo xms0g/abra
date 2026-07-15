@@ -7,7 +7,7 @@
 
 Sepia::Sepia(const std::string& name, const RenderContext& ctx, const bool enabled)
 	: BasePostEffect(name, enabled) {
-	mShader = rm.get<Shader>("sepia");
+	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("sepia");
 
 	constexpr TextureBinding textureBindings[] = {
 		{"screenTexture", 0},

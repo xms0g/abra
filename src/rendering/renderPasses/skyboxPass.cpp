@@ -13,7 +13,7 @@
 SkyboxPass::~SkyboxPass() = default;
 
 void SkyboxPass::configure(RenderContext& ctx, EventBus& eventBus) {
-	mShader = rm.get<Shader>("skybox");
+	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("skybox");
 	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("skybox");
 
 	constexpr TextureBinding textureBindings[] = {

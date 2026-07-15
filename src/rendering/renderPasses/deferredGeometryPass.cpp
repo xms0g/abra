@@ -15,8 +15,8 @@ DeferredGeometryPass::~DeferredGeometryPass() = default;
 
 void DeferredGeometryPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	mGBuffer = std::make_unique<FrameBuffer>(
-		cfg.get<int32_t>("window.width"),
-		cfg.get<int32_t>("window.height"));
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"));
 	mGBuffer->withTextureFP(GL_RGBA) // position
 			.withTextureFP(GL_RGBA) // normal
 #ifdef HDR
@@ -31,16 +31,16 @@ void DeferredGeometryPass::configure(RenderContext& ctx, EventBus& eventBus) {
 			.checkStatus();
 
 	ctx.gBuffer = mGBuffer.get();
-	mShader = rm.get<Shader>("gBuffer");
+	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("gBuffer");
 	mObjects = &ctx.renderQueue->get<std::vector<RenderableObject>>("visibleDeferred");
 
 	const TextureBinding textureBindings[] = {
-		{"material.texture_albedo", cfg.get<int32_t>("PBR.albedo.textureSlot")},
-		{"material.texture_normal", cfg.get<int32_t>("PBR.normal.textureSlot")},
-		{"material.texture_roughnessMetallic", cfg.get<int32_t>("PBR.roughnessMetallic.textureSlot")},
-		{"material.texture_ao", cfg.get<int32_t>("PBR.ao.textureSlot")},
-		{"material.texture_emissive", cfg.get<int32_t>("PBR.emissive.textureSlot")},
-		{"material.texture_height", cfg.get<int32_t>("PBR.height.textureSlot")},
+		{"material.texture_albedo", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.albedo.textureSlot")},
+		{"material.texture_normal", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.normal.textureSlot")},
+		{"material.texture_roughnessMetallic", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.roughnessMetallic.textureSlot")},
+		{"material.texture_ao", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.ao.textureSlot")},
+		{"material.texture_emissive", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.emissive.textureSlot")},
+		{"material.texture_height", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.height.textureSlot")},
 	};
 
 	RenderCommand::setTextureUnits(textureBindings, *mShader);

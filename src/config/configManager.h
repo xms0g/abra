@@ -3,7 +3,7 @@
 #include <any>
 #include <unordered_map>
 
-#define cfg ConfigManager::instance()
+#define CONFIG_MANAGER_INSTANCE ConfigManager::instance()
 
 class ConfigManager {
 public:

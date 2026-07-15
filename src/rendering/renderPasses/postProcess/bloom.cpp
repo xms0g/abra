@@ -8,9 +8,9 @@
 
 Bloom::Bloom(const std::string& name, const RenderContext& ctx, const bool enabled)
 	: BasePostEffect(name, enabled) {
-	mBrightFilter = rm.get<Shader>("bloomBF");
-	mBlur = rm.get<Shader>("bloomBlur");
-	mCombine = rm.get<Shader>("bloomCombine");
+	mBrightFilter = RESOURCE_MANAGER_INSTANCE.get<Shader>("bloomBF");
+	mBlur = RESOURCE_MANAGER_INSTANCE.get<Shader>("bloomBlur");
+	mCombine = RESOURCE_MANAGER_INSTANCE.get<Shader>("bloomCombine");
 
 	constexpr TextureBinding textureBindings[] = {
 		{"screenTexture", 0},
@@ -27,8 +27,8 @@ Bloom::Bloom(const std::string& name, const RenderContext& ctx, const bool enabl
 
 	for (auto& target: mRenderTargets) {
 		target = std::make_unique<FrameBuffer>(
-			cfg.get<int32_t>("window.width"),
-			cfg.get<int32_t>("window.height"));
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"));
 #ifdef HDR
 		target->withTextureFP(GL_RGBA)
 #else

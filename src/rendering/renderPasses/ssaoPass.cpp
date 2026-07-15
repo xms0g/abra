@@ -17,8 +17,8 @@ SSAOPass::SSAOPass() = default;
 SSAOPass::~SSAOPass() = default;
 
 void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
-	int32_t width = cfg.get<int32_t>("window.width");
-	int32_t height = cfg.get<int32_t>("window.height");
+	int32_t width = CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width");
+	int32_t height = CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height");
 
 	mQuad = std::make_unique<Model::SingleQuad>();
 
@@ -32,14 +32,14 @@ void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 
 	ctx.ssao.buffer = mBlurFBO.get();
 
-	mShader = rm.get<Shader>("ssao");
-	mBlurShader = rm.get<Shader>("ssaoBlur");
+	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("ssao");
+	mBlurShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("ssaoBlur");
 
 	const TextureBinding ssaoTextureBindings[] = {
-		{"gDepthMap", cfg.get<int32_t>("gBuffer.depth.textureSlot")},
-		{"gNormal", cfg.get<int32_t>("gBuffer.normal.textureSlot")},
-		{"texNoise", cfg.get<int32_t>("ssao.noise.textureSlot")},
-		{"kernelSize", cfg.get<int32_t>("ssao.kernelSize")}
+		{"gDepthMap", CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureSlot")},
+		{"gNormal", CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot")},
+		{"texNoise", CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.noise.textureSlot")},
+		{"kernelSize", CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.kernelSize")}
 	};
 
 	constexpr TextureBinding blurTextureBindings[] = {
@@ -49,19 +49,19 @@ void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	RenderCommand::setTextureUnits(ssaoTextureBindings, *mShader);
 	RenderCommand::setTextureUnits(blurTextureBindings, *mBlurShader);
 
-	ctx.gBuffer->bindTexture(cfg.get<int32_t>("gBuffer.depth.textureSlot"), cfg.get<int32_t>("gBuffer.depth.textureIdx"));
-	ctx.gBuffer->bindTexture(cfg.get<int32_t>("gBuffer.normal.textureSlot"), cfg.get<int32_t>("gBuffer.normal.textureIdx"));
+	ctx.gBuffer->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureSlot"), CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureIdx"));
+	ctx.gBuffer->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot"), CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureIdx"));
 
-	int32_t textureSize = cfg.get<int32_t>("ssao.noise.textureSize");
+	int32_t textureSize = CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.noise.textureSize");
 
 	std::vector<float> noise;
 	noise.resize(textureSize * textureSize);
 	noise = math::random::generateNoise(textureSize * textureSize);
 
 	const Texture noiseTexture = Texture::generate(textureSize, textureSize, noise.data());
-	noiseTexture.bind(cfg.get<int32_t>("ssao.noise.textureSlot"));
+	noiseTexture.bind(CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.noise.textureSlot"));
 
-	int32_t kernelSize = cfg.get<int32_t>("ssao.kernelSize");
+	int32_t kernelSize = CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.kernelSize");
 
 	std::vector<glm::vec4> kernel;
 	kernel.resize(kernelSize);
@@ -80,21 +80,21 @@ void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	}
 
 	data.rbi = glm::vec4(
-		cfg.get<float>("ssao.radius"),
-		cfg.get<float>("ssao.bias"),
-		cfg.get<float>("ssao.intensity"),
+		CONFIG_MANAGER_INSTANCE.get<float>("ssao.radius"),
+		CONFIG_MANAGER_INSTANCE.get<float>("ssao.bias"),
+		CONFIG_MANAGER_INSTANCE.get<float>("ssao.intensity"),
 		0.0f);
 	data.resolution = glm::vec4(width, height, 0.0f, 0.0f);
 
-	mUBO = std::make_unique<UniformBuffer>(DYNAMIC, sizeof(SSAOData), cfg.get<uint32_t>("ssao.ubo_binding"));
+	mUBO = std::make_unique<UniformBuffer>(DYNAMIC, sizeof(SSAOData), CONFIG_MANAGER_INSTANCE.get<uint32_t>("ssao.ubo_binding"));
 	mUBO->bind();
 	mUBO->setData(&data, sizeof(SSAOData), 0);
 	mUBO->unbind();
 
 	mUBO->configure(
 		mShader->id(),
-		cfg.get<uint32_t>("ssao.ubo_binding"),
-		cfg.get<std::string>("ssao.block_name").c_str());
+		CONFIG_MANAGER_INSTANCE.get<uint32_t>("ssao.ubo_binding"),
+		CONFIG_MANAGER_INSTANCE.get<std::string>("ssao.block_name").c_str());
 
 	ctx.ssao.ubo = mUBO.get();
 }

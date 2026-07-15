@@ -41,8 +41,8 @@ void PostProcessPass::configure(RenderContext& ctx, EventBus& eventBus) {
 
 	for (auto& target: mRenderTargets) {
 		target = std::make_unique<FrameBuffer>(
-			cfg.get<int32_t>("window.width"),
-			cfg.get<int32_t>("window.height"));
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"));
 #ifdef HDR
 		target->withTextureFP(GL_RGBA)
 #else

@@ -17,33 +17,33 @@ DeferredLightingPass::~DeferredLightingPass() = default;
 
 void DeferredLightingPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	mQuad = std::make_unique<Model::SingleQuad>();
-	mShader = rm.get<Shader>("deferredLighting");
+	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("deferredLighting");
 
 	const TextureBinding textureBindings[] = {
-		{"gPosition", cfg.get<int32_t>("gBuffer.position.textureSlot")},
-		{"gNormal", cfg.get<int32_t>("gBuffer.normal.textureSlot")},
-		{"gAlbedo", cfg.get<int32_t>("gBuffer.albedo.textureSlot")},
-		{"gORM", cfg.get<int32_t>("gBuffer.orm.textureSlot")},
-		{"ssao", cfg.get<int32_t>("ssao.textureSlot")},
-		{"irradianceMap", cfg.get<int32_t>("PBR.irradianceMap.textureSlot")},
-		{"prefilterMap", cfg.get<int32_t>("PBR.prefilterMap.textureSlot")},
-		{"brdfLUT", cfg.get<int32_t>("PBR.brdfLUT.textureSlot")},
+		{"gPosition", CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureSlot")},
+		{"gNormal", CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot")},
+		{"gAlbedo", CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureSlot")},
+		{"gORM", CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureSlot")},
+		{"ssao", CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.textureSlot")},
+		{"irradianceMap", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.textureSlot")},
+		{"prefilterMap", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.textureSlot")},
+		{"brdfLUT", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.brdfLUT.textureSlot")},
 	};
 
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
 
-	ctx.PBR.irradianceMap = rm.get<BaseFrameBuffer>("irradianceMap");
-	ctx.PBR.prefilterMap = rm.get<BaseFrameBuffer>("prefilterMap");
-	ctx.PBR.brdfLUT = rm.get<BaseFrameBuffer>("brdfLUT");
+	ctx.PBR.irradianceMap = RESOURCE_MANAGER_INSTANCE.get<BaseFrameBuffer>("irradianceMap");
+	ctx.PBR.prefilterMap = RESOURCE_MANAGER_INSTANCE.get<BaseFrameBuffer>("prefilterMap");
+	ctx.PBR.brdfLUT = RESOURCE_MANAGER_INSTANCE.get<BaseFrameBuffer>("brdfLUT");
 
-	ctx.gBuffer->bindTexture(cfg.get<int32_t>("gBuffer.position.textureSlot"), cfg.get<int32_t>("gBuffer.position.textureIdx"));
-	ctx.gBuffer->bindTexture(cfg.get<int32_t>("gBuffer.normal.textureSlot"), cfg.get<int32_t>("gBuffer.normal.textureIdx"));
-	ctx.gBuffer->bindTexture(cfg.get<int32_t>("gBuffer.albedo.textureSlot"), cfg.get<int32_t>("gBuffer.albedo.textureIdx"));
-	ctx.gBuffer->bindTexture(cfg.get<int32_t>("gBuffer.orm.textureSlot"), cfg.get<int32_t>("gBuffer.orm.textureIdx"));
-	ctx.ssao.buffer->bindTexture(cfg.get<int32_t>("ssao.textureSlot"));
-	ctx.PBR.irradianceMap->bindTexture(cfg.get<int32_t>("PBR.irradianceMap.textureSlot"));
-	ctx.PBR.prefilterMap->bindTexture(cfg.get<int32_t>("PBR.prefilterMap.textureSlot"));
-	ctx.PBR.brdfLUT->bindTexture(cfg.get<int32_t>("PBR.brdfLUT.textureSlot"));
+	ctx.gBuffer->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureSlot"), CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureIdx"));
+	ctx.gBuffer->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot"), CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureIdx"));
+	ctx.gBuffer->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureSlot"), CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureIdx"));
+	ctx.gBuffer->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureSlot"), CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureIdx"));
+	ctx.ssao.buffer->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.textureSlot"));
+	ctx.PBR.irradianceMap->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.textureSlot"));
+	ctx.PBR.prefilterMap->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.textureSlot"));
+	ctx.PBR.brdfLUT->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.brdfLUT.textureSlot"));
 
 	RenderCommand::bindShadowMaps(ctx);
 }

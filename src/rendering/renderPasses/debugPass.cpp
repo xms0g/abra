@@ -14,8 +14,8 @@ DebugPass::~DebugPass() = default;
 void DebugPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	mDebugShaders = {
 		nullptr,
-		rm.get<Shader>("debugNormal"),
-		rm.get<Shader>("debugWireframe")
+		RESOURCE_MANAGER_INSTANCE.get<Shader>("debugNormal"),
+		RESOURCE_MANAGER_INSTANCE.get<Shader>("debugWireframe")
 	};
 
 	mObjects = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleDebug");

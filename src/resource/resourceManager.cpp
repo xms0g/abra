@@ -59,7 +59,7 @@ void ResourceManager::uploadModelsToGPU() {
 			if (material.textureTarget == GL_TEXTURE_CUBE_MAP) {
 				// Handle HDR to Cubemap
 				if (material.textures.size() == 1) {
-					const std::string path = fs::path(cfg.get<std::string>("path.asset") + material.textures.front().path);
+					const std::string path = fs::path(CONFIG_MANAGER_INSTANCE.get<std::string>("path.asset") + material.textures.front().path);
 
 					uint32_t id = createEnvMap(path);
 
@@ -71,7 +71,7 @@ void ResourceManager::uploadModelsToGPU() {
 					paths.reserve(material.textures.size());
 
 					for (auto& [id, type, path]: material.textures) {
-						paths.push_back(fs::path(cfg.get<std::string>("path.asset") + path));
+						paths.push_back(fs::path(CONFIG_MANAGER_INSTANCE.get<std::string>("path.asset") + path));
 					}
 
 					material.textures.clear();
@@ -88,7 +88,7 @@ void ResourceManager::uploadModelsToGPU() {
 				}
 
 				id = Texture::load(
-					fs::path(cfg.get<std::string>("path.asset") + path),
+					fs::path(CONFIG_MANAGER_INSTANCE.get<std::string>("path.asset") + path),
 					material.flags,
 					type == aiTextureType_DIFFUSE || type == aiTextureType_EMISSIVE);
 
@@ -166,7 +166,7 @@ void ResourceManager::loadModel(const size_t entityID, const std::string& file) 
 	// read file via ASSIMP
 	Assimp::Importer importer;
 
-	const std::string path = fs::path(cfg.get<std::string>("path.asset") + file);
+	const std::string path = fs::path(CONFIG_MANAGER_INSTANCE.get<std::string>("path.asset") + file);
 	const aiScene* scene = importer.ReadFile(
 		path,
 		aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -326,8 +326,8 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 				.flags = flags,
 				.textureTarget = GL_TEXTURE_2D,
 				.alphaCutoff = alphaCutoff,
-				.shader = flags & OPAQUE ? rm.get<Shader>("opaque") :
-				          flags & BLEND ? rm.get<Shader>("blend") : nullptr
+				.shader = flags & OPAQUE ? RESOURCE_MANAGER_INSTANCE.get<Shader>("opaque") :
+				          flags & BLEND ? RESOURCE_MANAGER_INSTANCE.get<Shader>("blend") : nullptr
 			};
 	}
 
@@ -369,8 +369,8 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 	glDepthFunc(GL_LEQUAL);
 
 	auto envMap = std::make_unique<CubemapBuffer>(
-		cfg.get<int32_t>("PBR.envMap.size"),
-		cfg.get<int32_t>("PBR.envMap.size"),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.envMap.size"),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.envMap.size"),
 		true);
 	envMap->checkStatus();
 
@@ -414,8 +414,8 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 
 void ResourceManager::createIrradianceMap() {
 	auto irradianceMap = std::make_unique<CubemapBuffer>(
-		cfg.get<int32_t>("PBR.irradianceMap.size"),
-		cfg.get<int32_t>("PBR.irradianceMap.size"));
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.size"),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.size"));
 	irradianceMap->checkStatus();
 
 	mBuffers.emplace("irradianceMap", std::move(irradianceMap));
@@ -451,8 +451,8 @@ void ResourceManager::createPrefilterMap() {
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 	auto prefilterMap = std::make_unique<CubemapBuffer>(
-		cfg.get<int32_t>("PBR.prefilterMap.size"),
-		cfg.get<int32_t>("PBR.prefilterMap.size"),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.size"),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.size"),
 		true,
 		true);
 	prefilterMap->checkStatus();
@@ -472,7 +472,7 @@ void ResourceManager::createPrefilterMap() {
 	prefilter->setInt("environmentMap", 0);
 	prefilter->setMat4("projection", mCaptureProjection);
 	prefilter->setFloat("resolution",
-		static_cast<float>(cfg.get<int32_t>("PBR.envMap.size")));
+		static_cast<float>(CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.envMap.size")));
 
 	envMapBuffer->bindTexture(0);
 	prefilterMapBuffer->bind();
@@ -480,7 +480,7 @@ void ResourceManager::createPrefilterMap() {
 	constexpr uint32_t mipLevels = 5;
 	for (int32_t i = 0; i < mipLevels; ++i) {
 		const int32_t mipSize = static_cast<int32_t>(
-			cfg.get<int32_t>("PBR.prefilterMap.size") * std::pow(0.5, i));
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.size") * std::pow(0.5, i));
 
 		prefilterMapBuffer->resizeRenderBuffer(mipSize, mipSize);
 
@@ -501,8 +501,8 @@ void ResourceManager::createPrefilterMap() {
 
 void ResourceManager::createBrdfLUT() {
 	auto brdfLUT = std::make_unique<FrameBuffer>(
-		cfg.get<int32_t>("PBR.brdfLUT.size"),
-		cfg.get<int32_t>("PBR.brdfLUT.size"));
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.brdfLUT.size"),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.brdfLUT.size"));
 	brdfLUT->withTextureFP(GL_RG)
 			.checkStatus();
 

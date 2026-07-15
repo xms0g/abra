@@ -13,7 +13,7 @@ TerrainPass::~TerrainPass() = default;
 void TerrainPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
-	mShader = rm.get<Shader>("terrain");
+	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("terrain");
 	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("terrain");
 
 	constexpr TextureBinding textureBindings[] = {

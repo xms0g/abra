@@ -15,7 +15,7 @@ Model::Terrain::Terrain(
 	const std::string& specularTexture,
 	const std::string& normalTexture,
 	const std::string& heightTexture) {
-	std::string path = fs::path(cfg.get<std::string>("path.asset") + heightTexture);
+	std::string path = fs::path(CONFIG_MANAGER_INSTANCE.get<std::string>("path.asset") + heightTexture);
 
 	int32_t width, height;
 	Texture::info(path, width, height);

@@ -60,11 +60,11 @@ void ShaderResource::checkCompileErrors(const std::string& fn) const {
 
 Shader::Shader(const std::string& vs, const std::string& fs, const std::string& gs, const std::string& tcs, const std::string& tes) {
 	try {
-		const std::string vertexSource = preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + vs));
-		const std::string fragmentSource = preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + fs));
-		const std::string geometrySource = preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + gs));
-		const std::string tessControlSource = preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + tcs));
-		const std::string tessEvalSource = preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + tes));
+		const std::string vertexSource = preprocess(fs::loadFile(CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader") + vs));
+		const std::string fragmentSource = preprocess(fs::loadFile(CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader") + fs));
+		const std::string geometrySource = preprocess(fs::loadFile(CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader") + gs));
+		const std::string tessControlSource = preprocess(fs::loadFile(CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader") + tcs));
+		const std::string tessEvalSource = preprocess(fs::loadFile(CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader") + tes));
 
 		auto vert = compileShader(vertexSource, vs, GL_VERTEX_SHADER);
 		auto frag = compileShader(fragmentSource, fs, GL_FRAGMENT_SHADER);
@@ -198,7 +198,7 @@ std::string Shader::preprocess(const std::string& source, std::unordered_set<std
 				}
 				includedFiles.insert(includeFile);
 				// Load included file
-				result << preprocess(fs::loadFile(cfg.get<std::string>("path.shader") + includeFile.c_str()), includedFiles) << "\n";
+				result << preprocess(fs::loadFile(CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader") + includeFile.c_str()), includedFiles) << "\n";
 			}
 		} else {
 			result << line << "\n";

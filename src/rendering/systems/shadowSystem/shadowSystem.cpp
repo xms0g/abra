@@ -20,8 +20,8 @@ ShadowSystem::~ShadowSystem() = default;
 
 void ShadowSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mCtx = &ctx;
-	mWidth= cfg.get<int32_t>("window.width");
-	mHeight = cfg.get<int32_t>("window.height");
+	mWidth= CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width");
+	mHeight = CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height");
 
 	mDirShadow = std::make_unique<DirectionalShadow>(ctx);
 	mOmnidirShadow = std::make_unique<OmnidirectionalShadow>(ctx);
@@ -30,7 +30,7 @@ void ShadowSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 	mUBO = std::make_unique<UniformBuffer>(
 		DYNAMIC,
 		sizeof(ShadowData),
-		cfg.get<uint32_t>("shadow.ubo_binding"));
+		CONFIG_MANAGER_INSTANCE.get<uint32_t>("shadow.ubo_binding"));
 
 	ctx.renderData->shadowMaps = {
 		mDirShadow->depthTexture(),
@@ -40,7 +40,7 @@ void ShadowSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 
 	eventBus.subscribeToEvent<ShadowSystem, UpdateShadowMapEvent>(this, &ShadowSystem::onGuiUpdate);
 
-	mGPUData.omniFarPlane = glm::vec4(cfg.get<float>("shadow.omnidirectional.farPlane"), 0.0f, 0.0f, 0.0f);
+	mGPUData.omniFarPlane = glm::vec4(CONFIG_MANAGER_INSTANCE.get<float>("shadow.omnidirectional.farPlane"), 0.0f, 0.0f, 0.0f);
 
 	constexpr UpdateShadowMapEvent event;
 	onGuiUpdate(event);

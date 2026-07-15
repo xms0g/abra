@@ -33,7 +33,7 @@ glm::vec3 parseVec3(const json& j) {
 }
 
 void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
-	std::ifstream file(fs::path(cfg.get<std::string>("path.scene") + filePath));
+	std::ifstream file(fs::path(CONFIG_MANAGER_INSTANCE.get<std::string>("path.scene") + filePath));
 	if (!file.is_open()) {
 		throw std::runtime_error(std::format("Failed to open scene file: {}", filePath));
 	}
@@ -58,7 +58,7 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 
 		if (entityData.contains("model_path")) {
 			std::string modelPath = entityData["model_path"];
-			rm.asyncLoadModel(entity.id(), modelPath);
+			RESOURCE_MANAGER_INSTANCE.asyncLoadModel(entity.id(), modelPath);
 		}
 
 		DeferredEntity deferred{entity, entityData["components"]};
@@ -71,7 +71,7 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 	}
 
 	// Wait for GPU/Disk assets to be ready
-	rm.waitForAll();
+	RESOURCE_MANAGER_INSTANCE.waitForAll();
 
 	// Assemble Components
 	for (auto& [entity, comps, isPrimitive, primType]: deferredEntities) {
@@ -117,10 +117,10 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 				T model{color, unlit, albedoTexture, specularTexture, normalTexture, heightTexture};
 
 				auto& mat = model.material();
-				mat[0].shader = rm.get<Shader>(shaderName);
+				mat[0].shader = RESOURCE_MANAGER_INSTANCE.get<Shader>(shaderName);
 
-				rm.upload<MeshMap>(entity.id(), model.meshes());
-				rm.upload<MaterialMap>(entity.id(), model.material());
+				RESOURCE_MANAGER_INSTANCE.upload<MeshMap>(entity.id(), model.meshes());
+				RESOURCE_MANAGER_INSTANCE.upload<MaterialMap>(entity.id(), model.material());
 			};
 
 			if (primType == "Cube") {
@@ -135,8 +135,8 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 
 			Model::Cubemap cubemap{faces};
 
-			rm.upload<MeshMap>(entity.id(), cubemap.meshes());
-			rm.upload<MaterialMap>(entity.id(), cubemap.material());
+			RESOURCE_MANAGER_INSTANCE.upload<MeshMap>(entity.id(), cubemap.meshes());
+			RESOURCE_MANAGER_INSTANCE.upload<MaterialMap>(entity.id(), cubemap.material());
 		} else if (isPrimitive && primType == "Sphere") {
 			glm::vec3 color{0.0f};
 			bool unlit{false};
@@ -164,8 +164,8 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 
 			Model::Sphere sphere{color, unlit, albedo, normal, orm};
 
-			rm.upload<MeshMap>(entity.id(), sphere.meshes());
-			rm.upload<MaterialMap>(entity.id(), sphere.material());
+			RESOURCE_MANAGER_INSTANCE.upload<MeshMap>(entity.id(), sphere.meshes());
+			RESOURCE_MANAGER_INSTANCE.upload<MaterialMap>(entity.id(), sphere.material());
 		}
 
 		// Transform Component
@@ -180,7 +180,7 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 
 		// Mesh Component
 		if (comps.contains("MeshComponent")) {
-			entity.addComponent<MeshComponent>(rm.get<MeshMap>(entity.id()));
+			entity.addComponent<MeshComponent>(RESOURCE_MANAGER_INSTANCE.get<MeshMap>(entity.id()));
 		}
 
 		// Bounding Volume Component
@@ -200,9 +200,9 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 		// Instance Component
 		if (comps.contains("InstanceComponent")) {
 			auto transforms = comps["InstanceComponent"]["transforms"].get<std::vector<float> >();
-			rm.upload<decltype(transforms)>(entity.id(), transforms);
+			RESOURCE_MANAGER_INSTANCE.upload<decltype(transforms)>(entity.id(), transforms);
 
-			entity.addComponent<InstanceComponent>(rm.get<decltype(transforms)>(entity.id()));
+			entity.addComponent<InstanceComponent>(RESOURCE_MANAGER_INSTANCE.get<decltype(transforms)>(entity.id()));
 		}
 
 		// Material Component
@@ -217,7 +217,7 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 							primType == "Cubemap" ? SKYBOX_PASS : 0;
 
 			entity.addComponent<MaterialComponent>(
-				rm.get<MaterialMap>(entity.id()),
+				RESOURCE_MANAGER_INSTANCE.get<MaterialMap>(entity.id()),
 				heightScale,
 				flags);
 		}
@@ -278,5 +278,5 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 		}
 	}
 
-	rm.uploadModelsToGPU();
+	RESOURCE_MANAGER_INSTANCE.uploadModelsToGPU();
 }
