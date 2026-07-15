@@ -4,7 +4,7 @@
 #include <span>
 
 struct TextureBinding;
-struct InstanceGroup;
+struct RenderInstanceGroup;
 struct RenderableObject;
 struct RenderContext;
 struct Material;
@@ -14,7 +14,7 @@ class Shader;
 namespace RenderCommand {
 void forward(const RenderContext& ctx, const std::vector<RenderableObject>& objects);
 
-void instanced(const RenderContext& ctx, const std::vector<InstanceGroup>& objects);
+void instanced(const RenderContext& ctx, const std::vector<RenderInstanceGroup>& objects);
 
 void setupTransform(size_t entityID, const RenderContext& ctx, const Shader& shader);
 

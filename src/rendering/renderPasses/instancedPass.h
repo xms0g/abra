@@ -5,7 +5,7 @@
 #include "IRenderPass.hpp"
 
 class VertexBuffer;
-struct InstanceGroup;
+struct RenderInstanceGroup;
 
 class InstancedPass final : public IRenderPass {
 public:
@@ -24,15 +24,15 @@ private:
 	};
 
 	static void prepareInstanceBuffer(
-		const std::vector<InstanceGroup>& groups,
+		const std::vector<RenderInstanceGroup>& groups,
 		const std::vector<uint32_t>& vaos,
 		std::unique_ptr<VertexBuffer>& vbo);
 
-	static void uploadInstanceData(const std::vector<InstanceGroup>& groups, const VertexBuffer& vbo);
+	static void uploadInstanceData(const std::vector<RenderInstanceGroup>& groups, const VertexBuffer& vbo);
 
 	std::unique_ptr<VertexBuffer> mOpaqueVBO;
 	std::unique_ptr<VertexBuffer> mBlendVBO;
 
-	std::vector<InstanceGroup>* mOpaqueObjects{nullptr};
-	std::vector<InstanceGroup>* mTransparentObjects{nullptr};
+	std::vector<RenderInstanceGroup>* mOpaqueObjects{nullptr};
+	std::vector<RenderInstanceGroup>* mTransparentObjects{nullptr};
 };

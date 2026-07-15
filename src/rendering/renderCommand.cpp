@@ -30,7 +30,7 @@ void RenderCommand::forward(const RenderContext& ctx, const std::vector<Renderab
 	}
 }
 
-void RenderCommand::instanced(const RenderContext& ctx, const std::vector<InstanceGroup>& objects) {
+void RenderCommand::instanced(const RenderContext& ctx, const std::vector<RenderInstanceGroup>& objects) {
 	const Shader* lastShader{nullptr};
 
 	for (const auto& obj: objects) {

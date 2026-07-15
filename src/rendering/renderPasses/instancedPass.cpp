@@ -15,8 +15,8 @@ InstancedPass::InstancedPass() = default;
 InstancedPass::~InstancedPass() = default;
 
 void InstancedPass::configure(RenderContext& ctx, EventBus& eventBus) {
-	mOpaqueObjects = &ctx.renderQueue->get<std::vector<InstanceGroup> >("opaqueInstanced");
-	mTransparentObjects = &ctx.renderQueue->get<std::vector<InstanceGroup> >("blendInstanced");
+	mOpaqueObjects = &ctx.renderQueue->get<std::vector<RenderInstanceGroup> >("opaqueInstanced");
+	mTransparentObjects = &ctx.renderQueue->get<std::vector<RenderInstanceGroup> >("blendInstanced");
 
 	if (!mOpaqueObjects->empty()) {
 		prepareInstanceBuffer(*mOpaqueObjects, ctx.renderData->mesh.vaos, mOpaqueVBO);
@@ -49,7 +49,7 @@ void InstancedPass::execute(const RenderContext& ctx) {
 }
 
 void InstancedPass::prepareInstanceBuffer(
-	const std::vector<InstanceGroup>& groups,
+	const std::vector<RenderInstanceGroup>& groups,
 	const std::vector<uint32_t>& vaos,
 	std::unique_ptr<VertexBuffer>& vbo) {
 	vbo = std::make_unique<VertexBuffer>(DYNAMIC);
@@ -78,7 +78,7 @@ void InstancedPass::prepareInstanceBuffer(
 	vbo->unbind();
 }
 
-void InstancedPass::uploadInstanceData(const std::vector<InstanceGroup>& groups, const VertexBuffer& vbo) {
+void InstancedPass::uploadInstanceData(const std::vector<RenderInstanceGroup>& groups, const VertexBuffer& vbo) {
 	vbo.bind();
 
 	uint32_t currentOffset = 0;

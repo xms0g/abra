@@ -6,6 +6,6 @@ struct RenderGroup {
 	MaterialBatch matBatch;
 };
 
-struct InstanceGroup : RenderGroup {
+struct RenderInstanceGroup : RenderGroup {
 	std::vector<float> transforms{}; // P,R,S data
 };

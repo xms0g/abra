@@ -5,17 +5,14 @@
 #include "glm/gtx/norm.hpp"
 #include "shader.h"
 #include "renderCommand.h"
+#include "renderBatcher.h"
 #include "systems/lightSystem.h"
 #include "systems/syncStateSystem.h"
 #include "systems/shadowSystem/shadowSystem.h"
 #include "buffers/frameBuffer.h"
 #include "buffers/uniformBuffer.h"
 #include "models/quad.h"
-#include "mesh/mesh.h"
-#include "mesh/vertex.hpp"
-#include "mesh/vertexArray.h"
 #include "renderContext/renderContext.hpp"
-#include "renderContext/renderFlags.hpp"
 #include "renderContext/renderGroup.hpp"
 #include "renderContext/renderableObject.hpp"
 #include "renderContext/renderQueue.hpp"
@@ -38,14 +35,8 @@
 #include "../core/camera.h"
 #include "../core/window.h"
 #include "../ECS/registry.h"
-#include "../ECS/components/bv.hpp"
-#include "../ECS/components/debug.hpp"
 #include "../ECS/components/transform.hpp"
-#include "../ECS/components/material.hpp"
 #include "../ECS/components/mesh.hpp"
-#include "../ECS/components/instance.hpp"
-#include "../math/boundingVolume.h"
-#include "../math/matrix.h"
 #include "../event/eventBus.hpp"
 #include "../resource/resourceManager.h"
 
@@ -76,7 +67,9 @@ RenderPipeline::~RenderPipeline() {
 }
 
 void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
-	batchEntities();
+	RenderBatcher batcher;
+	batcher.build(*mRenderData, *mRenderQueue, getSystemEntities());
+
 	createRenderPasses(eventBus);
 	createUniformBuffers(camera);
 	configureSystems(eventBus);
@@ -132,8 +125,8 @@ void RenderPipeline::createUniformBuffers(const Camera& camera) {
 void RenderPipeline::createRenderQueues() {
 	mRenderQueue = std::make_unique<RenderQueue>();
 
-	mRenderQueue->set("opaqueInstanced", std::vector<InstanceGroup>());
-	mRenderQueue->set("blendInstanced", std::vector<InstanceGroup>());
+	mRenderQueue->set("opaqueInstanced", std::vector<RenderInstanceGroup>());
+	mRenderQueue->set("blendInstanced", std::vector<RenderInstanceGroup>());
 	mRenderQueue->set("opaque", std::vector<RenderGroup>());
 	mRenderQueue->set("blend", std::vector<RenderGroup>());
 	mRenderQueue->set("debug", std::vector<RenderGroup>());
@@ -165,8 +158,8 @@ void RenderPipeline::createRenderPasses(EventBus& eventBus) {
 		mRenderPasses.emplace_back(std::make_unique<DebugPass>());
 	}
 
-	if (!mRenderQueue->get<std::vector<InstanceGroup> >("opaqueInstanced").empty() ||
-		!mRenderQueue->get<std::vector<InstanceGroup> >("blendInstanced").empty()) {
+	if (!mRenderQueue->get<std::vector<RenderInstanceGroup> >("opaqueInstanced").empty() ||
+		!mRenderQueue->get<std::vector<RenderInstanceGroup> >("blendInstanced").empty()) {
 		mRenderPasses.emplace_back(std::make_unique<InstancedPass>());
 		}
 
@@ -289,111 +282,6 @@ void RenderPipeline::refreshCameraData() const {
 
 	mCameraUBO->bind();
 	mCameraUBO->setData(&packed, sizeof(PackedView), 0);
-}
-
-void RenderPipeline::batchEntities() const {
-	for (const auto& entity: getSystemEntities()) {
-		batchEntity(entity);
-	}
-}
-
-void RenderPipeline::batchEntity(const Entity& entity) const {
-	static uint32_t materialIndex{0}, textureOffset{0}, meshIndex{0};
-
-	const auto& transform = entity.getComponent<TransformComponent>();
-	const auto modelMat = math::modelMatrix(transform.position, transform.rotation, transform.scale);
-	const auto normalMat = math::normalMatrix(modelMat);
-
-	mRenderData->entity.positions.push_back(transform.position);
-	mRenderData->entity.rotations.push_back(transform.rotation);
-	mRenderData->entity.scales.push_back(transform.scale);
-	mRenderData->entity.models.push_back(modelMat);
-	mRenderData->entity.normals.push_back(normalMat);
-
-	const auto& bv = entity.getComponent<BoundingVolumeComponent>().bv;
-	mRenderData->entity.centers.push_back(bv->center());
-	mRenderData->entity.extents.push_back(bv->extents());
-
-	mRenderData->entity.debugModes.emplace_back(0);
-
-	auto& matComponent = entity.getComponent<MaterialComponent>();
-	mRenderData->entity.heightScales.emplace_back(matComponent.heightScale);
-
-
-	struct PassRule {
-		uint32_t flags;
-		std::string queue;
-		std::string instancedQueue;
-	} rules[] = {
-		{CASTSHADOW, "shadow", "shadow"},
-		{PBR, "deferred", "deferred"},
-		{OPAQUE, "opaque", "opaqueInstanced"},
-		{BLEND, "blend", "blendInstanced"},
-	};
-
-	for (auto& [matID, meshes]: *entity.getComponent<MeshComponent>().meshes) {
-		std::vector<uint32_t> meshIndices;
-
-		for (const auto& mesh: meshes) {
-			meshIndices.push_back(meshIndex++);
-			mRenderData->mesh.vaos.push_back(mesh.vao().id());
-			mRenderData->mesh.vertexCounts.push_back(mesh.vertices().size());
-			mRenderData->mesh.indexCounts.push_back(mesh.indices().size());
-			mRenderData->mesh.maxCounts.push_back(mesh.max());
-			mRenderData->mesh.minCounts.push_back(mesh.min());
-		}
-
-		auto& material = matComponent.materials->at(matID);
-		material.idx = materialIndex++;
-
-		mRenderData->material.flags.push_back(material.flags);
-		mRenderData->material.textureTargets.push_back(material.textureTarget);
-		mRenderData->material.alphaCutoffs.push_back(material.alphaCutoff);
-		mRenderData->material.colors.push_back(material.color);
-
-		for (const auto& texture: material.textures) {
-			mRenderData->material.textures.push_back(texture.id);
-		}
-
-		const size_t textureCount = material.textures.size();
-		MaterialBatch matBatch{material.idx, textureOffset, textureCount, nullptr, meshIndices};
-		textureOffset += textureCount;
-
-		// Set shader
-		matBatch.shader = material.shader;
-
-		RenderGroup group;
-		InstanceGroup instance;
-
-		const bool isInstanced = matComponent.renderFlag == INSTANCED_PASS;
-
-		if (isInstanced) {
-			const auto& instComponent = entity.getComponent<InstanceComponent>();
-			instance = {entity.id(), matBatch, *instComponent.transforms};
-		} else {
-			group = {entity.id(), matBatch};
-		}
-
-		if (matComponent.renderFlag == SKYBOX_PASS) {
-			mRenderQueue->get<std::vector<RenderGroup> >("skybox").push_back(group);
-		} else if (matComponent.renderFlag == TERRAIN_PASS) {
-			mRenderQueue->get<std::vector<RenderGroup> >("terrain").push_back(group);
-		}
-
-		if (entity.hasComponent<DebugComponent>()) {
-			mRenderQueue->get<std::vector<RenderGroup> >("debug").push_back(group);
-		}
-
-		for (const auto& [flags, queue, instancedQueue]: rules) {
-			if (material.flags & flags) {
-				if (isInstanced) {
-					mRenderQueue->get<std::vector<InstanceGroup> >(instancedQueue).push_back(instance);
-				} else {
-					mRenderQueue->get<std::vector<RenderGroup> >(queue).push_back(group);
-				}
-			}
-		}
-	}
 }
 
 void RenderPipeline::sortEntities() {

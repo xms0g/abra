@@ -52,10 +52,6 @@ private:
 
 	void refreshCameraData() const;
 
-	void batchEntities() const;
-
-	void batchEntity(const Entity& entity) const;
-
 	void sortEntities();
 	// Systems
 	LightSystem* mLightSystem{};
