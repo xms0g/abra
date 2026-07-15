@@ -28,7 +28,6 @@ int main(int argc, char **argv) {
 		cfg.load("config.toml");
 		engine.init(registry);
 
-		rm.createShaders();
 		SceneLoader::loadScene(registry, sceneName);
 		rm.createBuffers();
 

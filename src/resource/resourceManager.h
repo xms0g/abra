@@ -22,8 +22,6 @@ public:
 
 	static ResourceManager& instance();
 
-	void createShaders();
-
 	void createBuffers();
 
 	template<typename T, typename KeyType>
@@ -42,7 +40,7 @@ public:
 	void waitForAll() const;
 
 private:
-	explicit ResourceManager() = default;
+	ResourceManager();
 
 	~ResourceManager() = default;
 
@@ -58,6 +56,8 @@ private:
 		aiTextureType type;
 		uint32_t materialID;
 	};
+
+	void createShaders();
 
 	void loadModel(size_t entityID, const std::string& file);
 
