@@ -48,16 +48,6 @@ struct RenderContext {
 		const UniformBuffer* ubo;
 	} shadow{};
 
-	struct {
-		struct {
-			mutable uint32_t binding;
-		} envMap;
-
-		const BaseFrameBuffer* irradianceMap;
-		const BaseFrameBuffer* prefilterMap;
-		const BaseFrameBuffer* brdfLUT;
-	} PBR{};
-
 	RenderContext() = default;
 
 	RenderContext(const RenderContext&) = delete;
