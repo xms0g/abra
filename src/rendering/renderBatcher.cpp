@@ -114,21 +114,22 @@ void RenderBatcher::enqueueRenderGroup(const Entity& entity, RenderQueue& render
 			}
 		}
 	} else {
+		using QueueType = std::vector<RenderGroup>;
 		const RenderGroup group{entity.id(), matBatch};
 
 		if (entity.hasComponent<DebugComponent>()) {
-			renderQueue.get<std::vector<RenderGroup> >("debug").push_back(group);
+			renderQueue.get<QueueType>("debug").push_back(group);
 		}
 
 		if (matBatch.renderFlag == SKYBOX_PASS) {
-			renderQueue.get<std::vector<RenderGroup> >("skybox").push_back(group);
+			renderQueue.get<QueueType>("skybox").push_back(group);
 		} else if (matBatch.renderFlag == TERRAIN_PASS) {
-			renderQueue.get<std::vector<RenderGroup> >("terrain").push_back(group);
+			renderQueue.get<QueueType>("terrain").push_back(group);
 		}
 
 		for (const auto& rule: rules) {
 			if (matBatch.materialFlags & rule.flags) {
-				renderQueue.get<std::vector<RenderGroup> >(rule.queue).push_back(group);
+				renderQueue.get<QueueType>(rule.queue).push_back(group);
 			}
 		}
 	}
