@@ -1,7 +1,6 @@
 #include "syncStateSystem.h"
 #include "../renderContext/renderData.hpp"
 #include "../renderContext/renderContext.hpp"
-#include "../../math/matrix.h"
 #include "../../event/eventBus.hpp"
 #include "../../event/events/guiDebugEvent.hpp"
 #include "../../event/events/guiTransformEvent.hpp"
@@ -21,13 +20,6 @@ void SyncStateSystem::onDebugUpdate(const GuiDebugEvent& event) {
 }
 
 void SyncStateSystem::onTransformUpdate(const GuiTransformEvent& event) {
-	mCtx->renderData->entity.positions[event.entityID] = event.position;
-	mCtx->renderData->entity.rotations[event.entityID] = event.rotation;
-	mCtx->renderData->entity.scales[event.entityID] = event.scale;
-
-	const auto model = math::modelMatrix(event.position, event.rotation, event.scale);
-	mCtx->renderData->entity.models[event.entityID] = model;
-	mCtx->renderData->entity.normals[event.entityID] = math::normalMatrix(model);
-
+	mCtx->renderData->updateTransform(event.entityID, event.position, event.rotation, event.scale);
 	mEventBus->emitEvent<UpdateShadowMapEvent>();
 }
