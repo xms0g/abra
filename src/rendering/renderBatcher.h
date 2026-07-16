@@ -29,4 +29,18 @@ private:
 	};
 
 	void batch(const Entity& entity, RenderData& renderData, RenderQueue& renderQueue);
+
+	static void batchTransform(const Entity& entity, RenderData& renderData);
+
+	static void batchBV(const Entity& entity, RenderData& renderData);
+
+	std::vector<uint32_t> batchMeshes(RenderData& renderData, const std::vector<Mesh>& meshes);
+
+	MaterialBatch batchMaterial(
+		uint32_t matID,
+		const Entity& entity,
+		RenderData& renderData,
+		const std::vector<uint32_t>& meshIndices);
+
+	void enqueueRenderGroup(const Entity& entity, RenderQueue& renderQueue, const MaterialBatch& matBatch);
 };

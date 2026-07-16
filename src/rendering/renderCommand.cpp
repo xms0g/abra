@@ -36,15 +36,20 @@ void RenderCommand::instanced(const RenderContext& ctx, const std::vector<Render
 	for (const auto& obj: objects) {
 		const size_t count = obj.transforms.size() / 9;
 
-		const auto& [materialIdx, textureOffset, textureCount, shader, meshes] = obj.matBatch;
-		if (lastShader != shader) {
-			lastShader = shader;
+		if (lastShader != obj.matBatch.shader) {
+			lastShader = obj.matBatch.shader;
 			lastShader->activate();
 		}
 
-		setupMaterial(obj.entityID, materialIdx, textureOffset, textureCount, ctx, *lastShader);
+		setupMaterial(
+			obj.entityID,
+			obj.matBatch.materialIndex,
+			obj.matBatch.textureOffset,
+			obj.matBatch.textureCount,
+			ctx,
+			*lastShader);
 
-		for (const auto& meshIdx: meshes) {
+		for (const auto& meshIdx: obj.matBatch.meshIndices) {
 			const uint32_t vao = ctx.renderData->mesh.vaos[meshIdx];
 			const size_t indexCount = ctx.renderData->mesh.indexCounts[meshIdx];
 

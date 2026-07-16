@@ -34,6 +34,8 @@ struct Material {
 
 struct MaterialBatch {
 	uint32_t materialIndex{};
+	uint32_t materialFlags{};
+	uint32_t renderFlag{};
 	uint32_t textureOffset{};
 	size_t textureCount{};
 	const Shader* shader{};

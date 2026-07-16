@@ -47,15 +47,21 @@ void CullingPass::cullScene(
 			continue;
 		}
 
-		const auto& [matIdx, textureOffset, textureCount, shader, meshes] = matBatch;
-		for (const auto& meshIdx: meshes) {
+		for (const auto& meshIdx: matBatch.meshIndices) {
 			const glm::vec3& max = ctx.renderData->mesh.maxCounts[meshIdx];
 			const glm::vec3& min = ctx.renderData->mesh.minCounts[meshIdx];
 
 			const bool isVisible = math::AABB::isMeshInFrustum(frustum, min, max, model);
 
 			if (isVisible) {
-				outQueue.push_back({entityID, matIdx, textureOffset, textureCount, meshIdx, shader});
+				outQueue.push_back({
+					entityID,
+					matBatch.materialIndex,
+					matBatch.textureOffset,
+					matBatch.textureCount,
+					meshIdx,
+					matBatch.shader
+				});
 			}
 		}
 	}
