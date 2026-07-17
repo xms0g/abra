@@ -43,12 +43,13 @@ void PostProcessPass::configure(RenderContext& ctx, EventBus& eventBus) {
 		target = std::make_unique<FrameBuffer>(
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"));
-#ifdef HDR
-		target->withTextureFP(GL_RGBA)
-#else
-		target->withTexture(GL_RGBA)
-#endif
-				.checkStatus();
+
+		if (CONFIG_MANAGER_INSTANCE.get<bool>("hdr.enabled")) {
+			target->withTextureFP(GL_RGBA);
+		} else {
+			target->withTexture(GL_RGBA);
+		}
+		target->checkStatus();
 	}
 
 	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessEvent>(this, &PostProcessPass::onGuiUpdate);
