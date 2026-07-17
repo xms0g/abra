@@ -8,7 +8,7 @@ class FrameBuffer;
 
 class Bloom final : public BasePostEffect {
 public:
-	Bloom(const std::string& name, const RenderContext& ctx, bool enabled = false);
+	explicit Bloom(const std::string& name, bool enabled = false);
 
 	~Bloom() override;
 

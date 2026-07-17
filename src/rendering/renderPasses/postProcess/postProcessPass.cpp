@@ -27,16 +27,16 @@ PostProcessPass::~PostProcessPass() = default;
 void PostProcessPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	mQuad = std::make_unique<Model::Quad>();
 	mEffects = {
-		std::make_shared<Bloom>("Bloom", ctx, false),
-		std::make_shared<ToneMapping>("Tone Mapping", ctx, false),
-		std::make_shared<Grayscale>("Grayscale", ctx, false),
-		std::make_shared<Sepia>("Sepia", ctx, false),
-		std::make_shared<Kernel>("Blur", blurKernel, ctx, false),
-		std::make_shared<Kernel>("Edge Detection", edgeKernel, ctx, false),
-		std::make_shared<Kernel>("Sharpen", sharpenKernel, ctx, false),
-		std::make_shared<CA>("Chromatic Aberration", ctx, false),
-		std::make_shared<Gamma>("Gamma Correction", ctx, true),
-		std::make_shared<FXAA>("FXAA", ctx, false),
+		std::make_shared<Bloom>("Bloom", false),
+		std::make_shared<ToneMapping>("Tone Mapping", false),
+		std::make_shared<Grayscale>("Grayscale", false),
+		std::make_shared<Sepia>("Sepia", false),
+		std::make_shared<Kernel>("Blur", blurKernel, false),
+		std::make_shared<Kernel>("Edge Detection", edgeKernel, false),
+		std::make_shared<Kernel>("Sharpen", sharpenKernel, false),
+		std::make_shared<CA>("Chromatic Aberration", false),
+		std::make_shared<Gamma>("Gamma Correction", true),
+		std::make_shared<FXAA>("FXAA", false),
 	};
 
 	for (auto& target: mRenderTargets) {

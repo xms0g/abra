@@ -8,7 +8,7 @@ struct RenderContext;
 
 class Grayscale final : public BasePostEffect {
 public:
-	explicit Grayscale(const std::string& name, const RenderContext& ctx, bool enabled = false);
+	explicit Grayscale(const std::string& name, bool enabled = false);
 
 	uint32_t render(
 		uint32_t vao,

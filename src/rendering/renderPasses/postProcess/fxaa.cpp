@@ -5,7 +5,7 @@
 #include "../../buffers/frameBuffer.h"
 #include "../../renderContext/renderContext.hpp"
 
-FXAA::FXAA(const std::string& name, const RenderContext& ctx, const bool enabled)
+FXAA::FXAA(const std::string& name, const bool enabled)
 	: BasePostEffect(name, enabled) {
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("fxaa");
 

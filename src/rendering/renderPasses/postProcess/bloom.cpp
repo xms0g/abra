@@ -6,7 +6,7 @@
 #include "../../renderContext/renderContext.hpp"
 #include "../../../config/configManager.h"
 
-Bloom::Bloom(const std::string& name, const RenderContext& ctx, const bool enabled)
+Bloom::Bloom(const std::string& name, const bool enabled)
 	: BasePostEffect(name, enabled) {
 	mBrightFilter = RESOURCE_MANAGER_INSTANCE.get<Shader>("bloomBF");
 	mBlur = RESOURCE_MANAGER_INSTANCE.get<Shader>("bloomBlur");

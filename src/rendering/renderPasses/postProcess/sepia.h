@@ -8,7 +8,7 @@ struct RenderContext;
 
 class Sepia final : public BasePostEffect {
 public:
-	explicit Sepia(const std::string& name, const RenderContext& ctx, bool enabled = false);
+	explicit Sepia(const std::string& name, bool enabled = false);
 
 	uint32_t render(
 		uint32_t vao,

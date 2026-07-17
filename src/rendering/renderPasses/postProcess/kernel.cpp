@@ -5,7 +5,7 @@
 #include "../../buffers/frameBuffer.h"
 #include "../../renderContext/renderContext.hpp"
 
-Kernel::Kernel(const std::string& name, const float* kernel, const RenderContext& ctx, const bool enabled)
+Kernel::Kernel(const std::string& name, const float* kernel, const bool enabled)
 	: BasePostEffect(name, enabled),
 	  mKernel(kernel) {
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("kernel");
