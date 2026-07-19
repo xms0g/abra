@@ -12,7 +12,7 @@ public:
 
 	void configure(RenderContext& ctx, EventBus& eventBus) override;
 
-	void execute(const RenderContext& ctx) override;
+	void execute(const RenderContext& ctx, RenderGraph& graph) override;
 
 private:
 	std::array<const Shader*, 3> mDebugShaders{};

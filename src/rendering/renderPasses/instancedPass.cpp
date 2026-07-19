@@ -1,6 +1,7 @@
 #include "instancedPass.h"
 #include "glad/glad.h"
 #include "../renderCommand.h"
+#include "../renderGraph.h"
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderGroup.hpp"
 #include "../renderContext/renderData.hpp"
@@ -31,8 +32,8 @@ void InstancedPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	RenderCommand::bindShadowMaps(ctx);
 }
 
-void InstancedPass::execute(const RenderContext& ctx) {
-	ctx.sceneBuffer->bind();
+void InstancedPass::execute(const RenderContext& ctx, RenderGraph& graph) {
+	graph.getResource("sceneBuffer").bind();
 
 	if (!mTransparentObjects->empty()) {
 		glDepthMask(GL_FALSE);

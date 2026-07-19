@@ -2,8 +2,8 @@
 #include <cstdint>
 #include <memory>
 #include "IRenderPass.hpp"
+#include "../buffers/uniformBuffer.h"
 
-class UniformBuffer;
 class FrameBuffer;
 class Shader;
 
@@ -18,17 +18,15 @@ public:
 
 	void configure(RenderContext& ctx, EventBus& eventBus) override;
 
-	void execute(const RenderContext& ctx) override;
+	void execute(const RenderContext& ctx, RenderGraph& graph) override;
 
 private:
-	void ssao(const RenderContext& ctx) const;
+	void ssao(const RenderGraph& graph) const;
 
-	void blur() const;
+	void blur(const RenderGraph& graph) const;
 
 	std::unique_ptr<Model::SingleQuad> mQuad;
-	std::unique_ptr<FrameBuffer> mFBO;
-	std::unique_ptr<FrameBuffer> mBlurFBO;
 	const Shader* mShader{nullptr};
 	const Shader* mBlurShader{nullptr};
-	std::unique_ptr<UniformBuffer> mUBO;
+	UniformBuffer mUBO{};
 };

@@ -1,4 +1,5 @@
 #include "cullingPass.h"
+#include "../renderGraph.h"
 #include "../mesh/mesh.h"
 #include "../renderContext/renderData.hpp"
 #include "../renderContext/renderContext.hpp"
@@ -22,7 +23,7 @@ void CullingPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	mVisibleDebug = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleDebug");
 }
 
-void CullingPass::execute(const RenderContext& ctx) {
+void CullingPass::execute(const RenderContext& ctx, RenderGraph& graph) {
 	const auto frustum = ctx.camera.self->generateFrustum();
 
 	cullScene(ctx, frustum, *mOpaqueGroups, *mVisibleOpaque);

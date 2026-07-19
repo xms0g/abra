@@ -2,6 +2,7 @@
 #include "glad/glad.h"
 #include "../shader.h"
 #include "../renderCommand.h"
+#include "../renderGraph.h"
 #include "../buffers/frameBuffer.h"
 #include "../material/material.hpp"
 #include "../renderContext/renderContext.hpp"
@@ -23,12 +24,12 @@ void SkyboxPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
 }
 
-void SkyboxPass::execute(const RenderContext& ctx) {
+void SkyboxPass::execute(const RenderContext& ctx, RenderGraph& graph) {
 	const auto& [entityID, matBatch] = mObjects->front();
 	const uint32_t meshIdx = matBatch.meshIndices.front();
 	const uint32_t vao = ctx.renderData->mesh.vaos[meshIdx];
 
-	ctx.sceneBuffer->bind();
+	graph.getResource("sceneBuffer").bind();
 	mShader->activate();
 	mShader->setMat4("skyView", ctx.camera.skyView);
 

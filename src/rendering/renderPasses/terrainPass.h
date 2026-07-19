@@ -11,7 +11,7 @@ public:
 
 	void configure(RenderContext& ctx, EventBus& eventBus) override;
 
-	void execute(const RenderContext& ctx) override;
+	void execute(const RenderContext& ctx, RenderGraph& graph) override;
 
 private:
 	const Shader* mShader{nullptr};

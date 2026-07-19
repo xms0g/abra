@@ -9,7 +9,6 @@ struct Frustum;
 }
 
 class RenderQueue;
-class BaseFrameBuffer;
 class FrameBuffer;
 class UniformBuffer;
 class Camera;
@@ -21,8 +20,6 @@ struct SpotLightComponent;
 struct RenderContext {
 	RenderData* renderData{};
 	RenderQueue* renderQueue{};
-	mutable const FrameBuffer* sceneBuffer{};
-	const FrameBuffer* intermediateBuffer{};
 	mutable MaterialCache materialCache;
 	const FrameBuffer* gBuffer{};
 

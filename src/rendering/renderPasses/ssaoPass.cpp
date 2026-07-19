@@ -1,8 +1,8 @@
 #include "ssaoPass.h"
 #include "glad/glad.h"
 #include "../shader.h"
+#include "../renderGraph.h"
 #include "../buffers/frameBuffer.h"
-#include "../buffers/uniformBuffer.h"
 #include "../buffers/vertexBuffer.h"
 #include "../texture/texture.h"
 #include "../models/quad.h"
@@ -21,16 +21,6 @@ void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	int32_t height = CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height");
 
 	mQuad = std::make_unique<Model::SingleQuad>();
-
-	mFBO = std::make_unique<FrameBuffer>(width, height);
-	mFBO->withTextureFP(GL_RED)
-			.checkStatus();
-
-	mBlurFBO = std::make_unique<FrameBuffer>(width, height);
-	mBlurFBO->withTextureFP(GL_RED)
-			.checkStatus();
-
-	ctx.ssao.buffer = mBlurFBO.get();
 
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("ssao");
 	mBlurShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("ssaoBlur");
@@ -86,38 +76,38 @@ void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 		0.0f);
 	data.resolution = glm::vec4(width, height, 0.0f, 0.0f);
 
-	mUBO = std::make_unique<UniformBuffer>(DYNAMIC, sizeof(SSAOData), CONFIG_MANAGER_INSTANCE.get<uint32_t>("ssao.ubo_binding"));
-	mUBO->bind();
-	mUBO->setData(&data, sizeof(SSAOData), 0);
-	mUBO->unbind();
+	mUBO = UniformBuffer{DYNAMIC, sizeof(SSAOData), CONFIG_MANAGER_INSTANCE.get<uint32_t>("ssao.ubo_binding")};
+	mUBO.bind();
+	mUBO.setData(&data, sizeof(SSAOData), 0);
+	mUBO.unbind();
 
-	mUBO->configure(
+	mUBO.configure(
 		mShader->id(),
 		CONFIG_MANAGER_INSTANCE.get<uint32_t>("ssao.ubo_binding"),
 		CONFIG_MANAGER_INSTANCE.get<std::string>("ssao.block_name").c_str());
 
-	ctx.ssao.ubo = mUBO.get();
+	ctx.ssao.ubo = &mUBO;
 }
 
-void SSAOPass::execute(const RenderContext& ctx) {
-	ssao(ctx);
-	blur();
+void SSAOPass::execute(const RenderContext& ctx, RenderGraph& graph) {
+	ssao(graph);
+	blur(graph);
 }
 
-void SSAOPass::ssao(const RenderContext& ctx) const {
-	mFBO->bind();
+void SSAOPass::ssao(const RenderGraph& graph) const {
+	graph.getResource("ssao").bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	mShader->activate();
 	RenderCommand::drawQuad(mQuad->vao());
 }
 
-void SSAOPass::blur() const {
-	mBlurFBO->bind();
+void SSAOPass::blur(const RenderGraph& graph) const {
+	graph.getResource("ssaoBlur").bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	mBlurShader->activate();
-	mFBO->bindTexture(0);
+	graph.getResource("ssao").bindTexture(0);
 
 	RenderCommand::drawQuad(mQuad->vao());
 }

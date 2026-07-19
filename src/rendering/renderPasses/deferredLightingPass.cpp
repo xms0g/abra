@@ -1,5 +1,6 @@
 #include "deferredLightingPass.h"
 #include "glad/glad.h"
+#include "../renderGraph.h"
 #include "../shader.h"
 #include "../renderCommand.h"
 #include "../buffers/frameBuffer.h"
@@ -44,15 +45,17 @@ void DeferredLightingPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	RenderCommand::bindShadowMaps(ctx);
 }
 
-void DeferredLightingPass::execute(const RenderContext& ctx) {
+void DeferredLightingPass::execute(const RenderContext& ctx, RenderGraph& graph) {
+	const auto& sceneBuffer = graph.getResource("sceneBuffer");
 	// Copy depth buffer of gBuffer to scene buffer for the proper depth testing
 	ctx.gBuffer->bindForRead();
-	ctx.sceneBuffer->bindForDraw();
+	sceneBuffer.bindForDraw();
+
 	glBlitFramebuffer(0, 0, ctx.gBuffer->width(), ctx.gBuffer->height(),
-	                  0, 0, ctx.sceneBuffer->width(), ctx.sceneBuffer->height(),
+	                  0, 0, sceneBuffer.width(), sceneBuffer.height(),
 	                  GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
-	ctx.sceneBuffer->bind();
+	sceneBuffer.bind();
 	mShader->activate();
 
 	RenderCommand::drawQuad(mQuad->vao());

@@ -2,6 +2,7 @@
 #include "glad/glad.h"
 #include "../shader.h"
 #include "../renderCommand.h"
+#include "../renderGraph.h"
 #include "../buffers/frameBuffer.h"
 #include "../material/material.hpp"
 #include "../renderContext/renderData.hpp"
@@ -46,7 +47,7 @@ void DeferredGeometryPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
 }
 
-void DeferredGeometryPass::execute(const RenderContext& ctx) {
+void DeferredGeometryPass::execute(const RenderContext& ctx, RenderGraph& graph) {
 	mGBuffer->bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

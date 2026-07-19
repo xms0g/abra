@@ -12,11 +12,8 @@
 #include "buffers/frameBuffer.h"
 #include "buffers/uniformBuffer.h"
 #include "models/quad.h"
-#include "renderContext/renderContext.hpp"
 #include "renderContext/renderGroup.hpp"
 #include "renderContext/renderableObject.hpp"
-#include "renderContext/renderQueue.hpp"
-#include "renderContext/renderData.hpp"
 #include "renderPasses/IRenderPass.hpp"
 #include "renderPasses/deferredGeometryPass.h"
 #include "renderPasses/deferredLightingPass.h"
@@ -68,7 +65,7 @@ RenderPipeline::~RenderPipeline() {
 
 void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	RenderBatcher batcher;
-	batcher.build(*mRenderData, *mRenderQueue, getSystemEntities());
+	batcher.build(mRenderData, mRenderQueue, getSystemEntities());
 
 	createRenderPasses(eventBus);
 	createUniformBuffers(camera);
@@ -81,16 +78,14 @@ void RenderPipeline::render() {
 	refreshCameraData();
 	sortEntities();
 
-	mRenderCtx->materialCache.reset();
+	mRenderCtx.materialCache.reset();
 
-	mSceneBuffer->bind();
+	mGraph.getResource("sceneBuffer").bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for (const auto& pass: mRenderPasses) {
-		pass->execute(*mRenderCtx);
+		pass->execute(mRenderCtx, mGraph);
 	}
-
-	mRenderCtx->sceneBuffer = mSceneBuffer.get();
 }
 
 void RenderPipeline::drawGui() {
@@ -105,65 +100,66 @@ void RenderPipeline::createSystems(Registry& registry) {
 
 void RenderPipeline::createUniformBuffers(const Camera& camera) {
 	// Create camera buffer
-	mCameraUBO = std::make_unique<UniformBuffer>(
+	mCameraUBO = UniformBuffer{
 		DYNAMIC,
 		3 * sizeof(glm::mat4) + sizeof(glm::vec4),
-		CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"));
+		CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding")
+	};
 
 	const glm::mat4 projectionMat = glm::perspective(
 		glm::radians(camera.zoom()),
-		static_cast<float>(CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width")) / static_cast<float>(CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height")),
+		static_cast<float>(CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width")) / static_cast<float>(
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height")),
 		camera.znear(), camera.zfar());
 
 	const glm::mat4 invProjectionMat = glm::inverse(projectionMat);
 
-	mCameraUBO->setData(glm::value_ptr(projectionMat), sizeof(glm::mat4), sizeof(glm::mat4) + sizeof(glm::vec4));
-	mCameraUBO->setData(glm::value_ptr(invProjectionMat), sizeof(glm::mat4), 2 * sizeof(glm::mat4) + sizeof(glm::vec4));
-	mCameraUBO->unbind();
+	mCameraUBO.bind();
+	mCameraUBO.setData(glm::value_ptr(projectionMat), sizeof(glm::mat4), sizeof(glm::mat4) + sizeof(glm::vec4));
+	mCameraUBO.setData(glm::value_ptr(invProjectionMat), sizeof(glm::mat4), 2 * sizeof(glm::mat4) + sizeof(glm::vec4));
+	mCameraUBO.unbind();
 }
 
 void RenderPipeline::createRenderQueues() {
-	mRenderQueue = std::make_unique<RenderQueue>();
-
-	mRenderQueue->set("opaqueInstanced", std::vector<RenderInstanceGroup>());
-	mRenderQueue->set("blendInstanced", std::vector<RenderInstanceGroup>());
-	mRenderQueue->set("opaque", std::vector<RenderGroup>());
-	mRenderQueue->set("blend", std::vector<RenderGroup>());
-	mRenderQueue->set("debug", std::vector<RenderGroup>());
-	mRenderQueue->set("shadow", std::vector<RenderGroup>());
-	mRenderQueue->set("terrain", std::vector<RenderGroup>());
-	mRenderQueue->set("skybox", std::vector<RenderGroup>());
-	mRenderQueue->set("deferred", std::vector<RenderGroup>());
-	mRenderQueue->set("visibleDeferred", std::vector<RenderableObject>());
-	mRenderQueue->set("visibleOpaque", std::vector<RenderableObject>());
-	mRenderQueue->set("visibleBlend", std::vector<RenderableObject>());
-	mRenderQueue->set("visibleDebug", std::vector<RenderableObject>());
+	mRenderQueue.set("opaqueInstanced", std::vector<RenderInstanceGroup>());
+	mRenderQueue.set("blendInstanced", std::vector<RenderInstanceGroup>());
+	mRenderQueue.set("opaque", std::vector<RenderGroup>());
+	mRenderQueue.set("blend", std::vector<RenderGroup>());
+	mRenderQueue.set("debug", std::vector<RenderGroup>());
+	mRenderQueue.set("shadow", std::vector<RenderGroup>());
+	mRenderQueue.set("terrain", std::vector<RenderGroup>());
+	mRenderQueue.set("skybox", std::vector<RenderGroup>());
+	mRenderQueue.set("deferred", std::vector<RenderGroup>());
+	mRenderQueue.set("visibleDeferred", std::vector<RenderableObject>());
+	mRenderQueue.set("visibleOpaque", std::vector<RenderableObject>());
+	mRenderQueue.set("visibleBlend", std::vector<RenderableObject>());
+	mRenderQueue.set("visibleDebug", std::vector<RenderableObject>());
 }
 
 void RenderPipeline::createRenderPasses(EventBus& eventBus) {
 	mRenderPasses.emplace_back(std::make_unique<CullingPass>());
 
-	if (!mRenderQueue->get<std::vector<RenderGroup> >("deferred").empty()) {
+	if (!mRenderQueue.get<std::vector<RenderGroup> >("deferred").empty()) {
 		mRenderPasses.emplace_back(std::make_unique<DeferredGeometryPass>());
 		mRenderPasses.emplace_back(std::make_unique<SSAOPass>());
 		mRenderPasses.emplace_back(std::make_unique<DeferredLightingPass>());
 	}
 
-	if (!mRenderQueue->get<std::vector<RenderGroup> >("opaque").empty() ||
-		!mRenderQueue->get<std::vector<RenderGroup> >("blend").empty()) {
+	if (!mRenderQueue.get<std::vector<RenderGroup> >("opaque").empty() ||
+	    !mRenderQueue.get<std::vector<RenderGroup> >("blend").empty()) {
 		mRenderPasses.emplace_back(std::make_unique<ForwardPass>());
-		}
+	}
 
-	if (!mRenderQueue->get<std::vector<RenderGroup> >("debug").empty()) {
+	if (!mRenderQueue.get<std::vector<RenderGroup> >("debug").empty()) {
 		mRenderPasses.emplace_back(std::make_unique<DebugPass>());
 	}
 
-	if (!mRenderQueue->get<std::vector<RenderInstanceGroup> >("opaqueInstanced").empty() ||
-		!mRenderQueue->get<std::vector<RenderInstanceGroup> >("blendInstanced").empty()) {
+	if (!mRenderQueue.get<std::vector<RenderInstanceGroup> >("opaqueInstanced").empty() ||
+	    !mRenderQueue.get<std::vector<RenderInstanceGroup> >("blendInstanced").empty()) {
 		mRenderPasses.emplace_back(std::make_unique<InstancedPass>());
-		}
+	}
 
-	if (!mRenderQueue->get<std::vector<RenderGroup> >("terrain").empty()) {
+	if (!mRenderQueue.get<std::vector<RenderGroup> >("terrain").empty()) {
 		mRenderPasses.emplace_back(std::make_unique<TerrainPass>());
 	}
 
@@ -171,84 +167,115 @@ void RenderPipeline::createRenderPasses(EventBus& eventBus) {
 
 	if (CONFIG_MANAGER_INSTANCE.get<bool>("msaa.enabled")) {
 		mRenderPasses.emplace_back(std::make_unique<ResolvePass>());
-		mRenderCtx->intermediateBuffer = mIntermediateBuffer.get();
 	}
 
 	mRenderPasses.emplace_back(std::make_unique<PostProcessPass>());
 
 	for (const auto& pass: mRenderPasses) {
-		pass->configure(*mRenderCtx, eventBus);
+		pass->configure(mRenderCtx, eventBus);
 	}
 }
 
 void RenderPipeline::createFrameBuffers() {
-	mSceneBuffer = std::make_unique<FrameBuffer>(
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"));
+	mGraph.addResources(
+		"sceneBuffer", std::make_unique<FrameBuffer>(
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height")));
+
+	auto& sceneBuffer = mGraph.getResource("sceneBuffer");
 
 	if (CONFIG_MANAGER_INSTANCE.get<bool>("msaa.enabled")) {
 		glEnable(GL_MULTISAMPLE);
 		const int32_t sampleCount = CONFIG_MANAGER_INSTANCE.get<int32_t>("msaa.sample_count");
-		mIntermediateBuffer = std::make_unique<FrameBuffer>(
-			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
-			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"));
+
+		mGraph.addResources(
+			"intermediateBuffer", std::make_unique<FrameBuffer>(
+				CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
+				CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height")));
+
+		auto& intermediateBuffer = mGraph.getResource("intermediateBuffer");
+		intermediateBuffer.bind();
 
 		if (CONFIG_MANAGER_INSTANCE.get<bool>("hdr.enabled")) {
-			mIntermediateBuffer->withTextureFP(GL_RGBA)
+			intermediateBuffer.withTextureFP(GL_RGBA)
 					.withRenderBufferDepth(GL_DEPTH_COMPONENT24)
 					.checkStatus();
 
-			mSceneBuffer->bind();
-			mSceneBuffer->withTextureFPMultisampled(sampleCount, GL_RGBA)
+			sceneBuffer.bind();
+			sceneBuffer.withTextureFPMultisampled(sampleCount, GL_RGBA)
 					.withRenderBufferDepthMultisampled(sampleCount, GL_DEPTH_COMPONENT24)
 					.checkStatus();
 		} else {
-			mIntermediateBuffer->withTexture(GL_RGBA)
+			intermediateBuffer.withTexture(GL_RGBA)
 					.withRenderBufferDepth(GL_DEPTH_COMPONENT24)
 					.checkStatus();
 
-			mSceneBuffer->bind();
-			mSceneBuffer->withTextureMultisampled(sampleCount, GL_RGBA)
+			sceneBuffer.bind();
+			sceneBuffer.withTextureMultisampled(sampleCount, GL_RGBA)
 					.withRenderBufferDepthMultisampled(sampleCount, GL_DEPTH_COMPONENT24)
 					.checkStatus();
 		}
 	} else {
+		sceneBuffer.bind();
 		if (CONFIG_MANAGER_INSTANCE.get<bool>("hdr.enabled")) {
-			mSceneBuffer->withTextureFP(GL_RGBA)
+			sceneBuffer.withTextureFP(GL_RGBA)
 					.withTextureDepth(GL_DEPTH_COMPONENT24, false)
 					.checkStatus();
 		} else {
-			mSceneBuffer->withTexture(GL_RGBA)
+			sceneBuffer.withTexture(GL_RGBA)
 					.withTextureDepth(GL_DEPTH_COMPONENT24, false)
 					.checkStatus();
 		}
 	}
-	mSceneBuffer->unbind();
+	sceneBuffer.unbind();
+
+	mGraph.addResources("ssao", std::make_unique<FrameBuffer>(
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"))
+	);
+	mGraph.getResource("ssao").bind();
+	mGraph.getResource("ssao").withTexture(GL_RED).checkStatus();
+	mGraph.getResource("ssao").unbind();
+
+	mGraph.addResources("ssaoBlur", std::make_unique<FrameBuffer>(
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"))
+	);
+	mGraph.getResource("ssaoBlur").bind();
+	mGraph.getResource("ssaoBlur").withTexture(GL_RED).checkStatus();
+	mGraph.getResource("ssaoBlur").unbind();
+	mRenderCtx.ssao.buffer = &mGraph.getResource("ssaoBlur");
 }
 
 void RenderPipeline::createRenderContext(const Camera& camera) {
-	mRenderCtx = std::make_unique<RenderContext>();
-	mRenderData = std::make_unique<RenderData>();
-	mRenderCtx->renderData = mRenderData.get();
-	mRenderCtx->renderQueue = mRenderQueue.get();
-	mRenderCtx->light.dirLights = &mLightSystem->dirLights();
-	mRenderCtx->light.pointLights = &mLightSystem->pointLights();
-	mRenderCtx->light.spotLights = &mLightSystem->spotLights();
-	mRenderCtx->sceneBuffer = mSceneBuffer.get();
-	mRenderCtx->camera.self = &camera;
+	mRenderCtx.renderData = &mRenderData;
+	mRenderCtx.renderQueue = &mRenderQueue;
+	mRenderCtx.light.dirLights = &mLightSystem->dirLights();
+	mRenderCtx.light.pointLights = &mLightSystem->pointLights();
+	mRenderCtx.light.spotLights = &mLightSystem->spotLights();
+	mRenderCtx.camera.self = &camera;
 }
 
 void RenderPipeline::configureSystems(EventBus& eventBus) const {
-	mLightSystem->configure(*mRenderCtx, eventBus);
-	mSyncStateSystem->configure(*mRenderCtx, eventBus);
-	mShadowSystem->configure(*mRenderCtx, eventBus);
+	mLightSystem->configure(mRenderCtx, eventBus);
+	mSyncStateSystem->configure(mRenderCtx, eventBus);
+	mShadowSystem->configure(mRenderCtx, eventBus);
 }
 
 void RenderPipeline::configureShaders() {
 	const UniformBinding uboBindings[] = {
-		{CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name"), CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"), UniformBuffer::configure},
-		{CONFIG_MANAGER_INSTANCE.get<std::string>("light.block_name"), CONFIG_MANAGER_INSTANCE.get<uint32_t>("light.ubo_binding"), UniformBuffer::configure},
-		{CONFIG_MANAGER_INSTANCE.get<std::string>("shadow.block_name"), CONFIG_MANAGER_INSTANCE.get<uint32_t>("shadow.ubo_binding"), UniformBuffer::configure}
+		{
+			CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name"),
+			CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"), UniformBuffer::configure
+		},
+		{
+			CONFIG_MANAGER_INSTANCE.get<std::string>("light.block_name"),
+			CONFIG_MANAGER_INSTANCE.get<uint32_t>("light.ubo_binding"), UniformBuffer::configure
+		},
+		{
+			CONFIG_MANAGER_INSTANCE.get<std::string>("shadow.block_name"),
+			CONFIG_MANAGER_INSTANCE.get<uint32_t>("shadow.ubo_binding"), UniformBuffer::configure
+		}
 	};
 
 	const TextureBinding shadowMapBindings[] = {
@@ -267,8 +294,8 @@ void RenderPipeline::configureShaders() {
 	}
 }
 
-void RenderPipeline::refreshCameraData() const {
-	mRenderCtx->camera.skyView = glm::mat4(glm::mat3(mRenderCtx->camera.self->viewMatrix()));
+void RenderPipeline::refreshCameraData() {
+	mRenderCtx.camera.skyView = glm::mat4(glm::mat3(mRenderCtx.camera.self->viewMatrix()));
 
 	struct alignas(16) PackedView {
 		glm::mat4 view;
@@ -276,24 +303,24 @@ void RenderPipeline::refreshCameraData() const {
 	};
 
 	const PackedView packed = {
-		mRenderCtx->camera.self->viewMatrix(),
-		glm::vec4(mRenderCtx->camera.self->position(), 1.0)
+		mRenderCtx.camera.self->viewMatrix(),
+		glm::vec4(mRenderCtx.camera.self->position(), 1.0)
 	};
 
-	mCameraUBO->bind();
-	mCameraUBO->setData(&packed, sizeof(PackedView), 0);
+	mCameraUBO.bind();
+	mCameraUBO.setData(&packed, sizeof(PackedView), 0);
 }
 
 void RenderPipeline::sortEntities() {
-	const glm::vec3& camPos = mRenderCtx->camera.self->position();
+	const glm::vec3& camPos = mRenderCtx.camera.self->position();
 
 	auto sortBatches = [&](auto& batch, bool transparent) -> void {
 		std::sort(
 			batch.begin(),
 			batch.end(),
 			[&camPos, &transparent, this](const RenderGroup& a, const RenderGroup& b) {
-				const auto aPos = mRenderData->entity.positions[a.entityID];
-				const auto bPos = mRenderData->entity.positions[b.entityID];
+				const auto aPos = mRenderData.entity.positions[a.entityID];
+				const auto bPos = mRenderData.entity.positions[b.entityID];
 
 				const float da = glm::length2(camPos - aPos);
 				const float db = glm::length2(camPos - bPos);
@@ -306,9 +333,9 @@ void RenderPipeline::sortEntities() {
 	};
 
 	// Sort opaque objects front to back
-	sortBatches(mRenderQueue->get<std::vector<RenderGroup> >("deferred"), false);
-	sortBatches(mRenderQueue->get<std::vector<RenderGroup> >("opaque"), false);
-	sortBatches(mRenderQueue->get<std::vector<RenderGroup> >("blend"), true);
+	sortBatches(mRenderQueue.get<std::vector<RenderGroup> >("deferred"), false);
+	sortBatches(mRenderQueue.get<std::vector<RenderGroup> >("opaque"), false);
+	sortBatches(mRenderQueue.get<std::vector<RenderGroup> >("blend"), true);
 
 	// for (auto& [entity, transforms, materials]: renderQueues.blendInstancedGroup) {
 	// 	auto transform = *transforms;

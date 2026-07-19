@@ -11,6 +11,7 @@
 #include "kernels.hpp"
 #include "../../shader.h"
 #include "../../renderCommand.h"
+#include "../../renderGraph.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../buffers/vertexBuffer.h"
 #include "../../models/quad.h"
@@ -55,10 +56,10 @@ void PostProcessPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessEvent>(this, &PostProcessPass::onGuiUpdate);
 }
 
-void PostProcessPass::execute(const RenderContext& ctx) {
+void PostProcessPass::execute(const RenderContext& ctx, RenderGraph& graph) {
 	bool toggle = false;
 
-	uint32_t inputTex = ctx.sceneBuffer->texture();
+	uint32_t inputTex = graph.getResource("sceneBuffer").texture();
 	for (const auto& effect: mEffects) {
 		if (!effect->enabled())
 			continue;

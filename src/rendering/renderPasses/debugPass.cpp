@@ -1,6 +1,7 @@
 #include "debugPass.h"
 #include "../shader.h"
 #include "../renderCommand.h"
+#include "../renderGraph.h"
 #include "../buffers/uniformBuffer.h"
 #include "../buffers/frameBuffer.h"
 #include "../renderContext/renderContext.hpp"
@@ -21,8 +22,8 @@ void DebugPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	mObjects = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleDebug");
 }
 
-void DebugPass::execute(const RenderContext& ctx) {
-	ctx.sceneBuffer->bind();
+void DebugPass::execute(const RenderContext& ctx, RenderGraph& graph) {
+	graph.getResource("sceneBuffer").bind();
 
 	for (const auto& object: *mObjects) {
 		const uint32_t mode = ctx.renderData->entity.debugModes[object.entityID];

@@ -1,25 +1,22 @@
 #pragma once
 #include <memory>
 #include <vector>
+#include "renderGraph.h"
+#include "renderContext/renderContext.hpp"
+#include "buffers/uniformBuffer.h"
+#include "renderContext/renderData.hpp"
+#include "renderContext/renderQueue.hpp"
 #include "../ECS/system.hpp"
 
 class Window;
-class RenderQueue;
-struct RenderData;
 class SyncStateSystem;
 class EventBus;
-class SSAOPass;
 class ShadowSystem;
-class DeferredLightingPass;
-class DeferredGeometryPass;
 class IRenderPass;
-class FrameBuffer;
-class UniformBuffer;
 class Camera;
 class Registry;
 class LightSystem;
 class PostProcessPass;
-struct RenderContext;
 
 class RenderPipeline final : public System {
 public:
@@ -50,24 +47,23 @@ private:
 
 	void configureShaders();
 
-	void refreshCameraData() const;
+	void refreshCameraData();
 
 	void sortEntities();
+
+	RenderGraph mGraph{};
 	// Systems
 	LightSystem* mLightSystem{};
 	std::unique_ptr<ShadowSystem> mShadowSystem;
 	std::unique_ptr<SyncStateSystem> mSyncStateSystem;
-	// Frame Buffers
-	std::unique_ptr<FrameBuffer> mSceneBuffer;
-	std::unique_ptr<FrameBuffer> mIntermediateBuffer;
 	// Uniform Buffers
-	std::unique_ptr<UniformBuffer> mCameraUBO;
+	UniformBuffer mCameraUBO{};
 	// Render Data
-	std::unique_ptr<RenderData> mRenderData;
+	RenderData mRenderData{};
 	// Render Queue
-	std::unique_ptr<RenderQueue> mRenderQueue;
+	RenderQueue mRenderQueue{};
 	// Render context
-	std::unique_ptr<RenderContext> mRenderCtx;
+	RenderContext mRenderCtx{};
 	// Render passes
 	std::vector<std::unique_ptr<IRenderPass>> mRenderPasses;
 };

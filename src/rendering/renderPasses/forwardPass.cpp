@@ -1,6 +1,7 @@
 #include "forwardPass.h"
 #include "glad/glad.h"
 #include "../renderCommand.h"
+#include "../renderGraph.h"
 #include "../buffers/frameBuffer.h"
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderQueue.hpp"
@@ -15,8 +16,8 @@ void ForwardPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	RenderCommand::bindShadowMaps(ctx);
 }
 
-void ForwardPass::execute(const RenderContext& ctx) {
-	ctx.sceneBuffer->bind();
+void ForwardPass::execute(const RenderContext& ctx, RenderGraph& graph) {
+	graph.getResource("sceneBuffer").bind();
 
 	if (!mOpaqueObjects->empty()) {
 		glDepthMask(GL_FALSE);

@@ -6,6 +6,12 @@ class BaseFrameBuffer {
 public:
 	BaseFrameBuffer(int32_t width, int32_t height);
 
+	BaseFrameBuffer(const BaseFrameBuffer&) = delete;
+	BaseFrameBuffer& operator=(const BaseFrameBuffer&) = delete;
+
+	BaseFrameBuffer(BaseFrameBuffer&&) noexcept = default;
+	BaseFrameBuffer& operator=(BaseFrameBuffer&&) noexcept = default;
+
 	virtual ~BaseFrameBuffer();
 
 	[[nodiscard]]
@@ -49,6 +55,24 @@ protected:
 class FrameBuffer final : public BaseFrameBuffer {
 public:
 	FrameBuffer(int32_t width, int32_t height);
+
+	FrameBuffer(const FrameBuffer&) = delete;
+	FrameBuffer& operator=(const FrameBuffer&) = delete;
+
+	FrameBuffer(FrameBuffer&& other) noexcept
+		: BaseFrameBuffer(std::move(other)),
+		  mTextures(std::move(other.mTextures)),
+		  mAttachments(std::move(other.mAttachments)) {
+	}
+
+	FrameBuffer& operator=(FrameBuffer&& other) noexcept {
+		if (this == &other)
+			return *this;
+		BaseFrameBuffer::operator =(std::move(other));
+		mTextures = std::move(other.mTextures);
+		mAttachments = std::move(other.mAttachments);
+		return *this;
+	}
 
 	~FrameBuffer() override;
 

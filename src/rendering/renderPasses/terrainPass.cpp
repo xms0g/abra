@@ -1,6 +1,7 @@
 #include "terrainPass.h"
 #include "glad/glad.h"
 #include "../renderCommand.h"
+#include "../renderGraph.h"
 #include "../buffers/frameBuffer.h"
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderGroup.hpp"
@@ -24,8 +25,8 @@ void TerrainPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	RenderCommand::bindShadowMaps(ctx);
 }
 
-void TerrainPass::execute(const RenderContext& ctx) {
-	ctx.sceneBuffer->bind();
+void TerrainPass::execute(const RenderContext& ctx, RenderGraph& graph) {
+	graph.getResource("sceneBuffer").bind();
 
 	const auto& [entityID, matBatch] = mObjects->front();
 	const uint32_t meshIdx = matBatch.meshIndices.front();
