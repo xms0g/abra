@@ -150,7 +150,14 @@ Model::Cube::Cube(
 	if (color != glm::vec3(0.0f)) {
 		flags |= HAS_SOLID_COLOR;
 	}
-	mMaterial[0] = {.flags = flags, .textureTarget = GL_TEXTURE_2D, .color = color, .textures = textures};
+
+	Material material;
+	material.flags = flags;
+	material.textureTarget = GL_TEXTURE_2D;
+	material.color = color;
+	material.textures = std::move(textures);
+
+	mMaterial[0] = std::move(material);
 }
 
 Model::Cube::~Cube() = default;

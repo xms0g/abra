@@ -65,8 +65,11 @@ Model::Cubemap::Cubemap(std::vector<std::string>& faces) {
 	for (const auto& face : faces) {
 		textures.emplace_back(0, ALBEDO,  face);
 	}
+	Material material;
+	material.textureTarget = GL_TEXTURE_CUBE_MAP;
+	material.textures = std::move(textures);
 
-	mMaterial[0] = {.textureTarget = GL_TEXTURE_CUBE_MAP, .textures = textures};
+	mMaterial[0] = std::move(material);
 }
 
 Model::Cubemap::~Cubemap() = default;

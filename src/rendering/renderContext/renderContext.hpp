@@ -24,8 +24,7 @@ struct RenderContext {
 	const FrameBuffer* gBuffer{};
 
 	struct {
-		const FrameBuffer* buffer;
-		const UniformBuffer* ubo;
+		const FrameBuffer* buffer; //TODO: Will be removed this soon.
 	} ssao{};
 
 	struct {

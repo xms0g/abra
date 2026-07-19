@@ -186,7 +186,7 @@ void ResourceManager::loadModel(const size_t entityID, const std::string& file) 
 	{
 		std::lock_guard<std::mutex> lock(mResourceMutex);
 		mMeshesByEntity.emplace(entityID, std::move(meshesByMatID));
-		mMaterialsByEntity.emplace(entityID, mlCtx.materials);
+		mMaterialsByEntity.emplace(entityID, std::move(mlCtx.materials));
 	}
 }
 
@@ -322,13 +322,14 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 			}
 		}
 
-		materialLoadCtx.materials[req.materialID] = {
-				.flags = flags,
-				.textureTarget = GL_TEXTURE_2D,
-				.alphaCutoff = alphaCutoff,
-				.shader = flags & OPAQUE ? RESOURCE_MANAGER_INSTANCE.get<Shader>("opaque") :
-				          flags & BLEND ? RESOURCE_MANAGER_INSTANCE.get<Shader>("blend") : nullptr
-			};
+		Material material;
+		material.flags = flags;
+		material.textureTarget = GL_TEXTURE_2D;
+		material.alphaCutoff = alphaCutoff;
+		material.shader = flags & OPAQUE ? RESOURCE_MANAGER_INSTANCE.get<Shader>("opaque") :
+						  flags & BLEND ? RESOURCE_MANAGER_INSTANCE.get<Shader>("blend") : nullptr;
+
+		materialLoadCtx.materials[req.materialID] = std::move(material);
 	}
 
 	auto& material = materialLoadCtx.materials[req.materialID];
@@ -359,7 +360,7 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 			}
 		}
 
-		material.textures.emplace_back(0, req.type, std::move(path));
+		material.textures.emplace_back(0, static_cast<uint32_t>(req.type), std::move(path));
 	}
 }
 

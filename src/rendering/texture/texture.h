@@ -22,7 +22,20 @@ struct Texture {
 	uint32_t type;
     std::string path;
 
-	void bind(uint32_t slot) const;
+	Texture() = default;
+
+	Texture(uint32_t id, uint32_t type, const std::string& path);
+
+	~Texture();
+
+	Texture(const Texture&) = delete;
+	Texture& operator=(const Texture&) = delete;
+
+    Texture(Texture&& other) noexcept;
+
+    Texture& operator=(Texture&& other) noexcept;
+
+    void bind(uint32_t slot) const;
 
 	static Texture generate(int32_t width, int32_t height, const float* data);
 

@@ -30,6 +30,34 @@ struct Material {
 	float alphaCutoff{0.0f};
 	const Shader* shader{nullptr};
 	std::vector<Texture> textures;
+
+	Material() = default;
+
+	Material(const Material& other) = delete;
+	Material& operator=(const Material& other) = delete;
+
+	Material(Material&& other) noexcept
+		: idx(std::exchange(other.idx, 0)),
+		  flags(std::exchange(other.flags, 0)),
+		  textureTarget(std::exchange(other.textureTarget, 0)),
+		  color(std::move(other.color)),
+		  alphaCutoff(std::exchange(other.alphaCutoff, 0.0f)),
+		  shader(std::exchange(other.shader, nullptr)),
+		  textures(std::move(other.textures)) {
+	}
+
+	Material& operator=(Material&& other) noexcept {
+		if (this == &other)
+			return *this;
+		idx = std::exchange(other.idx, 0);
+		flags = std::exchange(other.flags, 0);
+		textureTarget = std::exchange(other.textureTarget, 0);
+		color = std::move(other.color);
+		alphaCutoff = std::exchange(other.alphaCutoff, 0.0f);
+		shader = std::exchange(other.shader, nullptr);
+		textures = std::move(other.textures);
+		return *this;
+	}
 };
 
 struct MaterialBatch {

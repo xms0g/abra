@@ -3,6 +3,7 @@
 #include <memory>
 #include "IRenderPass.hpp"
 #include "../buffers/uniformBuffer.h"
+#include "../texture/texture.h"
 
 class FrameBuffer;
 class Shader;
@@ -29,4 +30,5 @@ private:
 	const Shader* mShader{nullptr};
 	const Shader* mBlurShader{nullptr};
 	UniformBuffer mUBO{};
+	Texture mNoiseTexture;
 };

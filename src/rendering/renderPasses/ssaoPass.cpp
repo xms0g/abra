@@ -42,16 +42,16 @@ void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	ctx.gBuffer->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureSlot"), CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureIdx"));
 	ctx.gBuffer->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot"), CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureIdx"));
 
-	int32_t textureSize = CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.noise.textureSize");
+	const int32_t textureSize = CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.noise.textureSize");
 
 	std::vector<float> noise;
 	noise.resize(textureSize * textureSize);
 	noise = math::random::generateNoise(textureSize * textureSize);
 
-	const Texture noiseTexture = Texture::generate(textureSize, textureSize, noise.data());
-	noiseTexture.bind(CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.noise.textureSlot"));
+	mNoiseTexture = Texture::generate(textureSize, textureSize, noise.data());
+	mNoiseTexture.bind(CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.noise.textureSlot"));
 
-	int32_t kernelSize = CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.kernelSize");
+	const int32_t kernelSize = CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.kernelSize");
 
 	std::vector<glm::vec4> kernel;
 	kernel.resize(kernelSize);
@@ -85,8 +85,6 @@ void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 		mShader->id(),
 		CONFIG_MANAGER_INSTANCE.get<uint32_t>("ssao.ubo_binding"),
 		CONFIG_MANAGER_INSTANCE.get<std::string>("ssao.block_name").c_str());
-
-	ctx.ssao.ubo = &mUBO;
 }
 
 void SSAOPass::execute(const RenderContext& ctx, RenderGraph& graph) {

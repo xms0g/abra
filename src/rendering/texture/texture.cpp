@@ -4,6 +4,32 @@
 #include "image/stb_image.h"
 #include "../material/material.hpp"
 
+Texture::Texture(const uint32_t id, const uint32_t type, const std::string& path)
+	: id(id),
+	  type(type),
+	  path(path) {
+}
+
+Texture::~Texture() {
+	if (id != 0)
+		glDeleteTextures(1, &id);
+}
+
+Texture::Texture(Texture&& other) noexcept
+	: id(std::exchange(other.id, 0)),
+	  type(std::exchange(other.type, 0)),
+	  path(std::move(other.path)) {
+}
+
+Texture& Texture::operator=(Texture&& other) noexcept {
+	if (this == &other)
+		return *this;
+	id = std::exchange(other.id, 0);
+	type = std::exchange(other.type, 0);
+	path = std::move(other.path);
+	return *this;
+}
+
 void Texture::bind(const uint32_t slot) const {
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, id);
