@@ -26,13 +26,11 @@ struct RenderContext {
 		const std::vector<DirectionalLightComponent*>* dirLights;
 		const std::vector<PointLightComponent*>* pointLights;
 		const std::vector<SpotLightComponent*>* spotLights;
-		const UniformBuffer* ubo;
 	} light{};
 
 	struct {
 		const Camera* self;
 		glm::mat4 skyView;
-		const UniformBuffer* ubo;
 	} camera{};
 
 	RenderContext() = default;

@@ -2,6 +2,7 @@
 #include <memory>
 #include <array>
 #include "glm/glm.hpp"
+#include "../../buffers/uniformBuffer.h"
 
 class RenderGraph;
 class EventBus;
@@ -10,7 +11,6 @@ class DirectionalShadow;
 class OmnidirectionalShadow;
 class PerspectiveShadow;
 struct RenderContext;
-class UniformBuffer;
 
 class ShadowSystem {
 public:
@@ -33,7 +33,7 @@ private:
 	int32_t mHeight{0};
 	const RenderContext* mCtx{nullptr};
 	const RenderGraph* mGraph{nullptr};
-	std::unique_ptr<UniformBuffer> mUBO;
+	UniformBuffer mUBO;
 	std::unique_ptr<DirectionalShadow> mDirShadow;
 	std::unique_ptr<OmnidirectionalShadow> mOmnidirShadow;
 	std::unique_ptr<PerspectiveShadow> mPersShadow;

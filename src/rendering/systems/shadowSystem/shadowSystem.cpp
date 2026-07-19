@@ -29,7 +29,7 @@ void ShadowSystem::configure(const RenderContext& ctx, const RenderGraph& graph,
 	mOmnidirShadow = std::make_unique<OmnidirectionalShadow>(ctx);
 	mPersShadow = std::make_unique<PerspectiveShadow>(ctx);
 
-	mUBO = std::make_unique<UniformBuffer>(
+	mUBO = UniformBuffer(
 		DYNAMIC,
 		sizeof(ShadowData),
 		CONFIG_MANAGER_INSTANCE.get<uint32_t>("shadow.ubo_binding"));
@@ -103,6 +103,6 @@ void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
 	glCullFace(GL_BACK);
 	glViewport(0, 0, mWidth, mHeight);
 
-	mUBO->bind();
-	mUBO->setData(&mGPUData, sizeof(ShadowData), 0);
+	mUBO.bind();
+	mUBO.setData(&mGPUData, sizeof(ShadowData), 0);
 }

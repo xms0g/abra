@@ -1,11 +1,11 @@
 #pragma once
 #include "glm/glm.hpp"
 #include "../../ECS/system.hpp"
+#include "../buffers/uniformBuffer.h"
 
 struct RenderContext;
 struct GuiLightEvent;
 class EventBus;
-class UniformBuffer;
 struct PointLightComponent;
 struct DirectionalLightComponent;
 struct SpotLightComponent;
@@ -29,7 +29,7 @@ private:
 
 	EventBus* mEventBus{};
 	const RenderContext* mCtx{};
-	std::unique_ptr<UniformBuffer> mUBO;
+	UniformBuffer mUBO;
 	std::vector<DirectionalLightComponent*> mDirLights{};
 	std::vector<PointLightComponent*> mPointLights{};
 	std::vector<SpotLightComponent*> mSpotLights{};

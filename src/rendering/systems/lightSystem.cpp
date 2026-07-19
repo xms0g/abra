@@ -40,7 +40,7 @@ void LightSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 		}
 	}
 
-	mUBO = std::make_unique<UniformBuffer>(
+	mUBO = UniformBuffer(
 		DYNAMIC,
 		sizeof(PackedLights),
 		CONFIG_MANAGER_INSTANCE.get<uint32_t>("light.ubo_binding"));
@@ -100,8 +100,8 @@ void LightSystem::updateLightUBO() {
 
 	mGPUData.lightCount = glm::ivec4(dirLightCount, pointLightCount, spotLightCount, 0);
 
-	mUBO->bind();
-	mUBO->setData(&mGPUData, sizeof(PackedLights), 0);
+	mUBO.bind();
+	mUBO.setData(&mGPUData, sizeof(PackedLights), 0);
 }
 
 void LightSystem::onGuiUpdate(const GuiLightEvent& event) {
