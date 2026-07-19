@@ -30,7 +30,7 @@ void BaseFrameBuffer::bind() const {
 	glViewport(0, 0, mWidth, mHeight);
 }
 
-void BaseFrameBuffer::unbind() {
+void BaseFrameBuffer::unbind() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 

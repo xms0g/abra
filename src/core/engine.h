@@ -26,8 +26,8 @@ private:
 	// Engine
 	bool isRunning{true};
 
-	GuiSystem* mGuiSystem{};
-	RenderPipeline* mRenderPipeline{};
+	GuiSystem* mGuiSystem{nullptr};
+	RenderPipeline* mRenderPipeline{nullptr};
 	std::unique_ptr<Window> mWindow;
 	std::unique_ptr<Camera> mCamera;
 	std::unique_ptr<EventBus> mEventBus;

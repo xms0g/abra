@@ -3,6 +3,7 @@
 #include <array>
 #include "glm/glm.hpp"
 
+class RenderGraph;
 class EventBus;
 struct UpdateShadowMapEvent;
 class DirectionalShadow;
@@ -17,7 +18,7 @@ public:
 
 	~ShadowSystem();
 
-	void configure(const RenderContext& ctx, EventBus& eventBus);
+	void configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus);
 
 private:
 	void directionalShadowPass();
@@ -30,7 +31,8 @@ private:
 
 	int32_t mWidth{0};
 	int32_t mHeight{0};
-	const RenderContext* mCtx{};
+	const RenderContext* mCtx{nullptr};
+	const RenderGraph* mGraph{nullptr};
 	std::unique_ptr<UniformBuffer> mUBO;
 	std::unique_ptr<DirectionalShadow> mDirShadow;
 	std::unique_ptr<OmnidirectionalShadow> mOmnidirShadow;

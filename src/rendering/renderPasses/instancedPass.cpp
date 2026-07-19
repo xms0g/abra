@@ -11,11 +11,9 @@
 #include "../buffers/vertexBuffer.h"
 #include "../mesh/mesh.h"
 #include "../../math/matrix.h"
+#include "../../config/configManager.h"
 
-InstancedPass::InstancedPass() = default;
-InstancedPass::~InstancedPass() = default;
-
-void InstancedPass::configure(RenderContext& ctx, EventBus& eventBus) {
+InstancedPass::InstancedPass(const RenderContext& ctx, const RenderGraph& graph) {
 	mOpaqueObjects = &ctx.renderQueue->get<std::vector<RenderInstanceGroup> >("opaqueInstanced");
 	mTransparentObjects = &ctx.renderQueue->get<std::vector<RenderInstanceGroup> >("blendInstanced");
 
@@ -29,8 +27,12 @@ void InstancedPass::configure(RenderContext& ctx, EventBus& eventBus) {
 		uploadInstanceData(*mTransparentObjects, *mBlendVBO);
 	}
 
-	RenderCommand::bindShadowMaps(ctx);
+	const int32_t slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot");
+	graph.getResource("directional").bindTexture(slot);
+	graph.getResource("point").bindTexture(slot + 1);
+	graph.getResource("spot").bindTexture(slot + 2);
 }
+InstancedPass::~InstancedPass() = default;
 
 void InstancedPass::execute(const RenderContext& ctx, RenderGraph& graph) {
 	graph.getResource("sceneBuffer").bind();

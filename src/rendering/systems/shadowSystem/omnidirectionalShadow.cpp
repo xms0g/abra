@@ -15,11 +15,6 @@ OmnidirectionalShadow::OmnidirectionalShadow(const RenderContext& ctx) {
 	mWidth = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_width");
 	mHeight = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_height");
 	mAspect = static_cast<float>(mWidth) / static_cast<float>(mHeight);
-	mDepthMap = std::make_unique<FrameBuffer>(mWidth, mHeight);
-	mDepthMap->withTextureCubemapDepthArray(CONFIG_MANAGER_INSTANCE.get<int32_t>("light.max_point"), GL_DEPTH_COMPONENT24, true)
-			.checkStatus();
-	mDepthMap->unbind();
-
 	mDepthShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("depthCubemap");
 	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("shadow");
 
@@ -32,14 +27,6 @@ OmnidirectionalShadow::OmnidirectionalShadow(const RenderContext& ctx) {
 }
 
 OmnidirectionalShadow::~OmnidirectionalShadow() = default;
-
-uint32_t OmnidirectionalShadow::depthTexture() const {
-	return mDepthMap->texture();
-}
-
-FrameBuffer& OmnidirectionalShadow::depthMap() const {
-	return *mDepthMap;
-}
 
 void OmnidirectionalShadow::render(
 	const RenderContext& ctx,

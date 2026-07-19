@@ -14,12 +14,6 @@ public:
 
 	~OmnidirectionalShadow();
 
-	[[nodiscard]]
-	uint32_t depthTexture() const;
-
-	[[nodiscard]]
-	FrameBuffer& depthMap() const;
-
 	void render(const RenderContext& ctx, const glm::vec3& position, int32_t layer);
 
 private:
@@ -32,7 +26,6 @@ private:
 
 	std::vector<glm::mat4> mShadowTransforms;
 	std::vector<RenderGroup>* mObjects;
-	std::unique_ptr<FrameBuffer> mDepthMap;
 	const Shader* mDepthShader;
 	glm::mat4 mShadowProj;
 

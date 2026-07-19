@@ -12,11 +12,7 @@
 #include "../renderContext/renderContext.hpp"
 #include "../../config/configManager.h"
 
-DeferredLightingPass::DeferredLightingPass()= default;
-
-DeferredLightingPass::~DeferredLightingPass() = default;
-
-void DeferredLightingPass::configure(RenderContext& ctx, EventBus& eventBus) {
+DeferredLightingPass::DeferredLightingPass(const RenderGraph& graph) {
 	mQuad = std::make_unique<Model::SingleQuad>();
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("deferredLighting");
 
@@ -33,25 +29,35 @@ void DeferredLightingPass::configure(RenderContext& ctx, EventBus& eventBus) {
 
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
 
-	ctx.gBuffer->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureSlot"), CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureIdx"));
-	ctx.gBuffer->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot"), CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureIdx"));
-	ctx.gBuffer->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureSlot"), CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureIdx"));
-	ctx.gBuffer->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureSlot"), CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureIdx"));
-	ctx.ssao.buffer->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.textureSlot"));
+	const auto& gBuffer = graph.getResource("gBuffer");
+	const auto& ssaoBlur = graph.getResource("ssaoBlur");
+
+	gBuffer.bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureSlot"), CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureIdx"));
+	gBuffer.bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot"), CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureIdx"));
+	gBuffer.bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureSlot"), CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureIdx"));
+	gBuffer.bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureSlot"), CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureIdx"));
+	ssaoBlur.bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.textureSlot"));
 	RESOURCE_MANAGER_INSTANCE.get<BaseFrameBuffer>("irradianceMap")->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.textureSlot"));
 	RESOURCE_MANAGER_INSTANCE.get<BaseFrameBuffer>("prefilterMap")->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.textureSlot"));
 	RESOURCE_MANAGER_INSTANCE.get<BaseFrameBuffer>("brdfLUT")->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.brdfLUT.textureSlot"));
 
-	RenderCommand::bindShadowMaps(ctx);
+	const int32_t slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot");
+	graph.getResource("directional").bindTexture(slot);
+	graph.getResource("point").bindTexture(slot + 1);
+	graph.getResource("spot").bindTexture(slot + 2);
+	
 }
+
+DeferredLightingPass::~DeferredLightingPass() = default;
 
 void DeferredLightingPass::execute(const RenderContext& ctx, RenderGraph& graph) {
 	const auto& sceneBuffer = graph.getResource("sceneBuffer");
+	const auto& gBuffer = graph.getResource("gBuffer");
 	// Copy depth buffer of gBuffer to scene buffer for the proper depth testing
-	ctx.gBuffer->bindForRead();
+	gBuffer.bindForRead();
 	sceneBuffer.bindForDraw();
 
-	glBlitFramebuffer(0, 0, ctx.gBuffer->width(), ctx.gBuffer->height(),
+	glBlitFramebuffer(0, 0, gBuffer.width(), gBuffer.height(),
 	                  0, 0, sceneBuffer.width(), sceneBuffer.height(),
 	                  GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 

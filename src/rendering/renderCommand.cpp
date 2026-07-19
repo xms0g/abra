@@ -180,16 +180,3 @@ void RenderCommand::drawSkybox(const uint32_t vao) {
 	glDepthFunc(GL_LESS);
 	glDepthMask(GL_TRUE);
 }
-
-void RenderCommand::bindShadowMaps(const RenderContext& ctx) {
-	const int32_t slot = GL_TEXTURE0 + CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot");
-
-	glActiveTexture(slot);
-	glBindTexture(GL_TEXTURE_2D, ctx.renderData->shadowMaps[0]);
-
-	glActiveTexture(slot + 1);
-	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, ctx.renderData->shadowMaps[1]);
-
-	glActiveTexture(slot + 2);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, ctx.renderData->shadowMaps[2]);
-}

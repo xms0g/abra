@@ -21,11 +21,7 @@
 #include "../../../event/events/guiPostProcessEvent.hpp"
 #include "../../../config/configManager.h"
 
-PostProcessPass::PostProcessPass() = default;
-
-PostProcessPass::~PostProcessPass() = default;
-
-void PostProcessPass::configure(RenderContext& ctx, EventBus& eventBus) {
+PostProcessPass::PostProcessPass(const RenderGraph& graph, EventBus& eventBus) {
 	mQuad = std::make_unique<Model::Quad>();
 	mEffects = {
 		std::make_shared<Bloom>("Bloom", false),
@@ -54,7 +50,10 @@ void PostProcessPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	}
 
 	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessEvent>(this, &PostProcessPass::onGuiUpdate);
+
 }
+
+PostProcessPass::~PostProcessPass() = default;
 
 void PostProcessPass::execute(const RenderContext& ctx, RenderGraph& graph) {
 	bool toggle = false;

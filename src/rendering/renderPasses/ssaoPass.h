@@ -14,10 +14,9 @@ class SingleQuad;
 
 class SSAOPass final : public IRenderPass {
 public:
-	SSAOPass();
-	~SSAOPass() override;
+	SSAOPass(const RenderGraph& graph);
 
-	void configure(RenderContext& ctx, EventBus& eventBus) override;
+	~SSAOPass() override;
 
 	void execute(const RenderContext& ctx, RenderGraph& graph) override;
 

@@ -3,22 +3,17 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "../../mesh/mesh.h"
 #include "../../shader.h"
+#include "../../renderGraph.h"
 #include "../../renderContext/renderContext.hpp"
 #include "../../renderContext/renderGroup.hpp"
 #include "../../renderContext/renderData.hpp"
 #include "../../renderContext/renderQueue.hpp"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderCommand.h"
+#include "../../renderGraph.h"
 #include "../../../config/configManager.h"
 
 DirectionalShadow::DirectionalShadow(const RenderContext& ctx) {
-	mDepthMap = std::make_unique<FrameBuffer>(
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_width"),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_height"));
-	mDepthMap->withTextureDepth(GL_DEPTH_COMPONENT24, true)
-			.checkStatus();
-	mDepthMap->unbind();
-
 	mDepthShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("depth");
 	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("shadow");
 
@@ -33,15 +28,11 @@ DirectionalShadow::DirectionalShadow(const RenderContext& ctx) {
 
 DirectionalShadow::~DirectionalShadow() = default;
 
-uint32_t DirectionalShadow::depthTexture() const {
-	return mDepthMap->texture();
-}
-
 glm::mat4 DirectionalShadow::lightSpaceMatrix() const {
 	return mLightSpaceMatrix;
 }
 
-void DirectionalShadow::render(const RenderContext& ctx, const glm::vec3& direction) {
+void DirectionalShadow::render(const RenderContext& ctx, const RenderGraph& graph, const glm::vec3& direction) {
 	const glm::vec3 lightPos = -direction * mHeight;
 	const glm::mat4 lightProjection = glm::ortho(mLeft, mRight, mBottom, mTop, mNear, mFar);
 	const glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
@@ -52,7 +43,7 @@ void DirectionalShadow::render(const RenderContext& ctx, const glm::vec3& direct
 	mDepthShader->setMat4("lightSpaceMatrix", mLightSpaceMatrix);
 
 	// render scene from light's point of view
-	mDepthMap->bind();
+	graph.getResource("directional").bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 	for (const auto& [entityID, matBatch]: *mObjects) {
@@ -66,5 +57,5 @@ void DirectionalShadow::render(const RenderContext& ctx, const glm::vec3& direct
 			RenderCommand::drawMesh(vao, vertexCount, indexCount);
 		}
 	}
-	mDepthMap->unbind();
+	graph.getResource("directional").unbind();
 }

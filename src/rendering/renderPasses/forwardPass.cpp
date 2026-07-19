@@ -6,15 +6,19 @@
 #include "../renderContext/renderContext.hpp"
 #include "../renderContext/renderQueue.hpp"
 #include "../renderContext/renderableObject.hpp"
+#include "../../config/configManager.h"
 
-ForwardPass::~ForwardPass() = default;
-
-void ForwardPass::configure(RenderContext& ctx, EventBus& eventBus) {
+ForwardPass::ForwardPass(const RenderContext& ctx, const RenderGraph& graph) {
 	mOpaqueObjects = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleOpaque");
 	mTransparentObjects = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleBlend");
 
-	RenderCommand::bindShadowMaps(ctx);
+	const int32_t slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot");
+	graph.getResource("directional").bindTexture(slot);
+	graph.getResource("point").bindTexture(slot + 1);
+	graph.getResource("spot").bindTexture(slot + 2);
 }
+
+ForwardPass::~ForwardPass() = default;
 
 void ForwardPass::execute(const RenderContext& ctx, RenderGraph& graph) {
 	graph.getResource("sceneBuffer").bind();

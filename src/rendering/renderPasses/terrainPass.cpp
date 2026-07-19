@@ -8,10 +8,9 @@
 #include "../renderContext/renderData.hpp"
 #include "../renderContext/renderQueue.hpp"
 #include "../../rendering/shader.h"
+#include "../../config/configManager.h"
 
-TerrainPass::~TerrainPass() = default;
-
-void TerrainPass::configure(RenderContext& ctx, EventBus& eventBus) {
+TerrainPass::TerrainPass(const RenderContext& ctx, const RenderGraph& graph) {
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("terrain");
@@ -22,8 +21,14 @@ void TerrainPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	};
 
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
-	RenderCommand::bindShadowMaps(ctx);
+
+	const int32_t slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot");
+	graph.getResource("directional").bindTexture(slot);
+	graph.getResource("point").bindTexture(slot + 1);
+	graph.getResource("spot").bindTexture(slot + 2);
 }
+
+TerrainPass::~TerrainPass() = default;
 
 void TerrainPass::execute(const RenderContext& ctx, RenderGraph& graph) {
 	graph.getResource("sceneBuffer").bind();

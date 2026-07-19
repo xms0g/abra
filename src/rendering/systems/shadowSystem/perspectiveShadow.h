@@ -15,12 +15,6 @@ public:
 	~PerspectiveShadow();
 
 	[[nodiscard]]
-	uint32_t depthTexture() const;
-
-	[[nodiscard]]
-	FrameBuffer& depthMap() const;
-
-	[[nodiscard]]
 	glm::mat4 lightSpaceMatrix(int layer) const;
 
 	void render(
@@ -28,6 +22,7 @@ public:
 		const glm::vec3& direction,
 		const glm::vec3& position,
 		float fovy,
+		uint32_t texture,
 		int32_t layer);
 
 private:
@@ -37,7 +32,6 @@ private:
 	float mFar{0.0f};
 	float mNear{0.0f};
 	glm::mat4 mLightSpaceMatrix[4]{};
-	std::unique_ptr<FrameBuffer> mDepthMap;
 	const Shader* mDepthShader;
 	std::vector<RenderGroup>* mObjects;
 };

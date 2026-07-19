@@ -12,26 +12,7 @@
 #include "../../ECS/components/bv.hpp"
 #include "../../config/configManager.h"
 
-DeferredGeometryPass::~DeferredGeometryPass() = default;
-
-void DeferredGeometryPass::configure(RenderContext& ctx, EventBus& eventBus) {
-	mGBuffer = std::make_unique<FrameBuffer>(
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"));
-	mGBuffer->withTextureFP(GL_RGBA) // position
-			.withTextureFP(GL_RGBA) // normal
-#ifdef HDR
-			.withTextureFP(GL_RGBA)
-#else
-			.withTexture(GL_RGBA) // albedo
-			// Emissive placed into alpha channels in position, normal, albedo
-#endif
-			.withTexture(GL_RGBA) // orm
-			.configureAttachments()
-			.withTextureDepth(GL_DEPTH_COMPONENT24, false)
-			.checkStatus();
-
-	ctx.gBuffer = mGBuffer.get();
+DeferredGeometryPass::DeferredGeometryPass(const RenderContext& ctx) {
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("gBuffer");
 	mObjects = &ctx.renderQueue->get<std::vector<RenderableObject>>("visibleDeferred");
 
@@ -47,8 +28,10 @@ void DeferredGeometryPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
 }
 
+DeferredGeometryPass::~DeferredGeometryPass() = default;
+
 void DeferredGeometryPass::execute(const RenderContext& ctx, RenderGraph& graph) {
-	mGBuffer->bind();
+	graph.getResource("gBuffer").bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	mShader->activate();

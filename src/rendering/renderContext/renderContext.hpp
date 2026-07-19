@@ -21,11 +21,6 @@ struct RenderContext {
 	RenderData* renderData{};
 	RenderQueue* renderQueue{};
 	mutable MaterialCache materialCache;
-	const FrameBuffer* gBuffer{};
-
-	struct {
-		const FrameBuffer* buffer; //TODO: Will be removed this soon.
-	} ssao{};
 
 	struct {
 		const std::vector<DirectionalLightComponent*>* dirLights;
@@ -39,10 +34,6 @@ struct RenderContext {
 		glm::mat4 skyView;
 		const UniformBuffer* ubo;
 	} camera{};
-
-	struct {
-		const UniformBuffer* ubo;
-	} shadow{};
 
 	RenderContext() = default;
 

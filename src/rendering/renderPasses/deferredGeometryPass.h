@@ -9,14 +9,13 @@ class FrameBuffer;
 
 class DeferredGeometryPass final : public IRenderPass {
 public:
-	~DeferredGeometryPass() override;
+	explicit DeferredGeometryPass(const RenderContext& ctx);
 
-	void configure(RenderContext& ctx, EventBus& eventBus) override;
+	~DeferredGeometryPass() override;
 
 	void execute(const RenderContext& ctx, RenderGraph& graph) override;
 
 private:
-	std::unique_ptr<FrameBuffer> mGBuffer;
 	const Shader* mShader{nullptr};
 	std::vector<RenderableObject>* mObjects{nullptr};
 };

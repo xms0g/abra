@@ -15,27 +15,13 @@ PerspectiveShadow::PerspectiveShadow(const RenderContext& ctx) {
 	mWidth = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_width");
 	mHeight = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_height");
 	mAspect = static_cast<float>(mWidth) / static_cast<float>(mHeight);
-	mDepthMap = std::make_unique<FrameBuffer>(mWidth, mHeight);
-	mDepthMap->withTextureDepthArray(CONFIG_MANAGER_INSTANCE.get<int32_t>("light.max_spot"), GL_DEPTH_COMPONENT24, true)
-			.checkStatus();
-	mDepthMap->unbind();
-
 	mDepthShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("depth");
 	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("shadow");
-
 	mNear = CONFIG_MANAGER_INSTANCE.get<float>("shadow.perspective.nearPlane");
 	mFar = CONFIG_MANAGER_INSTANCE.get<float>("shadow.perspective.farPlane");
 }
 
 PerspectiveShadow::~PerspectiveShadow() = default;
-
-uint32_t PerspectiveShadow::depthTexture() const {
-	return mDepthMap->texture();
-}
-
-FrameBuffer& PerspectiveShadow::depthMap() const {
-	return *mDepthMap;
-}
 
 glm::mat4 PerspectiveShadow::lightSpaceMatrix(const int layer) const {
 	return mLightSpaceMatrix[layer];
@@ -46,13 +32,9 @@ void PerspectiveShadow::render(
 	const glm::vec3& direction,
 	const glm::vec3& position,
 	const float fovy,
+	const uint32_t texture,
 	const int32_t layer) {
-	glFramebufferTextureLayer(
-		GL_FRAMEBUFFER,
-		GL_DEPTH_ATTACHMENT,
-		mDepthMap->texture(),
-		0,
-		layer);
+	glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texture, 0, layer);
 
 	glClear(GL_DEPTH_BUFFER_BIT);
 

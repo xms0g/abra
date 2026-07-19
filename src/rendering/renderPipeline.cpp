@@ -137,43 +137,39 @@ void RenderPipeline::createRenderQueues() {
 }
 
 void RenderPipeline::createRenderPasses(EventBus& eventBus) {
-	mRenderPasses.emplace_back(std::make_unique<CullingPass>());
+	mRenderPasses.emplace_back(std::make_unique<CullingPass>(mRenderCtx));
 
 	if (!mRenderQueue.get<std::vector<RenderGroup> >("deferred").empty()) {
-		mRenderPasses.emplace_back(std::make_unique<DeferredGeometryPass>());
-		mRenderPasses.emplace_back(std::make_unique<SSAOPass>());
-		mRenderPasses.emplace_back(std::make_unique<DeferredLightingPass>());
+		mRenderPasses.emplace_back(std::make_unique<DeferredGeometryPass>(mRenderCtx));
+		mRenderPasses.emplace_back(std::make_unique<SSAOPass>(mGraph));
+		mRenderPasses.emplace_back(std::make_unique<DeferredLightingPass>(mGraph));
 	}
 
 	if (!mRenderQueue.get<std::vector<RenderGroup> >("opaque").empty() ||
 	    !mRenderQueue.get<std::vector<RenderGroup> >("blend").empty()) {
-		mRenderPasses.emplace_back(std::make_unique<ForwardPass>());
+		mRenderPasses.emplace_back(std::make_unique<ForwardPass>(mRenderCtx, mGraph));
 	}
 
 	if (!mRenderQueue.get<std::vector<RenderGroup> >("debug").empty()) {
-		mRenderPasses.emplace_back(std::make_unique<DebugPass>());
+		mRenderPasses.emplace_back(std::make_unique<DebugPass>(mRenderCtx));
 	}
 
 	if (!mRenderQueue.get<std::vector<RenderInstanceGroup> >("opaqueInstanced").empty() ||
 	    !mRenderQueue.get<std::vector<RenderInstanceGroup> >("blendInstanced").empty()) {
-		mRenderPasses.emplace_back(std::make_unique<InstancedPass>());
+		mRenderPasses.emplace_back(std::make_unique<InstancedPass>(mRenderCtx, mGraph));
 	}
 
 	if (!mRenderQueue.get<std::vector<RenderGroup> >("terrain").empty()) {
-		mRenderPasses.emplace_back(std::make_unique<TerrainPass>());
+		mRenderPasses.emplace_back(std::make_unique<TerrainPass>(mRenderCtx, mGraph));
 	}
 
-	mRenderPasses.emplace_back(std::make_unique<SkyboxPass>());
+	mRenderPasses.emplace_back(std::make_unique<SkyboxPass>(mRenderCtx));
 
 	if (CONFIG_MANAGER_INSTANCE.get<bool>("msaa.enabled")) {
 		mRenderPasses.emplace_back(std::make_unique<ResolvePass>());
 	}
 
-	mRenderPasses.emplace_back(std::make_unique<PostProcessPass>());
-
-	for (const auto& pass: mRenderPasses) {
-		pass->configure(mRenderCtx, eventBus);
-	}
+	mRenderPasses.emplace_back(std::make_unique<PostProcessPass>(mGraph, eventBus));
 }
 
 void RenderPipeline::createFrameBuffers() {
@@ -229,22 +225,73 @@ void RenderPipeline::createFrameBuffers() {
 	}
 	sceneBuffer.unbind();
 
-	mGraph.addResources("ssao", std::make_unique<FrameBuffer>(
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"))
+	mGraph.addResources(
+		"gBuffer", std::make_unique<FrameBuffer>(
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height")));
+
+	auto& gBuffer = mGraph.getResource("gBuffer");
+	gBuffer.bind();
+	gBuffer.withTextureFP(GL_RGBA) // position
+			.withTextureFP(GL_RGBA); // normal
+	if (CONFIG_MANAGER_INSTANCE.get<bool>("hdr.enabled")) {
+		// albedo
+		gBuffer.withTextureFP(GL_RGBA);
+	} else {
+		gBuffer.withTexture(GL_RGBA);
+	}
+	// Emissive placed into alpha channels in position, normal, albedo
+
+	gBuffer.withTexture(GL_RGBA) // orm
+			.configureAttachments()
+			.withTextureDepth(GL_DEPTH_COMPONENT24, false)
+			.checkStatus();
+
+	mGraph.addResources(
+		"ssao", std::make_unique<FrameBuffer>(
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"))
 	);
 	mGraph.getResource("ssao").bind();
 	mGraph.getResource("ssao").withTexture(GL_RED).checkStatus();
 	mGraph.getResource("ssao").unbind();
 
-	mGraph.addResources("ssaoBlur", std::make_unique<FrameBuffer>(
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"))
+	mGraph.addResources(
+		"ssaoBlur", std::make_unique<FrameBuffer>(
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"))
 	);
 	mGraph.getResource("ssaoBlur").bind();
 	mGraph.getResource("ssaoBlur").withTexture(GL_RED).checkStatus();
 	mGraph.getResource("ssaoBlur").unbind();
-	mRenderCtx.ssao.buffer = &mGraph.getResource("ssaoBlur");
+
+	// Shadow Maps
+	mGraph.addResources(
+		"directional", std::make_unique<FrameBuffer>(
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_width"),
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_height")));
+	mGraph.getResource("directional").bind();
+	mGraph.getResource("directional").withTextureDepth(GL_DEPTH_COMPONENT24, true).checkStatus();
+	mGraph.getResource("directional").unbind();
+
+	mGraph.addResources(
+		"point", std::make_unique<FrameBuffer>(
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_width"),
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_height")));
+	mGraph.getResource("point").bind();
+	mGraph.getResource("point").withTextureCubemapDepthArray(
+				CONFIG_MANAGER_INSTANCE.get<int32_t>("light.max_point"), GL_DEPTH_COMPONENT24, true)
+			.checkStatus();
+	mGraph.getResource("point").unbind();
+
+	mGraph.addResources(
+		"spot", std::make_unique<FrameBuffer>(
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_width"),
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_height")));
+	mGraph.getResource("spot").bind();
+	mGraph.getResource("spot").withTextureDepthArray(
+				CONFIG_MANAGER_INSTANCE.get<int32_t>("light.max_spot"), GL_DEPTH_COMPONENT24, true)
+			.checkStatus();
 }
 
 void RenderPipeline::createRenderContext(const Camera& camera) {
@@ -259,7 +306,7 @@ void RenderPipeline::createRenderContext(const Camera& camera) {
 void RenderPipeline::configureSystems(EventBus& eventBus) const {
 	mLightSystem->configure(mRenderCtx, eventBus);
 	mSyncStateSystem->configure(mRenderCtx, eventBus);
-	mShadowSystem->configure(mRenderCtx, eventBus);
+	mShadowSystem->configure(mRenderCtx, mGraph, eventBus);
 }
 
 void RenderPipeline::configureShaders() {

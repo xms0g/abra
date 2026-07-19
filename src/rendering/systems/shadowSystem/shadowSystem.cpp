@@ -3,7 +3,7 @@
 #include "directionalShadow.h"
 #include "omnidirectionalShadow.h"
 #include "perspectiveShadow.h"
-#include "../../../config/configManager.h"
+#include "../../renderGraph.h"
 #include "../../renderContext/renderContext.hpp"
 #include "../../renderContext/renderData.hpp"
 #include "../../buffers/uniformBuffer.h"
@@ -13,13 +13,15 @@
 #include "../../../ECS/components/spotLight.hpp"
 #include "../../../event/eventBus.hpp"
 #include "../../../event/events/updateShadowMapEvent.hpp"
+#include "../../../config/configManager.h"
 
 ShadowSystem::ShadowSystem() = default;
 
 ShadowSystem::~ShadowSystem() = default;
 
-void ShadowSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
+void ShadowSystem::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
 	mCtx = &ctx;
+	mGraph = &graph;
 	mWidth= CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width");
 	mHeight = CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height");
 
@@ -32,12 +34,6 @@ void ShadowSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 		sizeof(ShadowData),
 		CONFIG_MANAGER_INSTANCE.get<uint32_t>("shadow.ubo_binding"));
 
-	ctx.renderData->shadowMaps = {
-		mDirShadow->depthTexture(),
-		mOmnidirShadow->depthTexture(),
-		mPersShadow->depthTexture()
-	};
-
 	eventBus.subscribeToEvent<ShadowSystem, UpdateShadowMapEvent>(this, &ShadowSystem::onGuiUpdate);
 
 	mGPUData.omniFarPlane = glm::vec4(CONFIG_MANAGER_INSTANCE.get<float>("shadow.omnidirectional.farPlane"), 0.0f, 0.0f, 0.0f);
@@ -49,17 +45,20 @@ void ShadowSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 void ShadowSystem::directionalShadowPass() {
 	const auto& lights = *mCtx->light.dirLights;
 
-	if (!lights[0])
+	if (lights.empty())
 		return;
 
-	mDirShadow->render(*mCtx, lights[0]->direction);
+	mDirShadow->render(*mCtx, *mGraph, lights[0]->direction);
 	mGPUData.lightSpaceMatrix = mDirShadow->lightSpaceMatrix();
 }
 
 void ShadowSystem::omnidirectionalShadowPass() const {
 	const auto& lights = *mCtx->light.pointLights;
 
-	mOmnidirShadow->depthMap().bind();
+	if (lights.empty())
+		return;
+
+	mGraph->getResource("point").bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 	for (int32_t i = 0; i < lights.size(); ++i) {
@@ -71,25 +70,27 @@ void ShadowSystem::omnidirectionalShadowPass() const {
 		mOmnidirShadow->render(*mCtx, light->position, i);
 	}
 
-	mOmnidirShadow->depthMap().unbind();
+	mGraph->getResource("point").unbind();
 }
 
 void ShadowSystem::perspectiveShadowPass() {
 	const auto& lights = *mCtx->light.spotLights;
+	if (lights.empty())
+		return;
 
-	mPersShadow->depthMap().bind();
+	const auto& depthBuffer = mGraph->getResource("spot");
 
+	depthBuffer.bind();
 	for (int32_t i = 0; i < lights.size(); ++i) {
 		const auto& light = lights[i];
 
 		if (!light || !light->castShadow)
 			continue;
 
-		mPersShadow->render(*mCtx, light->direction, light->position, light->outerCutOff, i);
+		mPersShadow->render(*mCtx, light->direction, light->position, light->outerCutOff, depthBuffer.texture(), i);
 		mGPUData.persLightSpaceMatrix[i] = mPersShadow->lightSpaceMatrix(i);
 	}
-
-	mPersShadow->depthMap().unbind();
+	depthBuffer.unbind();
 }
 
 void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {

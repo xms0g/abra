@@ -6,9 +6,6 @@
 
 ResolvePass::~ResolvePass() = default;
 
-void ResolvePass::configure(RenderContext& ctx, EventBus& eventBus) {
-}
-
 void ResolvePass::execute(const RenderContext& ctx, RenderGraph& graph) {
 	const auto& sceneBuffer = graph.getResource("sceneBuffer");
 	const auto& intermediateBuffer = graph.getResource("intermediateBuffer");

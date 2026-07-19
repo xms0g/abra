@@ -27,7 +27,7 @@ public:
 
 	void bind() const;
 
-	void unbind();
+	void unbind() const;
 
 	void bindTexture(const uint32_t slot, const uint32_t index = 0) const {
 		bindTextureImpl(slot, index);

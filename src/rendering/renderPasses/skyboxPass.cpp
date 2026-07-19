@@ -11,9 +11,7 @@
 #include "../renderContext/renderQueue.hpp"
 #include "../texture/texture.h"
 
-SkyboxPass::~SkyboxPass() = default;
-
-void SkyboxPass::configure(RenderContext& ctx, EventBus& eventBus) {
+SkyboxPass::SkyboxPass(const RenderContext& ctx) {
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("skybox");
 	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("skybox");
 
@@ -23,6 +21,8 @@ void SkyboxPass::configure(RenderContext& ctx, EventBus& eventBus) {
 
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
 }
+
+SkyboxPass::~SkyboxPass() = default;
 
 void SkyboxPass::execute(const RenderContext& ctx, RenderGraph& graph) {
 	const auto& [entityID, matBatch] = mObjects->front();

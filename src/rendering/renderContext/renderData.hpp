@@ -32,8 +32,6 @@ struct RenderData {
 		std::vector<size_t> indexCounts;
 	} mesh;
 
-	std::array<uint32_t, 3> shadowMaps{};
-
 	void updateTransform(const uint32_t entityID, const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale) {
 		entity.positions[entityID] = position;
 		entity.rotations[entityID] = rotation;

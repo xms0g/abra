@@ -11,9 +11,9 @@ struct RenderableObject;
 
 class CullingPass final : public IRenderPass {
 public:
-	~CullingPass() override;
+	explicit CullingPass(const RenderContext& ctx);
 
-	void configure(RenderContext& ctx, EventBus& eventBus) override;
+	~CullingPass() override;
 
 	void execute(const RenderContext& ctx, RenderGraph& graph) override;
 

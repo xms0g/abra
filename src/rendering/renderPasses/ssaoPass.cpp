@@ -12,11 +12,7 @@
 #include "../../config/configManager.h"
 #include "../../math/random.h"
 
-SSAOPass::SSAOPass() = default;
-
-SSAOPass::~SSAOPass() = default;
-
-void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
+SSAOPass::SSAOPass(const RenderGraph& graph) {
 	int32_t width = CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width");
 	int32_t height = CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height");
 
@@ -39,8 +35,9 @@ void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 	RenderCommand::setTextureUnits(ssaoTextureBindings, *mShader);
 	RenderCommand::setTextureUnits(blurTextureBindings, *mBlurShader);
 
-	ctx.gBuffer->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureSlot"), CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureIdx"));
-	ctx.gBuffer->bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot"), CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureIdx"));
+	const auto& gBuffer = graph.getResource("gBuffer");
+	gBuffer.bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureSlot"), CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureIdx"));
+	gBuffer.bindTexture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot"), CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureIdx"));
 
 	const int32_t textureSize = CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.noise.textureSize");
 
@@ -86,6 +83,8 @@ void SSAOPass::configure(RenderContext& ctx, EventBus& eventBus) {
 		CONFIG_MANAGER_INSTANCE.get<uint32_t>("ssao.ubo_binding"),
 		CONFIG_MANAGER_INSTANCE.get<std::string>("ssao.block_name").c_str());
 }
+
+SSAOPass::~SSAOPass() = default;
 
 void SSAOPass::execute(const RenderContext& ctx, RenderGraph& graph) {
 	ssao(graph);
