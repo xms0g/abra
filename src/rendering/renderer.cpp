@@ -1,4 +1,4 @@
-#include "renderPipeline.h"
+#include "renderer.h"
 #include <SDL.h>
 #include "glad/glad.h"
 #include "glm/gtc/type_ptr.hpp"
@@ -37,7 +37,7 @@
 #include "../event/eventBus.hpp"
 #include "../resource/resourceManager.h"
 
-RenderPipeline::RenderPipeline(Registry& registry, const Camera& camera, Window& window) {
+Renderer::Renderer(Registry& registry, const Camera& camera, Window& window) {
 	RequireComponent<MeshComponent>();
 	RequireComponent<TransformComponent>();
 	// glad: load all OpenGL function pointers
@@ -62,11 +62,11 @@ RenderPipeline::RenderPipeline(Registry& registry, const Camera& camera, Window&
 	GuiBackend::init(&*window, window.glContext(), "#version 410");
 }
 
-RenderPipeline::~RenderPipeline() {
+Renderer::~Renderer() {
 	GuiBackend::shutdown();
 }
 
-void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
+void Renderer::configure(const Camera& camera, EventBus& eventBus) {
 	RenderBatcher batcher;
 	batcher.build(mRenderData, mRenderQueue, getSystemEntities());
 
@@ -76,7 +76,7 @@ void RenderPipeline::configure(const Camera& camera, EventBus& eventBus) {
 	configureShaders();
 }
 
-void RenderPipeline::render() {
+void Renderer::render() {
 	GuiBackend::newFrame();
 	refreshCameraData();
 	sortEntities();
@@ -91,17 +91,17 @@ void RenderPipeline::render() {
 	}
 }
 
-void RenderPipeline::drawGui() {
+void Renderer::drawGui() {
 	GuiBackend::renderFrame();
 }
 
-void RenderPipeline::createSystems(Registry& registry) {
+void Renderer::createSystems(Registry& registry) {
 	mLightSystem = &registry.addSystem<LightSystem>();
 	mShadowSystem = std::make_unique<ShadowSystem>();
 	mSyncStateSystem = std::make_unique<SyncStateSystem>();
 }
 
-void RenderPipeline::createUniformBuffers(const Camera& camera) {
+void Renderer::createUniformBuffers(const Camera& camera) {
 	// Create camera buffer
 	mCameraUBO = UniformBuffer{
 		DYNAMIC,
@@ -123,7 +123,7 @@ void RenderPipeline::createUniformBuffers(const Camera& camera) {
 	mCameraUBO.unbind();
 }
 
-void RenderPipeline::createRenderQueues() {
+void Renderer::createRenderQueues() {
 	mRenderQueue.set("opaqueInstanced", std::vector<RenderInstanceGroup>());
 	mRenderQueue.set("blendInstanced", std::vector<RenderInstanceGroup>());
 	mRenderQueue.set("opaque", std::vector<RenderGroup>());
@@ -139,7 +139,7 @@ void RenderPipeline::createRenderQueues() {
 	mRenderQueue.set("visibleDebug", std::vector<RenderableObject>());
 }
 
-void RenderPipeline::createRenderPasses(EventBus& eventBus) {
+void Renderer::createRenderPasses(EventBus& eventBus) {
 	mRenderPasses.emplace_back(std::make_unique<CullingPass>(mRenderCtx));
 
 	if (!mRenderQueue.get<std::vector<RenderGroup> >("deferred").empty()) {
@@ -175,7 +175,7 @@ void RenderPipeline::createRenderPasses(EventBus& eventBus) {
 	mRenderPasses.emplace_back(std::make_unique<PostProcessPass>(mGraph, eventBus));
 }
 
-void RenderPipeline::createFrameBuffers() {
+void Renderer::createFrameBuffers() {
 	mGraph.addResources(
 		"sceneBuffer", std::make_unique<FrameBuffer>(
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
@@ -320,13 +320,13 @@ void RenderPipeline::createFrameBuffers() {
 	addPPRenderTarget("bloomPong");
 }
 
-void RenderPipeline::configureSystems(EventBus& eventBus) {
+void Renderer::configureSystems(EventBus& eventBus) {
 	mLightSystem->configure(mRenderCtx, eventBus);
 	mSyncStateSystem->configure(mRenderCtx, eventBus);
 	mShadowSystem->configure(mRenderCtx, mGraph, eventBus);
 }
 
-void RenderPipeline::configureShaders() {
+void Renderer::configureShaders() {
 	const UniformBinding uboBindings[] = {
 		{
 			CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name"),
@@ -358,7 +358,7 @@ void RenderPipeline::configureShaders() {
 	}
 }
 
-void RenderPipeline::refreshCameraData() {
+void Renderer::refreshCameraData() {
 	mRenderCtx.camera.skyView = glm::mat4(glm::mat3(mRenderCtx.camera.self->viewMatrix()));
 
 	struct alignas(16) PackedView {
@@ -375,7 +375,7 @@ void RenderPipeline::refreshCameraData() {
 	mCameraUBO.setData(&packed, sizeof(PackedView), 0);
 }
 
-void RenderPipeline::sortEntities() {
+void Renderer::sortEntities() {
 	const glm::vec3& camPos = mRenderCtx.camera.self->position();
 
 	auto sortBatches = [&](auto& batch, bool transparent) -> void {

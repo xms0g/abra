@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 
-class RenderPipeline;
+class Renderer;
 class GuiSystem;
 class Window;
 class Registry;
@@ -27,7 +27,7 @@ private:
 	bool isRunning{true};
 
 	GuiSystem* mGuiSystem{nullptr};
-	RenderPipeline* mRenderPipeline{nullptr};
+	Renderer* mRenderPipeline{nullptr};
 	std::unique_ptr<Window> mWindow;
 	std::unique_ptr<Camera> mCamera;
 	std::unique_ptr<EventBus> mEventBus;

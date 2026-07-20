@@ -7,7 +7,7 @@
 #include "gui/system.h"
 #include "../event/eventBus.hpp"
 #include "../ECS/registry.h"
-#include "../rendering/renderPipeline.h"
+#include "../rendering/renderer.h"
 #include "../config/configManager.h"
 
 Engine::Engine() = default;
@@ -24,7 +24,7 @@ void Engine::init(Registry& registry) {
 		CONFIG_MANAGER_INSTANCE.get<bool>("window.fullscreen"));
 
 	mGuiSystem = &registry.addSystem<GuiSystem>();
-	mRenderPipeline = &registry.addSystem<RenderPipeline>(registry, *mCamera, *mWindow);
+	mRenderPipeline = &registry.addSystem<Renderer>(registry, *mCamera, *mWindow);
 }
 
 void Engine::configure() const {
@@ -45,7 +45,7 @@ void Engine::run() {
 
 		mRenderPipeline->render();
 		mGuiSystem->render(*mEventBus);
-		RenderPipeline::drawGui();
+		Renderer::drawGui();
 
 		// SDL swap buffers
 		mWindow->swapBuffer();

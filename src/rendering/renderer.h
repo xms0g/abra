@@ -18,11 +18,11 @@ class Registry;
 class LightSystem;
 class PostProcessPass;
 
-class RenderPipeline final : public System {
+class Renderer final : public System {
 public:
-	explicit RenderPipeline(Registry& registry, const Camera& camera, Window& window);
+	explicit Renderer(Registry& registry, const Camera& camera, Window& window);
 
-	~RenderPipeline() override;
+	~Renderer() override;
 
 	void configure(const Camera& camera, EventBus& eventBus);
 
