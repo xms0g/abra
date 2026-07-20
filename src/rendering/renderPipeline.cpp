@@ -225,6 +225,7 @@ void RenderPipeline::createFrameBuffers() {
 	}
 	sceneBuffer.unbind();
 
+	// GBuffer
 	mGraph.addResources(
 		"gBuffer", std::make_unique<FrameBuffer>(
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
@@ -247,6 +248,7 @@ void RenderPipeline::createFrameBuffers() {
 			.withTextureDepth(GL_DEPTH_COMPONENT24, false)
 			.checkStatus();
 
+	// SSAO
 	mGraph.addResources(
 		"ssao", std::make_unique<FrameBuffer>(
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
@@ -292,6 +294,27 @@ void RenderPipeline::createFrameBuffers() {
 	mGraph.getResource("spot").withTextureDepthArray(
 				CONFIG_MANAGER_INSTANCE.get<int32_t>("light.max_spot"), GL_DEPTH_COMPONENT24, true)
 			.checkStatus();
+
+	// PostProcess Render Targets
+	auto addPPRenderTarget = [&](const std::string& name) {
+		mGraph.addResources(
+			name, std::make_unique<FrameBuffer>(
+				CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
+				CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height")));
+
+		auto& target = mGraph.getResource(name);
+		if (CONFIG_MANAGER_INSTANCE.get<bool>("hdr.enabled")) {
+			target.withTextureFP(GL_RGBA);
+		} else {
+			target.withTexture(GL_RGBA);
+		}
+		target.checkStatus();
+	};
+
+	addPPRenderTarget("ping");
+	addPPRenderTarget("pong");
+	addPPRenderTarget("bloomPing");
+	addPPRenderTarget("bloomPong");
 }
 
 void RenderPipeline::createRenderContext(const Camera& camera) {

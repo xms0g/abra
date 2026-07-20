@@ -16,26 +16,17 @@ FXAA::FXAA(const std::string& name, const bool enabled)
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
 }
 
-uint32_t FXAA::render(
-	const uint32_t vao,
-	const uint32_t sceneTexture,
-	bool& toggle,
-	PingPongBuffer& renderTargets) const {
-	renderTargets[toggle]->bind();
+uint32_t FXAA::render(const uint32_t vao, const uint32_t sceneTexture, FrameBuffer* renderTarget) const {
+	renderTarget->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	const int32_t width = renderTargets[toggle]->width();
-	const int32_t height = renderTargets[toggle]->height();
-
 	mShader->activate();
-	mShader->setVec2("resolution", glm::vec2(width, height));
+	mShader->setVec2("resolution", glm::vec2(renderTarget->width(), renderTarget->height()));
 
 	const uint32_t textures[] = {sceneTexture};
 	RenderCommand::drawQuad(vao, textures);
 
-	const uint32_t texture = renderTargets[toggle]->texture();
-	toggle = !toggle;
-	return texture;
+	return renderTarget->texture();
 }
 
 void FXAA::updateFromEventImpl(const GuiPostProcessEvent& event) {

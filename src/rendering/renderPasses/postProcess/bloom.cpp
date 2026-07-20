@@ -2,11 +2,12 @@
 #include "glad/glad.h"
 #include "../../shader.h"
 #include "../../renderCommand.h"
+#include "../../renderGraph.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderContext/renderContext.hpp"
 #include "../../../config/configManager.h"
 
-Bloom::Bloom(const std::string& name, const bool enabled)
+Bloom::Bloom(const std::string& name, const RenderGraph& graph, const bool enabled)
 	: BasePostEffect(name, enabled) {
 	mBrightFilter = RESOURCE_MANAGER_INSTANCE.get<Shader>("bloomBF");
 	mBlur = RESOURCE_MANAGER_INSTANCE.get<Shader>("bloomBlur");
@@ -25,35 +26,19 @@ Bloom::Bloom(const std::string& name, const bool enabled)
 	RenderCommand::setTextureUnits(textureBindings, *mBlur);
 	RenderCommand::setTextureUnits(combineTextureBindings, *mCombine);
 
-	for (auto& target: mRenderTargets) {
-		target = std::make_unique<FrameBuffer>(
-			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
-			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"));
-
-		if (CONFIG_MANAGER_INSTANCE.get<bool>("hdr.enabled")) {
-			target->withTextureFP(GL_RGBA);
-		} else {
-			target->withTexture(GL_RGBA);
-		}
-		target->checkStatus();
-	}
+	mRenderTargets = {&graph.getResource("bloomPing"), &graph.getResource("bloomPong")};
 }
 
 Bloom::~Bloom() = default;
 
-uint32_t Bloom::render(
-	const uint32_t vao,
-	const uint32_t sceneTexture,
-	bool& toggle,
-	PingPongBuffer& renderTargets) const {
-	(void) toggle;
-	(void) renderTargets;
-	bool toggle_ = false;
+uint32_t Bloom::render(const uint32_t vao, const uint32_t sceneTexture, FrameBuffer* renderTarget) const {
+	(void) renderTarget;
+	bool toggle = false;
 	uint32_t inputTex = sceneTexture;
 
-	inputTex = brightFilterPass(vao, inputTex, toggle_);
-	inputTex = blurPass(vao, inputTex, toggle_);
-	inputTex = combinePass(vao, sceneTexture, inputTex, toggle_);
+	inputTex = brightFilterPass(vao, inputTex, toggle);
+	inputTex = blurPass(vao, inputTex, toggle);
+	inputTex = combinePass(vao, sceneTexture, inputTex, toggle);
 
 	return inputTex;
 }
@@ -72,6 +57,7 @@ uint32_t Bloom::brightFilterPass(const uint32_t vao, const uint32_t sceneTexture
 
 	const uint32_t outTex = mRenderTargets[toggle]->texture();
 	toggle = !toggle;
+
 	return outTex;
 }
 

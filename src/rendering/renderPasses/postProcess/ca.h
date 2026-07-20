@@ -10,11 +10,7 @@ class CA final : public BasePostEffect {
 public:
 	explicit CA(const std::string& name, bool enabled = false);
 
-	uint32_t render(
-		uint32_t vao,
-		uint32_t sceneTexture,
-		bool& toggle,
-		PingPongBuffer& renderTargets) const override;
+	uint32_t render(uint32_t vao, uint32_t sceneTexture, FrameBuffer* renderTarget) const override;
 
 protected:
 	void updateFromEventImpl(const GuiPostProcessEvent& event) override;

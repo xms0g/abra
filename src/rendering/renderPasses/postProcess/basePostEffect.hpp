@@ -23,11 +23,7 @@ public:
 
 	void enabled(const bool e) { mEnabled = e; }
 
-	virtual uint32_t render(
-		uint32_t vao,
-		uint32_t sceneTexture,
-		bool& toggle,
-		PingPongBuffer& renderTargets) const = 0;
+	virtual uint32_t render(uint32_t vao, uint32_t sceneTexture, FrameBuffer* renderTarget) const = 0;
 
 	void updateFromEvent(const GuiPostProcessEvent& event) {
 		this->enabled(event.enabled);

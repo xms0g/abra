@@ -13,18 +13,15 @@
 #include "../../renderCommand.h"
 #include "../../renderGraph.h"
 #include "../../buffers/frameBuffer.h"
-#include "../../buffers/vertexBuffer.h"
 #include "../../models/quad.h"
-#include "../../mesh/vertexArray.h"
 #include "../../renderContext/renderContext.hpp"
 #include "../../../event/eventBus.hpp"
 #include "../../../event/events/guiPostProcessEvent.hpp"
-#include "../../../config/configManager.h"
 
 PostProcessPass::PostProcessPass(const RenderGraph& graph, EventBus& eventBus) {
 	mQuad = std::make_unique<Model::Quad>();
 	mEffects = {
-		std::make_shared<Bloom>("Bloom", false),
+		std::make_shared<Bloom>("Bloom", graph, false),
 		std::make_shared<ToneMapping>("Tone Mapping", false),
 		std::make_shared<Grayscale>("Grayscale", false),
 		std::make_shared<Sepia>("Sepia", false),
@@ -36,21 +33,8 @@ PostProcessPass::PostProcessPass(const RenderGraph& graph, EventBus& eventBus) {
 		std::make_shared<FXAA>("FXAA", false),
 	};
 
-	for (auto& target: mRenderTargets) {
-		target = std::make_unique<FrameBuffer>(
-			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
-			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"));
-
-		if (CONFIG_MANAGER_INSTANCE.get<bool>("hdr.enabled")) {
-			target->withTextureFP(GL_RGBA);
-		} else {
-			target->withTexture(GL_RGBA);
-		}
-		target->checkStatus();
-	}
-
+	mRenderTargets = {&graph.getResource("ping"), &graph.getResource("pong")};
 	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessEvent>(this, &PostProcessPass::onGuiUpdate);
-
 }
 
 PostProcessPass::~PostProcessPass() = default;
@@ -63,7 +47,8 @@ void PostProcessPass::execute(const RenderContext& ctx, RenderGraph& graph) {
 		if (!effect->enabled())
 			continue;
 
-		inputTex = effect->render(mQuad->vao(), inputTex, toggle, mRenderTargets);
+		inputTex = effect->render(mQuad->vao(), inputTex, mRenderTargets[toggle]);
+		toggle = !toggle;
 	}
 
 	mQuad->shader().activate();
