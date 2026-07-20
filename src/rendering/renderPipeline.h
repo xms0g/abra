@@ -41,9 +41,7 @@ private:
 
 	void createFrameBuffers();
 
-	void createRenderContext(const Camera& camera);
-
-	void configureSystems(EventBus& eventBus) const;
+	void configureSystems(EventBus& eventBus);
 
 	void configureShaders();
 

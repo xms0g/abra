@@ -5,7 +5,6 @@
 #include "../../renderGraph.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderContext/renderContext.hpp"
-#include "../../../config/configManager.h"
 
 Bloom::Bloom(const std::string& name, const RenderGraph& graph, const bool enabled)
 	: BasePostEffect(name, enabled) {

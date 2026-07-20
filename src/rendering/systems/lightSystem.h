@@ -14,13 +14,7 @@ class LightSystem final : public System {
 public:
 	LightSystem();
 
-	void configure(const RenderContext& ctx, EventBus& eventBus);
-
-	std::vector<DirectionalLightComponent*>& dirLights();
-
-	std::vector<PointLightComponent*>& pointLights();
-
-	std::vector<SpotLightComponent*>& spotLights();
+	void configure(RenderContext& ctx, EventBus& eventBus);
 
 private:
 	void updateLightUBO();
@@ -28,7 +22,7 @@ private:
 	void onGuiUpdate(const GuiLightEvent& event);
 
 	EventBus* mEventBus{};
-	const RenderContext* mCtx{};
+	RenderContext* mCtx{};
 	UniformBuffer mUBO;
 	std::vector<DirectionalLightComponent*> mDirLights{};
 	std::vector<PointLightComponent*> mPointLights{};

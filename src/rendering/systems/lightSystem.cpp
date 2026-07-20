@@ -18,7 +18,7 @@ LightSystem::LightSystem() {
 	RequireComponent<SpotLightComponent>(true);
 }
 
-void LightSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
+void LightSystem::configure(RenderContext& ctx, EventBus& eventBus) {
 	mDirLights.reserve(CONFIG_MANAGER_INSTANCE.get<int32_t>("light.max_directional"));
 	mPointLights.reserve(CONFIG_MANAGER_INSTANCE.get<int32_t>("light.max_point"));
 	mSpotLights.reserve(CONFIG_MANAGER_INSTANCE.get<int32_t>("light.max_spot"));
@@ -40,24 +40,16 @@ void LightSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 		}
 	}
 
+	mCtx->light.dirLights = &mDirLights;
+	mCtx->light.pointLights = &mPointLights;
+	mCtx->light.spotLights = &mSpotLights;
+
 	mUBO = UniformBuffer(
 		DYNAMIC,
 		sizeof(PackedLights),
 		CONFIG_MANAGER_INSTANCE.get<uint32_t>("light.ubo_binding"));
 
 	updateLightUBO();
-}
-
-std::vector<DirectionalLightComponent*>& LightSystem::dirLights() {
-	return mDirLights;
-}
-
-std::vector<PointLightComponent*>& LightSystem::pointLights() {
-	return mPointLights;
-}
-
-std::vector<SpotLightComponent*>& LightSystem::spotLights() {
-	return mSpotLights;
 }
 
 void LightSystem::updateLightUBO() {

@@ -54,7 +54,10 @@ RenderPipeline::RenderPipeline(Registry& registry, const Camera& camera, Window&
 	createRenderQueues();
 	createSystems(registry);
 	createFrameBuffers();
-	createRenderContext(camera);
+
+	mRenderCtx.renderData = &mRenderData;
+	mRenderCtx.renderQueue = &mRenderQueue;
+	mRenderCtx.camera.self = &camera;
 
 	GuiBackend::init(&*window, window.glContext(), "#version 410");
 }
@@ -317,16 +320,7 @@ void RenderPipeline::createFrameBuffers() {
 	addPPRenderTarget("bloomPong");
 }
 
-void RenderPipeline::createRenderContext(const Camera& camera) {
-	mRenderCtx.renderData = &mRenderData;
-	mRenderCtx.renderQueue = &mRenderQueue;
-	mRenderCtx.light.dirLights = &mLightSystem->dirLights();
-	mRenderCtx.light.pointLights = &mLightSystem->pointLights();
-	mRenderCtx.light.spotLights = &mLightSystem->spotLights();
-	mRenderCtx.camera.self = &camera;
-}
-
-void RenderPipeline::configureSystems(EventBus& eventBus) const {
+void RenderPipeline::configureSystems(EventBus& eventBus) {
 	mLightSystem->configure(mRenderCtx, eventBus);
 	mSyncStateSystem->configure(mRenderCtx, eventBus);
 	mShadowSystem->configure(mRenderCtx, mGraph, eventBus);
