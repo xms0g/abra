@@ -5,6 +5,7 @@
 #include "../renderContext/renderContext.hpp"
 
 ResolvePass::ResolvePass() {
+	mReads = {"sceneBuffer"};
 	mWrites = {"intermediateBuffer"};
 }
 
