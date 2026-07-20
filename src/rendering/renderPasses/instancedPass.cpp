@@ -14,6 +14,8 @@
 #include "../../config/configManager.h"
 
 InstancedPass::InstancedPass(const RenderContext& ctx, const RenderGraph& graph) {
+	mReads = {"directional", "point", "spot"};
+	mWrites = {"sceneBuffer"};
 	mOpaqueObjects = &ctx.renderQueue->get<std::vector<RenderInstanceGroup> >("opaqueInstanced");
 	mTransparentObjects = &ctx.renderQueue->get<std::vector<RenderInstanceGroup> >("blendInstanced");
 
@@ -34,7 +36,7 @@ InstancedPass::InstancedPass(const RenderContext& ctx, const RenderGraph& graph)
 }
 InstancedPass::~InstancedPass() = default;
 
-void InstancedPass::execute(const RenderContext& ctx, RenderGraph& graph) {
+void InstancedPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	graph.getResource("sceneBuffer").bind();
 
 	if (!mTransparentObjects->empty()) {

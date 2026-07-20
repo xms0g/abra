@@ -13,16 +13,17 @@
 #include "../../config/configManager.h"
 
 DeferredGeometryPass::DeferredGeometryPass(const RenderContext& ctx) {
+	mWrites = {"gBuffer"};
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("gBuffer");
 	mObjects = &ctx.renderQueue->get<std::vector<RenderableObject>>("visibleDeferred");
 
 	const TextureBinding textureBindings[] = {
-		{"material.texture_albedo", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.albedo.textureSlot")},
-		{"material.texture_normal", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.normal.textureSlot")},
-		{"material.texture_roughnessMetallic", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.roughnessMetallic.textureSlot")},
-		{"material.texture_ao", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.ao.textureSlot")},
-		{"material.texture_emissive", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.emissive.textureSlot")},
-		{"material.texture_height", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.height.textureSlot")},
+		{.name = "material.texture_albedo", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.albedo.textureSlot")},
+		{.name = "material.texture_normal", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.normal.textureSlot")},
+		{.name = "material.texture_roughnessMetallic", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.roughnessMetallic.textureSlot")},
+		{.name = "material.texture_ao", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.ao.textureSlot")},
+		{.name = "material.texture_emissive", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.emissive.textureSlot")},
+		{.name = "material.texture_height", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.height.textureSlot")},
 	};
 
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
@@ -30,7 +31,7 @@ DeferredGeometryPass::DeferredGeometryPass(const RenderContext& ctx) {
 
 DeferredGeometryPass::~DeferredGeometryPass() = default;
 
-void DeferredGeometryPass::execute(const RenderContext& ctx, RenderGraph& graph) {
+void DeferredGeometryPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	graph.getResource("gBuffer").bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

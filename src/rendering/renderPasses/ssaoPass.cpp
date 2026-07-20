@@ -13,23 +13,22 @@
 #include "../../math/random.h"
 
 SSAOPass::SSAOPass(const RenderGraph& graph) {
-	int32_t width = CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width");
-	int32_t height = CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height");
-
+	mReads  = {"gBuffer"};
+	mWrites = {"ssao", "ssaoBlur"};
 	mQuad = std::make_unique<Model::SingleQuad>();
 
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("ssao");
 	mBlurShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("ssaoBlur");
 
 	const TextureBinding ssaoTextureBindings[] = {
-		{"gDepthMap", CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureSlot")},
-		{"gNormal", CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot")},
-		{"texNoise", CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.noise.textureSlot")},
-		{"kernelSize", CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.kernelSize")}
+		{.name = "gDepthMap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureSlot")},
+		{.name = "gNormal", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot")},
+		{.name = "texNoise", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.noise.textureSlot")},
+		{.name = "kernelSize", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.kernelSize")}
 	};
 
 	constexpr TextureBinding blurTextureBindings[] = {
-		{"ssaoTexture", 0}
+		{.name = "ssaoTexture", .slot = 0}
 	};
 
 	RenderCommand::setTextureUnits(ssaoTextureBindings, *mShader);
@@ -44,7 +43,6 @@ SSAOPass::SSAOPass(const RenderGraph& graph) {
 	std::vector<float> noise;
 	noise.resize(textureSize * textureSize);
 	noise = math::random::generateNoise(textureSize * textureSize);
-
 	mNoiseTexture = Texture::generate(textureSize, textureSize, noise.data());
 	mNoiseTexture.bind(CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.noise.textureSlot"));
 
@@ -59,7 +57,6 @@ SSAOPass::SSAOPass(const RenderGraph& graph) {
 		glm::vec4 rbi;
 		glm::vec4 resolution;
 	};
-
 	SSAOData data{};
 
 	for (size_t i = 0; i < kernel.size(); ++i) {
@@ -71,7 +68,9 @@ SSAOPass::SSAOPass(const RenderGraph& graph) {
 		CONFIG_MANAGER_INSTANCE.get<float>("ssao.bias"),
 		CONFIG_MANAGER_INSTANCE.get<float>("ssao.intensity"),
 		0.0f);
-	data.resolution = glm::vec4(width, height, 0.0f, 0.0f);
+	data.resolution = glm::vec4(
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"), 0.0f, 0.0f);
 
 	mUBO = UniformBuffer{DYNAMIC, sizeof(SSAOData), CONFIG_MANAGER_INSTANCE.get<uint32_t>("ssao.ubo_binding")};
 	mUBO.bind();
@@ -86,7 +85,7 @@ SSAOPass::SSAOPass(const RenderGraph& graph) {
 
 SSAOPass::~SSAOPass() = default;
 
-void SSAOPass::execute(const RenderContext& ctx, RenderGraph& graph) {
+void SSAOPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	ssao(graph);
 	blur(graph);
 }

@@ -29,7 +29,7 @@ struct RenderContext {
 	} light{};
 
 	struct {
-		const Camera* self;
+		const Camera* camera;
 		glm::mat4 skyView;
 	} camera{};
 

@@ -9,6 +9,8 @@
 #include "../../config/configManager.h"
 
 ForwardPass::ForwardPass(const RenderContext& ctx, const RenderGraph& graph) {
+	mReads = {"directional", "point", "spot"};
+	mWrites = {"sceneBuffer"};
 	mOpaqueObjects = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleOpaque");
 	mTransparentObjects = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleBlend");
 
@@ -20,7 +22,7 @@ ForwardPass::ForwardPass(const RenderContext& ctx, const RenderGraph& graph) {
 
 ForwardPass::~ForwardPass() = default;
 
-void ForwardPass::execute(const RenderContext& ctx, RenderGraph& graph) {
+void ForwardPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	graph.getResource("sceneBuffer").bind();
 
 	if (!mOpaqueObjects->empty()) {

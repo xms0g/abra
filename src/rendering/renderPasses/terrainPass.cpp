@@ -8,29 +8,24 @@
 #include "../renderContext/renderData.hpp"
 #include "../renderContext/renderQueue.hpp"
 #include "../../rendering/shader.h"
-#include "../../config/configManager.h"
 
-TerrainPass::TerrainPass(const RenderContext& ctx, const RenderGraph& graph) {
+TerrainPass::TerrainPass(const RenderContext& ctx) {
+	mWrites = {"sceneBuffer"};
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("terrain");
 	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("terrain");
 
 	constexpr TextureBinding textureBindings[] = {
-		{"heightMap", 0},
+		{.name = "heightMap", .slot = 0},
 	};
 
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
-
-	const int32_t slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot");
-	graph.getResource("directional").bindTexture(slot);
-	graph.getResource("point").bindTexture(slot + 1);
-	graph.getResource("spot").bindTexture(slot + 2);
 }
 
 TerrainPass::~TerrainPass() = default;
 
-void TerrainPass::execute(const RenderContext& ctx, RenderGraph& graph) {
+void TerrainPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	graph.getResource("sceneBuffer").bind();
 
 	const auto& [entityID, matBatch] = mObjects->front();

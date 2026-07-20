@@ -12,11 +12,12 @@
 #include "../texture/texture.h"
 
 SkyboxPass::SkyboxPass(const RenderContext& ctx) {
+	mWrites = {"sceneBuffer"};
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("skybox");
 	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("skybox");
 
 	constexpr TextureBinding textureBindings[] = {
-		{"skybox", 0},
+		{.name = "skybox", .slot = 0},
 	};
 
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
@@ -24,7 +25,7 @@ SkyboxPass::SkyboxPass(const RenderContext& ctx) {
 
 SkyboxPass::~SkyboxPass() = default;
 
-void SkyboxPass::execute(const RenderContext& ctx, RenderGraph& graph) {
+void SkyboxPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	const auto& [entityID, matBatch] = mObjects->front();
 	const uint32_t meshIdx = matBatch.meshIndices.front();
 	const uint32_t vao = ctx.renderData->mesh.vaos[meshIdx];

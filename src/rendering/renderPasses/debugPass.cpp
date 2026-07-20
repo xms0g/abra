@@ -22,7 +22,7 @@ DebugPass::DebugPass(const RenderContext& ctx) {
 
 DebugPass::~DebugPass() = default;
 
-void DebugPass::execute(const RenderContext& ctx, RenderGraph& graph) {
+void DebugPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	graph.getResource("sceneBuffer").bind();
 
 	for (const auto& object: *mObjects) {

@@ -23,8 +23,8 @@ CullingPass::CullingPass(const RenderContext& ctx) {
 
 CullingPass::~CullingPass() = default;
 
-void CullingPass::execute(const RenderContext& ctx, RenderGraph& graph) {
-	const auto frustum = ctx.camera.self->generateFrustum();
+void CullingPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
+	const auto frustum = ctx.camera.camera->generateFrustum();
 
 	cullScene(ctx, frustum, *mOpaqueGroups, *mVisibleOpaque);
 	cullScene(ctx, frustum, *mDeferredGroups, *mVisibleDeferred);
@@ -56,12 +56,12 @@ void CullingPass::cullScene(
 
 			if (isVisible) {
 				outQueue.push_back({
-					entityID,
-					matBatch.materialIndex,
-					matBatch.textureOffset,
-					matBatch.textureCount,
-					meshIdx,
-					matBatch.shader
+					.entityID = entityID,
+					.materialIndex = matBatch.materialIndex,
+					.textureOffset = matBatch.textureOffset,
+					.textureCount = matBatch.textureCount,
+					.meshIndex = meshIdx,
+					.shader = matBatch.shader
 				});
 			}
 		}

@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "IRenderPass.hpp"
+#include "baseRenderPass.hpp"
 
 namespace math {
 struct Frustum;
@@ -9,13 +9,13 @@ struct Frustum;
 struct RenderGroup;
 struct RenderableObject;
 
-class CullingPass final : public IRenderPass {
+class CullingPass final : public BaseRenderPass {
 public:
 	explicit CullingPass(const RenderContext& ctx);
 
 	~CullingPass() override;
 
-	void execute(const RenderContext& ctx, RenderGraph& graph) override;
+	void execute(const RenderContext& ctx, const RenderGraph& graph) override;
 
 private:
 	static void cullScene(

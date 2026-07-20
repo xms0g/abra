@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <memory>
-#include "IRenderPass.hpp"
+#include "baseRenderPass.hpp"
 #include "../buffers/uniformBuffer.h"
 #include "../texture/texture.h"
 
@@ -12,13 +12,13 @@ namespace Model {
 class SingleQuad;
 }
 
-class SSAOPass final : public IRenderPass {
+class SSAOPass final : public BaseRenderPass {
 public:
 	SSAOPass(const RenderGraph& graph);
 
 	~SSAOPass() override;
 
-	void execute(const RenderContext& ctx, RenderGraph& graph) override;
+	void execute(const RenderContext& ctx, const RenderGraph& graph) override;
 
 private:
 	void ssao(const RenderGraph& graph) const;

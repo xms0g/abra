@@ -12,7 +12,7 @@ class Window;
 class SyncStateSystem;
 class EventBus;
 class ShadowSystem;
-class IRenderPass;
+class BaseRenderPass;
 class Camera;
 class Registry;
 class LightSystem;
@@ -62,6 +62,4 @@ private:
 	RenderQueue mRenderQueue{};
 	// Render context
 	RenderContext mRenderCtx{};
-	// Render passes
-	std::vector<std::unique_ptr<IRenderPass>> mRenderPasses;
 };

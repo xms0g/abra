@@ -2,18 +2,18 @@
 #include <memory>
 #include <vector>
 #include "glm/glm.hpp"
-#include "IRenderPass.hpp"
+#include "baseRenderPass.hpp"
 
 class VertexBuffer;
 struct RenderInstanceGroup;
 
-class InstancedPass final : public IRenderPass {
+class InstancedPass final : public BaseRenderPass {
 public:
 	InstancedPass(const RenderContext& ctx, const RenderGraph& graph);
 
 	~InstancedPass() override;
 
-	void execute(const RenderContext& ctx, RenderGraph& graph) override;
+	void execute(const RenderContext& ctx, const RenderGraph& graph) override;
 
 private:
 	struct InstanceData {

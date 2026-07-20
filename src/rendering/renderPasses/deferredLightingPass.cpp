@@ -4,27 +4,25 @@
 #include "../shader.h"
 #include "../renderCommand.h"
 #include "../buffers/frameBuffer.h"
-#include "../buffers/uniformBuffer.h"
-#include "../buffers//vertexBuffer.h"
-#include "../mesh/mesh.h"
-#include "../mesh/vertexArray.h"
 #include "../models/quad.h"
 #include "../renderContext/renderContext.hpp"
 #include "../../config/configManager.h"
 
 DeferredLightingPass::DeferredLightingPass(const RenderGraph& graph) {
+	mReads = {"gBuffer", "ssaoBlur", "directional", "point", "spot"};
+	mWrites = {"sceneBuffer"};
 	mQuad = std::make_unique<Model::SingleQuad>();
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("deferredLighting");
 
 	const TextureBinding textureBindings[] = {
-		{"gPosition", CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureSlot")},
-		{"gNormal", CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot")},
-		{"gAlbedo", CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureSlot")},
-		{"gORM", CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureSlot")},
-		{"ssao", CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.textureSlot")},
-		{"irradianceMap", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.textureSlot")},
-		{"prefilterMap", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.textureSlot")},
-		{"brdfLUT", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.brdfLUT.textureSlot")},
+		{.name = "gPosition", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureSlot")},
+		{.name = "gNormal", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot")},
+		{.name = "gAlbedo", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureSlot")},
+		{.name = "gORM", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureSlot")},
+		{.name = "ssao", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.textureSlot")},
+		{.name = "irradianceMap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.textureSlot")},
+		{.name = "prefilterMap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.textureSlot")},
+		{.name = "brdfLUT", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.brdfLUT.textureSlot")},
 	};
 
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
@@ -50,7 +48,7 @@ DeferredLightingPass::DeferredLightingPass(const RenderGraph& graph) {
 
 DeferredLightingPass::~DeferredLightingPass() = default;
 
-void DeferredLightingPass::execute(const RenderContext& ctx, RenderGraph& graph) {
+void DeferredLightingPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	const auto& sceneBuffer = graph.getResource("sceneBuffer");
 	const auto& gBuffer = graph.getResource("gBuffer");
 	// Copy depth buffer of gBuffer to scene buffer for the proper depth testing

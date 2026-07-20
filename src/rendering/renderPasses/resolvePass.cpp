@@ -4,9 +4,13 @@
 #include "../buffers/frameBuffer.h"
 #include "../renderContext/renderContext.hpp"
 
+ResolvePass::ResolvePass() {
+	mWrites = {"intermediateBuffer"};
+}
+
 ResolvePass::~ResolvePass() = default;
 
-void ResolvePass::execute(const RenderContext& ctx, RenderGraph& graph) {
+void ResolvePass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	const auto& sceneBuffer = graph.getResource("sceneBuffer");
 	const auto& intermediateBuffer = graph.getResource("intermediateBuffer");
 

@@ -6,14 +6,15 @@
 
 class FrameBuffer;
 struct RenderContext;
-class IRenderPass;
+class BaseRenderPass;
 
 class RenderGraph {
 public:
 
+	[[nodiscard]]
 	FrameBuffer& getResource(const std::string& key) const;
 
-	void addPass(std::unique_ptr<IRenderPass> pass);
+	void addPass(std::unique_ptr<BaseRenderPass> pass);
 
 	void addResources(const std::string& key, std::unique_ptr<FrameBuffer> resource);
 
@@ -23,6 +24,6 @@ public:
 
 private:
 	std::unordered_map<std::string, std::unique_ptr<FrameBuffer>> mResources;
-	std::vector<std::unique_ptr<IRenderPass> > mRenderPasses;
+	std::vector<std::unique_ptr<BaseRenderPass> > mRenderPasses;
 	std::vector<size_t> executionOrder;
 };

@@ -39,7 +39,7 @@ PostProcessPass::PostProcessPass(const RenderGraph& graph, EventBus& eventBus) {
 
 PostProcessPass::~PostProcessPass() = default;
 
-void PostProcessPass::execute(const RenderContext& ctx, RenderGraph& graph) {
+void PostProcessPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	bool toggle = false;
 
 	uint32_t inputTex = graph.getResource("sceneBuffer").texture();

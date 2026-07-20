@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include "IRenderPass.hpp"
+#include "baseRenderPass.hpp"
 
 namespace Model {
 class SingleQuad;
@@ -10,13 +10,13 @@ class CubemapBuffer;
 class FrameBuffer;
 class Shader;
 
-class DeferredLightingPass final : public IRenderPass {
+class DeferredLightingPass final : public BaseRenderPass {
 public:
 	explicit DeferredLightingPass(const RenderGraph& graph);
 
 	~DeferredLightingPass() override;
 
-	void execute(const RenderContext& ctx, RenderGraph& graph) override;
+	void execute(const RenderContext& ctx, const RenderGraph& graph) override;
 
 private:
 	const Shader* mShader{nullptr};

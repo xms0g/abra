@@ -14,7 +14,6 @@
 #include "models/quad.h"
 #include "renderContext/renderGroup.hpp"
 #include "renderContext/renderableObject.hpp"
-#include "renderPasses/IRenderPass.hpp"
 #include "renderPasses/deferredGeometryPass.h"
 #include "renderPasses/deferredLightingPass.h"
 #include "renderPasses/ssaoPass.h"
@@ -57,7 +56,7 @@ Renderer::Renderer(Registry& registry, const Camera& camera, Window& window) {
 
 	mRenderCtx.renderData = &mRenderData;
 	mRenderCtx.renderQueue = &mRenderQueue;
-	mRenderCtx.camera.self = &camera;
+	mRenderCtx.camera.camera = &camera;
 
 	GuiBackend::init(&*window, window.glContext(), "#version 410");
 }
@@ -86,9 +85,7 @@ void Renderer::render() {
 	mGraph.getResource("sceneBuffer").bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for (const auto& pass: mRenderPasses) {
-		pass->execute(mRenderCtx, mGraph);
-	}
+	mGraph.execute(mRenderCtx);
 }
 
 void Renderer::drawGui() {
@@ -140,39 +137,40 @@ void Renderer::createRenderQueues() {
 }
 
 void Renderer::createRenderPasses(EventBus& eventBus) {
-	mRenderPasses.emplace_back(std::make_unique<CullingPass>(mRenderCtx));
+	mGraph.addPass(std::make_unique<CullingPass>(mRenderCtx));
 
 	if (!mRenderQueue.get<std::vector<RenderGroup> >("deferred").empty()) {
-		mRenderPasses.emplace_back(std::make_unique<DeferredGeometryPass>(mRenderCtx));
-		mRenderPasses.emplace_back(std::make_unique<SSAOPass>(mGraph));
-		mRenderPasses.emplace_back(std::make_unique<DeferredLightingPass>(mGraph));
+		mGraph.addPass(std::make_unique<DeferredGeometryPass>(mRenderCtx));
+		mGraph.addPass(std::make_unique<SSAOPass>(mGraph));
+		mGraph.addPass(std::make_unique<DeferredLightingPass>(mGraph));
 	}
 
 	if (!mRenderQueue.get<std::vector<RenderGroup> >("opaque").empty() ||
 	    !mRenderQueue.get<std::vector<RenderGroup> >("blend").empty()) {
-		mRenderPasses.emplace_back(std::make_unique<ForwardPass>(mRenderCtx, mGraph));
+		mGraph.addPass(std::make_unique<ForwardPass>(mRenderCtx, mGraph));
 	}
 
 	if (!mRenderQueue.get<std::vector<RenderGroup> >("debug").empty()) {
-		mRenderPasses.emplace_back(std::make_unique<DebugPass>(mRenderCtx));
+		mGraph.addPass(std::make_unique<DebugPass>(mRenderCtx));
 	}
 
 	if (!mRenderQueue.get<std::vector<RenderInstanceGroup> >("opaqueInstanced").empty() ||
 	    !mRenderQueue.get<std::vector<RenderInstanceGroup> >("blendInstanced").empty()) {
-		mRenderPasses.emplace_back(std::make_unique<InstancedPass>(mRenderCtx, mGraph));
+		mGraph.addPass(std::make_unique<InstancedPass>(mRenderCtx, mGraph));
 	}
 
 	if (!mRenderQueue.get<std::vector<RenderGroup> >("terrain").empty()) {
-		mRenderPasses.emplace_back(std::make_unique<TerrainPass>(mRenderCtx, mGraph));
+		mGraph.addPass(std::make_unique<TerrainPass>(mRenderCtx));
 	}
 
-	mRenderPasses.emplace_back(std::make_unique<SkyboxPass>(mRenderCtx));
+	mGraph.addPass(std::make_unique<SkyboxPass>(mRenderCtx));
 
 	if (CONFIG_MANAGER_INSTANCE.get<bool>("msaa.enabled")) {
-		mRenderPasses.emplace_back(std::make_unique<ResolvePass>());
+		mGraph.addPass(std::make_unique<ResolvePass>());
 	}
 
-	mRenderPasses.emplace_back(std::make_unique<PostProcessPass>(mGraph, eventBus));
+	mGraph.addPass(std::make_unique<PostProcessPass>(mGraph, eventBus));
+	mGraph.compile();
 }
 
 void Renderer::createFrameBuffers() {
@@ -329,23 +327,26 @@ void Renderer::configureSystems(EventBus& eventBus) {
 void Renderer::configureShaders() {
 	const UniformBinding uboBindings[] = {
 		{
-			CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name"),
-			CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"), UniformBuffer::configure
+			.name = CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name"),
+			.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"),
+			.configure = UniformBuffer::configure
 		},
 		{
-			CONFIG_MANAGER_INSTANCE.get<std::string>("light.block_name"),
-			CONFIG_MANAGER_INSTANCE.get<uint32_t>("light.ubo_binding"), UniformBuffer::configure
+			.name = CONFIG_MANAGER_INSTANCE.get<std::string>("light.block_name"),
+			.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("light.ubo_binding"),
+			.configure = UniformBuffer::configure
 		},
 		{
-			CONFIG_MANAGER_INSTANCE.get<std::string>("shadow.block_name"),
-			CONFIG_MANAGER_INSTANCE.get<uint32_t>("shadow.ubo_binding"), UniformBuffer::configure
+			.name = CONFIG_MANAGER_INSTANCE.get<std::string>("shadow.block_name"),
+			.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("shadow.ubo_binding"),
+			.configure = UniformBuffer::configure
 		}
 	};
 
 	const TextureBinding shadowMapBindings[] = {
-		{"shadowMap", CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot")},
-		{"shadowCubemap", CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot") + 1},
-		{"persShadowMap", CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot") + 2}
+		{.name = "shadowMap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot")},
+		{.name = "shadowCubemap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot") + 1},
+		{.name = "persShadowMap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot") + 2}
 	};
 
 	// Configure shaders
@@ -359,7 +360,7 @@ void Renderer::configureShaders() {
 }
 
 void Renderer::refreshCameraData() {
-	mRenderCtx.camera.skyView = glm::mat4(glm::mat3(mRenderCtx.camera.self->viewMatrix()));
+	mRenderCtx.camera.skyView = glm::mat4(glm::mat3(mRenderCtx.camera.camera->viewMatrix()));
 
 	struct alignas(16) PackedView {
 		glm::mat4 view;
@@ -367,8 +368,8 @@ void Renderer::refreshCameraData() {
 	};
 
 	const PackedView packed = {
-		mRenderCtx.camera.self->viewMatrix(),
-		glm::vec4(mRenderCtx.camera.self->position(), 1.0)
+		.view = mRenderCtx.camera.camera->viewMatrix(),
+		.viewPos = glm::vec4(mRenderCtx.camera.camera->position(), 1.0)
 	};
 
 	mCameraUBO.bind();
@@ -376,7 +377,7 @@ void Renderer::refreshCameraData() {
 }
 
 void Renderer::sortEntities() {
-	const glm::vec3& camPos = mRenderCtx.camera.self->position();
+	const glm::vec3& camPos = mRenderCtx.camera.camera->position();
 
 	auto sortBatches = [&](auto& batch, bool transparent) -> void {
 		std::sort(
