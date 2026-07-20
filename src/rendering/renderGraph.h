@@ -24,5 +24,5 @@ public:
 private:
 	std::unordered_map<std::string, std::unique_ptr<FrameBuffer>> mResources;
 	std::vector<std::unique_ptr<BaseRenderPass> > mRenderPasses;
-	std::vector<size_t> executionOrder;
+	std::vector<size_t> mExecutionOrder;
 };
