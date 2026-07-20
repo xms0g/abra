@@ -31,6 +31,7 @@ void RenderGraph::compile() {
 }
 
 void RenderGraph::execute(const RenderContext& ctx) const {
-	for (const size_t index : executionOrder)
+	for (const size_t index : executionOrder) {
 		mRenderPasses[index]->execute(ctx, *this);
+	}
 }
