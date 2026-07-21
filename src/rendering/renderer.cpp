@@ -137,7 +137,10 @@ void Renderer::createRenderQueues() {
 }
 
 void Renderer::createRenderPasses(EventBus& eventBus) {
-	mGraph.addPass(std::make_unique<CullingPass>(mRenderCtx));
+	if (!mRenderQueue.get<std::vector<RenderGroup> >("opaque").empty() ||
+	    !mRenderQueue.get<std::vector<RenderGroup> >("blend").empty()) {
+		mGraph.addPass(std::make_unique<ForwardPass>(mRenderCtx, mGraph));
+	}
 
 	if (!mRenderQueue.get<std::vector<RenderGroup> >("deferred").empty()) {
 		mGraph.addPass(std::make_unique<DeferredGeometryPass>(mRenderCtx));
@@ -145,30 +148,25 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 		mGraph.addPass(std::make_unique<DeferredLightingPass>(mGraph));
 	}
 
-	if (!mRenderQueue.get<std::vector<RenderGroup> >("opaque").empty() ||
-	    !mRenderQueue.get<std::vector<RenderGroup> >("blend").empty()) {
-		mGraph.addPass(std::make_unique<ForwardPass>(mRenderCtx, mGraph));
-	}
+	if (!mRenderQueue.get<std::vector<RenderInstanceGroup> >("opaqueInstanced").empty() ||
+		!mRenderQueue.get<std::vector<RenderInstanceGroup> >("blendInstanced").empty()) {
+		mGraph.addPass(std::make_unique<InstancedPass>(mRenderCtx, mGraph));
+		}
 
 	if (!mRenderQueue.get<std::vector<RenderGroup> >("debug").empty()) {
 		mGraph.addPass(std::make_unique<DebugPass>(mRenderCtx));
-	}
-
-	if (!mRenderQueue.get<std::vector<RenderInstanceGroup> >("opaqueInstanced").empty() ||
-	    !mRenderQueue.get<std::vector<RenderInstanceGroup> >("blendInstanced").empty()) {
-		mGraph.addPass(std::make_unique<InstancedPass>(mRenderCtx, mGraph));
 	}
 
 	if (!mRenderQueue.get<std::vector<RenderGroup> >("terrain").empty()) {
 		mGraph.addPass(std::make_unique<TerrainPass>(mRenderCtx));
 	}
 
-	mGraph.addPass(std::make_unique<SkyboxPass>(mRenderCtx));
-
 	if (CONFIG_MANAGER_INSTANCE.get<bool>("msaa.enabled")) {
 		mGraph.addPass(std::make_unique<ResolvePass>());
 	}
 
+	mGraph.addPass(std::make_unique<SkyboxPass>(mRenderCtx));
+	mGraph.addPass(std::make_unique<CullingPass>(mRenderCtx));
 	mGraph.addPass(std::make_unique<PostProcessPass>(mGraph, eventBus));
 	mGraph.compile();
 }

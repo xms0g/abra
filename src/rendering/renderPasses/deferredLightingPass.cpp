@@ -9,8 +9,8 @@
 #include "../../config/configManager.h"
 
 DeferredLightingPass::DeferredLightingPass(const RenderGraph& graph) {
-	mReads = {"gBuffer", "ssaoBlur", "directional", "point", "spot"};
-	mWrites = {"sceneBuffer"};
+	mInputs = {"gBuffer", "ssaoBlur"};
+	mOutputs = {"sceneBuffer"};
 	mQuad = std::make_unique<Model::SingleQuad>();
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("deferredLighting");
 
@@ -43,7 +43,6 @@ DeferredLightingPass::DeferredLightingPass(const RenderGraph& graph) {
 	graph.getResource("directional").bindTexture(slot);
 	graph.getResource("point").bindTexture(slot + 1);
 	graph.getResource("spot").bindTexture(slot + 2);
-	
 }
 
 DeferredLightingPass::~DeferredLightingPass() = default;

@@ -13,7 +13,8 @@
 #include "../../config/configManager.h"
 
 DeferredGeometryPass::DeferredGeometryPass(const RenderContext& ctx) {
-	mWrites = {"gBuffer"};
+	mInputs = {"visibleDeferred"};
+	mOutputs = {"gBuffer"};
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("gBuffer");
 	mObjects = &ctx.renderQueue->get<std::vector<RenderableObject>>("visibleDeferred");
 

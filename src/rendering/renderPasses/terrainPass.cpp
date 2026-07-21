@@ -10,7 +10,8 @@
 #include "../../rendering/shader.h"
 
 TerrainPass::TerrainPass(const RenderContext& ctx) {
-	mWrites = {"sceneBuffer"};
+	mInputs = {"sceneBuffer"};
+	mOutputs = {"sceneBuffer"};
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("terrain");

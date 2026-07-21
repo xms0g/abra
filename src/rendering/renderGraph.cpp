@@ -19,14 +19,25 @@ void RenderGraph::addResources(const std::string& key, std::unique_ptr<FrameBuff
 
 void RenderGraph::compile() {
 	std::unordered_map<std::string, size_t> producer;
+	std::unordered_map<std::string, std::string> latestVersion;
 	std::vector<std::vector<size_t> > edges(mRenderPasses.size());
 	std::vector<size_t> indegree(mRenderPasses.size(), 0);
 
 	mExecutionOrder.resize(mRenderPasses.size());
 
 	for (size_t i = 0; i < mRenderPasses.size(); ++i) {
-		for (auto& output: mRenderPasses[i]->outputs())
-			producer[output] = i;
+		for (auto& input: mRenderPasses[i]->inputs()) {
+			if (latestVersion.contains(input)) {
+				input = latestVersion[input];
+			}
+		}
+
+		for (auto& output: mRenderPasses[i]->outputs()) {
+			std::string versioned;
+			versioned = output + "#v" + std::to_string(i);
+			latestVersion[output] = versioned;
+			producer[versioned] = i;
+		}
 	}
 
 	for (size_t i = 0; i < mRenderPasses.size(); ++i) {

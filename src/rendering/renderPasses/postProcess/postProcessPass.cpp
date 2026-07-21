@@ -19,8 +19,8 @@
 #include "../../../event/events/guiPostProcessEvent.hpp"
 
 PostProcessPass::PostProcessPass(const RenderGraph& graph, EventBus& eventBus) {
-	mReads = {"sceneBuffer"};
-
+	mInputs = {"sceneBuffer"};
+	mOutputs = {"frameBuffer"};
 	mQuad = std::make_unique<Model::Quad>();
 	mEffects = {
 		std::make_shared<Bloom>("Bloom", graph, false),

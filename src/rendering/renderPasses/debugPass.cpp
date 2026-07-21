@@ -11,7 +11,8 @@
 #include "../../ECS/components/debug.hpp"
 
 DebugPass::DebugPass(const RenderContext& ctx) {
-	mWrites = {"sceneBuffer"};
+	mInputs = {"sceneBuffer", "visibleDebug"};
+	mOutputs = {"sceneBuffer"};
 
 	mDebugShaders = {
 		nullptr,

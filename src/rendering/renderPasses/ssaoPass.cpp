@@ -13,8 +13,8 @@
 #include "../../math/random.h"
 
 SSAOPass::SSAOPass(const RenderGraph& graph) {
-	mReads  = {"gBuffer"};
-	mWrites = {"ssao", "ssaoBlur"};
+	mInputs  = {"gBuffer"};
+	mOutputs = {"ssao", "ssaoBlur"};
 	mQuad = std::make_unique<Model::SingleQuad>();
 
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("ssao");

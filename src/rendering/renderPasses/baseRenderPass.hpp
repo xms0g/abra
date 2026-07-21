@@ -12,10 +12,10 @@ public:
 
 	virtual void execute(const RenderContext& ctx, const RenderGraph& graph) = 0;
 
-	std::vector<std::string>& reads() { return mReads; }
-	std::vector<std::string>& writes() { return mWrites; }
+	std::vector<std::string>& inputs() { return mInputs; }
+	std::vector<std::string>& outputs() { return mOutputs; }
 
 protected:
-	std::vector<std::string> mReads;
-	std::vector<std::string> mWrites;
+	std::vector<std::string> mInputs;
+	std::vector<std::string> mOutputs;
 };

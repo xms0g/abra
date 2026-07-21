@@ -9,8 +9,8 @@
 #include "../../config/configManager.h"
 
 ForwardPass::ForwardPass(const RenderContext& ctx, const RenderGraph& graph) {
-	mReads = {"directional", "point", "spot"};
-	mWrites = {"sceneBuffer"};
+	mInputs = {"sceneBuffer", "visibleOpaque", "visibleBlend"};
+	mOutputs = {"sceneBuffer"};
 	mOpaqueObjects = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleOpaque");
 	mTransparentObjects = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleBlend");
 
@@ -25,7 +25,7 @@ ForwardPass::~ForwardPass() = default;
 void ForwardPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	graph.getResource("sceneBuffer").bind();
 
-	if (!mOpaqueObjects->empty()) {
+	if (!mTransparentObjects->empty()) {
 		glDepthMask(GL_FALSE);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

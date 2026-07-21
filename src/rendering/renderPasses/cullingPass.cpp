@@ -11,6 +11,8 @@
 #include "../../core/camera.h"
 
 CullingPass::CullingPass(const RenderContext& ctx) {
+	mOutputs = {"visibleOpaque", "visibleBlend", "visibleDeferred", "visibleDebug"};
+
 	mOpaqueGroups = &ctx.renderQueue->get<std::vector<RenderGroup> >("opaque");
 	mBlendGroups = &ctx.renderQueue->get<std::vector<RenderGroup> >("blend");
 	mDeferredGroups = &ctx.renderQueue->get<std::vector<RenderGroup> >("deferred");

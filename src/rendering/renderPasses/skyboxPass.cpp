@@ -12,7 +12,8 @@
 #include "../texture/texture.h"
 
 SkyboxPass::SkyboxPass(const RenderContext& ctx) {
-	mWrites = {"sceneBuffer"};
+	mInputs = {"sceneBuffer"};
+	mOutputs = {"sceneBuffer"};
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("skybox");
 	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("skybox");
 
