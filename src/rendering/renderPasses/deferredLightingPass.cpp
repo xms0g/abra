@@ -8,12 +8,16 @@
 #include "../renderContext/renderContext.hpp"
 #include "../../config/configManager.h"
 
-DeferredLightingPass::DeferredLightingPass(const RenderGraph& graph) {
+DeferredLightingPass::DeferredLightingPass() {
 	mInputs = {"gBuffer", "ssaoBlur"};
 	mOutputs = {"sceneBuffer"};
 	mQuad = std::make_unique<Model::SingleQuad>();
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("deferredLighting");
+}
 
+DeferredLightingPass::~DeferredLightingPass() = default;
+
+void DeferredLightingPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
 	const TextureBinding textureBindings[] = {
 		{.name = "gPosition", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureSlot")},
 		{.name = "gNormal", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot")},
@@ -44,8 +48,6 @@ DeferredLightingPass::DeferredLightingPass(const RenderGraph& graph) {
 	graph.getResource("point").bindTexture(slot + 1);
 	graph.getResource("spot").bindTexture(slot + 2);
 }
-
-DeferredLightingPass::~DeferredLightingPass() = default;
 
 void DeferredLightingPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	const auto& sceneBuffer = graph.getResource("sceneBuffer");

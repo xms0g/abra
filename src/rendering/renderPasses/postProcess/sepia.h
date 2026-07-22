@@ -9,6 +9,8 @@ class Sepia final : public BasePostEffect {
 public:
 	explicit Sepia(const std::string& name, bool enabled = false);
 
+	void configure(const RenderGraph& graph) override;
+
 	uint32_t render(uint32_t vao, uint32_t sceneTexture, FrameBuffer* renderTarget) const override;
 
 protected:

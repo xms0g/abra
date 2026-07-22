@@ -5,6 +5,8 @@
 #include "../../types.hpp"
 #include "../../../event/events/guiPostProcessEvent.hpp"
 
+class RenderGraph;
+
 class BasePostEffect {
 public:
 	BasePostEffect() = default;
@@ -22,6 +24,8 @@ public:
 	bool enabled() const { return mEnabled; }
 
 	void enabled(const bool e) { mEnabled = e; }
+
+	virtual void configure(const RenderGraph& graph) = 0;
 
 	virtual uint32_t render(uint32_t vao, uint32_t sceneTexture, FrameBuffer* renderTarget) const = 0;
 

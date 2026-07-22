@@ -8,9 +8,11 @@
 Sepia::Sepia(const std::string& name, const bool enabled)
 	: BasePostEffect(name, enabled) {
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("sepia");
+}
 
+void Sepia::configure(const RenderGraph& graph) {
 	constexpr TextureBinding textureBindings[] = {
-		{"screenTexture", 0},
+		{.name = "screenTexture", .slot = 0},
 	};
 
 	RenderCommand::setTextureUnits(textureBindings, *mShader);

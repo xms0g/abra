@@ -18,12 +18,12 @@
 #include "../../../event/eventBus.hpp"
 #include "../../../event/events/guiPostProcessEvent.hpp"
 
-PostProcessPass::PostProcessPass(const RenderGraph& graph, EventBus& eventBus) {
+PostProcessPass::PostProcessPass() {
 	mInputs = {"sceneBuffer"};
 	mOutputs = {"frameBuffer"};
-	mQuad = std::make_unique<Model::Quad>();
+
 	mEffects = {
-		std::make_shared<Bloom>("Bloom", graph, false),
+		std::make_shared<Bloom>("Bloom", false),
 		std::make_shared<ToneMapping>("Tone Mapping", false),
 		std::make_shared<Grayscale>("Grayscale", false),
 		std::make_shared<Sepia>("Sepia", false),
@@ -34,12 +34,19 @@ PostProcessPass::PostProcessPass(const RenderGraph& graph, EventBus& eventBus) {
 		std::make_shared<Gamma>("Gamma Correction", true),
 		std::make_shared<FXAA>("FXAA", false),
 	};
-
-	mRenderTargets = {&graph.getResource("ping"), &graph.getResource("pong")};
-	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessEvent>(this, &PostProcessPass::onGuiUpdate);
 }
 
 PostProcessPass::~PostProcessPass() = default;
+
+void PostProcessPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
+	mQuad = std::make_unique<Model::Quad>();
+	mRenderTargets = {&graph.getResource("ping"), &graph.getResource("pong")};
+	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessEvent>(this, &PostProcessPass::onGuiUpdate);
+
+	for (const auto& effect: mEffects) {
+		effect->configure(graph);
+	}
+}
 
 void PostProcessPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	bool toggle = false;

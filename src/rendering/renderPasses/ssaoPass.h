@@ -14,9 +14,11 @@ class SingleQuad;
 
 class SSAOPass final : public BaseRenderPass {
 public:
-	SSAOPass(const RenderGraph& graph);
+	SSAOPass();
 
 	~SSAOPass() override;
+
+	void configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) override;
 
 	void execute(const RenderContext& ctx, const RenderGraph& graph) override;
 
@@ -29,5 +31,5 @@ private:
 	const Shader* mShader{nullptr};
 	const Shader* mBlurShader{nullptr};
 	UniformBuffer mUBO{};
-	Texture mNoiseTexture;
+	Texture mNoiseTexture{};
 };

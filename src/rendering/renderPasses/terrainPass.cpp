@@ -9,12 +9,17 @@
 #include "../renderContext/renderQueue.hpp"
 #include "../../rendering/shader.h"
 
-TerrainPass::TerrainPass(const RenderContext& ctx) {
+TerrainPass::TerrainPass() {
 	mInputs = {"sceneBuffer"};
 	mOutputs = {"sceneBuffer"};
+	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("terrain");
+}
+
+TerrainPass::~TerrainPass() = default;
+
+void TerrainPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
-	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("terrain");
 	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("terrain");
 
 	constexpr TextureBinding textureBindings[] = {
@@ -23,8 +28,6 @@ TerrainPass::TerrainPass(const RenderContext& ctx) {
 
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
 }
-
-TerrainPass::~TerrainPass() = default;
 
 void TerrainPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	graph.getResource("sceneBuffer").bind();

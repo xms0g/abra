@@ -16,9 +16,11 @@ class Shader;
 
 class PostProcessPass final : public BaseRenderPass {
 public:
-	PostProcessPass(const RenderGraph& graph, EventBus& eventBus);
+	PostProcessPass();
 
 	~PostProcessPass() override;
+
+	void configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) override;
 
 	void execute(const RenderContext& ctx, const RenderGraph& graph) override;
 

@@ -10,6 +10,8 @@ class BaseRenderPass {
 public:
 	virtual ~BaseRenderPass() = default;
 
+	virtual void configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) = 0;
+
 	virtual void execute(const RenderContext& ctx, const RenderGraph& graph) = 0;
 
 	std::vector<std::string>& inputs() { return mInputs; }

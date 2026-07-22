@@ -12,10 +12,15 @@
 #include "../../ECS/components/bv.hpp"
 #include "../../config/configManager.h"
 
-DeferredGeometryPass::DeferredGeometryPass(const RenderContext& ctx) {
+DeferredGeometryPass::DeferredGeometryPass() {
 	mInputs = {"visibleDeferred"};
 	mOutputs = {"gBuffer"};
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("gBuffer");
+}
+
+DeferredGeometryPass::~DeferredGeometryPass() = default;
+
+void DeferredGeometryPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
 	mObjects = &ctx.renderQueue->get<std::vector<RenderableObject>>("visibleDeferred");
 
 	const TextureBinding textureBindings[] = {
@@ -29,8 +34,6 @@ DeferredGeometryPass::DeferredGeometryPass(const RenderContext& ctx) {
 
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
 }
-
-DeferredGeometryPass::~DeferredGeometryPass() = default;
 
 void DeferredGeometryPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	graph.getResource("gBuffer").bind();

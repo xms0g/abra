@@ -1,15 +1,15 @@
 #include "renderGraph.h"
-#include <cassert>
 #include <numeric>
 #include <queue>
 #include "buffers/frameBuffer.h"
 #include "renderPasses/baseRenderPass.hpp"
+#include "../event/eventBus.hpp"
 
 FrameBuffer& RenderGraph::getResource(const std::string& key) const {
 	return *mResources.at(key);
 }
 
-void RenderGraph::addPass(std::unique_ptr<BaseRenderPass> pass) {
+void RenderGraph::addPass(PassNode&& pass) {
 	mRenderPasses.push_back(std::move(pass));
 }
 
@@ -18,6 +18,8 @@ void RenderGraph::addResources(const std::string& key, std::unique_ptr<FrameBuff
 }
 
 void RenderGraph::compile() {
+	std::erase_if(mRenderPasses, [](auto& p) { return !p.isActive; });
+
 	std::unordered_map<std::string, size_t> producer;
 	std::unordered_map<std::string, std::string> latestVersion;
 	std::vector<std::vector<size_t> > edges(mRenderPasses.size());
@@ -26,26 +28,34 @@ void RenderGraph::compile() {
 	mExecutionOrder.resize(mRenderPasses.size());
 
 	for (size_t i = 0; i < mRenderPasses.size(); ++i) {
-		for (auto& input: mRenderPasses[i]->inputs()) {
+		for (auto& input: mRenderPasses[i].pass->inputs()) {
 			if (latestVersion.contains(input)) {
 				input = latestVersion[input];
 			}
 		}
 
-		for (auto& output: mRenderPasses[i]->outputs()) {
-			std::string versioned;
-			versioned = output + "#v" + std::to_string(i);
-			latestVersion[output] = versioned;
-			producer[versioned] = i;
+		for (auto& output: mRenderPasses[i].pass->outputs()) {
+			if (producer.contains(output)) {
+				std::string versioned;
+				versioned = output + "#v" + std::to_string(i);
+				latestVersion[output] = versioned;
+				producer[versioned] = i;
+				continue;
+			}
+
+			producer[output] = i;
 		}
 	}
 
 	for (size_t i = 0; i < mRenderPasses.size(); ++i) {
-		for (auto& input: mRenderPasses[i]->inputs()) {
+		for (auto& input: mRenderPasses[i].pass->inputs()) {
 			if (!producer.contains(input))
 				continue;
 
 			const size_t dependency = producer[input];
+
+			if (dependency == i)
+				continue;
 
 			edges[dependency].push_back(i);
 			indegree[i]++;
@@ -73,8 +83,14 @@ void RenderGraph::compile() {
 	}
 }
 
+void RenderGraph::configure(const RenderContext& ctx, EventBus& eventBus) const {
+	for (const size_t index: mExecutionOrder) {
+		mRenderPasses[index].pass->configure(ctx, *this, eventBus);
+	}
+}
+
 void RenderGraph::execute(const RenderContext& ctx) const {
 	for (const size_t index: mExecutionOrder) {
-		mRenderPasses[index]->execute(ctx, *this);
+		mRenderPasses[index].pass->execute(ctx, *this);
 	}
 }

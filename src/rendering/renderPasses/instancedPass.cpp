@@ -13,9 +13,14 @@
 #include "../../math/matrix.h"
 #include "../../config/configManager.h"
 
-InstancedPass::InstancedPass(const RenderContext& ctx, const RenderGraph& graph) {
+InstancedPass::InstancedPass() {
 	mInputs = {"sceneBuffer"};
 	mOutputs = {"sceneBuffer"};
+}
+
+InstancedPass::~InstancedPass() = default;
+
+void InstancedPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
 	mOpaqueObjects = &ctx.renderQueue->get<std::vector<RenderInstanceGroup> >("opaqueInstanced");
 	mTransparentObjects = &ctx.renderQueue->get<std::vector<RenderInstanceGroup> >("blendInstanced");
 
@@ -34,8 +39,6 @@ InstancedPass::InstancedPass(const RenderContext& ctx, const RenderGraph& graph)
 	graph.getResource("point").bindTexture(slot + 1);
 	graph.getResource("spot").bindTexture(slot + 2);
 }
-
-InstancedPass::~InstancedPass() = default;
 
 void InstancedPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	graph.getResource("sceneBuffer").bind();

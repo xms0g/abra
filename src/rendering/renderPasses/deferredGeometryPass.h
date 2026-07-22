@@ -9,9 +9,11 @@ class FrameBuffer;
 
 class DeferredGeometryPass final : public BaseRenderPass {
 public:
-	explicit DeferredGeometryPass(const RenderContext& ctx);
+	DeferredGeometryPass();
 
 	~DeferredGeometryPass() override;
+
+	void configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) override;
 
 	void execute(const RenderContext& ctx, const RenderGraph& graph) override;
 

@@ -8,9 +8,14 @@
 #include "../renderContext/renderableObject.hpp"
 #include "../../config/configManager.h"
 
-ForwardPass::ForwardPass(const RenderContext& ctx, const RenderGraph& graph) {
+ForwardPass::ForwardPass() {
 	mInputs = {"sceneBuffer", "visibleOpaque", "visibleBlend"};
 	mOutputs = {"sceneBuffer"};
+}
+
+ForwardPass::~ForwardPass() = default;
+
+void ForwardPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
 	mOpaqueObjects = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleOpaque");
 	mTransparentObjects = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleBlend");
 
@@ -19,8 +24,6 @@ ForwardPass::ForwardPass(const RenderContext& ctx, const RenderGraph& graph) {
 	graph.getResource("point").bindTexture(slot + 1);
 	graph.getResource("spot").bindTexture(slot + 2);
 }
-
-ForwardPass::~ForwardPass() = default;
 
 void ForwardPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	graph.getResource("sceneBuffer").bind();

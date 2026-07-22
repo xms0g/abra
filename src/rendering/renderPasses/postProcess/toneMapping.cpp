@@ -8,9 +8,11 @@
 ToneMapping::ToneMapping(const std::string& name, const bool enabled)
 	: BasePostEffect(name, enabled) {
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("toneMapping");
+}
 
+void ToneMapping::configure(const RenderGraph& graph) {
 	constexpr TextureBinding textureBindings[] = {
-		{"screenTexture", 0},
+		{.name = "screenTexture", .slot = 0},
 	};
 
 	RenderCommand::setTextureUnits(textureBindings, *mShader);

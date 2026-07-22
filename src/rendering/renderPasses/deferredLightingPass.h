@@ -12,9 +12,11 @@ class Shader;
 
 class DeferredLightingPass final : public BaseRenderPass {
 public:
-	explicit DeferredLightingPass(const RenderGraph& graph);
+	explicit DeferredLightingPass();
 
 	~DeferredLightingPass() override;
+
+	void configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) override;
 
 	void execute(const RenderContext& ctx, const RenderGraph& graph) override;
 

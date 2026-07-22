@@ -9,9 +9,11 @@ struct RenderInstanceGroup;
 
 class InstancedPass final : public BaseRenderPass {
 public:
-	InstancedPass(const RenderContext& ctx, const RenderGraph& graph);
+	InstancedPass();
 
 	~InstancedPass() override;
+
+	void configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) override;
 
 	void execute(const RenderContext& ctx, const RenderGraph& graph) override;
 

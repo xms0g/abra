@@ -137,38 +137,53 @@ void Renderer::createRenderQueues() {
 }
 
 void Renderer::createRenderPasses(EventBus& eventBus) {
-	if (!mRenderQueue.get<std::vector<RenderGroup> >("opaque").empty() ||
-	    !mRenderQueue.get<std::vector<RenderGroup> >("blend").empty()) {
-		mGraph.addPass(std::make_unique<ForwardPass>(mRenderCtx, mGraph));
-	}
-
-	if (!mRenderQueue.get<std::vector<RenderGroup> >("deferred").empty()) {
-		mGraph.addPass(std::make_unique<DeferredGeometryPass>(mRenderCtx));
-		mGraph.addPass(std::make_unique<SSAOPass>(mGraph));
-		mGraph.addPass(std::make_unique<DeferredLightingPass>(mGraph));
-	}
-
-	if (!mRenderQueue.get<std::vector<RenderInstanceGroup> >("opaqueInstanced").empty() ||
-		!mRenderQueue.get<std::vector<RenderInstanceGroup> >("blendInstanced").empty()) {
-		mGraph.addPass(std::make_unique<InstancedPass>(mRenderCtx, mGraph));
-		}
-
-	if (!mRenderQueue.get<std::vector<RenderGroup> >("debug").empty()) {
-		mGraph.addPass(std::make_unique<DebugPass>(mRenderCtx));
-	}
-
-	if (!mRenderQueue.get<std::vector<RenderGroup> >("terrain").empty()) {
-		mGraph.addPass(std::make_unique<TerrainPass>(mRenderCtx));
-	}
-
-	if (CONFIG_MANAGER_INSTANCE.get<bool>("msaa.enabled")) {
-		mGraph.addPass(std::make_unique<ResolvePass>());
-	}
-
-	mGraph.addPass(std::make_unique<SkyboxPass>(mRenderCtx));
-	mGraph.addPass(std::make_unique<CullingPass>(mRenderCtx));
-	mGraph.addPass(std::make_unique<PostProcessPass>(mGraph, eventBus));
+	mGraph.addPass({
+		.name = "DeferredLightingPass",
+		.isActive = !mRenderQueue.get<std::vector<RenderGroup> >("deferred").empty(),
+		.pass = std::make_unique<DeferredLightingPass>()
+	});
+	mGraph.addPass({
+		.name = "DeferredGeometryPass",
+		.isActive = !mRenderQueue.get<std::vector<RenderGroup> >("deferred").empty(),
+		.pass = std::make_unique<DeferredGeometryPass>()
+	});
+	mGraph.addPass({
+		.name = "ForwardPass",
+		.isActive = !mRenderQueue.get<std::vector<RenderGroup> >("opaque").empty() ||
+		            !mRenderQueue.get<std::vector<RenderGroup> >("blend").empty(),
+		.pass = std::make_unique<ForwardPass>()
+	});
+	mGraph.addPass({
+		.name = "SSAOPass",
+		.isActive = !mRenderQueue.get<std::vector<RenderGroup> >("deferred").empty(),
+		.pass = std::make_unique<SSAOPass>()
+	});
+	mGraph.addPass({
+		.name = "InstancedPass",
+		.isActive = !mRenderQueue.get<std::vector<RenderInstanceGroup> >("opaqueInstanced").empty() ||
+		            !mRenderQueue.get<std::vector<RenderInstanceGroup> >("blendInstanced").empty(),
+		.pass = std::make_unique<InstancedPass>()
+	});
+	mGraph.addPass({
+		.name = "DebugPass",
+		.isActive = !mRenderQueue.get<std::vector<RenderGroup> >("debug").empty(),
+		.pass = std::make_unique<DebugPass>()
+	});
+	mGraph.addPass({
+		.name = "TerrainPass",
+		.isActive = !mRenderQueue.get<std::vector<RenderGroup> >("terrain").empty(),
+		.pass = std::make_unique<TerrainPass>()
+	});
+	mGraph.addPass({
+		.name = "ResolvePass",
+		.isActive = CONFIG_MANAGER_INSTANCE.get<bool>("msaa.enabled"),
+		.pass = std::make_unique<ResolvePass>()
+	});
+	mGraph.addPass({.name = "SkyboxPass", .pass = std::make_unique<SkyboxPass>()});
+	mGraph.addPass({.name = "CullingPass", .pass = std::make_unique<CullingPass>()});
+	mGraph.addPass({.name = "PostProcessPass", .pass = std::make_unique<PostProcessPass>()});
 	mGraph.compile();
+	mGraph.configure(mRenderCtx, eventBus);
 }
 
 void Renderer::createFrameBuffers() {

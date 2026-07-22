@@ -10,9 +10,13 @@
 #include "../../math/boundingVolume.h"
 #include "../../core/camera.h"
 
-CullingPass::CullingPass(const RenderContext& ctx) {
+CullingPass::CullingPass() {
 	mOutputs = {"visibleOpaque", "visibleBlend", "visibleDeferred", "visibleDebug"};
+}
 
+CullingPass::~CullingPass() = default;
+
+void CullingPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
 	mOpaqueGroups = &ctx.renderQueue->get<std::vector<RenderGroup> >("opaque");
 	mBlendGroups = &ctx.renderQueue->get<std::vector<RenderGroup> >("blend");
 	mDeferredGroups = &ctx.renderQueue->get<std::vector<RenderGroup> >("deferred");
@@ -22,8 +26,6 @@ CullingPass::CullingPass(const RenderContext& ctx) {
 	mVisibleDeferred = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleDeferred");
 	mVisibleDebug = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleDebug");
 }
-
-CullingPass::~CullingPass() = default;
 
 void CullingPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	const auto frustum = ctx.camera.camera->generateFrustum();

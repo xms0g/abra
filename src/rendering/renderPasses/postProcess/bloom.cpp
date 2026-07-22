@@ -6,19 +6,23 @@
 #include "../../buffers/frameBuffer.h"
 #include "../../renderContext/renderContext.hpp"
 
-Bloom::Bloom(const std::string& name, const RenderGraph& graph, const bool enabled)
+Bloom::Bloom(const std::string& name, const bool enabled)
 	: BasePostEffect(name, enabled) {
 	mBrightFilter = RESOURCE_MANAGER_INSTANCE.get<Shader>("bloomBF");
 	mBlur = RESOURCE_MANAGER_INSTANCE.get<Shader>("bloomBlur");
 	mCombine = RESOURCE_MANAGER_INSTANCE.get<Shader>("bloomCombine");
+}
 
+Bloom::~Bloom() = default;
+
+void Bloom::configure(const RenderGraph& graph) {
 	constexpr TextureBinding textureBindings[] = {
-		{"screenTexture", 0},
+		{.name = "screenTexture", .slot = 0},
 	};
 
 	constexpr TextureBinding combineTextureBindings[] = {
-		{"screenTexture", 0},
-		{"bloomBlur", 1}
+		{.name = "screenTexture", .slot = 0},
+		{.name = "bloomBlur", .slot = 1}
 	};
 
 	RenderCommand::setTextureUnits(textureBindings, *mBrightFilter);
@@ -27,8 +31,6 @@ Bloom::Bloom(const std::string& name, const RenderGraph& graph, const bool enabl
 
 	mRenderTargets = {&graph.getResource("bloomPing"), &graph.getResource("bloomPong")};
 }
-
-Bloom::~Bloom() = default;
 
 uint32_t Bloom::render(const uint32_t vao, const uint32_t sceneTexture, FrameBuffer* renderTarget) const {
 	(void) renderTarget;

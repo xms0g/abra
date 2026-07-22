@@ -9,9 +9,11 @@ class FrameBuffer;
 
 class Bloom final : public BasePostEffect {
 public:
-	Bloom(const std::string& name, const RenderGraph& graph, bool enabled = false);
+	explicit Bloom(const std::string& name, bool enabled = false);
 
 	~Bloom() override;
+
+	void configure(const RenderGraph& graph) override;
 
 	uint32_t render(uint32_t vao, uint32_t sceneTexture, FrameBuffer* renderTarget) const override;
 
@@ -30,7 +32,7 @@ private:
 		uint32_t blurTexture,
 		const bool& toggle) const;
 
-	std::array<FrameBuffer*, 2> mRenderTargets;
+	std::array<FrameBuffer*, 2> mRenderTargets{};
 
 	const Shader* mBrightFilter;
 	const Shader* mBlur;

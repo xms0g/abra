@@ -12,13 +12,17 @@
 #include "../../config/configManager.h"
 #include "../../math/random.h"
 
-SSAOPass::SSAOPass(const RenderGraph& graph) {
+SSAOPass::SSAOPass() {
 	mInputs  = {"gBuffer"};
 	mOutputs = {"ssao", "ssaoBlur"};
-	mQuad = std::make_unique<Model::SingleQuad>();
-
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("ssao");
 	mBlurShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("ssaoBlur");
+}
+
+SSAOPass::~SSAOPass() = default;
+
+void SSAOPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
+	mQuad = std::make_unique<Model::SingleQuad>();
 
 	const TextureBinding ssaoTextureBindings[] = {
 		{.name = "gDepthMap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureSlot")},
@@ -82,8 +86,6 @@ SSAOPass::SSAOPass(const RenderGraph& graph) {
 		CONFIG_MANAGER_INSTANCE.get<uint32_t>("ssao.ubo_binding"),
 		CONFIG_MANAGER_INSTANCE.get<std::string>("ssao.block_name").c_str());
 }
-
-SSAOPass::~SSAOPass() = default;
 
 void SSAOPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	ssao(graph);

@@ -9,9 +9,11 @@ Kernel::Kernel(const std::string& name, const float* kernel, const bool enabled)
 	: BasePostEffect(name, enabled),
 	  mKernel(kernel) {
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("kernel");
+}
 
+void Kernel::configure(const RenderGraph& graph) {
 	constexpr TextureBinding textureBindings[] = {
-		{"screenTexture", 0},
+		{.name = "screenTexture", .slot = 0},
 	};
 
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
