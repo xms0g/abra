@@ -16,7 +16,7 @@ void SyncStateSystem::configure(const RenderContext& ctx, EventBus& eventBus) {
 }
 
 void SyncStateSystem::onDebugUpdate(const GuiDebugEvent& event) {
-	mCtx->renderData->entity.debugModes[event.entityID] = event.mode;
+	mCtx->renderData->updateDebugMode(event.entityID, event.mode);
 }
 
 void SyncStateSystem::onTransformUpdate(const GuiTransformEvent& event) {

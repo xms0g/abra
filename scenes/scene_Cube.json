@@ -25,7 +25,8 @@
             "skybox/back.jpg"
           ]
         },
-        "BoundingVolumeComponent": { "type": "Dummy" }
+        "BoundingVolumeComponent": { "type": "Dummy" },
+        "DebugComponent": {}
       }
     },
     {
@@ -44,7 +45,8 @@
           "shader": "unlit",
           "from_resource_manager": true
         },
-        "BoundingVolumeComponent": { "type": "AABB" }
+        "BoundingVolumeComponent": { "type": "AABB" },
+        "DebugComponent": {}
       }
     },
     {
@@ -71,7 +73,8 @@
           "specular": [1.0, 1.0, 1.0],
           "intensity": 2.1
         },
-        "BoundingVolumeComponent": { "type": "AABB" }
+        "BoundingVolumeComponent": { "type": "AABB" },
+        "DebugComponent": {}
       }
     }
   ]

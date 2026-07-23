@@ -20,7 +20,8 @@
             "textures/hdr/newport_loft.hdr"
           ]
         },
-        "BoundingVolumeComponent": { "type": "Dummy" }
+        "BoundingVolumeComponent": { "type": "Dummy" },
+        "DebugComponent": {}
       }
     },
     {
@@ -127,7 +128,8 @@
           "specular": [0.5, 0.5, 0.5],
           "intensity": 2.1
         },
-        "BoundingVolumeComponent": { "type": "AABB" }
+        "BoundingVolumeComponent": { "type": "AABB" },
+        "DebugComponent": {}
       }
     }
   ]

@@ -22,10 +22,10 @@ private:
 		std::string queue;
 		std::string instancedQueue;
 	} rules[4] = {
-		{CASTSHADOW, "shadow", "shadow"},
-		{PBR, "deferred", "deferred"},
-		{OPAQUE, "opaque", "opaqueInstanced"},
-		{BLEND, "blend", "blendInstanced"},
+		{.flags = CASTSHADOW, .queue = "shadow", .instancedQueue = "shadow"},
+		{.flags = PBR, .queue = "deferred", .instancedQueue = "deferred"},
+		{.flags = OPAQUE, .queue = "opaque", .instancedQueue = "opaqueInstanced"},
+		{.flags = BLEND, .queue = "blend", .instancedQueue = "blendInstanced"},
 	};
 
 	void batch(const Entity& entity, RenderData& renderData, RenderQueue& renderQueue);
@@ -33,6 +33,8 @@ private:
 	static void batchTransform(const Entity& entity, RenderData& renderData);
 
 	static void batchBV(const Entity& entity, RenderData& renderData);
+
+	static void batchDebugMode(const Entity& entity, RenderData& renderData);
 
 	std::vector<uint32_t> batchMeshes(RenderData& renderData, const std::vector<Mesh>& meshes);
 

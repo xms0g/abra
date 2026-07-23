@@ -25,6 +25,7 @@ void RenderBatcher::build(RenderData& renderData, RenderQueue& renderQueue, cons
 void RenderBatcher::batch(const Entity& entity, RenderData& renderData, RenderQueue& renderQueue) {
 	batchTransform(entity, renderData);
 	batchBV(entity, renderData);
+	batchDebugMode(entity, renderData);
 
 	for (auto& [matID, meshes]: *entity.getComponent<MeshComponent>().meshes) {
 		const std::vector<uint32_t> meshIndices = batchMeshes(renderData, meshes);
@@ -35,22 +36,16 @@ void RenderBatcher::batch(const Entity& entity, RenderData& renderData, RenderQu
 
 void RenderBatcher::batchTransform(const Entity& entity, RenderData& renderData) {
 	const auto& transform = entity.getComponent<TransformComponent>();
-	const auto modelMat = math::modelMatrix(transform.position, transform.rotation, transform.scale);
-	const auto normalMat = math::normalMatrix(modelMat);
-
-	renderData.entity.positions.push_back(transform.position);
-	renderData.entity.rotations.push_back(transform.rotation);
-	renderData.entity.scales.push_back(transform.scale);
-	renderData.entity.models.push_back(modelMat);
-	renderData.entity.normals.push_back(normalMat);
+	renderData.emplaceTransform(transform.position, transform.rotation, transform.scale);
 }
 
 void RenderBatcher::batchBV(const Entity& entity, RenderData& renderData) {
 	const auto& bv = entity.getComponent<BoundingVolumeComponent>().bv;
-	renderData.entity.centers.push_back(bv->center());
-	renderData.entity.extents.push_back(bv->extents());
+	renderData.emplaceBV(bv->center(), bv->extents());
+}
 
-	renderData.entity.debugModes.emplace_back(0);
+void RenderBatcher::batchDebugMode(const Entity& entity, RenderData& renderData) {
+	renderData.emplaceDebugMode(entity.getComponent<DebugComponent>().mode);
 }
 
 std::vector<uint32_t> RenderBatcher::batchMeshes(RenderData& renderData, const std::vector<Mesh>& meshes) {
@@ -58,11 +53,12 @@ std::vector<uint32_t> RenderBatcher::batchMeshes(RenderData& renderData, const s
 
 	for (const auto& mesh: meshes) {
 		meshIndices.push_back(buildState.meshIndex++);
-		renderData.mesh.vaos.push_back(mesh.vao().id());
-		renderData.mesh.vertexCounts.push_back(mesh.vertices().size());
-		renderData.mesh.indexCounts.push_back(mesh.indices().size());
-		renderData.mesh.maxCounts.push_back(mesh.max());
-		renderData.mesh.minCounts.push_back(mesh.min());
+		renderData.emplaceMesh(
+			mesh.vao().id(),
+			mesh.min(),
+			mesh.max(),
+			mesh.vertices().size(),
+			mesh.indices().size());
 	}
 
 	return meshIndices;
@@ -73,19 +69,15 @@ MaterialBatch RenderBatcher::batchMaterial(
 	const Entity& entity,
 	RenderData& renderData,
 	const std::vector<uint32_t>& meshIndices) {
-	auto& matComponent = entity.getComponent<MaterialComponent>();
-	renderData.entity.heightScales.emplace_back(matComponent.heightScale);
-
+	const auto& matComponent = entity.getComponent<MaterialComponent>();
 	auto& material = matComponent.materials->at(matID);
 	material.idx = buildState.materialIndex++;
 
-	renderData.material.flags.push_back(material.flags);
-	renderData.material.textureTargets.push_back(material.textureTarget);
-	renderData.material.alphaCutoffs.push_back(material.alphaCutoff);
-	renderData.material.colors.push_back(material.color);
+	renderData.emplaceHeightScale(matComponent.heightScale);
+	renderData.emplaceMaterial(material.flags, material.textureTarget, material.color, material.alphaCutoff);
 
 	for (const auto& texture: material.textures) {
-		renderData.material.textures.push_back(texture.id);
+		renderData.emplaceTexture(texture.id);
 	}
 
 	const size_t textureCount = material.textures.size();
@@ -106,30 +98,29 @@ MaterialBatch RenderBatcher::batchMaterial(
 void RenderBatcher::enqueueRenderGroup(const Entity& entity, RenderQueue& renderQueue, const MaterialBatch& matBatch) {
 	if (matBatch.renderFlag == INSTANCED_PASS) {
 		const auto& instComponent = entity.getComponent<InstanceComponent>();
-		const RenderInstanceGroup group{entity.id(), matBatch, *instComponent.transforms};
+		RenderInstanceGroup group{entity.id(), matBatch, *instComponent.transforms};
 
 		for (const auto& rule: rules) {
 			if (matBatch.materialFlags & rule.flags) {
-				renderQueue.get<std::vector<RenderInstanceGroup> >(rule.instancedQueue).push_back(group);
+				renderQueue.emplace(rule.instancedQueue, group);
 			}
 		}
 	} else {
-		using QueueType = std::vector<RenderGroup>;
-		const RenderGroup group{entity.id(), matBatch};
+		RenderGroup group{.entityID = entity.id(), .matBatch = matBatch};
 
 		if (entity.hasComponent<DebugComponent>()) {
-			renderQueue.get<QueueType>("debug").push_back(group);
+			renderQueue.emplace("debug", group);
 		}
 
 		if (matBatch.renderFlag == SKYBOX_PASS) {
-			renderQueue.get<QueueType>("skybox").push_back(group);
+			renderQueue.emplace("skybox", group);
 		} else if (matBatch.renderFlag == TERRAIN_PASS) {
-			renderQueue.get<QueueType>("terrain").push_back(group);
+			renderQueue.emplace("terrain", group);
 		}
 
 		for (const auto& rule: rules) {
 			if (matBatch.materialFlags & rule.flags) {
-				renderQueue.get<QueueType>(rule.queue).push_back(group);
+				renderQueue.emplace(rule.queue, group);
 			}
 		}
 	}

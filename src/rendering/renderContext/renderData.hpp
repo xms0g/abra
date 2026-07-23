@@ -32,6 +32,47 @@ struct RenderData {
 		std::vector<size_t> indexCounts;
 	} mesh;
 
+	void emplaceTransform(const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale) {
+		entity.positions.push_back(position);
+		entity.rotations.push_back(rotation);
+		entity.scales.push_back(scale);
+
+		entity.models.emplace_back(math::modelMatrix(position, rotation, scale));
+		entity.normals.emplace_back(math::normalMatrix(entity.models.back()));
+	}
+
+	void emplaceBV(const glm::vec3& center, const glm::vec3& extent) {
+		entity.centers.emplace_back(center);
+		entity.extents.emplace_back(extent);
+	}
+
+	void emplaceMesh(const uint32_t vaoid, const glm::vec3& minCount, const glm::vec3& maxCount, const size_t vertexCount, const size_t indexCount) {
+		mesh.vaos.push_back(vaoid);
+		mesh.minCounts.push_back(minCount);
+		mesh.maxCounts.push_back(maxCount);
+		mesh.vertexCounts.push_back(vertexCount);
+		mesh.indexCounts.push_back(indexCount);
+	}
+
+	void emplaceMaterial(const uint32_t flags, const uint32_t textureTarget, const glm::vec3& color, const float alphaCutoff) {
+		material.flags.push_back(flags);
+		material.textureTargets.push_back(textureTarget);
+		material.colors.push_back(color);
+		material.alphaCutoffs.push_back(alphaCutoff);
+	}
+
+	void emplaceTexture(const uint32_t textureID) {
+		material.textures.push_back(textureID);
+	}
+
+	void emplaceHeightScale(const float heightScale) {
+		entity.heightScales.push_back(heightScale);
+	}
+
+	void emplaceDebugMode(const uint32_t debugMode) {
+		entity.debugModes.push_back(debugMode);
+	}
+
 	void updateTransform(const uint32_t entityID, const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale) {
 		entity.positions[entityID] = position;
 		entity.rotations[entityID] = rotation;
@@ -41,5 +82,9 @@ struct RenderData {
 
 		entity.models[entityID] = model;
 		entity.normals[entityID] = math::normalMatrix(model);
+	}
+
+	void updateDebugMode(const uint32_t entityID, const uint32_t debugMode) {
+		entity.debugModes[entityID] = debugMode;
 	}
 };

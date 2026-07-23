@@ -25,7 +25,8 @@
             "skybox/back.jpg"
           ]
         },
-        "BoundingVolumeComponent": { "type": "Dummy" }
+        "BoundingVolumeComponent": { "type": "Dummy" },
+        "DebugComponent": {}
       }
     },
     {
@@ -72,7 +73,8 @@
           "specular": [1.0, 1.0, 1.0],
           "intensity": 2.1
         },
-        "BoundingVolumeComponent": { "type": "AABB" }
+        "BoundingVolumeComponent": { "type": "AABB" },
+        "DebugComponent": {}
       }
     }
   ]
