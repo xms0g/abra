@@ -24,7 +24,7 @@ DebugPass::DebugPass() {
 DebugPass::~DebugPass() = default;
 
 void DebugPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
-	mObjects = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleDebug");
+	mObjects = &ctx.queueRegistry->get<RenderableObject>("visibleDebug");
 }
 
 void DebugPass::execute(const RenderContext& ctx, const RenderGraph& graph) {

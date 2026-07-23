@@ -16,13 +16,13 @@
 #include "../ECS/components/mesh.hpp"
 #include "../ECS/components/instance.hpp"
 
-void RenderBatcher::build(RenderData& renderData, RenderQueue& renderQueue, const std::vector<Entity>& entities) {
+void RenderBatcher::build(RenderData& renderData, QueueRegistry& queueRegistry, const std::vector<Entity>& entities) {
 	for (const auto& entity: entities) {
-		batch(entity, renderData, renderQueue);
+		batch(entity, renderData, queueRegistry);
 	}
 }
 
-void RenderBatcher::batch(const Entity& entity, RenderData& renderData, RenderQueue& renderQueue) {
+void RenderBatcher::batch(const Entity& entity, RenderData& renderData, QueueRegistry& queueRegistry) {
 	batchTransform(entity, renderData);
 	batchBV(entity, renderData);
 	batchDebugMode(entity, renderData);
@@ -30,7 +30,7 @@ void RenderBatcher::batch(const Entity& entity, RenderData& renderData, RenderQu
 	for (auto& [matID, meshes]: *entity.getComponent<MeshComponent>().meshes) {
 		const std::vector<uint32_t> meshIndices = batchMeshes(renderData, meshes);
 		const MaterialBatch matBatch = batchMaterial(matID, entity, renderData, meshIndices);
-		enqueueRenderGroup(entity, renderQueue, matBatch);
+		enqueueRenderGroup(entity, queueRegistry, matBatch);
 	}
 }
 
@@ -95,32 +95,32 @@ MaterialBatch RenderBatcher::batchMaterial(
 	return matBatch;
 }
 
-void RenderBatcher::enqueueRenderGroup(const Entity& entity, RenderQueue& renderQueue, const MaterialBatch& matBatch) {
+void RenderBatcher::enqueueRenderGroup(const Entity& entity, QueueRegistry& queueRegistry, const MaterialBatch& matBatch) {
 	if (matBatch.renderFlag == INSTANCED_PASS) {
 		const auto& instComponent = entity.getComponent<InstanceComponent>();
 		RenderInstanceGroup group{entity.id(), matBatch, *instComponent.transforms};
 
 		for (const auto& rule: rules) {
 			if (matBatch.materialFlags & rule.flags) {
-				renderQueue.emplace(rule.instancedQueue, group);
+				queueRegistry.emplace(rule.instancedQueue, group);
 			}
 		}
 	} else {
 		RenderGroup group{.entityID = entity.id(), .matBatch = matBatch};
 
 		if (entity.hasComponent<DebugComponent>()) {
-			renderQueue.emplace("debug", group);
+			queueRegistry.emplace("debug", group);
 		}
 
 		if (matBatch.renderFlag == SKYBOX_PASS) {
-			renderQueue.emplace("skybox", group);
+			queueRegistry.emplace("skybox", group);
 		} else if (matBatch.renderFlag == TERRAIN_PASS) {
-			renderQueue.emplace("terrain", group);
+			queueRegistry.emplace("terrain", group);
 		}
 
 		for (const auto& rule: rules) {
 			if (matBatch.materialFlags & rule.flags) {
-				renderQueue.emplace(rule.queue, group);
+				queueRegistry.emplace(rule.queue, group);
 			}
 		}
 	}

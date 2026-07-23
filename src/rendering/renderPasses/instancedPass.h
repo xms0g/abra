@@ -3,6 +3,7 @@
 #include <vector>
 #include "glm/glm.hpp"
 #include "baseRenderPass.hpp"
+#include "../renderContext/renderQueue.hpp"
 
 class VertexBuffer;
 struct RenderInstanceGroup;
@@ -25,15 +26,15 @@ private:
 	};
 
 	static void prepareInstanceBuffer(
-		const std::vector<RenderInstanceGroup>& groups,
+		const RenderQueue<RenderInstanceGroup>& groups,
 		const std::vector<uint32_t>& vaos,
 		std::unique_ptr<VertexBuffer>& vbo);
 
-	static void uploadInstanceData(const std::vector<RenderInstanceGroup>& groups, const VertexBuffer& vbo);
+	static void uploadInstanceData(const RenderQueue<RenderInstanceGroup>& groups, const VertexBuffer& vbo);
 
 	std::unique_ptr<VertexBuffer> mOpaqueVBO;
 	std::unique_ptr<VertexBuffer> mBlendVBO;
 
-	std::vector<RenderInstanceGroup>* mOpaqueObjects{nullptr};
-	std::vector<RenderInstanceGroup>* mTransparentObjects{nullptr};
+	RenderQueue<RenderInstanceGroup>* mOpaqueObjects{nullptr};
+	RenderQueue<RenderInstanceGroup>* mTransparentObjects{nullptr};
 };

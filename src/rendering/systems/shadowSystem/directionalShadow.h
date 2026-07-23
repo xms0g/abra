@@ -1,7 +1,6 @@
 #pragma once
-#include <memory>
-#include <vector>
 #include "glm/glm.hpp"
+#include "../../renderContext/renderQueue.hpp"
 
 class RenderGraph;
 struct RenderGroup;
@@ -24,5 +23,5 @@ private:
 	float mHeight, mLeft, mRight, mBottom, mTop, mNear, mFar;
 	glm::mat4 mLightSpaceMatrix{};
 	const Shader* mDepthShader;
-	std::vector<RenderGroup>* mObjects;
+	RenderQueue<RenderGroup>* mObjects;
 };

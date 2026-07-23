@@ -1,6 +1,6 @@
 #pragma once
-#include <vector>
 #include "baseRenderPass.hpp"
+#include "../renderContext/renderQueue.hpp"
 
 struct RenderableObject;
 
@@ -15,6 +15,6 @@ public:
 	void execute(const RenderContext& ctx, const RenderGraph& graph) override;
 
 private:
-	std::vector<RenderableObject>* mOpaqueObjects{nullptr};
-	std::vector<RenderableObject>* mTransparentObjects{nullptr};
+	RenderQueue<RenderableObject>* mOpaqueObjects{nullptr};
+	RenderQueue<RenderableObject>* mTransparentObjects{nullptr};
 };

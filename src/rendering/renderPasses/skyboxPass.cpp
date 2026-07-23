@@ -20,7 +20,7 @@ SkyboxPass::SkyboxPass() {
 SkyboxPass::~SkyboxPass() = default;
 
 void SkyboxPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
-	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("skybox");
+	mObjects = &ctx.queueRegistry->get<RenderGroup>("skybox");
 
 	constexpr TextureBinding textureBindings[] = {
 		{.name = "skybox", .slot = 0},

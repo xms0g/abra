@@ -3,12 +3,12 @@
 #include "material/material.hpp"
 
 class Entity;
-class RenderQueue;
+class QueueRegistry;
 struct RenderData;
 
 class RenderBatcher {
 public:
-	void build(RenderData& renderData, RenderQueue& renderQueue, const std::vector<Entity>& entities);
+	void build(RenderData& renderData, QueueRegistry& queueRegistry, const std::vector<Entity>& entities);
 
 private:
 	struct BuildState {
@@ -28,7 +28,7 @@ private:
 		{.flags = BLEND, .queue = "blend", .instancedQueue = "blendInstanced"},
 	};
 
-	void batch(const Entity& entity, RenderData& renderData, RenderQueue& renderQueue);
+	void batch(const Entity& entity, RenderData& renderData, QueueRegistry& queueRegistry);
 
 	static void batchTransform(const Entity& entity, RenderData& renderData);
 
@@ -44,5 +44,5 @@ private:
 		RenderData& renderData,
 		const std::vector<uint32_t>& meshIndices);
 
-	void enqueueRenderGroup(const Entity& entity, RenderQueue& renderQueue, const MaterialBatch& matBatch);
+	void enqueueRenderGroup(const Entity& entity, QueueRegistry& queueRegistry, const MaterialBatch& matBatch);
 };

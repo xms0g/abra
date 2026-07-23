@@ -1,7 +1,7 @@
 #pragma once
 #include <array>
-#include <vector>
 #include "baseRenderPass.hpp"
+#include "../renderContext/renderQueue.hpp"
 
 struct RenderableObject;
 class Shader;
@@ -18,5 +18,5 @@ public:
 
 private:
 	std::array<const Shader*, 3> mDebugShaders{};
-	std::vector<RenderableObject>* mObjects{nullptr};
+	RenderQueue<RenderableObject>* mObjects{nullptr};
 };

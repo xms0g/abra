@@ -59,7 +59,7 @@ private:
 	// Render Data
 	RenderData mRenderData{};
 	// Render Queue
-	RenderQueue mRenderQueue{};
+	QueueRegistry mQueueRegistry{};
 	// Render context
 	RenderContext mRenderCtx{};
 };

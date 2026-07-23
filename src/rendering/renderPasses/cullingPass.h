@@ -1,6 +1,6 @@
 #pragma once
-#include <vector>
 #include "baseRenderPass.hpp"
+#include "../renderContext/renderQueue.hpp"
 
 namespace math {
 struct Frustum;
@@ -23,15 +23,15 @@ private:
 	static void cullScene(
 		const RenderContext& ctx,
 		const math::Frustum& frustum,
-		const std::vector<RenderGroup>& groups,
-		std::vector<RenderableObject>& outQueue);
+		const RenderQueue<RenderGroup>& groups,
+		RenderQueue<RenderableObject>& outQueue);
 
-	std::vector<RenderGroup>* mOpaqueGroups{nullptr};
-	std::vector<RenderGroup>* mBlendGroups{nullptr};
-	std::vector<RenderGroup>* mDeferredGroups{nullptr};
-	std::vector<RenderGroup>* mDebugGroups{nullptr};
-	std::vector<RenderableObject>* mVisibleOpaque{nullptr};
-	std::vector<RenderableObject>* mVisibleBlend{nullptr};
-	std::vector<RenderableObject>* mVisibleDeferred{nullptr};
-	std::vector<RenderableObject>* mVisibleDebug{nullptr};
+	RenderQueue<RenderGroup>* mOpaqueGroups{nullptr};
+	RenderQueue<RenderGroup>* mBlendGroups{nullptr};
+	RenderQueue<RenderGroup>* mDeferredGroups{nullptr};
+	RenderQueue<RenderGroup>* mDebugGroups{nullptr};
+	RenderQueue<RenderableObject>* mVisibleOpaque{nullptr};
+	RenderQueue<RenderableObject>* mVisibleBlend{nullptr};
+	RenderQueue<RenderableObject>* mVisibleDeferred{nullptr};
+	RenderQueue<RenderableObject>* mVisibleDebug{nullptr};
 };

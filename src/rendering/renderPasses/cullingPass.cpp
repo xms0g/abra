@@ -17,14 +17,14 @@ CullingPass::CullingPass() {
 CullingPass::~CullingPass() = default;
 
 void CullingPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
-	mOpaqueGroups = &ctx.renderQueue->get<std::vector<RenderGroup> >("opaque");
-	mBlendGroups = &ctx.renderQueue->get<std::vector<RenderGroup> >("blend");
-	mDeferredGroups = &ctx.renderQueue->get<std::vector<RenderGroup> >("deferred");
-	mDebugGroups = &ctx.renderQueue->get<std::vector<RenderGroup> >("debug");
-	mVisibleOpaque = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleOpaque");
-	mVisibleBlend = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleBlend");
-	mVisibleDeferred = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleDeferred");
-	mVisibleDebug = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleDebug");
+	mOpaqueGroups = &ctx.queueRegistry->get<RenderGroup>("opaque");
+	mBlendGroups = &ctx.queueRegistry->get<RenderGroup>("blend");
+	mDeferredGroups = &ctx.queueRegistry->get<RenderGroup>("deferred");
+	mDebugGroups = &ctx.queueRegistry->get<RenderGroup>("debug");
+	mVisibleOpaque = &ctx.queueRegistry->get<RenderableObject>("visibleOpaque");
+	mVisibleBlend = &ctx.queueRegistry->get<RenderableObject>("visibleBlend");
+	mVisibleDeferred = &ctx.queueRegistry->get<RenderableObject>("visibleDeferred");
+	mVisibleDebug = &ctx.queueRegistry->get<RenderableObject>("visibleDebug");
 }
 
 void CullingPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
@@ -39,8 +39,8 @@ void CullingPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 void CullingPass::cullScene(
 	const RenderContext& ctx,
 	const math::Frustum& frustum,
-	const std::vector<RenderGroup>& groups,
-	std::vector<RenderableObject>& outQueue) {
+	const RenderQueue<RenderGroup>& groups,
+	RenderQueue<RenderableObject>& outQueue) {
 	outQueue.clear();
 
 	for (const auto& [entityID, matBatch]: groups) {

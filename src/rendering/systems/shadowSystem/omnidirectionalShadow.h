@@ -1,6 +1,5 @@
 #pragma once
-#include <memory>
-#include <vector>
+#include "../../renderContext/renderQueue.hpp"
 #include "glm/glm.hpp"
 
 struct RenderGroup;
@@ -25,7 +24,7 @@ private:
 	float mFovy{0.0f};
 
 	std::vector<glm::mat4> mShadowTransforms;
-	std::vector<RenderGroup>* mObjects;
+	RenderQueue<RenderGroup>* mObjects;
 	const Shader* mDepthShader;
 	glm::mat4 mShadowProj;
 

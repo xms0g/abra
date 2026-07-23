@@ -1,6 +1,6 @@
 #pragma once
-#include <vector>
 #include "baseRenderPass.hpp"
+#include "../renderContext/renderQueue.hpp"
 
 class Shader;
 struct RenderGroup;
@@ -17,5 +17,5 @@ public:
 
 private:
 	const Shader* mShader{nullptr};
-	std::vector<RenderGroup>* mObjects{nullptr};
+	RenderQueue<RenderGroup>* mObjects{nullptr};
 };

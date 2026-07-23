@@ -16,7 +16,7 @@ PerspectiveShadow::PerspectiveShadow(const RenderContext& ctx) {
 	mHeight = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_height");
 	mAspect = static_cast<float>(mWidth) / static_cast<float>(mHeight);
 	mDepthShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("depth");
-	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("shadow");
+	mObjects = &ctx.queueRegistry->get<RenderGroup>("shadow");
 	mNear = CONFIG_MANAGER_INSTANCE.get<float>("shadow.perspective.nearPlane");
 	mFar = CONFIG_MANAGER_INSTANCE.get<float>("shadow.perspective.farPlane");
 }

@@ -8,7 +8,7 @@ namespace math {
 struct Frustum;
 }
 
-class RenderQueue;
+class QueueRegistry;
 class FrameBuffer;
 class UniformBuffer;
 class Camera;
@@ -19,7 +19,7 @@ struct SpotLightComponent;
 
 struct RenderContext {
 	RenderData* renderData{};
-	RenderQueue* renderQueue{};
+	QueueRegistry* queueRegistry{};
 	mutable MaterialCache materialCache;
 
 	struct {

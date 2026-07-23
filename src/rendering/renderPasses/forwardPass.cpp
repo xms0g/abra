@@ -16,8 +16,8 @@ ForwardPass::ForwardPass() {
 ForwardPass::~ForwardPass() = default;
 
 void ForwardPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
-	mOpaqueObjects = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleOpaque");
-	mTransparentObjects = &ctx.renderQueue->get<std::vector<RenderableObject> >("visibleBlend");
+	mOpaqueObjects = &ctx.queueRegistry->get<RenderableObject>("visibleOpaque");
+	mTransparentObjects = &ctx.queueRegistry->get<RenderableObject>("visibleBlend");
 
 	const int32_t slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot");
 	graph.getResource("directional").bindTexture(slot);

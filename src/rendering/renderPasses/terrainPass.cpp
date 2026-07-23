@@ -20,7 +20,7 @@ TerrainPass::~TerrainPass() = default;
 void TerrainPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
-	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("terrain");
+	mObjects = &ctx.queueRegistry->get<RenderGroup>("terrain");
 
 	constexpr TextureBinding textureBindings[] = {
 		{.name = "heightMap", .slot = 0},

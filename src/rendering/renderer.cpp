@@ -55,7 +55,7 @@ Renderer::Renderer(Registry& registry, const Camera& camera, Window& window) {
 	createFrameBuffers();
 
 	mRenderCtx.renderData = &mRenderData;
-	mRenderCtx.renderQueue = &mRenderQueue;
+	mRenderCtx.queueRegistry = &mQueueRegistry;
 	mRenderCtx.camera.camera = &camera;
 
 	GuiBackend::init(&*window, window.glContext(), "#version 410");
@@ -67,7 +67,7 @@ Renderer::~Renderer() {
 
 void Renderer::configure(const Camera& camera, EventBus& eventBus) {
 	RenderBatcher batcher;
-	batcher.build(mRenderData, mRenderQueue, getSystemEntities());
+	batcher.build(mRenderData, mQueueRegistry, getSystemEntities());
 
 	createRenderPasses(eventBus);
 	createUniformBuffers(camera);
@@ -121,57 +121,55 @@ void Renderer::createUniformBuffers(const Camera& camera) {
 }
 
 void Renderer::createRenderQueues() {
-	mRenderQueue.set("opaqueInstanced", std::vector<RenderInstanceGroup>());
-	mRenderQueue.set("blendInstanced", std::vector<RenderInstanceGroup>());
-	mRenderQueue.set("opaque", std::vector<RenderGroup>());
-	mRenderQueue.set("blend", std::vector<RenderGroup>());
-	mRenderQueue.set("debug", std::vector<RenderGroup>());
-	mRenderQueue.set("shadow", std::vector<RenderGroup>());
-	mRenderQueue.set("terrain", std::vector<RenderGroup>());
-	mRenderQueue.set("skybox", std::vector<RenderGroup>());
-	mRenderQueue.set("deferred", std::vector<RenderGroup>());
-	mRenderQueue.set("visibleDeferred", std::vector<RenderableObject>());
-	mRenderQueue.set("visibleOpaque", std::vector<RenderableObject>());
-	mRenderQueue.set("visibleBlend", std::vector<RenderableObject>());
-	mRenderQueue.set("visibleDebug", std::vector<RenderableObject>());
+	mQueueRegistry.set<RenderInstanceGroup>("opaqueInstanced");
+	mQueueRegistry.set<RenderInstanceGroup>("blendInstanced");
+	mQueueRegistry.set<RenderGroup>("opaque");
+	mQueueRegistry.set<RenderGroup>("blend");
+	mQueueRegistry.set<RenderGroup>("debug");
+	mQueueRegistry.set<RenderGroup>("shadow");
+	mQueueRegistry.set<RenderGroup>("terrain");
+	mQueueRegistry.set<RenderGroup>("skybox");
+	mQueueRegistry.set<RenderGroup>("deferred");
+	mQueueRegistry.set<RenderableObject>("visibleDeferred");
+	mQueueRegistry.set<RenderableObject>("visibleOpaque");
+	mQueueRegistry.set<RenderableObject>("visibleBlend");
+	mQueueRegistry.set<RenderableObject>("visibleDebug");
 }
 
 void Renderer::createRenderPasses(EventBus& eventBus) {
 	mGraph.addPass({
 		.name = "DeferredLightingPass",
-		.isActive = !mRenderQueue.get<std::vector<RenderGroup> >("deferred").empty(),
+		.isActive = !mQueueRegistry.empty("deferred"),
 		.pass = std::make_unique<DeferredLightingPass>()
 	});
 	mGraph.addPass({
 		.name = "DeferredGeometryPass",
-		.isActive = !mRenderQueue.get<std::vector<RenderGroup> >("deferred").empty(),
+		.isActive = !mQueueRegistry.empty("deferred"),
 		.pass = std::make_unique<DeferredGeometryPass>()
 	});
 	mGraph.addPass({
 		.name = "ForwardPass",
-		.isActive = !mRenderQueue.get<std::vector<RenderGroup> >("opaque").empty() ||
-		            !mRenderQueue.get<std::vector<RenderGroup> >("blend").empty(),
+		.isActive = !mQueueRegistry.empty("opaque")|| !mQueueRegistry.empty("blend"),
 		.pass = std::make_unique<ForwardPass>()
 	});
 	mGraph.addPass({
 		.name = "SSAOPass",
-		.isActive = !mRenderQueue.get<std::vector<RenderGroup> >("deferred").empty(),
+		.isActive = !mQueueRegistry.empty("deferred"),
 		.pass = std::make_unique<SSAOPass>()
 	});
 	mGraph.addPass({
 		.name = "InstancedPass",
-		.isActive = !mRenderQueue.get<std::vector<RenderInstanceGroup> >("opaqueInstanced").empty() ||
-		            !mRenderQueue.get<std::vector<RenderInstanceGroup> >("blendInstanced").empty(),
+		.isActive = !mQueueRegistry.empty("opaqueInstanced") || !mQueueRegistry.empty("blendInstanced"),
 		.pass = std::make_unique<InstancedPass>()
 	});
 	mGraph.addPass({
 		.name = "DebugPass",
-		.isActive = !mRenderQueue.get<std::vector<RenderGroup> >("debug").empty(),
+		.isActive = !mQueueRegistry.empty("debug"),
 		.pass = std::make_unique<DebugPass>()
 	});
 	mGraph.addPass({
 		.name = "TerrainPass",
-		.isActive = !mRenderQueue.get<std::vector<RenderGroup> >("terrain").empty(),
+		.isActive = !mQueueRegistry.empty("terrain"),
 		.pass = std::make_unique<TerrainPass>()
 	});
 	mGraph.addPass({
@@ -411,9 +409,9 @@ void Renderer::sortEntities() {
 	};
 
 	// Sort opaque objects front to back
-	sortBatches(mRenderQueue.get<std::vector<RenderGroup> >("deferred"), false);
-	sortBatches(mRenderQueue.get<std::vector<RenderGroup> >("opaque"), false);
-	sortBatches(mRenderQueue.get<std::vector<RenderGroup> >("blend"), true);
+	sortBatches(mQueueRegistry.get<RenderGroup>("deferred"), false);
+	sortBatches(mQueueRegistry.get<RenderGroup>("opaque"), false);
+	sortBatches(mQueueRegistry.get<RenderGroup>("blend"), true);
 
 	// for (auto& [entity, transforms, materials]: renderQueues.blendInstancedGroup) {
 	// 	auto transform = *transforms;

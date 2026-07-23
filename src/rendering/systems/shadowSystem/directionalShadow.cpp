@@ -15,7 +15,7 @@
 
 DirectionalShadow::DirectionalShadow(const RenderContext& ctx) {
 	mDepthShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("depth");
-	mObjects = &ctx.renderQueue->get<std::vector<RenderGroup> >("shadow");
+	mObjects = &ctx.queueRegistry->get<RenderGroup>("shadow");
 
 	mHeight = CONFIG_MANAGER_INSTANCE.get<float>("shadow.directional.height");
 	mRight = CONFIG_MANAGER_INSTANCE.get<float>("shadow.directional.right");

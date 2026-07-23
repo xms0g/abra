@@ -1,7 +1,6 @@
 #pragma once
-#include <memory>
-#include <vector>
 #include "glm/glm.hpp"
+#include "../../renderContext/renderQueue.hpp"
 
 struct RenderGroup;
 struct RenderContext;
@@ -33,5 +32,5 @@ private:
 	float mNear{0.0f};
 	glm::mat4 mLightSpaceMatrix[4]{};
 	const Shader* mDepthShader;
-	std::vector<RenderGroup>* mObjects;
+	RenderQueue<RenderGroup>* mObjects;
 };
