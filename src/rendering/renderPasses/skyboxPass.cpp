@@ -11,6 +11,8 @@
 #include "../renderContext/renderQueue.hpp"
 #include "../texture/texture.h"
 
+SkyboxPass::SkyboxPass() = default;
+
 SkyboxPass::~SkyboxPass() = default;
 
 void SkyboxPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {

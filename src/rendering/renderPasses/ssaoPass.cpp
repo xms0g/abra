@@ -12,6 +12,8 @@
 #include "../../config/configManager.h"
 #include "../../math/random.h"
 
+SSAOPass::SSAOPass() = default;
+
 SSAOPass::~SSAOPass() = default;
 
 void SSAOPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {

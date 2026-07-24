@@ -8,6 +8,8 @@
 #include "../renderContext/renderableObject.hpp"
 #include "../../config/configManager.h"
 
+ForwardPass::ForwardPass() = default;
+
 ForwardPass::~ForwardPass() = default;
 
 void ForwardPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {

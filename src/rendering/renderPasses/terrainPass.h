@@ -7,6 +7,8 @@ struct RenderGroup;
 
 class TerrainPass final: public IRenderPass {
 public:
+	TerrainPass();
+
 	~TerrainPass() override;
 
 	void configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) override;

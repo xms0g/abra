@@ -4,6 +4,8 @@
 #include "../buffers/frameBuffer.h"
 #include "../renderContext/renderContext.hpp"
 
+ResolvePass::ResolvePass() = default;
+
 ResolvePass::~ResolvePass() = default;
 
 void ResolvePass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {

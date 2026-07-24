@@ -8,6 +8,8 @@ class Shader;
 
 class DebugPass final : public IRenderPass {
 public:
+	DebugPass();
+
 	~DebugPass() override;
 
 	void configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) override;

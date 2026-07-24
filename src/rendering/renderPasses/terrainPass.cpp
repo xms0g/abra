@@ -9,6 +9,8 @@
 #include "../renderContext/renderQueue.hpp"
 #include "../../rendering/shader.h"
 
+TerrainPass::TerrainPass() = default;
+
 TerrainPass::~TerrainPass() = default;
 
 void TerrainPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {

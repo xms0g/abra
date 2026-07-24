@@ -10,6 +10,8 @@
 #include "../../math/boundingVolume.h"
 #include "../../core/camera.h"
 
+CullingPass::CullingPass() = default;
+
 CullingPass::~CullingPass() = default;
 
 void CullingPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {

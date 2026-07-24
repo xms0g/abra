@@ -7,6 +7,8 @@ struct RenderGroup;
 
 class SkyboxPass final : public IRenderPass {
 public:
+	SkyboxPass();
+
 	~SkyboxPass() override;
 
 	void configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) override;

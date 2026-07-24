@@ -6,6 +6,8 @@ struct RenderableObject;
 
 class ForwardPass final : public IRenderPass {
 public:
+	ForwardPass();
+
 	~ForwardPass() override;
 
 	void configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) override;

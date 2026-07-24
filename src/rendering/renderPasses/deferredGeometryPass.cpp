@@ -12,6 +12,8 @@
 #include "../../ECS/components/bv.hpp"
 #include "../../config/configManager.h"
 
+DeferredGeometryPass::DeferredGeometryPass() = default;
+
 DeferredGeometryPass::~DeferredGeometryPass() = default;
 
 void DeferredGeometryPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {

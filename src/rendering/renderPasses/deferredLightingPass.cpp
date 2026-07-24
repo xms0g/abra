@@ -8,6 +8,8 @@
 #include "../renderContext/renderContext.hpp"
 #include "../../config/configManager.h"
 
+DeferredLightingPass::DeferredLightingPass() = default;
+
 DeferredLightingPass::~DeferredLightingPass() = default;
 
 void DeferredLightingPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {

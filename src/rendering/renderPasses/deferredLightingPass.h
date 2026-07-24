@@ -12,6 +12,8 @@ class Shader;
 
 class DeferredLightingPass final : public IRenderPass {
 public:
+	DeferredLightingPass();
+
 	~DeferredLightingPass() override;
 
 	void configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) override;
