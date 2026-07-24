@@ -1,4 +1,4 @@
-#include "deferredGeometryPass.h"
+#include "deferredGeometry.h"
 #include "glad/glad.h"
 #include "../shader.h"
 #include "../renderCommand.h"

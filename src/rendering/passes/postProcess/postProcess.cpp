@@ -1,4 +1,4 @@
-#include "postProcessPass.h"
+#include "postProcess.h"
 #include "glad/glad.h"
 #include "grayscale.h"
 #include "sepia.h"

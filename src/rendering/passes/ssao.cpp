@@ -1,4 +1,4 @@
-#include "ssaoPass.h"
+#include "ssao.h"
 #include "glad/glad.h"
 #include "../shader.h"
 #include "../graph.h"

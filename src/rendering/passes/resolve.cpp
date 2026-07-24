@@ -1,4 +1,4 @@
-#include "resolvePass.h"
+#include "resolve.h"
 #include "glad/glad.h"
 #include "../graph.h"
 #include "../buffers/frameBuffer.h"

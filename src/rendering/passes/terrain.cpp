@@ -1,4 +1,4 @@
-#include "terrainPass.h"
+#include "terrain.h"
 #include "glad/glad.h"
 #include "../renderCommand.h"
 #include "../graph.h"

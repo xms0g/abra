@@ -1,4 +1,4 @@
-#include "deferredLightingPass.h"
+#include "deferredLighting.h"
 #include "glad/glad.h"
 #include "../graph.h"
 #include "../shader.h"

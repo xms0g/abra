@@ -1,4 +1,4 @@
-#include "instancedPass.h"
+#include "instanced.h"
 #include "glad/glad.h"
 #include "../renderCommand.h"
 #include "../graph.h"

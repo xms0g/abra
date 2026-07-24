@@ -1,4 +1,4 @@
-#include "skyboxPass.h"
+#include "skybox.h"
 #include "glad/glad.h"
 #include "../shader.h"
 #include "../renderCommand.h"

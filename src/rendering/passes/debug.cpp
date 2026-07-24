@@ -1,4 +1,4 @@
-#include "debugPass.h"
+#include "debug.h"
 #include "../shader.h"
 #include "../renderCommand.h"
 #include "../graph.h"
