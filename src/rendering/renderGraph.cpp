@@ -9,8 +9,8 @@ FrameBuffer& RenderGraph::getResource(const std::string& key) const {
 	return *mResources.at(key);
 }
 
-void RenderGraph::addPass(PassNode&& pass) {
-	mRenderPasses.push_back(std::move(pass));
+void RenderGraph::addPass(const std::string& name, const bool active, std::unique_ptr<BaseRenderPass> pass) {
+	mRenderPasses.push_back({.name = name, .isActive = active, .pass = std::move(pass)});
 }
 
 void RenderGraph::addResources(const std::string& key, std::unique_ptr<FrameBuffer> resource) {

@@ -137,49 +137,49 @@ void Renderer::createRenderQueues() {
 }
 
 void Renderer::createRenderPasses(EventBus& eventBus) {
-	mGraph.addPass({
-		.name = "DeferredLightingPass",
-		.isActive = !mQueueRegistry.empty("deferred"),
-		.pass = std::make_unique<DeferredLightingPass>()
-	});
-	mGraph.addPass({
-		.name = "DeferredGeometryPass",
-		.isActive = !mQueueRegistry.empty("deferred"),
-		.pass = std::make_unique<DeferredGeometryPass>()
-	});
-	mGraph.addPass({
-		.name = "ForwardPass",
-		.isActive = !mQueueRegistry.empty("opaque")|| !mQueueRegistry.empty("blend"),
-		.pass = std::make_unique<ForwardPass>()
-	});
-	mGraph.addPass({
-		.name = "SSAOPass",
-		.isActive = !mQueueRegistry.empty("deferred"),
-		.pass = std::make_unique<SSAOPass>()
-	});
-	mGraph.addPass({
-		.name = "InstancedPass",
-		.isActive = !mQueueRegistry.empty("opaqueInstanced") || !mQueueRegistry.empty("blendInstanced"),
-		.pass = std::make_unique<InstancedPass>()
-	});
-	mGraph.addPass({
-		.name = "DebugPass",
-		.isActive = !mQueueRegistry.empty("debug"),
-		.pass = std::make_unique<DebugPass>()
-	});
-	mGraph.addPass({
-		.name = "TerrainPass",
-		.isActive = !mQueueRegistry.empty("terrain"),
-		.pass = std::make_unique<TerrainPass>()
-	});
-	mGraph.addPass({
-		.name = "ResolvePass",
-		.isActive = CONFIG_MANAGER_INSTANCE.get<bool>("msaa.enabled"),
-		.pass = std::make_unique<ResolvePass>()
-	});
-	mGraph.addPass({.name = "SkyboxPass", .pass = std::make_unique<SkyboxPass>()});
-	mGraph.addPass({.name = "CullingPass", .pass = std::make_unique<CullingPass>()});
-	mGraph.addPass({.name = "PostProcessPass", .pass = std::make_unique<PostProcessPass>()});
+	mGraph.addPass(
+		"DeferredLightingPass",
+		!mQueueRegistry.empty("deferred"),
+		std::make_unique<DeferredLightingPass>()
+	);
+	mGraph.addPass(
+		"DeferredGeometryPass",
+		!mQueueRegistry.empty("deferred"),
+		std::make_unique<DeferredGeometryPass>()
+	);
+	mGraph.addPass(
+		"ForwardPass",
+		!mQueueRegistry.empty("opaque") || !mQueueRegistry.empty("blend"),
+		std::make_unique<ForwardPass>()
+	);
+	mGraph.addPass(
+		"SSAOPass",
+		!mQueueRegistry.empty("deferred"),
+		std::make_unique<SSAOPass>()
+	);
+	mGraph.addPass(
+		"InstancedPass",
+		!mQueueRegistry.empty("opaqueInstanced") || !mQueueRegistry.empty("blendInstanced"),
+		std::make_unique<InstancedPass>()
+	);
+	mGraph.addPass(
+		"DebugPass",
+		!mQueueRegistry.empty("debug"),
+		std::make_unique<DebugPass>()
+	);
+	mGraph.addPass(
+		"TerrainPass",
+		!mQueueRegistry.empty("terrain"),
+		std::make_unique<TerrainPass>()
+	);
+	mGraph.addPass(
+		"ResolvePass",
+		CONFIG_MANAGER_INSTANCE.get<bool>("msaa.enabled"),
+		std::make_unique<ResolvePass>()
+	);
+	mGraph.addPass("SkyboxPass", true, std::make_unique<SkyboxPass>());
+	mGraph.addPass("CullingPass", true, std::make_unique<CullingPass>());
+	mGraph.addPass("PostProcessPass", true, std::make_unique<PostProcessPass>());
 	mGraph.compile();
 	mGraph.configure(mRenderCtx, eventBus);
 }
