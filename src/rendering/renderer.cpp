@@ -212,7 +212,7 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 }
 
 void Renderer::createFrameBuffers() {
-	mGraph.addResources(
+	mGraph.addResource(
 		"sceneBuffer", std::make_unique<FrameBuffer>(
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height")));
@@ -223,7 +223,7 @@ void Renderer::createFrameBuffers() {
 		glEnable(GL_MULTISAMPLE);
 		const int32_t sampleCount = CONFIG_MANAGER_INSTANCE.get<int32_t>("msaa.sample_count");
 
-		mGraph.addResources(
+		mGraph.addResource(
 			"intermediateBuffer", std::make_unique<FrameBuffer>(
 				CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
 				CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height")));
@@ -265,7 +265,7 @@ void Renderer::createFrameBuffers() {
 	sceneBuffer.unbind();
 
 	// GBuffer
-	mGraph.addResources(
+	mGraph.addResource(
 		"gBuffer", std::make_unique<FrameBuffer>(
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height")));
@@ -288,7 +288,7 @@ void Renderer::createFrameBuffers() {
 			.checkStatus();
 
 	// SSAO
-	mGraph.addResources(
+	mGraph.addResource(
 		"ssao", std::make_unique<FrameBuffer>(
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"))
@@ -297,7 +297,7 @@ void Renderer::createFrameBuffers() {
 	mGraph.getResource("ssao").withTexture(GL_RED).checkStatus();
 	mGraph.getResource("ssao").unbind();
 
-	mGraph.addResources(
+	mGraph.addResource(
 		"ssaoBlur", std::make_unique<FrameBuffer>(
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"))
@@ -307,7 +307,7 @@ void Renderer::createFrameBuffers() {
 	mGraph.getResource("ssaoBlur").unbind();
 
 	// Shadow Maps
-	mGraph.addResources(
+	mGraph.addResource(
 		"directional", std::make_unique<FrameBuffer>(
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_width"),
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_height")));
@@ -315,7 +315,7 @@ void Renderer::createFrameBuffers() {
 	mGraph.getResource("directional").withTextureDepth(GL_DEPTH_COMPONENT24, true).checkStatus();
 	mGraph.getResource("directional").unbind();
 
-	mGraph.addResources(
+	mGraph.addResource(
 		"point", std::make_unique<FrameBuffer>(
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_width"),
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_height")));
@@ -325,7 +325,7 @@ void Renderer::createFrameBuffers() {
 			.checkStatus();
 	mGraph.getResource("point").unbind();
 
-	mGraph.addResources(
+	mGraph.addResource(
 		"spot", std::make_unique<FrameBuffer>(
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_width"),
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_height")));
@@ -336,7 +336,7 @@ void Renderer::createFrameBuffers() {
 
 	// PostProcess Render Targets
 	auto addPPRenderTarget = [&](const std::string& name) {
-		mGraph.addResources(
+		mGraph.addResource(
 			name, std::make_unique<FrameBuffer>(
 				CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
 				CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height")));

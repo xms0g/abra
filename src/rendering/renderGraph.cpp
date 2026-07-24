@@ -24,7 +24,7 @@ void RenderGraph::addPass(
 	});
 }
 
-void RenderGraph::addResources(const std::string& key, std::unique_ptr<FrameBuffer> resource) {
+void RenderGraph::addResource(const std::string& key, std::unique_ptr<FrameBuffer> resource) {
 	mResources.emplace(key, std::move(resource));
 }
 

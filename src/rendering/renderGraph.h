@@ -20,7 +20,7 @@ public:
 		const std::vector<std::string>& inputs,
 		const std::vector<std::string>& outputs);
 
-	void addResources(const std::string& key, std::unique_ptr<FrameBuffer> resource);
+	void addResource(const std::string& key, std::unique_ptr<FrameBuffer> resource);
 
 	void compile();
 
