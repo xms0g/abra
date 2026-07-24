@@ -4,13 +4,7 @@
 #include "../material/material.hpp"
 #include "../../resource/resourceManager.h"
 
-namespace math {
-struct Frustum;
-}
-
 class QueueRegistry;
-class FrameBuffer;
-class UniformBuffer;
 class Camera;
 struct RenderData;
 struct DirectionalLightComponent;
