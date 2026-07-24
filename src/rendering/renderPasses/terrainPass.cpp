@@ -33,7 +33,7 @@ void TerrainPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	const uint32_t meshIdx = matBatch.meshIndices.front();
 	const uint32_t vao = ctx.renderData->mesh.vaos[meshIdx];
 
-	mShader->activate();
+	mShader->bind();
 	RenderCommand::setupTransform(entityID, ctx, *mShader);
 	RenderCommand::setupMaterial(
 		entityID,

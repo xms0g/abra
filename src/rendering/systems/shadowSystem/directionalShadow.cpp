@@ -39,7 +39,7 @@ void DirectionalShadow::render(const RenderContext& ctx, const RenderGraph& grap
 
 	mLightSpaceMatrix = lightProjection * lightView;
 
-	mDepthShader->activate();
+	mDepthShader->bind();
 	mDepthShader->setMat4("lightSpaceMatrix", mLightSpaceMatrix);
 
 	// render scene from light's point of view

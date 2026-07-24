@@ -42,7 +42,7 @@ void PerspectiveShadow::render(
 	const glm::mat4 lightView = glm::lookAt(position, position + direction, glm::vec3(0.0, 1.0, 0.0));
 	mLightSpaceMatrix[layer] = lightProjection * lightView;
 
-	mDepthShader->activate();
+	mDepthShader->bind();
 	mDepthShader->setMat4("lightSpaceMatrix", mLightSpaceMatrix[layer]);
 
 	for (const auto& [entityID, matBatch]: *mObjects) {

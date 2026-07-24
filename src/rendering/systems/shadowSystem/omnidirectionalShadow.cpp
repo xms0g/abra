@@ -38,7 +38,7 @@ void OmnidirectionalShadow::render(
 		mShadowTransforms.push_back(mShadowProj * glm::lookAt(position, position + dir, up));
 	}
 
-	mDepthShader->activate();
+	mDepthShader->bind();
 	mDepthShader->setMat4Array("shadowMatrices", mShadowTransforms.data(), mShadowTransforms.size());
 	mDepthShader->setFloat("omniFarPlane", mFar);
 	mDepthShader->setVec3("lightPos", position);

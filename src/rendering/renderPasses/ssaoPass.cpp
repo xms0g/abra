@@ -93,7 +93,7 @@ void SSAOPass::ssao(const RenderGraph& graph) const {
 	graph.getResource("ssao").bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	mShader->activate();
+	mShader->bind();
 	RenderCommand::drawQuad(mQuad->vao());
 }
 
@@ -101,7 +101,7 @@ void SSAOPass::blur(const RenderGraph& graph) const {
 	graph.getResource("ssaoBlur").bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	mBlurShader->activate();
+	mBlurShader->bind();
 	graph.getResource("ssao").bindTexture(0);
 
 	RenderCommand::drawQuad(mQuad->vao());

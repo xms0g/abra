@@ -387,7 +387,7 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 	const Texture hdrTexture = Texture::loadHDR(path);
 
 	// convert HDR equirectangular environment map to cubemap equivalent
-	equirectangularToCube->activate();
+	equirectangularToCube->bind();
 	equirectangularToCube->setInt("equirectangularMap", 0);
 	equirectangularToCube->setMat4("projection", mCaptureProjection);
 
@@ -430,7 +430,7 @@ void ResourceManager::createIrradianceMap() {
 
 	const auto irradianceConv = get<Shader>("irradianceConv");
 	// solve diffuse integral by convolution to create an irradiance (cube)map.
-	irradianceConv->activate();
+	irradianceConv->bind();
 	irradianceConv->setInt("environmentMap", 0);
 	irradianceConv->setMat4("projection", mCaptureProjection);
 
@@ -469,7 +469,7 @@ void ResourceManager::createPrefilterMap() {
 
 	const auto prefilter = get<Shader>("prefilter");
 	// run a quasi monte-carlo simulation on the environment lighting to create a prefilter (cube)map.
-	prefilter->activate();
+	prefilter->bind();
 	prefilter->setInt("environmentMap", 0);
 	prefilter->setMat4("projection", mCaptureProjection);
 	prefilter->setFloat("resolution",
@@ -514,7 +514,7 @@ void ResourceManager::createBrdfLUT() {
 	const Model::SingleQuad quad;
 	// generate a 2D LUT from the BRDF equations used.
 	const auto brdfLUTShader = get<Shader>("brdfLUT");
-	brdfLUTShader->activate();
+	brdfLUTShader->bind();
 
 	brdfLUTBuffer->bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -34,7 +34,7 @@ void DebugPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 			continue;
 
 		const auto& dbgShader = mDebugShaders[mode];
-		dbgShader->activate();
+		dbgShader->bind();
 
 		RenderCommand::setupTransform(object.entityID, ctx, *dbgShader);
 

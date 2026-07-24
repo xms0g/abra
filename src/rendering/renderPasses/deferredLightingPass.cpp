@@ -59,7 +59,7 @@ void DeferredLightingPass::execute(const RenderContext& ctx, const RenderGraph& 
 	                  GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
 	sceneBuffer.bind();
-	mShader->activate();
+	mShader->bind();
 
 	RenderCommand::drawQuad(mQuad->vao());
 }

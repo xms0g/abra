@@ -22,7 +22,7 @@ uint32_t FXAA::render(const uint32_t vao, const uint32_t sceneTexture, FrameBuff
 	renderTarget->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	mShader->activate();
+	mShader->bind();
 	mShader->setVec2("resolution", glm::vec2(renderTarget->width(), renderTarget->height()));
 
 	const uint32_t textures[] = {sceneTexture};

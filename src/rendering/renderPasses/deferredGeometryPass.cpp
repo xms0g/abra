@@ -39,7 +39,7 @@ void DeferredGeometryPass::execute(const RenderContext& ctx, const RenderGraph& 
 	graph.getResource("gBuffer").bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	mShader->activate();
+	mShader->bind();
 
 	for (const auto& [entityID, materialIdx, textureOffset, textureCount, meshIdx, shader]: *mObjects) {
 		RenderCommand::setupMaterial(entityID, materialIdx, textureOffset, textureCount, ctx, *mShader);

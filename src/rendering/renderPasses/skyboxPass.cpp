@@ -32,7 +32,7 @@ void SkyboxPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	const uint32_t vao = ctx.renderData->mesh.vaos[meshIdx];
 
 	graph.getResource("sceneBuffer").bind();
-	mShader->activate();
+	mShader->bind();
 	mShader->setMat4("skyView", ctx.camera.skyView);
 
 	RenderCommand::setupMaterial(

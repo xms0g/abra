@@ -51,7 +51,7 @@ uint32_t Bloom::brightFilterPass(const uint32_t vao, const uint32_t sceneTexture
 	mRenderTargets[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	mBrightFilter->activate();
+	mBrightFilter->bind();
 
 	const uint32_t textures[] = {sceneTexture};
 	RenderCommand::drawQuad(vao, textures);
@@ -70,7 +70,7 @@ uint32_t Bloom::blurPass(const uint32_t vao, const uint32_t sceneTexture, bool& 
 		mRenderTargets[toggle]->bind();
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		mBlur->activate();
+		mBlur->bind();
 		mBlur->setBool("horizontal", horizontal);
 		horizontal = !horizontal;
 
@@ -90,7 +90,7 @@ uint32_t Bloom::combinePass(
 	const uint32_t blurTexture,
 	const bool& toggle) const {
 	mRenderTargets[toggle]->bind();
-	mCombine->activate();
+	mCombine->bind();
 
 	const uint32_t textures[] = {sceneTexture, blurTexture};
 	RenderCommand::drawQuad(vao, textures);

@@ -23,7 +23,7 @@ uint32_t Kernel::render(const uint32_t vao, const uint32_t sceneTexture, FrameBu
 	renderTarget->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	mShader->activate();
+	mShader->bind();
 	mShader->setFloatArray("kernel", mKernel, 9);
 
 	const uint32_t textures[] = {sceneTexture};

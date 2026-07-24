@@ -57,7 +57,7 @@ void PostProcessPass::execute(const RenderContext& ctx, const RenderGraph& graph
 		toggle = !toggle;
 	}
 
-	mQuad->shader().activate();
+	mQuad->shader().bind();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	const uint32_t textures[] = {inputTex};

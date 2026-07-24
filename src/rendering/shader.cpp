@@ -107,7 +107,7 @@ Shader& Shader::operator=(Shader&& other) noexcept {
 	return *this;
 }
 
-void Shader::activate() const {
+void Shader::bind() const {
 	glUseProgram(mID);
 }
 

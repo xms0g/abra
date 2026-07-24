@@ -22,7 +22,7 @@ uint32_t CA::render(const uint32_t vao, const uint32_t sceneTexture, FrameBuffer
 	renderTarget->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	mShader->activate();
+	mShader->bind();
 	mShader->setFloat("intensity", mIntensity);
 
 	const uint32_t textures[] = {sceneTexture};

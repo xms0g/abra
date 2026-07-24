@@ -16,7 +16,7 @@ void RenderCommand::forward(const RenderContext& ctx, const std::vector<Renderab
 	for (const auto& [entityID, materialIdx, textureOffset, textureCount, meshIdx, shader]: objects) {
 		if (lastShader != shader) {
 			lastShader = shader;
-			lastShader->activate();
+			lastShader->bind();
 		}
 
 		setupMaterial(entityID, materialIdx, textureOffset, textureCount, ctx, *lastShader);
@@ -38,7 +38,7 @@ void RenderCommand::instanced(const RenderContext& ctx, const std::vector<Render
 
 		if (lastShader != obj.matBatch.shader) {
 			lastShader = obj.matBatch.shader;
-			lastShader->activate();
+			lastShader->bind();
 		}
 
 		setupMaterial(
@@ -128,7 +128,7 @@ void RenderCommand::setupMaterial(
 }
 
 void RenderCommand::setTextureUnits(std::span<const TextureBinding> textures, const Shader& shader) {
-	shader.activate();
+	shader.bind();
 
 	for (const auto& [name, slot]: textures) {
 		shader.setInt(name, slot);

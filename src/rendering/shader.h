@@ -48,7 +48,7 @@ public:
 	uint32_t id() const { return mID; }
 
 	// use/activate the shader
-	void activate() const;
+	void bind() const;
 
 	// utility uniform functions
 	void setBool(const char* name, bool value) const;
