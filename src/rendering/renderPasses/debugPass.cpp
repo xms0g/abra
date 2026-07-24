@@ -22,6 +22,12 @@ void DebugPass::configure(const RenderContext& ctx, const RenderGraph& graph, Ev
 	};
 }
 
+DebugPass::~DebugPass() = default;
+
+void DebugPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
+	mObjects = &ctx.queueRegistry->get<RenderableObject>("visibleDebug");
+}
+
 void DebugPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 	graph.getResource("sceneBuffer").bind();
 
