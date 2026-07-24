@@ -81,10 +81,6 @@ void Renderer::render() {
 	sortEntities();
 
 	mRenderCtx.materialCache.reset();
-
-	mGraph.getResource("sceneBuffer").bind();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	mGraph.execute(mRenderCtx);
 }
 
