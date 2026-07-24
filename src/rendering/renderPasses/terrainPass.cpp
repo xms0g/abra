@@ -10,8 +10,6 @@
 #include "../../rendering/shader.h"
 
 TerrainPass::TerrainPass() {
-	mInputs = {"sceneBuffer"};
-	mOutputs = {"sceneBuffer"};
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("terrain");
 }
 

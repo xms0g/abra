@@ -12,8 +12,6 @@
 #include "../texture/texture.h"
 
 SkyboxPass::SkyboxPass() {
-	mInputs = {"sceneBuffer"};
-	mOutputs = {"sceneBuffer"};
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("skybox");
 }
 

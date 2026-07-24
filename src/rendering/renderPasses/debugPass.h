@@ -1,12 +1,12 @@
 #pragma once
 #include <array>
-#include "baseRenderPass.hpp"
+#include "IRenderPass.hpp"
 #include "../renderContext/renderQueue.hpp"
 
 struct RenderableObject;
 class Shader;
 
-class DebugPass final : public BaseRenderPass {
+class DebugPass final : public IRenderPass {
 public:
 	DebugPass();
 

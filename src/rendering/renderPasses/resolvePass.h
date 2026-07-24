@@ -1,7 +1,7 @@
 #pragma once
-#include "baseRenderPass.hpp"
+#include "IRenderPass.hpp"
 
-class ResolvePass final : public BaseRenderPass {
+class ResolvePass final : public IRenderPass {
 public:
 	ResolvePass();
 

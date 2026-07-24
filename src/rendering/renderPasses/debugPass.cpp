@@ -11,9 +11,6 @@
 #include "../../ECS/components/debug.hpp"
 
 DebugPass::DebugPass() {
-	mInputs = {"sceneBuffer", "visibleDebug"};
-	mOutputs = {"sceneBuffer"};
-
 	mDebugShaders = {
 		nullptr,
 		RESOURCE_MANAGER_INSTANCE.get<Shader>("debugNormal"),

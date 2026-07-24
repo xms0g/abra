@@ -13,8 +13,6 @@
 #include "../../config/configManager.h"
 
 DeferredGeometryPass::DeferredGeometryPass() {
-	mInputs = {"visibleDeferred"};
-	mOutputs = {"gBuffer"};
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("gBuffer");
 }
 

@@ -9,8 +9,6 @@
 #include "../../config/configManager.h"
 
 ForwardPass::ForwardPass() {
-	mInputs = {"sceneBuffer", "visibleOpaque", "visibleBlend"};
-	mOutputs = {"sceneBuffer"};
 }
 
 ForwardPass::~ForwardPass() = default;

@@ -9,8 +9,6 @@
 #include "../../config/configManager.h"
 
 DeferredLightingPass::DeferredLightingPass() {
-	mInputs = {"gBuffer", "ssaoBlur"};
-	mOutputs = {"sceneBuffer"};
 	mQuad = std::make_unique<Model::SingleQuad>();
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("deferredLighting");
 }

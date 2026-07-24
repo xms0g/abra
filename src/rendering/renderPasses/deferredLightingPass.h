@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include "baseRenderPass.hpp"
+#include "IRenderPass.hpp"
 
 namespace Model {
 class SingleQuad;
@@ -10,7 +10,7 @@ class CubemapBuffer;
 class FrameBuffer;
 class Shader;
 
-class DeferredLightingPass final : public BaseRenderPass {
+class DeferredLightingPass final : public IRenderPass {
 public:
 	explicit DeferredLightingPass();
 

@@ -1,11 +1,11 @@
 #pragma once
-#include "baseRenderPass.hpp"
+#include "IRenderPass.hpp"
 #include "../renderContext/renderQueue.hpp"
 
 class Shader;
 struct RenderGroup;
 
-class SkyboxPass final : public BaseRenderPass {
+class SkyboxPass final : public IRenderPass {
 public:
 	explicit SkyboxPass();
 

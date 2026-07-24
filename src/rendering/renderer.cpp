@@ -140,46 +140,77 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 	mGraph.addPass(
 		"DeferredLightingPass",
 		!mQueueRegistry.empty("deferred"),
-		std::make_unique<DeferredLightingPass>()
+		std::make_unique<DeferredLightingPass>(),
+		{"gBuffer", "ssaoBlur"},
+		{"sceneBuffer"}
 	);
 	mGraph.addPass(
 		"DeferredGeometryPass",
 		!mQueueRegistry.empty("deferred"),
-		std::make_unique<DeferredGeometryPass>()
+		std::make_unique<DeferredGeometryPass>(),
+		{"visibleDeferred"},
+		{"gBuffer"}
 	);
 	mGraph.addPass(
 		"ForwardPass",
 		!mQueueRegistry.empty("opaque") || !mQueueRegistry.empty("blend"),
-		std::make_unique<ForwardPass>()
+		std::make_unique<ForwardPass>(),
+		{"sceneBuffer", "visibleOpaque", "visibleBlend"},
+		{"sceneBuffer"}
 	);
 	mGraph.addPass(
 		"SSAOPass",
 		!mQueueRegistry.empty("deferred"),
-		std::make_unique<SSAOPass>()
+		std::make_unique<SSAOPass>(),
+		{"gBuffer"},
+		{"ssao", "ssaoBlur"}
 	);
 	mGraph.addPass(
 		"InstancedPass",
 		!mQueueRegistry.empty("opaqueInstanced") || !mQueueRegistry.empty("blendInstanced"),
-		std::make_unique<InstancedPass>()
+		std::make_unique<InstancedPass>(),
+		{"sceneBuffer"},
+		{"sceneBuffer"}
 	);
 	mGraph.addPass(
 		"DebugPass",
 		!mQueueRegistry.empty("debug"),
-		std::make_unique<DebugPass>()
+		std::make_unique<DebugPass>(),
+		{"sceneBuffer", "visibleDebug"},
+		{"sceneBuffer"}
 	);
 	mGraph.addPass(
 		"TerrainPass",
 		!mQueueRegistry.empty("terrain"),
-		std::make_unique<TerrainPass>()
+		std::make_unique<TerrainPass>(),
+		{"sceneBuffer"},
+		{"sceneBuffer"}
 	);
 	mGraph.addPass(
 		"ResolvePass",
 		CONFIG_MANAGER_INSTANCE.get<bool>("msaa.enabled"),
-		std::make_unique<ResolvePass>()
+		std::make_unique<ResolvePass>(),
+		{"sceneBuffer"},
+		{"intermediateBuffer"}
 	);
-	mGraph.addPass("SkyboxPass", true, std::make_unique<SkyboxPass>());
-	mGraph.addPass("CullingPass", true, std::make_unique<CullingPass>());
-	mGraph.addPass("PostProcessPass", true, std::make_unique<PostProcessPass>());
+	mGraph.addPass(
+		"SkyboxPass",
+		true,
+		std::make_unique<SkyboxPass>(),
+		{"sceneBuffer"},
+		{"sceneBuffer"});
+	mGraph.addPass(
+		"CullingPass",
+		true,
+		std::make_unique<CullingPass>(),
+		{},
+		{"visibleOpaque", "visibleBlend", "visibleDeferred", "visibleDebug"});
+	mGraph.addPass(
+		"PostProcessPass",
+		true,
+		std::make_unique<PostProcessPass>(),
+		{"sceneBuffer"},
+		{"frameBuffer"});
 	mGraph.compile();
 	mGraph.configure(mRenderCtx, eventBus);
 }

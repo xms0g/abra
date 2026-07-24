@@ -1,12 +1,12 @@
 #pragma once
-#include "baseRenderPass.hpp"
+#include "IRenderPass.hpp"
 #include "../renderContext/renderQueue.hpp"
 
 struct RenderableObject;
 class Shader;
 class FrameBuffer;
 
-class DeferredGeometryPass final : public BaseRenderPass {
+class DeferredGeometryPass final : public IRenderPass {
 public:
 	DeferredGeometryPass();
 

@@ -13,8 +13,6 @@
 #include "../../math/random.h"
 
 SSAOPass::SSAOPass() {
-	mInputs  = {"gBuffer"};
-	mOutputs = {"ssao", "ssaoBlur"};
 	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("ssao");
 	mBlurShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("ssaoBlur");
 }

@@ -2,7 +2,7 @@
 #include <memory>
 #include <vector>
 #include "basePostEffect.hpp"
-#include "../baseRenderPass.hpp"
+#include "../IRenderPass.hpp"
 
 struct GuiPostProcessEvent;
 class EventBus;
@@ -14,7 +14,7 @@ class Quad;
 
 class Shader;
 
-class PostProcessPass final : public BaseRenderPass {
+class PostProcessPass final : public IRenderPass {
 public:
 	PostProcessPass();
 
