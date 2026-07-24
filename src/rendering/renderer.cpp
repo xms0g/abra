@@ -56,7 +56,7 @@ Renderer::Renderer(Registry& registry, const Camera& camera, Window& window) {
 
 	mRenderCtx.renderData = &mRenderData;
 	mRenderCtx.queueRegistry = &mQueueRegistry;
-	mRenderCtx.camera.camera = &camera;
+	mRenderCtx.camera = &camera;
 
 	GuiBackend::init(&*window, window.glContext(), "#version 410");
 }
@@ -111,8 +111,8 @@ void Renderer::createUniformBuffers(const Camera& camera) {
 	const glm::mat4 invProjectionMat = glm::inverse(projectionMat);
 
 	mCameraUBO.bind();
-	mCameraUBO.setData(glm::value_ptr(projectionMat), sizeof(glm::mat4), sizeof(glm::mat4) + sizeof(glm::vec4));
-	mCameraUBO.setData(glm::value_ptr(invProjectionMat), sizeof(glm::mat4), 2 * sizeof(glm::mat4) + sizeof(glm::vec4));
+	mCameraUBO.setData(glm::value_ptr(projectionMat), sizeof(glm::mat4), 2 * sizeof(glm::mat4) + sizeof(glm::vec4));
+	mCameraUBO.setData(glm::value_ptr(invProjectionMat), sizeof(glm::mat4), 3 * sizeof(glm::mat4) + sizeof(glm::vec4));
 	mCameraUBO.unbind();
 }
 
@@ -397,17 +397,17 @@ void Renderer::configureShaders() {
 	}
 }
 
-void Renderer::refreshCameraData() {
-	mRenderCtx.camera.skyView = glm::mat4(glm::mat3(mRenderCtx.camera.camera->viewMatrix()));
-
+void Renderer::refreshCameraData() const {
 	struct alignas(16) PackedView {
 		glm::mat4 view;
+		glm::mat4 skyView;
 		glm::vec4 viewPos;
 	};
 
 	const PackedView packed = {
-		.view = mRenderCtx.camera.camera->viewMatrix(),
-		.viewPos = glm::vec4(mRenderCtx.camera.camera->position(), 1.0)
+		.view = mRenderCtx.camera->viewMatrix(),
+		.skyView = glm::mat4(glm::mat3(mRenderCtx.camera->viewMatrix())),
+		.viewPos = glm::vec4(mRenderCtx.camera->position(), 1.0)
 	};
 
 	mCameraUBO.bind();
@@ -415,7 +415,7 @@ void Renderer::refreshCameraData() {
 }
 
 void Renderer::sortEntities() {
-	const glm::vec3& camPos = mRenderCtx.camera.camera->position();
+	const glm::vec3& camPos = mRenderCtx.camera->position();
 
 	auto sortBatches = [&](auto& batch, bool transparent) -> void {
 		std::sort(

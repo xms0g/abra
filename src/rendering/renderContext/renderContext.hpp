@@ -22,10 +22,7 @@ struct RenderContext {
 		const std::vector<SpotLightComponent*>* spotLights;
 	} light{};
 
-	struct {
-		const Camera* camera;
-		glm::mat4 skyView;
-	} camera{};
+	const Camera* camera{};
 
 	RenderContext() = default;
 

@@ -3,8 +3,6 @@ layout (location = 0) in vec3 aPos;
 
 #include "ub/camera.glsl"
 
-uniform mat4 skyView;
-
 out VS_OUT
 {
     vec3 TexCoord;

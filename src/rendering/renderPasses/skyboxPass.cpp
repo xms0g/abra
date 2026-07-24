@@ -33,7 +33,6 @@ void SkyboxPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
 
 	graph.getResource("sceneBuffer").bind();
 	mShader->bind();
-	mShader->setMat4("skyView", ctx.camera.skyView);
 
 	RenderCommand::setupMaterial(
 		entityID,

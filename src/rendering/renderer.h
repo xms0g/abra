@@ -45,7 +45,7 @@ private:
 
 	void configureShaders();
 
-	void refreshCameraData();
+	void refreshCameraData() const;
 
 	void sortEntities();
 

@@ -26,7 +26,7 @@ void CullingPass::configure(const RenderContext& ctx, const RenderGraph& graph, 
 }
 
 void CullingPass::execute(const RenderContext& ctx, const RenderGraph& graph) {
-	const auto frustum = ctx.camera.camera->generateFrustum();
+	const auto frustum = ctx.camera->generateFrustum();
 
 	cullScene(ctx, frustum, *mOpaqueGroups, *mVisibleOpaque);
 	cullScene(ctx, frustum, *mDeferredGroups, *mVisibleDeferred);
