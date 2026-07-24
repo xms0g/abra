@@ -6,14 +6,19 @@
 class EventBus;
 class FrameBuffer;
 struct RenderContext;
-class BaseRenderPass;
+class IRenderPass;
 
 class RenderGraph {
 public:
 	[[nodiscard]]
 	FrameBuffer& getResource(const std::string& key) const;
 
-	void addPass(const std::string& name, bool active, std::unique_ptr<BaseRenderPass> pass);
+	void addPass(
+		const std::string& name,
+		bool active,
+		std::unique_ptr<IRenderPass> pass,
+		const std::vector<std::string>& inputs,
+		const std::vector<std::string>& outputs);
 
 	void addResources(const std::string& key, std::unique_ptr<FrameBuffer> resource);
 
@@ -27,10 +32,12 @@ private:
 	struct PassNode {
 		std::string name;
 		bool isActive{true};
-		std::unique_ptr<BaseRenderPass> pass;
+		std::unique_ptr<IRenderPass> pass;
+		std::vector<std::string> inputs;
+		std::vector<std::string> outputs;
 	};
 
-	std::unordered_map<std::string, std::unique_ptr<FrameBuffer>> mResources;
+	std::unordered_map<std::string, std::unique_ptr<FrameBuffer> > mResources;
 	std::vector<PassNode> mRenderPasses;
 	std::vector<size_t> mExecutionOrder;
 };

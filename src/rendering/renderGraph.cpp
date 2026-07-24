@@ -2,15 +2,26 @@
 #include <numeric>
 #include <queue>
 #include "buffers/frameBuffer.h"
-#include "renderPasses/baseRenderPass.hpp"
+#include "renderPasses/IRenderPass.hpp"
 #include "../event/eventBus.hpp"
 
 FrameBuffer& RenderGraph::getResource(const std::string& key) const {
 	return *mResources.at(key);
 }
 
-void RenderGraph::addPass(const std::string& name, const bool active, std::unique_ptr<BaseRenderPass> pass) {
-	mRenderPasses.push_back({.name = name, .isActive = active, .pass = std::move(pass)});
+void RenderGraph::addPass(
+	const std::string& name,
+	const bool active,
+	std::unique_ptr<IRenderPass> pass,
+	const std::vector<std::string>& inputs,
+	const std::vector<std::string>& outputs) {
+	mRenderPasses.push_back({
+		.name = name,
+		.isActive = active,
+		.pass = std::move(pass),
+		.inputs = inputs,
+		.outputs = outputs
+	});
 }
 
 void RenderGraph::addResources(const std::string& key, std::unique_ptr<FrameBuffer> resource) {
@@ -28,13 +39,13 @@ void RenderGraph::compile() {
 	mExecutionOrder.resize(mRenderPasses.size());
 
 	for (size_t i = 0; i < mRenderPasses.size(); ++i) {
-		for (auto& input: mRenderPasses[i].pass->inputs()) {
+		for (auto& input: mRenderPasses[i].inputs) {
 			if (latestVersion.contains(input)) {
 				input = latestVersion[input];
 			}
 		}
 
-		for (auto& output: mRenderPasses[i].pass->outputs()) {
+		for (auto& output: mRenderPasses[i].outputs) {
 			if (producer.contains(output)) {
 				std::string versioned;
 				versioned = output + "#v" + std::to_string(i);
@@ -48,7 +59,7 @@ void RenderGraph::compile() {
 	}
 
 	for (size_t i = 0; i < mRenderPasses.size(); ++i) {
-		for (auto& input: mRenderPasses[i].pass->inputs()) {
+		for (auto& input: mRenderPasses[i].inputs) {
 			if (!producer.contains(input))
 				continue;
 

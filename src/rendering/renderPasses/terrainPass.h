@@ -1,14 +1,12 @@
 #pragma once
-#include "baseRenderPass.hpp"
+#include "IRenderPass.hpp"
 #include "../renderContext/renderQueue.hpp"
 
 class Shader;
 struct RenderGroup;
 
-class TerrainPass final: public BaseRenderPass {
+class TerrainPass final: public IRenderPass {
 public:
-	TerrainPass();
-
 	~TerrainPass() override;
 
 	void configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) override;

@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <memory>
-#include "baseRenderPass.hpp"
+#include "IRenderPass.hpp"
 #include "../buffers/uniformBuffer.h"
 #include "../texture/texture.h"
 
@@ -12,10 +12,8 @@ namespace Model {
 class SingleQuad;
 }
 
-class SSAOPass final : public BaseRenderPass {
+class SSAOPass final : public IRenderPass {
 public:
-	SSAOPass();
-
 	~SSAOPass() override;
 
 	void configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) override;

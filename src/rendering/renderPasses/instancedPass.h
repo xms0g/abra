@@ -2,13 +2,13 @@
 #include <memory>
 #include <vector>
 #include "glm/glm.hpp"
-#include "baseRenderPass.hpp"
+#include "IRenderPass.hpp"
 #include "../renderContext/renderQueue.hpp"
 
 class VertexBuffer;
 struct RenderInstanceGroup;
 
-class InstancedPass final : public BaseRenderPass {
+class InstancedPass final : public IRenderPass {
 public:
 	InstancedPass();
 

@@ -11,15 +11,10 @@
 #include "../renderContext/renderQueue.hpp"
 #include "../texture/texture.h"
 
-SkyboxPass::SkyboxPass() {
-	mInputs = {"sceneBuffer"};
-	mOutputs = {"sceneBuffer"};
-	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("skybox");
-}
-
 SkyboxPass::~SkyboxPass() = default;
 
 void SkyboxPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
+	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("skybox");
 	mObjects = &ctx.queueRegistry->get<RenderGroup>("skybox");
 
 	constexpr TextureBinding textureBindings[] = {

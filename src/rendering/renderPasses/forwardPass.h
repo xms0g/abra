@@ -1,13 +1,11 @@
 #pragma once
-#include "baseRenderPass.hpp"
+#include "IRenderPass.hpp"
 #include "../renderContext/renderQueue.hpp"
 
 struct RenderableObject;
 
-class ForwardPass final : public BaseRenderPass {
+class ForwardPass final : public IRenderPass {
 public:
-	ForwardPass();
-
 	~ForwardPass() override;
 
 	void configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) override;

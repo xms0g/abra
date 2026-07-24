@@ -8,11 +8,6 @@
 #include "../renderContext/renderableObject.hpp"
 #include "../../config/configManager.h"
 
-ForwardPass::ForwardPass() {
-	mInputs = {"sceneBuffer", "visibleOpaque", "visibleBlend"};
-	mOutputs = {"sceneBuffer"};
-}
-
 ForwardPass::~ForwardPass() = default;
 
 void ForwardPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {

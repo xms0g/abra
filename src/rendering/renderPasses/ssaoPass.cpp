@@ -12,16 +12,11 @@
 #include "../../config/configManager.h"
 #include "../../math/random.h"
 
-SSAOPass::SSAOPass() {
-	mInputs  = {"gBuffer"};
-	mOutputs = {"ssao", "ssaoBlur"};
-	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("ssao");
-	mBlurShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("ssaoBlur");
-}
-
 SSAOPass::~SSAOPass() = default;
 
 void SSAOPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
+	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("ssao");
+	mBlurShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("ssaoBlur");
 	mQuad = std::make_unique<Model::SingleQuad>();
 
 	const TextureBinding ssaoTextureBindings[] = {

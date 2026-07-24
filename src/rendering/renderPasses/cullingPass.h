@@ -1,5 +1,5 @@
 #pragma once
-#include "baseRenderPass.hpp"
+#include "IRenderPass.hpp"
 #include "../renderContext/renderQueue.hpp"
 
 namespace math {
@@ -9,10 +9,8 @@ struct Frustum;
 struct RenderGroup;
 struct RenderableObject;
 
-class CullingPass final : public BaseRenderPass {
+class CullingPass final : public IRenderPass {
 public:
-	CullingPass();
-
 	~CullingPass() override;
 
 	void configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) override;

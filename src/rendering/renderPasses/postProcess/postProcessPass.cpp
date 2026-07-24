@@ -19,9 +19,6 @@
 #include "../../../event/events/guiPostProcessEvent.hpp"
 
 PostProcessPass::PostProcessPass() {
-	mInputs = {"sceneBuffer"};
-	mOutputs = {"frameBuffer"};
-
 	mEffects = {
 		std::make_shared<Bloom>("Bloom", false),
 		std::make_shared<ToneMapping>("Tone Mapping", false),

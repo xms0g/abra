@@ -12,7 +12,7 @@ class Window;
 class SyncStateSystem;
 class EventBus;
 class ShadowSystem;
-class BaseRenderPass;
+class IRenderPass;
 class Camera;
 class Registry;
 class LightSystem;

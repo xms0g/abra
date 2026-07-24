@@ -10,21 +10,16 @@
 #include "../renderContext/renderQueue.hpp"
 #include "../../ECS/components/debug.hpp"
 
-DebugPass::DebugPass() {
-	mInputs = {"sceneBuffer", "visibleDebug"};
-	mOutputs = {"sceneBuffer"};
+DebugPass::~DebugPass() = default;
+
+void DebugPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
+	mObjects = &ctx.queueRegistry->get<RenderableObject>("visibleDebug");
 
 	mDebugShaders = {
 		nullptr,
 		RESOURCE_MANAGER_INSTANCE.get<Shader>("debugNormal"),
 		RESOURCE_MANAGER_INSTANCE.get<Shader>("debugWireframe")
 	};
-}
-
-DebugPass::~DebugPass() = default;
-
-void DebugPass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
-	mObjects = &ctx.queueRegistry->get<RenderableObject>("visibleDebug");
 }
 
 void DebugPass::execute(const RenderContext& ctx, const RenderGraph& graph) {

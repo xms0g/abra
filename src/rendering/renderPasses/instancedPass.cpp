@@ -13,10 +13,7 @@
 #include "../../math/matrix.h"
 #include "../../config/configManager.h"
 
-InstancedPass::InstancedPass() {
-	mInputs = {"sceneBuffer"};
-	mOutputs = {"sceneBuffer"};
-}
+InstancedPass::InstancedPass() = default;
 
 InstancedPass::~InstancedPass() = default;
 

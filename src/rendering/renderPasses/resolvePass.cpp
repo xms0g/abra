@@ -4,11 +4,6 @@
 #include "../buffers/frameBuffer.h"
 #include "../renderContext/renderContext.hpp"
 
-ResolvePass::ResolvePass() {
-	mInputs = {"sceneBuffer"};
-	mOutputs = {"intermediateBuffer"};
-}
-
 ResolvePass::~ResolvePass() = default;
 
 void ResolvePass::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
