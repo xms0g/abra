@@ -5,26 +5,26 @@
 #include "glm/gtx/norm.hpp"
 #include "shader.h"
 #include "renderCommand.h"
-#include "renderBatcher.h"
+#include "batcher.h"
 #include "systems/lightSystem.h"
 #include "systems/syncStateSystem.h"
 #include "systems/shadowSystem/shadowSystem.h"
 #include "buffers/frameBuffer.h"
 #include "buffers/uniformBuffer.h"
 #include "models/quad.h"
-#include "renderContext/renderGroup.hpp"
-#include "renderContext/renderableObject.hpp"
-#include "renderPasses/deferredGeometryPass.h"
-#include "renderPasses/deferredLightingPass.h"
-#include "renderPasses/ssaoPass.h"
-#include "renderPasses/debugPass.h"
-#include "renderPasses/forwardPass.h"
-#include "renderPasses/instancedPass.h"
-#include "renderPasses/cullingPass.h"
-#include "renderPasses/skyboxPass.h"
-#include "renderPasses/resolvePass.h"
-#include "renderPasses/terrainPass.h"
-#include "renderPasses/postProcess/postProcessPass.h"
+#include "context/renderGroup.hpp"
+#include "context/visibleObject.hpp"
+#include "passes/deferredGeometryPass.h"
+#include "passes/deferredLightingPass.h"
+#include "passes/ssaoPass.h"
+#include "passes/debugPass.h"
+#include "passes/forwardPass.h"
+#include "passes/instancedPass.h"
+#include "passes/cullingPass.h"
+#include "passes/skyboxPass.h"
+#include "passes/resolvePass.h"
+#include "passes/terrainPass.h"
+#include "passes/postProcess/postProcessPass.h"
 #include "gui/backend.h"
 #include "material/material.hpp"
 #include "../config/configManager.h"
@@ -66,7 +66,7 @@ Renderer::~Renderer() {
 }
 
 void Renderer::configure(const Camera& camera, EventBus& eventBus) {
-	RenderBatcher batcher;
+	Batcher batcher;
 	batcher.build(mRenderData, mQueueRegistry, getSystemEntities());
 
 	createRenderPasses(eventBus);
@@ -126,10 +126,10 @@ void Renderer::createRenderQueues() {
 	mQueueRegistry.set<RenderGroup>("terrain");
 	mQueueRegistry.set<RenderGroup>("skybox");
 	mQueueRegistry.set<RenderGroup>("deferred");
-	mQueueRegistry.set<RenderableObject>("visibleDeferred");
-	mQueueRegistry.set<RenderableObject>("visibleOpaque");
-	mQueueRegistry.set<RenderableObject>("visibleBlend");
-	mQueueRegistry.set<RenderableObject>("visibleDebug");
+	mQueueRegistry.set<VisibleObject>("visibleDeferred");
+	mQueueRegistry.set<VisibleObject>("visibleOpaque");
+	mQueueRegistry.set<VisibleObject>("visibleBlend");
+	mQueueRegistry.set<VisibleObject>("visibleDebug");
 }
 
 void Renderer::createRenderPasses(EventBus& eventBus) {

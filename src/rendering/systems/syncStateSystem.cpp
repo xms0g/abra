@@ -1,6 +1,6 @@
 #include "syncStateSystem.h"
-#include "../renderContext/renderData.hpp"
-#include "../renderContext/renderContext.hpp"
+#include "../context/renderData.hpp"
+#include "../context/renderContext.hpp"
 #include "../../event/eventBus.hpp"
 #include "../../event/events/guiDebugEvent.hpp"
 #include "../../event/events/guiTransformEvent.hpp"

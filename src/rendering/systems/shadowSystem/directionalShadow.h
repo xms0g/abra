@@ -1,8 +1,8 @@
 #pragma once
 #include "glm/glm.hpp"
-#include "../../renderContext/renderQueue.hpp"
+#include "../../context/renderQueue.hpp"
 
-class RenderGraph;
+class FrameGraph;
 struct RenderGroup;
 struct RenderContext;
 class Shader;
@@ -17,7 +17,7 @@ public:
 	[[nodiscard]]
 	glm::mat4 lightSpaceMatrix() const;
 
-	void render(const RenderContext& ctx, const RenderGraph& graph, const glm::vec3& direction);
+	void render(const RenderContext& ctx, const FrameGraph& graph, const glm::vec3& direction);
 
 private:
 	float mHeight, mLeft, mRight, mBottom, mTop, mNear, mFar;

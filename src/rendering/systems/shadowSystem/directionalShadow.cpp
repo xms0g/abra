@@ -3,14 +3,14 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "../../mesh/mesh.h"
 #include "../../shader.h"
-#include "../../renderGraph.h"
-#include "../../renderContext/renderContext.hpp"
-#include "../../renderContext/renderGroup.hpp"
-#include "../../renderContext/renderData.hpp"
-#include "../../renderContext/renderQueue.hpp"
+#include "../../graph.h"
+#include "../../context/renderContext.hpp"
+#include "../../context/renderGroup.hpp"
+#include "../../context/renderData.hpp"
+#include "../../context/renderQueue.hpp"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderCommand.h"
-#include "../../renderGraph.h"
+#include "../../graph.h"
 #include "../../../config/configManager.h"
 
 DirectionalShadow::DirectionalShadow(const RenderContext& ctx) {
@@ -32,7 +32,7 @@ glm::mat4 DirectionalShadow::lightSpaceMatrix() const {
 	return mLightSpaceMatrix;
 }
 
-void DirectionalShadow::render(const RenderContext& ctx, const RenderGraph& graph, const glm::vec3& direction) {
+void DirectionalShadow::render(const RenderContext& ctx, const FrameGraph& graph, const glm::vec3& direction) {
 	const glm::vec3 lightPos = -direction * mHeight;
 	const glm::mat4 lightProjection = glm::ortho(mLeft, mRight, mBottom, mTop, mNear, mFar);
 	const glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));

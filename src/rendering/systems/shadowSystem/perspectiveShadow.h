@@ -1,6 +1,6 @@
 #pragma once
 #include "glm/glm.hpp"
-#include "../../renderContext/renderQueue.hpp"
+#include "../../context/renderQueue.hpp"
 
 struct RenderGroup;
 struct RenderContext;

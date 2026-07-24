@@ -3,14 +3,14 @@
 #include "shader.h"
 #include "material/material.hpp"
 #include "texture/texture.h"
-#include "renderContext/renderContext.hpp"
-#include "renderContext/renderableObject.hpp"
-#include "renderContext/renderData.hpp"
-#include "renderContext/renderGroup.hpp"
+#include "context/renderContext.hpp"
+#include "context/visibleObject.hpp"
+#include "context/renderData.hpp"
+#include "context/renderGroup.hpp"
 #include "../ECS/components/mesh.hpp"
 #include "../config/configManager.h"
 
-void RenderCommand::forward(const RenderContext& ctx, const std::vector<RenderableObject>& objects) {
+void RenderCommand::forward(const RenderContext& ctx, const std::vector<VisibleObject>& objects) {
 	const Shader* lastShader{nullptr};
 
 	for (const auto& [entityID, materialIdx, textureOffset, textureCount, meshIdx, shader]: objects) {

@@ -4,7 +4,7 @@
 #include "glm/glm.hpp"
 #include "../../buffers/uniformBuffer.h"
 
-class RenderGraph;
+class FrameGraph;
 class EventBus;
 struct UpdateShadowMapEvent;
 class DirectionalShadow;
@@ -18,7 +18,7 @@ public:
 
 	~ShadowSystem();
 
-	void configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus);
+	void configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus);
 
 private:
 	void directionalShadowPass();
@@ -32,7 +32,7 @@ private:
 	int32_t mWidth{0};
 	int32_t mHeight{0};
 	const RenderContext* mCtx{nullptr};
-	const RenderGraph* mGraph{nullptr};
+	const FrameGraph* mGraph{nullptr};
 	UniformBuffer mUBO;
 	std::unique_ptr<DirectionalShadow> mDirShadow;
 	std::unique_ptr<OmnidirectionalShadow> mOmnidirShadow;

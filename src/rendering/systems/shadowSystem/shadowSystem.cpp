@@ -3,9 +3,9 @@
 #include "directionalShadow.h"
 #include "omnidirectionalShadow.h"
 #include "perspectiveShadow.h"
-#include "../../renderGraph.h"
-#include "../../renderContext/renderContext.hpp"
-#include "../../renderContext/renderData.hpp"
+#include "../../graph.h"
+#include "../../context/renderContext.hpp"
+#include "../../context/renderData.hpp"
 #include "../../buffers/uniformBuffer.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../../ECS/components/directionalLight.hpp"
@@ -19,7 +19,7 @@ ShadowSystem::ShadowSystem() = default;
 
 ShadowSystem::~ShadowSystem() = default;
 
-void ShadowSystem::configure(const RenderContext& ctx, const RenderGraph& graph, EventBus& eventBus) {
+void ShadowSystem::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
 	mCtx = &ctx;
 	mGraph = &graph;
 	mWidth= CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width");

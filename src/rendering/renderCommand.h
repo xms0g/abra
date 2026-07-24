@@ -5,14 +5,14 @@
 
 struct TextureBinding;
 struct RenderInstanceGroup;
-struct RenderableObject;
+struct VisibleObject;
 struct RenderContext;
 struct Material;
 struct Texture;
 class Shader;
 
 namespace RenderCommand {
-void forward(const RenderContext& ctx, const std::vector<RenderableObject>& objects);
+void forward(const RenderContext& ctx, const std::vector<VisibleObject>& objects);
 
 void instanced(const RenderContext& ctx, const std::vector<RenderInstanceGroup>& objects);
 

@@ -1,18 +1,18 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "renderGraph.h"
-#include "renderContext/renderContext.hpp"
+#include "graph.h"
+#include "context/renderContext.hpp"
+#include "context/renderData.hpp"
+#include "context/renderQueue.hpp"
 #include "buffers/uniformBuffer.h"
-#include "renderContext/renderData.hpp"
-#include "renderContext/renderQueue.hpp"
 #include "../ECS/system.hpp"
 
 class Window;
 class SyncStateSystem;
 class EventBus;
 class ShadowSystem;
-class IRenderPass;
+class IPass;
 class Camera;
 class Registry;
 class LightSystem;
@@ -49,7 +49,7 @@ private:
 
 	void sortEntities();
 
-	RenderGraph mGraph{};
+	FrameGraph mGraph{};
 	// Systems
 	LightSystem* mLightSystem{};
 	std::unique_ptr<ShadowSystem> mShadowSystem;

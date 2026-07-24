@@ -24,7 +24,7 @@
 #include "../rendering/models/cubemap.h"
 #include "../rendering/models/sphere.h"
 #include "../rendering/models/terrain.h"
-#include "../rendering/renderContext/renderFlags.hpp"
+#include "../rendering/context/renderFlags.hpp"
 
 using json = nlohmann::json;
 
