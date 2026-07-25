@@ -25,7 +25,7 @@ void CullingPass::configure(const RenderContext& ctx, const FrameGraph& graph, E
 	mUnlitCommands = &ctx.queueRegistry->get<DrawCommand>("UnlitCommands");
 	mBlendCommands = &ctx.queueRegistry->get<DrawCommand>("BlendCommands");
 	mDeferredCommands = &ctx.queueRegistry->get<DrawCommand>("DeferredCommands");
-	//mDebugCommands = &ctx.queueRegistry->get<DrawCommand>("DebugCommands");
+	mDebugCommands = &ctx.queueRegistry->get<DrawCommand>("DebugCommands");
 }
 
 void CullingPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
@@ -35,7 +35,7 @@ void CullingPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	cullScene(ctx, frustum, *mUnlitGroups, *mUnlitCommands);
 	cullScene(ctx, frustum, *mDeferredGroups, *mDeferredCommands);
 	cullScene(ctx, frustum, *mBlendGroups, *mBlendCommands);
-	//cullScene(ctx, frustum, *mDebugGroups, *mDebugCommands);
+	cullScene(ctx, frustum, *mDebugGroups, *mDebugCommands);
 }
 
 void CullingPass::cullScene(
@@ -63,6 +63,8 @@ void CullingPass::cullScene(
 
 			if (isVisible) {
 				outQueue.push_back({
+					.entityID = entityID,
+					.debugMode = ctx.renderData->entity.debugModes[entityID],
 					.material = {
 						.idx = matBatch.materialIndex,
 						.flags = ctx.renderData->material.flags[matBatch.materialIndex],

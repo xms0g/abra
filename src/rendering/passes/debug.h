@@ -1,6 +1,8 @@
 #pragma once
 #include <array>
 #include "IPass.hpp"
+#include "../graphicsPipeline.h"
+#include "../graphicsEncoder.h"
 #include "../context/renderQueue.hpp"
 
 struct VisibleObject;
@@ -17,6 +19,7 @@ public:
 	void execute(const RenderContext& ctx, const FrameGraph& graph) override;
 
 private:
-	std::array<const Shader*, 3> mDebugShaders{};
-	RenderQueue<VisibleObject>* mObjects{nullptr};
+	GraphicsEncoder mEncoder{};
+	std::array<GraphicsPipeline, 3> mPipelines{};
+	RenderQueue<DrawCommand>* mCommands{nullptr};
 };
