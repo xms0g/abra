@@ -28,8 +28,6 @@ public:
 	[[nodiscard]]
 	T* get(const KeyType& key) const;
 
-	std::unordered_map<std::string, std::unique_ptr<Shader> >& getShaders();
-
 	void asyncLoadModel(size_t entityID, const std::string& file);
 
 	template<typename T>

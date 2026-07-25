@@ -33,10 +33,6 @@ void ResourceManager::createBuffers() {
 	glEnable(GL_CULL_FACE);
 }
 
-std::unordered_map<std::string, std::unique_ptr<Shader> >& ResourceManager::getShaders() {
-	return mShaders;
-}
-
 void ResourceManager::asyncLoadModel(size_t entityID, const std::string& file) {
 	mThreadPool.enqueue([this, entityID, file]() {
 		loadModel(entityID, file);
