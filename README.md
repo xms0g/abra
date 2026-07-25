@@ -1,6 +1,6 @@
 # Abra
 `Abra` is a modern rendering engine built on OpenGL, featuring a flexible hybrid Forward + Deferred pipeline.
-It’s designed for clarity, experimentation, and real-time graphics research — without bloated abstractions.
+It’s designed for clarity, experimentation, and real-time graphics research.
 
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20MacOS-blue)
 ![Graphics](https://img.shields.io/badge/API-OpenGL-5586A4)
