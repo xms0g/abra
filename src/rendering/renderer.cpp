@@ -72,7 +72,6 @@ void Renderer::configure(const Camera& camera, EventBus& eventBus) {
 	createRenderPasses(eventBus);
 	createUniformBuffers(camera);
 	configureSystems(eventBus);
-	configureShaders();
 }
 
 void Renderer::render() {
@@ -360,41 +359,6 @@ void Renderer::configureSystems(EventBus& eventBus) {
 	mLightSystem->configure(mRenderCtx, eventBus);
 	mSyncStateSystem->configure(mRenderCtx, eventBus);
 	mShadowSystem->configure(mRenderCtx, mGraph, eventBus);
-}
-
-void Renderer::configureShaders() {
-	const UniformBinding uboBindings[] = {
-		{
-			.name = CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name"),
-			.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"),
-			.configure = UniformBuffer::configure
-		},
-		{
-			.name = CONFIG_MANAGER_INSTANCE.get<std::string>("light.block_name"),
-			.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("light.ubo_binding"),
-			.configure = UniformBuffer::configure
-		},
-		{
-			.name = CONFIG_MANAGER_INSTANCE.get<std::string>("shadow.block_name"),
-			.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("shadow.ubo_binding"),
-			.configure = UniformBuffer::configure
-		}
-	};
-
-	const TextureBinding shadowMapBindings[] = {
-		{.name = "shadowMap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot")},
-		{.name = "shadowCubemap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot") + 1},
-		{.name = "persShadowMap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot") + 2}
-	};
-
-	// Configure shaders
-	for (const auto& [name,shader]: RESOURCE_MANAGER_INSTANCE.getShaders()) {
-		for (const auto& [blockName, binding, configure]: uboBindings) {
-			configure(shader->id(), binding, blockName.c_str());
-		}
-
-		RenderCommand::setTextureUnits(shadowMapBindings, *shader);
-	}
 }
 
 void Renderer::refreshCameraData() const {
