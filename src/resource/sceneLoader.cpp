@@ -82,7 +82,6 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 			std::string specularTexture;
 			std::string normalTexture;
 			std::string heightTexture;
-			std::string shaderName;
 
 			auto matCom = comps["MaterialComponent"];
 
@@ -109,15 +108,8 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 				heightTexture = matCom["height_texture"].get<std::string>();
 			}
 
-			if (matCom.contains("shader")) {
-				shaderName = matCom["shader"].get<std::string>();
-			}
-
 			auto uploadPrimitives = [&]<typename T>() {
 				T model{color, unlit, albedoTexture, specularTexture, normalTexture, heightTexture};
-
-				auto& mat = model.material();
-				mat[0].shader = RESOURCE_MANAGER_INSTANCE.get<Shader>(shaderName);
 
 				RESOURCE_MANAGER_INSTANCE.upload<MeshMap>(entity.id(), model.meshes());
 				RESOURCE_MANAGER_INSTANCE.upload<MaterialMap>(entity.id(), model.material());

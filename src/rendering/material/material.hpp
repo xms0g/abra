@@ -28,7 +28,6 @@ struct Material {
 	uint32_t textureTarget{0};
 	glm::vec3 color{0.0f};
 	float alphaCutoff{0.0f};
-	const Shader* shader{nullptr};
 	std::vector<Texture> textures;
 
 	Material() = default;
@@ -43,7 +42,6 @@ struct Material {
 		  textureTarget(std::exchange(other.textureTarget, 0)),
 		  color(other.color),
 		  alphaCutoff(std::exchange(other.alphaCutoff, 0.0f)),
-		  shader(std::exchange(other.shader, nullptr)),
 		  textures(std::move(other.textures)) {
 	}
 
@@ -55,7 +53,6 @@ struct Material {
 		textureTarget = std::exchange(other.textureTarget, 0);
 		color = other.color;
 		alphaCutoff = std::exchange(other.alphaCutoff, 0.0f);
-		shader = std::exchange(other.shader, nullptr);
 		textures = std::move(other.textures);
 		return *this;
 	}
@@ -67,7 +64,6 @@ struct MaterialBatch {
 	uint32_t renderFlag{};
 	uint32_t textureOffset{};
 	size_t textureCount{};
-	const Shader* shader{};
 	std::vector<uint32_t> meshIndices;
 };
 

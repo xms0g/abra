@@ -1,0 +1,62 @@
+#include "forwardUnlit.h"
+#include "../context/renderContext.hpp"
+#include "../context/renderQueue.hpp"
+#include "../../config/configManager.h"
+
+ForwardUnlitPass::ForwardUnlitPass() = default;
+
+ForwardUnlitPass::~ForwardUnlitPass() = default;
+
+void ForwardUnlitPass::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
+	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
+		.topology = PrimitiveTopology::Triangles,
+	};
+
+	constexpr PipelineRasterizationState rasterizationState = {
+		.cullMode = CullMode::Back,
+		.frontFace = FrontFace::CounterClockwise,
+	};
+
+	constexpr PipelineDepthStencilState depthStencilState = {
+		.depthTestEnable = true,
+		.depthWriteEnable = true,
+		.depthCompareOp = CompareOp::Less,
+	};
+
+	constexpr PipelineColorBlendState colorBlendState = {
+		.blendEnable = false,
+	};
+
+	PipelineRenderingInfo desc = {
+		.primitiveAssembly = primitiveAssemblyState,
+		.rasterization = rasterizationState,
+		.depthStencil = depthStencilState,
+		.colorBlend = colorBlendState,
+		.stage = Shader("unlit.vert", "unlit.frag"),
+		.samples = {},
+		.uniforms = {
+			{
+				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name").c_str(),
+				.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"),
+			}
+		}
+	};
+
+	mPipeline = GraphicsPipeline(desc);
+	mEncoder = GraphicsEncoder(graph);
+
+	mCommands = &ctx.queueRegistry->get<DrawCommand>("UnlitCommands");
+}
+
+void ForwardUnlitPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
+	mEncoder.reset();
+	mEncoder.bindFrameBuffer("sceneBuffer");
+	mEncoder.bindPipeline(mPipeline);
+
+	for (const auto& object: *mCommands) {
+		mEncoder.bindMaterial(object.material);
+		mEncoder.bindTransform(object.transform);
+		mEncoder.drawIndexed(object.mesh);
+	}
+}
+

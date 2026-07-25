@@ -87,7 +87,6 @@ MaterialBatch Batcher::batchMaterial(
 		.renderFlag = matComponent.renderFlag,
 		.textureOffset = buildState.textureOffset,
 		.textureCount = textureCount,
-		.shader = material.shader,
 		.meshIndices = meshIndices
 	};
 	buildState.textureOffset += textureCount;

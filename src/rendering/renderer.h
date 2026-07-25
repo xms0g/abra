@@ -43,8 +43,6 @@ private:
 
 	void configureSystems(EventBus& eventBus);
 
-	void configureShaders();
-
 	void refreshCameraData() const;
 
 	void sortEntities();

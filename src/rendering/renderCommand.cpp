@@ -36,10 +36,10 @@ void RenderCommand::instanced(const RenderContext& ctx, const std::vector<Render
 	for (const auto& obj: objects) {
 		const size_t count = obj.transforms.size() / 9;
 
-		if (lastShader != obj.matBatch.shader) {
-			lastShader = obj.matBatch.shader;
-			lastShader->bind();
-		}
+		// if (lastShader != obj.matBatch.shader) {
+		// 	lastShader = obj.matBatch.shader;
+		// 	lastShader->bind();
+		// }
 
 		setupMaterial(
 			obj.entityID,

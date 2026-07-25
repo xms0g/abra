@@ -82,6 +82,12 @@ void SSAOPass::configure(const RenderContext& ctx, const FrameGraph& graph, Even
 		mShader->id(),
 		CONFIG_MANAGER_INSTANCE.get<uint32_t>("ssao.ubo_binding"),
 		CONFIG_MANAGER_INSTANCE.get<std::string>("ssao.block_name").c_str());
+
+	UniformBuffer::configure(
+		mShader->id(),
+		CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"),
+		CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name").c_str()
+	);
 }
 
 void SSAOPass::execute(const RenderContext& ctx, const FrameGraph& graph) {

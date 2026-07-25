@@ -2,6 +2,8 @@
 #include "IPass.hpp"
 #include "../context/renderQueue.hpp"
 
+struct DrawCommand;
+
 namespace math {
 struct Frustum;
 }
@@ -24,14 +26,16 @@ private:
 		const RenderContext& ctx,
 		const math::Frustum& frustum,
 		const RenderQueue<RenderGroup>& groups,
-		RenderQueue<VisibleObject>& outQueue);
+		RenderQueue<DrawCommand>& outQueue);
 
 	RenderQueue<RenderGroup>* mOpaqueGroups{nullptr};
+	RenderQueue<RenderGroup>* mUnlitGroups{nullptr};
 	RenderQueue<RenderGroup>* mBlendGroups{nullptr};
 	RenderQueue<RenderGroup>* mDeferredGroups{nullptr};
 	RenderQueue<RenderGroup>* mDebugGroups{nullptr};
-	RenderQueue<VisibleObject>* mVisibleOpaque{nullptr};
-	RenderQueue<VisibleObject>* mVisibleBlend{nullptr};
-	RenderQueue<VisibleObject>* mVisibleDeferred{nullptr};
-	RenderQueue<VisibleObject>* mVisibleDebug{nullptr};
+	RenderQueue<DrawCommand>* mOpaqueCommands{nullptr};
+	RenderQueue<DrawCommand>* mUnlitCommands{nullptr};
+	RenderQueue<DrawCommand>* mBlendCommands{nullptr};
+	RenderQueue<DrawCommand>* mDeferredCommands{nullptr};
+	RenderQueue<DrawCommand>* mDebugCommands{nullptr};
 };

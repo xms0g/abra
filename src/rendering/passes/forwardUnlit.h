@@ -5,14 +5,12 @@
 #include "../context/renderQueue.hpp"
 
 struct DrawCommand;
-class Shader;
-class FrameBuffer;
 
-class DeferredGeometryPass final : public IPass {
+class ForwardUnlitPass final : public IPass {
 public:
-	DeferredGeometryPass();
+	ForwardUnlitPass();
 
-	~DeferredGeometryPass() override;
+	~ForwardUnlitPass() override;
 
 	void configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) override;
 
@@ -23,3 +21,4 @@ private:
 	GraphicsEncoder mEncoder{};
 	RenderQueue<DrawCommand>* mCommands{nullptr};
 };
+

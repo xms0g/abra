@@ -94,16 +94,17 @@ Shader::~Shader() {
 }
 
 Shader::Shader(Shader&& other) noexcept {
-	mID = other.mID;
-	other.mID = 0;
+	mID = std::exchange(other.mID, 0);
 }
 
 Shader& Shader::operator=(Shader&& other) noexcept {
-	if (this != &other) {
+	if (this == &other)
+		return *this;
+
+	if (mID)
 		glDeleteProgram(mID);
-		mID = other.mID;
-		other.mID = 0;
-	}
+
+	mID = std::exchange(other.mID, 0);
 	return *this;
 }
 

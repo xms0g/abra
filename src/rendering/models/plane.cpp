@@ -96,10 +96,11 @@ Model::Plane::Plane(
 	if (unlit) {
 		flags |= UNLIT;
 	} else {
+		flags |= OPAQUE;
 		flags |= CASTSHADOW;
 	}
 
-	flags |= OPAQUE | TWOSIDED;
+	flags |= TWOSIDED;
 
 	if (color != glm::vec3(0.0f)) {
 		flags |= HAS_SOLID_COLOR;

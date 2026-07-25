@@ -1,6 +1,8 @@
 #pragma once
 #include <memory>
 #include "IPass.hpp"
+#include "../graphicsPipeline.h"
+#include "../graphicsEncoder.h"
 
 namespace Model {
 class SingleQuad;
@@ -21,6 +23,7 @@ public:
 	void execute(const RenderContext& ctx, const FrameGraph& graph) override;
 
 private:
-	const Shader* mShader{nullptr};
+	GraphicsPipeline mPipeline{};
+	GraphicsEncoder mEncoder{};
 	std::unique_ptr<Model::SingleQuad> mQuad;
 };

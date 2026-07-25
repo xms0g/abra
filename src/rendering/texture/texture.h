@@ -18,8 +18,8 @@ struct TextureBinding {
 };
 
 struct Texture {
-    uint32_t id;
-	uint32_t type;
+    uint32_t id{};
+	uint32_t type{};
     std::string path;
 
 	Texture() = default;

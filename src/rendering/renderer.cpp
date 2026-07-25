@@ -5,6 +5,7 @@
 #include "glm/gtx/norm.hpp"
 #include "shader.h"
 #include "renderCommand.h"
+#include "command.hpp"
 #include "batcher.h"
 #include "systems/lightSystem.h"
 #include "systems/syncStateSystem.h"
@@ -18,7 +19,7 @@
 #include "passes/deferredLighting.h"
 #include "passes/ssao.h"
 #include "passes/debug.h"
-#include "passes/forward.h"
+#include "passes/forwardOpaque.h"
 #include "passes/instanced.h"
 #include "passes/culling.h"
 #include "passes/skybox.h"
@@ -35,6 +36,7 @@
 #include "../ECS/components/mesh.hpp"
 #include "../event/eventBus.hpp"
 #include "../resource/resourceManager.h"
+#include "passes/forwardUnlit.h"
 
 Renderer::Renderer(Registry& registry, const Camera& camera, Window& window) {
 	RequireComponent<MeshComponent>();
@@ -79,7 +81,6 @@ void Renderer::render() {
 	refreshCameraData();
 	sortEntities();
 
-	mRenderCtx.materialCache.reset();
 	mGraph.execute(mRenderCtx);
 }
 
@@ -97,7 +98,7 @@ void Renderer::createUniformBuffers(const Camera& camera) {
 	// Create camera buffer
 	mCameraUBO = UniformBuffer{
 		DYNAMIC,
-		3 * sizeof(glm::mat4) + sizeof(glm::vec4),
+		4 * sizeof(glm::mat4) + sizeof(glm::vec4),
 		CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding")
 	};
 
@@ -119,15 +120,17 @@ void Renderer::createRenderQueues() {
 	mQueueRegistry.set<RenderInstanceGroup>("opaqueInstanced");
 	mQueueRegistry.set<RenderInstanceGroup>("blendInstanced");
 	mQueueRegistry.set<RenderGroup>("opaque");
+	mQueueRegistry.set<RenderGroup>("unlit");
 	mQueueRegistry.set<RenderGroup>("blend");
 	mQueueRegistry.set<RenderGroup>("debug");
 	mQueueRegistry.set<RenderGroup>("shadow");
 	mQueueRegistry.set<RenderGroup>("terrain");
 	mQueueRegistry.set<RenderGroup>("skybox");
 	mQueueRegistry.set<RenderGroup>("deferred");
-	mQueueRegistry.set<VisibleObject>("visibleDeferred");
-	mQueueRegistry.set<VisibleObject>("visibleOpaque");
-	mQueueRegistry.set<VisibleObject>("visibleBlend");
+	mQueueRegistry.set<DrawCommand>("DeferredCommands");
+	mQueueRegistry.set<DrawCommand>("OpaqueCommands");
+	mQueueRegistry.set<DrawCommand>("UnlitCommands");
+	mQueueRegistry.set<DrawCommand>("BlendCommands");
 	mQueueRegistry.set<VisibleObject>("visibleDebug");
 }
 
@@ -147,10 +150,17 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 		{"gBuffer"}
 	);
 	mGraph.addPass(
-		"ForwardPass",
-		!mQueueRegistry.empty("opaque") || !mQueueRegistry.empty("blend"),
-		std::make_unique<ForwardPass>(),
-		{"sceneBuffer", "visibleOpaque", "visibleBlend"},
+		"ForwardOpaquePass",
+		!mQueueRegistry.empty("opaque"),
+		std::make_unique<ForwardOpaquePass>(),
+		{"sceneBuffer", "OpaqueCommands"},
+		{"sceneBuffer"}
+	);
+	mGraph.addPass(
+		"ForwardUnlitPass",
+		!mQueueRegistry.empty("unlit"),
+		std::make_unique<ForwardUnlitPass>(),
+		{"sceneBuffer", "UnlitCommands"},
 		{"sceneBuffer"}
 	);
 	mGraph.addPass(
@@ -199,7 +209,7 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 		true,
 		std::make_unique<CullingPass>(),
 		{},
-		{"visibleOpaque", "visibleBlend", "visibleDeferred", "visibleDebug"});
+		{"OpaqueCommands", "UnlitCommands", "BlendCommands", "DeferredCommands", "DebugCommands"});
 	mGraph.addPass(
 		"PostProcessPass",
 		true,

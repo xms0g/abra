@@ -21,10 +21,11 @@ private:
 		uint32_t flags;
 		std::string queue;
 		std::string instancedQueue;
-	} rules[4] = {
+	} rules[5] = {
 		{.flags = CASTSHADOW, .queue = "shadow", .instancedQueue = "shadow"},
 		{.flags = PBR, .queue = "deferred", .instancedQueue = "deferred"},
 		{.flags = OPAQUE, .queue = "opaque", .instancedQueue = "opaqueInstanced"},
+		{.flags = UNLIT, .queue = "unlit", .instancedQueue = "unlitInstanced"},
 		{.flags = BLEND, .queue = "blend", .instancedQueue = "blendInstanced"},
 	};
 
