@@ -6,6 +6,8 @@ GraphicsPipeline::GraphicsPipeline(PipelineRenderingInfo& desc) {
 	mState.inputAssembly = desc.primitiveAssembly;
 	mState.rasterization = desc.rasterization;
 	mState.depthStencil = desc.depthStencil;
+	mState.colorBlend = desc.colorBlend;
+	mState.tessellation = desc.tessellation;
 	mState.stage = std::move(desc.stage);
 
 	mState.stage.bind();

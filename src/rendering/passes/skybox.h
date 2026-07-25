@@ -1,8 +1,9 @@
 #pragma once
 #include "IPass.hpp"
+#include "../graphicsPipeline.h"
+#include "../graphicsEncoder.h"
 #include "../context/renderQueue.hpp"
 
-class Shader;
 struct RenderGroup;
 
 class SkyboxPass final : public IPass {
@@ -16,6 +17,7 @@ public:
 	void execute(const RenderContext& ctx, const FrameGraph& graph) override;
 
 private:
-	const Shader* mShader{nullptr};
+	GraphicsPipeline mPipeline{};
+	GraphicsEncoder mEncoder{};
 	RenderQueue<RenderGroup>* mObjects{nullptr};
 };

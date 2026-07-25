@@ -15,6 +15,18 @@ enum class FrontFace: uint32_t {
 	CounterClockwise = GL_CCW
 };
 
+enum class PolygonMode: uint32_t {
+	Fill = GL_FILL,
+	Line = GL_LINE,
+	Point = GL_POINT
+};
+
+enum class PolygonFace: uint32_t {
+	Front = GL_FRONT,
+	Back = GL_BACK,
+	FrontAndBack = GL_FRONT_AND_BACK
+};
+
 enum class BlendFactor: uint32_t {
 	SrcAlpha = GL_SRC_ALPHA,
 	OneMinusSrcAlpha = GL_ONE_MINUS_SRC_ALPHA,
@@ -78,6 +90,8 @@ struct PipelinePrimitiveAssemblyState {
 struct PipelineRasterizationState {
 	CullMode cullMode;
 	FrontFace frontFace;
+	PolygonMode polygonMode;
+	PolygonFace polygonFace;
 };
 
 struct PipelineDepthStencilState {
@@ -98,11 +112,16 @@ struct PipelineColorBlendState {
 	ColorComponent colorWriteMask{};
 };
 
+struct PipelineTessellationState {
+	int32_t patchControlPoints;
+};
+
 struct PipelineRenderingInfo {
 	PipelinePrimitiveAssemblyState primitiveAssembly;
 	PipelineRasterizationState rasterization;
 	PipelineDepthStencilState depthStencil;
 	PipelineColorBlendState colorBlend;
+	PipelineTessellationState tessellation;
 	Shader stage;
 	std::vector<SampleDesc> samples;
 	std::vector<UniformBindingDesc> uniforms;
@@ -113,6 +132,7 @@ struct PipelineState {
 	PipelineRasterizationState rasterization;
 	PipelineDepthStencilState depthStencil;
 	PipelineColorBlendState colorBlend;
+	PipelineTessellationState tessellation;
 	Shader stage;
 };
 

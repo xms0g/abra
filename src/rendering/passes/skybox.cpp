@@ -16,31 +16,71 @@ SkyboxPass::SkyboxPass() = default;
 SkyboxPass::~SkyboxPass() = default;
 
 void SkyboxPass::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
-	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("skybox");
-	mObjects = &ctx.queueRegistry->get<RenderGroup>("skybox");
-
-	constexpr TextureBinding textureBindings[] = {
-		{.name = "skybox", .slot = 0},
+	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
+		.topology = PrimitiveTopology::Triangles,
 	};
 
-	RenderCommand::setTextureUnits(textureBindings, *mShader);
+	constexpr PipelineRasterizationState rasterizationState = {
+		.cullMode = CullMode::Back,
+		.frontFace = FrontFace::CounterClockwise,
+		.polygonMode = PolygonMode::Fill,
+		.polygonFace = PolygonFace::FrontAndBack,
+	};
+
+	constexpr PipelineDepthStencilState depthStencilState = {
+		.depthTestEnable = true,
+		.depthWriteEnable = false,
+		.depthCompareOp = CompareOp::Lequal,
+	};
+
+	constexpr PipelineColorBlendState colorBlendState = {
+		.blendEnable = false,
+	};
+
+	PipelineRenderingInfo desc = {
+		.primitiveAssembly = primitiveAssemblyState,
+		.rasterization = rasterizationState,
+		.depthStencil = depthStencilState,
+		.colorBlend = colorBlendState,
+		.stage = Shader("skybox.vert", "skybox.frag"),
+		.samples = {
+			{.name = "skybox", .slot = 0},
+		},
+		.uniforms = {}
+	};
+
+	mPipeline = GraphicsPipeline{desc};
+	mEncoder = GraphicsEncoder{graph};
+	mObjects = &ctx.queueRegistry->get<RenderGroup>("skybox");
 }
 
 void SkyboxPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	const auto& [entityID, matBatch] = mObjects->front();
 	const uint32_t meshIdx = matBatch.meshIndices.front();
-	const uint32_t vao = ctx.renderData->mesh.vaos[meshIdx];
 
-	graph.getResource("sceneBuffer").bind();
-	mShader->bind();
+	mEncoder.reset();
+	mEncoder.bindFrameBuffer("sceneBuffer");
+	mEncoder.bindPipeline(mPipeline);
 
-	RenderCommand::setupMaterial(
-		entityID,
-		matBatch.materialIndex,
-		matBatch.textureOffset,
-		matBatch.textureCount,
-		ctx,
-		*mShader);
-	
-	RenderCommand::drawSkybox(vao);
+	mEncoder.bindMaterial({
+		.idx = matBatch.materialIndex,
+		.flags = ctx.renderData->material.flags[matBatch.materialIndex],
+		.textureTarget = ctx.renderData->material.textureTargets[matBatch.materialIndex],
+		.textures = std::span<const uint32_t>(
+			ctx.renderData->material.textures.data() + matBatch.textureOffset,
+			matBatch.textureCount)
+	});
+
+	mEncoder.bindTransform({
+		.model = ctx.renderData->entity.models[entityID],
+		.normal = ctx.renderData->entity.normals[entityID],
+	});
+
+	mEncoder.draw({
+		.vao = ctx.renderData->mesh.vaos[meshIdx],
+		.vertexCount = ctx.renderData->mesh.vertexCounts[meshIdx],
+		.indexCount = 0
+	});
+	glDepthFunc(GL_LESS);
+	glDepthMask(GL_TRUE);
 }

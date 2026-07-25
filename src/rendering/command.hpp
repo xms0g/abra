@@ -24,6 +24,8 @@ struct MeshView {
 };
 
 struct DrawCommand {
+	size_t entityID{};
+	uint32_t debugMode{};
 	MaterialView material{};
 	TransformView transform{};
 	MeshView mesh{};

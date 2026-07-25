@@ -39,6 +39,14 @@ static constexpr uint32_t toGL(const PrimitiveTopology topology) {
 	return toUnderlying(topology);
 }
 
+static constexpr uint32_t toGL(const PolygonMode mode) {
+	return toUnderlying(mode);
+}
+
+static constexpr uint32_t toGL(const PolygonFace face) {
+	return toUnderlying(face);
+}
+
 GraphicsEncoder::GraphicsEncoder(const FrameGraph& graph) {
 	mState.graph = &graph;
 }
@@ -98,6 +106,12 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 		glDisable(GL_BLEND);
 	}
 
+	if (pipelineState.tessellation.patchControlPoints > 0) {
+		glPatchParameteri(GL_PATCH_VERTICES, pipelineState.tessellation.patchControlPoints);
+	}
+
+	glPolygonMode(toGL(pipelineState.rasterization.polygonFace), toGL(pipelineState.rasterization.polygonMode));
+
 	pipelineState.stage.bind();
 }
 
@@ -110,8 +124,7 @@ void GraphicsEncoder::bindMaterial(const MaterialView& material) {
 
 	auto& pipelineState = mState.pipeline->state();
 
-	if (mState.materialCache.lastMatFlags != material.flags ||
-	    mState.materialCache.lastShader != &pipelineState.stage) {
+	if (mState.materialCache.lastMatFlags != material.flags || mState.materialCache.lastShader != &pipelineState.stage) {
 		mState.materialCache.lastMatFlags = material.flags;
 		mState.materialCache.lastShader = &pipelineState.stage;
 		pipelineState.stage.setUint("material.flags", material.flags);

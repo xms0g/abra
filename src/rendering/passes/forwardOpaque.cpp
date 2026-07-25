@@ -15,6 +15,8 @@ void ForwardOpaquePass::configure(const RenderContext& ctx, const FrameGraph& gr
 	constexpr PipelineRasterizationState rasterizationState = {
 		.cullMode = CullMode::Back,
 		.frontFace = FrontFace::CounterClockwise,
+		.polygonMode = PolygonMode::Fill,
+		.polygonFace = PolygonFace::FrontAndBack,
 	};
 
 	constexpr PipelineDepthStencilState depthStencilState = {
