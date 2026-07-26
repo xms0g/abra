@@ -35,12 +35,16 @@ void CullingPass::configure(const RenderContext& ctx, const FrameGraph& graph, E
 	mTerrainGroups = std::span(
 		ctx.queueRegistry->get<RenderGroup>("terrain").data(),
 		ctx.queueRegistry->get<RenderGroup>("terrain").size());
+	mSkyboxGroups = std::span(
+		ctx.queueRegistry->get<RenderGroup>("skybox").data(),
+		ctx.queueRegistry->get<RenderGroup>("skybox").size());
 	mOpaqueCommands = &ctx.queueRegistry->get<DrawCommand>("OpaqueCommands");
 	mUnlitCommands = &ctx.queueRegistry->get<DrawCommand>("UnlitCommands");
 	mBlendCommands = &ctx.queueRegistry->get<DrawCommand>("BlendCommands");
 	mDeferredCommands = &ctx.queueRegistry->get<DrawCommand>("DeferredCommands");
 	mDebugCommands = &ctx.queueRegistry->get<DrawCommand>("DebugCommands");
 	mTerrainCommands = &ctx.queueRegistry->get<DrawCommand>("TerrainCommands");
+	mSkyboxCommands = &ctx.queueRegistry->get<DrawCommand>("SkyboxCommands");
 }
 
 void CullingPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
@@ -55,6 +59,7 @@ void CullingPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	cullScene(ctx, frustum, mBlendGroups, *mBlendCommands);
 	cullScene(ctx, frustum, mDebugGroups, *mDebugCommands);
 	cullScene(ctx, frustum, mTerrainGroups, *mTerrainCommands);
+	cullScene(ctx, frustum, mSkyboxGroups, *mSkyboxCommands);
 }
 
 void CullingPass::cullScene(

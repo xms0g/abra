@@ -126,6 +126,7 @@ void Renderer::createRenderQueues() {
 	mQueueRegistry.set<DrawCommand>("BlendCommands");
 	mQueueRegistry.set<DrawCommand>("DebugCommands");
 	mQueueRegistry.set<DrawCommand>("TerrainCommands");
+	mQueueRegistry.set<DrawCommand>("SkyboxCommands");
 }
 
 void Renderer::createRenderPasses(EventBus& eventBus) {

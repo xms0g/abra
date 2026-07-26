@@ -4,7 +4,7 @@
 #include "../graphicsEncoder.h"
 #include "../context/renderQueue.hpp"
 
-struct RenderGroup;
+struct DrawCommand;
 
 class SkyboxPass final : public IPass {
 public:
@@ -19,5 +19,5 @@ public:
 private:
 	GraphicsPipeline mPipeline{};
 	GraphicsEncoder mEncoder{};
-	RenderQueue<RenderGroup>* mObjects{nullptr};
+	RenderQueue<DrawCommand>* mCommands{nullptr};
 };
