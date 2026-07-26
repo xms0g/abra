@@ -11,7 +11,7 @@ GraphicsPipeline::GraphicsPipeline(PipelineRenderingInfo& desc) {
 	mState.stage = std::move(desc.stage);
 
 	mState.stage.bind();
-	for (const auto& [name, slot]: desc.samples) {
+	for (const auto& [name, slot]: desc.samplers) {
 		mState.stage.setInt(name, slot);
 	}
 

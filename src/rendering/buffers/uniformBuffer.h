@@ -1,15 +1,5 @@
 #pragma once
-#include <cstdlib>
-#include <string>
-#include <functional>
 #include "buffer.hpp"
-
-struct UniformBinding {
-	std::string name;
-	uint32_t binding;
-
-	void (*configure)(uint32_t, uint32_t, const char*);
-};
 
 class UniformBuffer final : public Buffer {
 public:

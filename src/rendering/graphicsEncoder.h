@@ -49,6 +49,8 @@ public:
 
 	void drawIndexed(const MeshView& mesh) const;
 
+	void drawInstanced(const MeshView& mesh, uint32_t count) const;
+
 	void reset();
 
 private:

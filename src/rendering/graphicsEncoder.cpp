@@ -191,6 +191,16 @@ void GraphicsEncoder::drawIndexed(const MeshView& mesh) const {
 	               static_cast<int32_t>(mesh.indexCount), GL_UNSIGNED_INT, nullptr);
 }
 
+void GraphicsEncoder::drawInstanced(const MeshView& mesh, const uint32_t count) const {
+	glBindVertexArray(mesh.vao);
+	glDrawElementsInstanced(
+		toGL(mState.pipeline->state().inputAssembly.topology),
+		static_cast<int32_t>(mesh.indexCount),
+		GL_UNSIGNED_INT,
+		nullptr,
+		static_cast<int32_t>(count));
+}
+
 void GraphicsEncoder::reset() {
 	mState.materialCache.reset();
 }

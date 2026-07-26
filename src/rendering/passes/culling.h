@@ -1,6 +1,7 @@
 #pragma once
 #include "IPass.hpp"
 #include <span>
+#include "../graphicsEncoder.h"
 #include "../context/renderQueue.hpp"
 
 struct DrawCommand;
@@ -28,6 +29,8 @@ private:
 		const math::Frustum& frustum,
 		std::span<RenderGroup> groups,
 		RenderQueue<DrawCommand>& outQueue);
+
+	GraphicsEncoder mEncoder{};
 
 	std::span<RenderGroup> mOpaqueGroups{};
 	std::span<RenderGroup> mUnlitGroups{};

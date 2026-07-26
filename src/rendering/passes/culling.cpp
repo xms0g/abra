@@ -16,6 +16,8 @@ CullingPass::CullingPass() = default;
 CullingPass::~CullingPass() = default;
 
 void CullingPass::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
+	mEncoder = GraphicsEncoder{graph};
+
 	mOpaqueGroups = std::span(
 		ctx.queueRegistry->get<RenderGroup>("opaque").data(),
 		ctx.queueRegistry->get<RenderGroup>("opaque").size());
@@ -39,6 +41,9 @@ void CullingPass::configure(const RenderContext& ctx, const FrameGraph& graph, E
 }
 
 void CullingPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
+	mEncoder.bindFrameBuffer("sceneBuffer");
+	mEncoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
+
 	const auto frustum = ctx.camera->generateFrustum();
 
 	cullScene(ctx, frustum, mOpaqueGroups, *mOpaqueCommands);

@@ -25,7 +25,7 @@ private:
 		{.flags = CASTSHADOW, .queue = "shadow", .instancedQueue = "shadow"},
 		{.flags = PBR, .queue = "deferred", .instancedQueue = "deferred"},
 		{.flags = OPAQUE, .queue = "opaque", .instancedQueue = "opaqueInstanced"},
-		{.flags = UNLIT, .queue = "unlit", .instancedQueue = "unlitInstanced"},
+		{.flags = UNLIT, .queue = "unlit", .instancedQueue = "unlit"},
 		{.flags = BLEND, .queue = "blend", .instancedQueue = "blendInstanced"},
 	};
 
