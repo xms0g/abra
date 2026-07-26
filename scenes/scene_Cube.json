@@ -42,7 +42,6 @@
         "MaterialComponent": {
           "color": [0.0, 1.0, 1.0, 1.0],
           "unlit": true,
-          "shader": "unlit",
           "from_resource_manager": true
         },
         "BoundingVolumeComponent": { "type": "AABB" },
@@ -62,7 +61,6 @@
         "MaterialComponent": {
           "color": [1.0, 1.0, 1.0],
           "unlit": true,
-          "shader": "unlit",
           "from_resource_manager": true
         },
         "DirectionalLightComponent": {

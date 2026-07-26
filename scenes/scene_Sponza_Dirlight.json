@@ -12,7 +12,6 @@
         },
         "MeshComponent": { "from_resource_manager": true },
         "MaterialComponent": {
-          "shader": "skybox",
           "from_resource_manager": true
         },
         "SkyboxComponent": {
@@ -67,7 +66,6 @@
         "MaterialComponent": {
           "color": [1.0, 1.0, 1.0],
           "unlit": true,
-          "shader": "unlit",
           "from_resource_manager": true
         },
         "DirectionalLightComponent": {
