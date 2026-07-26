@@ -7,7 +7,6 @@
 #include "../../context/renderContext.hpp"
 #include "../../context/renderData.hpp"
 #include "../../context/renderQueue.hpp"
-#include "../../buffers/frameBuffer.h"
 #include "../../renderCommand.h"
 #include "../../../config/configManager.h"
 
@@ -16,7 +15,9 @@ PerspectiveShadow::PerspectiveShadow(const RenderContext& ctx) {
 	mHeight = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_height");
 	mAspect = static_cast<float>(mWidth) / static_cast<float>(mHeight);
 	mDepthShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("depth");
-	mObjects = &ctx.queueRegistry->get<RenderGroup>("shadow");
+	mObjects = std::span(
+		ctx.queueRegistry->get<RenderGroup>("shadow").data(),
+		ctx.queueRegistry->get<RenderGroup>("shadow").size());
 	mNear = CONFIG_MANAGER_INSTANCE.get<float>("shadow.perspective.nearPlane");
 	mFar = CONFIG_MANAGER_INSTANCE.get<float>("shadow.perspective.farPlane");
 }
@@ -45,7 +46,7 @@ void PerspectiveShadow::render(
 	mDepthShader->bind();
 	mDepthShader->setMat4("lightSpaceMatrix", mLightSpaceMatrix[layer]);
 
-	for (const auto& [entityID, matBatch]: *mObjects) {
+	for (const auto& [entityID, matBatch]: mObjects) {
 		RenderCommand::setupTransform(entityID, ctx, *mDepthShader);
 
 		for (const auto& meshIdx: matBatch.meshIndices) {

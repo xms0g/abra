@@ -10,12 +10,13 @@
 #include "../../context/renderQueue.hpp"
 #include "../../buffers/frameBuffer.h"
 #include "../../renderCommand.h"
-#include "../../graph.h"
 #include "../../../config/configManager.h"
 
 DirectionalShadow::DirectionalShadow(const RenderContext& ctx) {
 	mDepthShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("depth");
-	mObjects = &ctx.queueRegistry->get<RenderGroup>("shadow");
+	mObjects = std::span(
+		ctx.queueRegistry->get<RenderGroup>("shadow").data(),
+		ctx.queueRegistry->get<RenderGroup>("shadow").size());
 
 	mHeight = CONFIG_MANAGER_INSTANCE.get<float>("shadow.directional.height");
 	mRight = CONFIG_MANAGER_INSTANCE.get<float>("shadow.directional.right");
@@ -46,7 +47,7 @@ void DirectionalShadow::render(const RenderContext& ctx, const FrameGraph& graph
 	graph.getResource("directional").bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	for (const auto& [entityID, matBatch]: *mObjects) {
+	for (const auto& [entityID, matBatch]: mObjects) {
 		RenderCommand::setupTransform(entityID, ctx, *mDepthShader);
 
 		for (const auto& meshIdx: matBatch.meshIndices) {

@@ -1,4 +1,5 @@
 #pragma once
+#include <span>
 #include "glm/glm.hpp"
 #include "../../context/renderQueue.hpp"
 
@@ -16,17 +17,13 @@ public:
 	void render(const RenderContext& ctx, const glm::vec3& position, int32_t layer);
 
 private:
-	int32_t mWidth{0};
-	int32_t mHeight{0};
-	float mAspect{0.0f};
-	float mFar{0.0f};
-	float mNear{0.0f};
-	float mFovy{0.0f};
+	int32_t mWidth{0}, mHeight{0};
+	float mAspect{0.0f}, mFar{0.0f}, mNear{0.0f}, mFovy{0.0f};
 
 	std::vector<glm::mat4> mShadowTransforms;
-	RenderQueue<RenderGroup>* mObjects;
+	std::span<RenderGroup> mObjects;
 	const Shader* mDepthShader;
-	glm::mat4 mShadowProj;
+	glm::mat4 mShadowProj{};
 
 	struct DirUpPair {
 		glm::vec3 dir;

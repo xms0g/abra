@@ -1,5 +1,4 @@
 #include "omnidirectionalShadow.h"
-#include "glad/glad.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "../../shader.h"
@@ -7,7 +6,6 @@
 #include "../../context/renderData.hpp"
 #include "../../context/renderContext.hpp"
 #include "../../context/renderQueue.hpp"
-#include "../../buffers/frameBuffer.h"
 #include "../../renderCommand.h"
 #include "../../../config/configManager.h"
 
@@ -16,7 +14,9 @@ OmnidirectionalShadow::OmnidirectionalShadow(const RenderContext& ctx) {
 	mHeight = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_height");
 	mAspect = static_cast<float>(mWidth) / static_cast<float>(mHeight);
 	mDepthShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("depthCubemap");
-	mObjects = &ctx.queueRegistry->get<RenderGroup>("shadow");
+	mObjects = std::span(
+		ctx.queueRegistry->get<RenderGroup>("shadow").data(),
+		ctx.queueRegistry->get<RenderGroup>("shadow").size());
 
 	mNear = CONFIG_MANAGER_INSTANCE.get<float>("shadow.omnidirectional.nearPlane");
 	mFar = CONFIG_MANAGER_INSTANCE.get<float>("shadow.omnidirectional.farPlane");
@@ -44,7 +44,7 @@ void OmnidirectionalShadow::render(
 	mDepthShader->setVec3("lightPos", position);
 	mDepthShader->setInt("cubeIndex", layer);
 
-	for (const auto& [entityID, matBatch]: *mObjects) {
+	for (const auto& [entityID, matBatch]: mObjects) {
 		RenderCommand::setupTransform(entityID, ctx, *mDepthShader);
 
 		for (const auto& meshIdx: matBatch.meshIndices) {

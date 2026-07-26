@@ -1,4 +1,5 @@
 #pragma once
+#include <span>
 #include "glm/glm.hpp"
 #include "../../context/renderQueue.hpp"
 
@@ -23,5 +24,5 @@ private:
 	float mHeight, mLeft, mRight, mBottom, mTop, mNear, mFar;
 	glm::mat4 mLightSpaceMatrix{};
 	const Shader* mDepthShader;
-	RenderQueue<RenderGroup>* mObjects;
+	std::span<RenderGroup> mObjects;
 };

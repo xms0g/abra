@@ -5,7 +5,6 @@
 #include "perspectiveShadow.h"
 #include "../../graph.h"
 #include "../../context/renderContext.hpp"
-#include "../../context/renderData.hpp"
 #include "../../buffers/uniformBuffer.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../../ECS/components/directionalLight.hpp"
