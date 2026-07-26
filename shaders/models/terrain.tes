@@ -11,7 +11,6 @@ in TCS_OUT
 #include "ub/camera.glsl"
 #include "legacy/material.glsl"
 
-uniform sampler2D heightMap;
 uniform mat4 model;
 
 out TES_OUT
@@ -36,7 +35,7 @@ void main() {
     vec2 texCoord = mix(t0, t1, v);
 
     // lookup texel at patch coordinate for height and scale + shift as desired
-    tes_out.Height = texture(heightMap, texCoord).y * material.heightScale - HEIGHT_SHIFT;
+    tes_out.Height = texture(material.texture_height, texCoord).y * material.heightScale - HEIGHT_SHIFT;
 
     // retrieve control point position coordinates
     vec4 p00 = gl_in[0].gl_Position;

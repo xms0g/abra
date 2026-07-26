@@ -1,5 +1,7 @@
 #pragma once
 #include "IPass.hpp"
+#include "../graphicsPipeline.h"
+#include "../graphicsEncoder.h"
 #include "../context/renderQueue.hpp"
 
 class Shader;
@@ -16,6 +18,7 @@ public:
 	void execute(const RenderContext& ctx, const FrameGraph& graph) override;
 
 private:
-	const Shader* mShader{nullptr};
+	GraphicsPipeline mPipeline{};
+	GraphicsEncoder mEncoder{};
 	RenderQueue<RenderGroup>* mObjects{nullptr};
 };
