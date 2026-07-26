@@ -58,35 +58,16 @@ void TerrainPass::configure(const RenderContext& ctx, const FrameGraph& graph, E
 
 	mPipeline = GraphicsPipeline{desc};
 	mEncoder = GraphicsEncoder{graph};
-	mObjects = &ctx.queueRegistry->get<RenderGroup>("terrain");
+	mCommands = &ctx.queueRegistry->get<DrawCommand>("TerrainCommands");
 }
 
 void TerrainPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
-	const auto& [entityID, matBatch] = mObjects->front();
-	const uint32_t meshIdx = matBatch.meshIndices.front();
+	const auto& cmd = mCommands->front();
 
 	mEncoder.reset();
 	mEncoder.bindFrameBuffer("sceneBuffer");
 	mEncoder.bindPipeline(mPipeline);
-
-	mEncoder.bindMaterial({
-		.idx = matBatch.materialIndex,
-		.flags = ctx.renderData->material.flags[matBatch.materialIndex],
-		.textureTarget = ctx.renderData->material.textureTargets[matBatch.materialIndex],
-		.heightScale = ctx.renderData->entity.heightScales[entityID],
-		.textures = std::span<const uint32_t>(
-			ctx.renderData->material.textures.data() + matBatch.textureOffset,
-			matBatch.textureCount)
-	});
-
-	mEncoder.bindTransform({
-		.model = ctx.renderData->entity.models[entityID],
-		.normal = ctx.renderData->entity.normals[entityID],
-	});
-
-	mEncoder.draw({
-		.vao = ctx.renderData->mesh.vaos[meshIdx],
-		.vertexCount = ctx.renderData->mesh.vertexCounts[meshIdx],
-		.indexCount = 0
-	});
+	mEncoder.bindMaterial(cmd.material);
+	mEncoder.bindTransform(cmd.transform);
+	mEncoder.draw(cmd.mesh);
 }

@@ -14,7 +14,6 @@
 #include "buffers/uniformBuffer.h"
 #include "models/quad.h"
 #include "context/renderGroup.hpp"
-#include "context/visibleObject.hpp"
 #include "passes/deferredGeometry.h"
 #include "passes/deferredLighting.h"
 #include "passes/ssao.h"
@@ -132,6 +131,7 @@ void Renderer::createRenderQueues() {
 	mQueueRegistry.set<DrawCommand>("UnlitCommands");
 	mQueueRegistry.set<DrawCommand>("BlendCommands");
 	mQueueRegistry.set<DrawCommand>("DebugCommands");
+	mQueueRegistry.set<DrawCommand>("TerrainCommands");
 }
 
 void Renderer::createRenderPasses(EventBus& eventBus) {

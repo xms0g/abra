@@ -20,5 +20,5 @@ public:
 private:
 	GraphicsPipeline mPipeline{};
 	GraphicsEncoder mEncoder{};
-	RenderQueue<RenderGroup>* mObjects{nullptr};
+	RenderQueue<DrawCommand>* mCommands{nullptr};
 };

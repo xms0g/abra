@@ -11,7 +11,6 @@ struct Frustum;
 }
 
 struct RenderGroup;
-struct VisibleObject;
 
 class CullingPass final : public IPass {
 public:
@@ -37,9 +36,11 @@ private:
 	std::span<RenderGroup> mBlendGroups{};
 	std::span<RenderGroup> mDeferredGroups{};
 	std::span<RenderGroup> mDebugGroups{};
+	std::span<RenderGroup> mTerrainGroups{};
 	RenderQueue<DrawCommand>* mOpaqueCommands{nullptr};
 	RenderQueue<DrawCommand>* mUnlitCommands{nullptr};
 	RenderQueue<DrawCommand>* mBlendCommands{nullptr};
 	RenderQueue<DrawCommand>* mDeferredCommands{nullptr};
 	RenderQueue<DrawCommand>* mDebugCommands{nullptr};
+	RenderQueue<DrawCommand>* mTerrainCommands{nullptr};
 };

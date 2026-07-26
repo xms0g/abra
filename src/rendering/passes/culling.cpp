@@ -5,7 +5,6 @@
 #include "../context/renderData.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderGroup.hpp"
-#include "../context/visibleObject.hpp"
 #include "../context/renderQueue.hpp"
 #include "../../ECS/registry.h"
 #include "../../math/boundingVolume.h"
@@ -33,11 +32,15 @@ void CullingPass::configure(const RenderContext& ctx, const FrameGraph& graph, E
 	mDebugGroups = std::span(
 		ctx.queueRegistry->get<RenderGroup>("debug").data(),
 		ctx.queueRegistry->get<RenderGroup>("debug").size());
+	mTerrainGroups = std::span(
+		ctx.queueRegistry->get<RenderGroup>("terrain").data(),
+		ctx.queueRegistry->get<RenderGroup>("terrain").size());
 	mOpaqueCommands = &ctx.queueRegistry->get<DrawCommand>("OpaqueCommands");
 	mUnlitCommands = &ctx.queueRegistry->get<DrawCommand>("UnlitCommands");
 	mBlendCommands = &ctx.queueRegistry->get<DrawCommand>("BlendCommands");
 	mDeferredCommands = &ctx.queueRegistry->get<DrawCommand>("DeferredCommands");
 	mDebugCommands = &ctx.queueRegistry->get<DrawCommand>("DebugCommands");
+	mTerrainCommands = &ctx.queueRegistry->get<DrawCommand>("TerrainCommands");
 }
 
 void CullingPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
@@ -51,6 +54,7 @@ void CullingPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	cullScene(ctx, frustum, mDeferredGroups, *mDeferredCommands);
 	cullScene(ctx, frustum, mBlendGroups, *mBlendCommands);
 	cullScene(ctx, frustum, mDebugGroups, *mDebugCommands);
+	cullScene(ctx, frustum, mTerrainGroups, *mTerrainCommands);
 }
 
 void CullingPass::cullScene(
