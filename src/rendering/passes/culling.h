@@ -1,5 +1,6 @@
 #pragma once
 #include "IPass.hpp"
+#include <span>
 #include "../context/renderQueue.hpp"
 
 struct DrawCommand;
@@ -25,14 +26,14 @@ private:
 	static void cullScene(
 		const RenderContext& ctx,
 		const math::Frustum& frustum,
-		const RenderQueue<RenderGroup>& groups,
+		std::span<RenderGroup> groups,
 		RenderQueue<DrawCommand>& outQueue);
 
-	RenderQueue<RenderGroup>* mOpaqueGroups{nullptr};
-	RenderQueue<RenderGroup>* mUnlitGroups{nullptr};
-	RenderQueue<RenderGroup>* mBlendGroups{nullptr};
-	RenderQueue<RenderGroup>* mDeferredGroups{nullptr};
-	RenderQueue<RenderGroup>* mDebugGroups{nullptr};
+	std::span<RenderGroup> mOpaqueGroups{};
+	std::span<RenderGroup> mUnlitGroups{};
+	std::span<RenderGroup> mBlendGroups{};
+	std::span<RenderGroup> mDeferredGroups{};
+	std::span<RenderGroup> mDebugGroups{};
 	RenderQueue<DrawCommand>* mOpaqueCommands{nullptr};
 	RenderQueue<DrawCommand>* mUnlitCommands{nullptr};
 	RenderQueue<DrawCommand>* mBlendCommands{nullptr};

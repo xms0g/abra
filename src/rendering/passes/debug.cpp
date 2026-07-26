@@ -40,7 +40,7 @@ void DebugPass::configure(const RenderContext& ctx, const FrameGraph& graph, Eve
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
 		.stage = Shader("debug/normal.vert", "debug/normal.frag", "debug/normal.geom"),
-		.samples = {},
+		.samplers = {},
 		.uniforms = {
 			{
 				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name").c_str(),
@@ -55,7 +55,7 @@ void DebugPass::configure(const RenderContext& ctx, const FrameGraph& graph, Eve
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
 		.stage = Shader("debug/wireframe.vert", "debug/wireframe.frag", "debug/wireframe.geom"),
-		.samples = {},
+		.samplers = {},
 		.uniforms = {
 			{
 				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name").c_str(),
@@ -78,12 +78,12 @@ void DebugPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	mEncoder.reset();
 	mEncoder.bindFrameBuffer("sceneBuffer");
 
-	for (const auto& object: *mCommands) {
-		if (object.debugMode == None)
+	for (const auto& cmd: *mCommands) {
+		if (cmd.debugMode == None)
 			continue;
 
-		mEncoder.bindPipeline(mPipelines[object.debugMode]);
-		mEncoder.bindTransform(object.transform);
-		mEncoder.drawIndexed(object.mesh);
+		mEncoder.bindPipeline(mPipelines[cmd.debugMode]);
+		mEncoder.bindTransform(cmd.transform);
+		mEncoder.drawIndexed(cmd.mesh);
 	}
 }

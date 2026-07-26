@@ -20,7 +20,7 @@
 #include "passes/ssao.h"
 #include "passes/debug.h"
 #include "passes/forwardOpaque.h"
-#include "passes/instanced.h"
+#include "passes/instancedOpaque.h"
 #include "passes/culling.h"
 #include "passes/skybox.h"
 #include "passes/resolve.h"
@@ -131,7 +131,7 @@ void Renderer::createRenderQueues() {
 	mQueueRegistry.set<DrawCommand>("OpaqueCommands");
 	mQueueRegistry.set<DrawCommand>("UnlitCommands");
 	mQueueRegistry.set<DrawCommand>("BlendCommands");
-	mQueueRegistry.set<VisibleObject>("visibleDebug");
+	mQueueRegistry.set<DrawCommand>("DebugCommands");
 }
 
 void Renderer::createRenderPasses(EventBus& eventBus) {
@@ -146,7 +146,7 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 		"DeferredGeometryPass",
 		!mQueueRegistry.empty("deferred"),
 		std::make_unique<DeferredGeometryPass>(),
-		{"visibleDeferred"},
+		{"DeferredCommands"},
 		{"gBuffer"}
 	);
 	mGraph.addPass(
@@ -173,7 +173,7 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 	mGraph.addPass(
 		"InstancedPass",
 		!mQueueRegistry.empty("opaqueInstanced") || !mQueueRegistry.empty("blendInstanced"),
-		std::make_unique<InstancedPass>(),
+		std::make_unique<InstancedOpaquePass>(),
 		{"sceneBuffer"},
 		{"sceneBuffer"}
 	);
@@ -181,7 +181,7 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 		"DebugPass",
 		!mQueueRegistry.empty("debug"),
 		std::make_unique<DebugPass>(),
-		{"sceneBuffer", "visibleDebug"},
+		{"sceneBuffer", "DebugCommands"},
 		{"sceneBuffer"}
 	);
 	mGraph.addPass(

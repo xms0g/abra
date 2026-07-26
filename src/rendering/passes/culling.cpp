@@ -16,11 +16,21 @@ CullingPass::CullingPass() = default;
 CullingPass::~CullingPass() = default;
 
 void CullingPass::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
-	mOpaqueGroups = &ctx.queueRegistry->get<RenderGroup>("opaque");
-	mUnlitGroups = &ctx.queueRegistry->get<RenderGroup>("unlit");
-	mBlendGroups = &ctx.queueRegistry->get<RenderGroup>("blend");
-	mDeferredGroups = &ctx.queueRegistry->get<RenderGroup>("deferred");
-	mDebugGroups = &ctx.queueRegistry->get<RenderGroup>("debug");
+	mOpaqueGroups = std::span(
+		ctx.queueRegistry->get<RenderGroup>("opaque").data(),
+		ctx.queueRegistry->get<RenderGroup>("opaque").size());
+	mUnlitGroups = std::span(
+		ctx.queueRegistry->get<RenderGroup>("unlit").data(),
+		ctx.queueRegistry->get<RenderGroup>("unlit").size());
+	mBlendGroups = std::span(
+		ctx.queueRegistry->get<RenderGroup>("blend").data(),
+		ctx.queueRegistry->get<RenderGroup>("blend").size());
+	mDeferredGroups = std::span(
+		ctx.queueRegistry->get<RenderGroup>("deferred").data(),
+		ctx.queueRegistry->get<RenderGroup>("deferred").size());
+	mDebugGroups = std::span(
+		ctx.queueRegistry->get<RenderGroup>("debug").data(),
+		ctx.queueRegistry->get<RenderGroup>("debug").size());
 	mOpaqueCommands = &ctx.queueRegistry->get<DrawCommand>("OpaqueCommands");
 	mUnlitCommands = &ctx.queueRegistry->get<DrawCommand>("UnlitCommands");
 	mBlendCommands = &ctx.queueRegistry->get<DrawCommand>("BlendCommands");
@@ -31,17 +41,17 @@ void CullingPass::configure(const RenderContext& ctx, const FrameGraph& graph, E
 void CullingPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	const auto frustum = ctx.camera->generateFrustum();
 
-	cullScene(ctx, frustum, *mOpaqueGroups, *mOpaqueCommands);
-	cullScene(ctx, frustum, *mUnlitGroups, *mUnlitCommands);
-	cullScene(ctx, frustum, *mDeferredGroups, *mDeferredCommands);
-	cullScene(ctx, frustum, *mBlendGroups, *mBlendCommands);
-	cullScene(ctx, frustum, *mDebugGroups, *mDebugCommands);
+	cullScene(ctx, frustum, mOpaqueGroups, *mOpaqueCommands);
+	cullScene(ctx, frustum, mUnlitGroups, *mUnlitCommands);
+	cullScene(ctx, frustum, mDeferredGroups, *mDeferredCommands);
+	cullScene(ctx, frustum, mBlendGroups, *mBlendCommands);
+	cullScene(ctx, frustum, mDebugGroups, *mDebugCommands);
 }
 
 void CullingPass::cullScene(
 	const RenderContext& ctx,
 	const math::Frustum& frustum,
-	const RenderQueue<RenderGroup>& groups,
+	std::span<RenderGroup> groups,
 	RenderQueue<DrawCommand>& outQueue) {
 	outQueue.clear();
 

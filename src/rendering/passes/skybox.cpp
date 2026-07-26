@@ -3,13 +3,11 @@
 #include "../shader.h"
 #include "../renderCommand.h"
 #include "../graph.h"
-#include "../buffers/frameBuffer.h"
 #include "../material/material.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderData.hpp"
 #include "../context/renderGroup.hpp"
 #include "../context/renderQueue.hpp"
-#include "../texture/texture.h"
 
 SkyboxPass::SkyboxPass() = default;
 
@@ -43,7 +41,7 @@ void SkyboxPass::configure(const RenderContext& ctx, const FrameGraph& graph, Ev
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
 		.stage = Shader("skybox.vert", "skybox.frag"),
-		.samples = {
+		.samplers = {
 			{.name = "skybox", .slot = 0},
 		},
 		.uniforms = {}

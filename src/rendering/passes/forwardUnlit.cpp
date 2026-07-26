@@ -35,7 +35,7 @@ void ForwardUnlitPass::configure(const RenderContext& ctx, const FrameGraph& gra
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
 		.stage = Shader("unlit.vert", "unlit.frag"),
-		.samples = {},
+		.samplers = {},
 		.uniforms = {
 			{
 				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name").c_str(),
@@ -55,10 +55,10 @@ void ForwardUnlitPass::execute(const RenderContext& ctx, const FrameGraph& graph
 	mEncoder.bindFrameBuffer("sceneBuffer");
 	mEncoder.bindPipeline(mPipeline);
 
-	for (const auto& object: *mCommands) {
-		mEncoder.bindMaterial(object.material);
-		mEncoder.bindTransform(object.transform);
-		mEncoder.drawIndexed(object.mesh);
+	for (const auto& cmd: *mCommands) {
+		mEncoder.bindMaterial(cmd.material);
+		mEncoder.bindTransform(cmd.transform);
+		mEncoder.drawIndexed(cmd.mesh);
 	}
 }
 

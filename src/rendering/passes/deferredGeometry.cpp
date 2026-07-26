@@ -38,7 +38,7 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, const FrameGraph&
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
 		.stage = Shader("deferred/gbuffer.vert", "deferred/gbuffer.frag"),
-		.samples = {
+		.samplers = {
 			{.name = "material.texture_albedo", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.albedo.textureSlot")},
 			{.name = "material.texture_normal", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.normal.textureSlot")},
 			{
@@ -71,9 +71,9 @@ void DeferredGeometryPass::execute(const RenderContext& ctx, const FrameGraph& g
 	mEncoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
 	mEncoder.bindPipeline(mPipeline);
 
-	for (const auto& object: *mCommands) {
-		mEncoder.bindMaterial(object.material);
-		mEncoder.bindTransform(object.transform);
-		mEncoder.drawIndexed(object.mesh);
+	for (const auto& cmd: *mCommands) {
+		mEncoder.bindMaterial(cmd.material);
+		mEncoder.bindTransform(cmd.transform);
+		mEncoder.drawIndexed(cmd.mesh);
 	}
 }

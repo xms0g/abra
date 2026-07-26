@@ -37,7 +37,7 @@ void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph&
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
 		.stage = Shader("models/quad.vert", "deferred/lighting.frag"),
-		.samples = {
+		.samplers = {
 			{.name = "gPosition", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureSlot")},
 			{.name = "gNormal", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot")},
 			{.name = "gAlbedo", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureSlot")},

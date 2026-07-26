@@ -35,7 +35,11 @@ void ForwardOpaquePass::configure(const RenderContext& ctx, const FrameGraph& gr
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
 		.stage = Shader("object.vert", "opaque.frag"),
-		.samples = {
+		.samplers = {
+			{.name = "material.texture_albedo", .slot = 0},
+			{.name = "material.texture_specular", .slot = 1},
+			{.name = "material.texture_normal", .slot = 2},
+			{.name = "material.texture_height", .slot = 3},
 			{.name = "shadowMap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot")},
 			{.name = "shadowCubemap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot") + 1},
 			{.name = "persShadowMap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot") + 2}
@@ -72,9 +76,9 @@ void ForwardOpaquePass::execute(const RenderContext& ctx, const FrameGraph& grap
 	mEncoder.bindFrameBuffer("sceneBuffer");
 	mEncoder.bindPipeline(mPipeline);
 
-	for (const auto& object: *mCommands) {
-		mEncoder.bindMaterial(object.material);
-		mEncoder.bindTransform(object.transform);
-		mEncoder.drawIndexed(object.mesh);
+	for (const auto& cmd: *mCommands) {
+		mEncoder.bindMaterial(cmd.material);
+		mEncoder.bindTransform(cmd.transform);
+		mEncoder.drawIndexed(cmd.mesh);
 	}
 }
