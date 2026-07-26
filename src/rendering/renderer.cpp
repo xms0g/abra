@@ -45,12 +45,6 @@ Renderer::Renderer(Registry& registry, const Camera& camera, Window& window) {
 		throw std::runtime_error(std::string("ERROR::RENDERER::FAILED_TO_INIT_GLAD"));
 	}
 
-	// configure global opengl state
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
-
 	createRenderQueues();
 	createSystems(registry);
 	createFrameBuffers();
