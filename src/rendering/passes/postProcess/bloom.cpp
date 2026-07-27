@@ -2,7 +2,7 @@
 #include "glad/glad.h"
 #include "../../shader.h"
 #include "../../renderCommand.h"
-#include "../../graph.h"
+#include "../../frameGraph.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../context/renderContext.hpp"
 
@@ -32,10 +32,10 @@ void Bloom::configure(const FrameGraph& graph) {
 	mRenderTargets = {&graph.getResource("bloomPing"), &graph.getResource("bloomPong")};
 }
 
-uint32_t Bloom::render(const uint32_t vao, const uint32_t sceneTexture, FrameBuffer* renderTarget) const {
+TextureHandle Bloom::render(const uint32_t vao, const TextureHandle sceneTexture, FrameBuffer* renderTarget) const {
 	(void) renderTarget;
 	bool toggle = false;
-	uint32_t inputTex = sceneTexture;
+	TextureHandle inputTex = sceneTexture;
 
 	inputTex = brightFilterPass(vao, inputTex, toggle);
 	inputTex = blurPass(vao, inputTex, toggle);
@@ -47,24 +47,24 @@ uint32_t Bloom::render(const uint32_t vao, const uint32_t sceneTexture, FrameBuf
 void Bloom::updateFromEventImpl(const GuiPostProcessEvent& event) {
 }
 
-uint32_t Bloom::brightFilterPass(const uint32_t vao, const uint32_t sceneTexture, bool& toggle) const {
+TextureHandle Bloom::brightFilterPass(const uint32_t vao, const TextureHandle sceneTexture, bool& toggle) const {
 	mRenderTargets[toggle]->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	mBrightFilter->bind();
 
-	const uint32_t textures[] = {sceneTexture};
+	const uint32_t textures[] = {sceneTexture.id};
 	RenderCommand::drawQuad(vao, textures);
 
-	const uint32_t outTex = mRenderTargets[toggle]->texture();
+	const TextureHandle outTex = mRenderTargets[toggle]->texture();
 	toggle = !toggle;
 
 	return outTex;
 }
 
-uint32_t Bloom::blurPass(const uint32_t vao, const uint32_t sceneTexture, bool& toggle) const {
+TextureHandle Bloom::blurPass(const uint32_t vao, const TextureHandle sceneTexture, bool& toggle) const {
 	bool horizontal = true;
-	uint32_t outTex = sceneTexture;
+	TextureHandle outTex = sceneTexture;
 
 	for (int i = 0; i < 10; ++i) {
 		mRenderTargets[toggle]->bind();
@@ -74,7 +74,7 @@ uint32_t Bloom::blurPass(const uint32_t vao, const uint32_t sceneTexture, bool& 
 		mBlur->setBool("horizontal", horizontal);
 		horizontal = !horizontal;
 
-		const uint32_t textures[] = {outTex};
+		const uint32_t textures[] = {outTex.id};
 		RenderCommand::drawQuad(vao, textures);
 
 		outTex = mRenderTargets[toggle]->texture();
@@ -84,15 +84,15 @@ uint32_t Bloom::blurPass(const uint32_t vao, const uint32_t sceneTexture, bool& 
 	return outTex;
 }
 
-uint32_t Bloom::combinePass(
+TextureHandle Bloom::combinePass(
 	const uint32_t vao,
-	const uint32_t sceneTexture,
-	const uint32_t blurTexture,
+	const TextureHandle sceneTexture,
+	const TextureHandle blurTexture,
 	const bool& toggle) const {
 	mRenderTargets[toggle]->bind();
 	mCombine->bind();
 
-	const uint32_t textures[] = {sceneTexture, blurTexture};
+	const uint32_t textures[] = {sceneTexture.id, blurTexture.id};
 	RenderCommand::drawQuad(vao, textures);
 
 	return mRenderTargets[toggle]->texture();

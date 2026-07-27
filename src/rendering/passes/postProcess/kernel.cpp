@@ -19,14 +19,14 @@ void Kernel::configure(const FrameGraph& graph) {
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
 }
 
-uint32_t Kernel::render(const uint32_t vao, const uint32_t sceneTexture, FrameBuffer* renderTarget) const {
+TextureHandle Kernel::render(const uint32_t vao, const TextureHandle sceneTexture, FrameBuffer* renderTarget) const {
 	renderTarget->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	mShader->bind();
 	mShader->setFloatArray("kernel", mKernel, 9);
 
-	const uint32_t textures[] = {sceneTexture};
+	const uint32_t textures[] = {sceneTexture.id};
 	RenderCommand::drawQuad(vao, textures);
 
 	return renderTarget->texture();

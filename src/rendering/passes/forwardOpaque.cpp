@@ -1,4 +1,6 @@
 #include "forwardOpaque.h"
+#include "../frameGraph.h"
+#include "../shader.h"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../../config/configManager.h"
@@ -61,19 +63,19 @@ void ForwardOpaquePass::configure(const RenderContext& ctx, const FrameGraph& gr
 	};
 
 	mPipeline = GraphicsPipeline(desc);
-	mEncoder = GraphicsEncoder(graph);
+	mEncoder = GraphicsEncoder{};
 
 	const int32_t slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot");
-	mEncoder.bindTexture("directional", slot);
-	mEncoder.bindTexture("point", slot + 1);
-	mEncoder.bindTexture("spot", slot + 2);
+	mEncoder.bindTexture(graph.getResource("directional").texture(0), slot);
+	mEncoder.bindTexture( graph.getResource("point").texture(0), slot + 1);
+	mEncoder.bindTexture(graph.getResource("spot").texture(0), slot + 2);
 
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("OpaqueCommands");
 }
 
 void ForwardOpaquePass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	mEncoder.reset();
-	mEncoder.bindFrameBuffer("sceneBuffer");
+	mEncoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
 	mEncoder.bindPipeline(mPipeline);
 
 	for (const auto& cmd: *mCommands) {

@@ -3,6 +3,7 @@
 #include <array>
 #include <string>
 #include "../../types.hpp"
+#include "../../texture/texture.h"
 #include "../../../event/events/guiPostProcessEvent.hpp"
 
 class FrameGraph;
@@ -27,7 +28,7 @@ public:
 
 	virtual void configure(const FrameGraph& graph) = 0;
 
-	virtual uint32_t render(uint32_t vao, uint32_t sceneTexture, FrameBuffer* renderTarget) const = 0;
+	virtual TextureHandle render(uint32_t vao, TextureHandle sceneTexture, FrameBuffer* renderTarget) const = 0;
 
 	void updateFromEvent(const GuiPostProcessEvent& event) {
 		this->enabled(event.enabled);

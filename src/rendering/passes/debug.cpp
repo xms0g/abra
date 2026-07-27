@@ -1,7 +1,7 @@
 #include "debug.h"
 #include "../shader.h"
 #include "../renderCommand.h"
-#include "../graph.h"
+#include "../frameGraph.h"
 #include "../context/renderContext.hpp"
 #include "../context/renderData.hpp"
 #include "../context/renderQueue.hpp"
@@ -70,13 +70,13 @@ void DebugPass::configure(const RenderContext& ctx, const FrameGraph& graph, Eve
 		GraphicsPipeline{wireframeDesc},
 	};
 
-	mEncoder = GraphicsEncoder{graph};
+	mEncoder = GraphicsEncoder{};
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("DebugCommands");
 }
 
 void DebugPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	mEncoder.reset();
-	mEncoder.bindFrameBuffer("sceneBuffer");
+	mEncoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
 
 	for (const auto& cmd: *mCommands) {
 		if (cmd.debugMode == None)

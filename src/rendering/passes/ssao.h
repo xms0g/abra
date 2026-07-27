@@ -26,9 +26,9 @@ public:
 	void execute(const RenderContext& ctx, const FrameGraph& graph) override;
 
 private:
-	void ssao();
+	void ssao(const FrameGraph& graph);
 
-	void blur();
+	void blur(const FrameGraph& graph);
 
 	void createKernel();
 

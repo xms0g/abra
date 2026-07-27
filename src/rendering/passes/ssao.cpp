@@ -1,7 +1,7 @@
 #include "ssao.h"
 #include "glad/glad.h"
 #include "../shader.h"
-#include "../graph.h"
+#include "../frameGraph.h"
 #include "../buffers/frameBuffer.h"
 #include "../buffers/vertexBuffer.h"
 #include "../texture/texture.h"
@@ -17,8 +17,8 @@ SSAOPass::SSAOPass() = default;
 SSAOPass::~SSAOPass() = default;
 
 void SSAOPass::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
-	createKernel();
 	createNoiseTexture();
+	createKernel();
 
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
@@ -80,28 +80,29 @@ void SSAOPass::configure(const RenderContext& ctx, const FrameGraph& graph, Even
 	mSSAOPipeline = GraphicsPipeline{ssaoInfo};
 	mBlurPipeline = GraphicsPipeline{blurInfo};
 
-	mEncoder = GraphicsEncoder{graph};
+	mEncoder = GraphicsEncoder{};
+
+	const auto& gBuffer = graph.getResource("gBuffer");
 
 	mEncoder.bindTexture(
-		"gBuffer",
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureSlot"),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureIdx"));
+		gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureIdx")),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureSlot"));
+
 	mEncoder.bindTexture(
-		"gBuffer",
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot"),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureIdx"));
+		gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureIdx")),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot"));
 
 	mQuad = std::make_unique<Model::SingleQuad>();
 }
 
 void SSAOPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
-	ssao();
-	blur();
+	ssao(graph);
+	blur(graph);
 }
 
-void SSAOPass::ssao() {
+void SSAOPass::ssao(const FrameGraph& graph) {
 	mEncoder.reset();
-	mEncoder.bindFrameBuffer("ssao");
+	mEncoder.bindFrameBuffer(graph.getResource("ssao"));
 	mEncoder.clearFrameBuffer(ClearMask::Color);
 
 	mEncoder.bindPipeline(mSSAOPipeline);
@@ -112,13 +113,13 @@ void SSAOPass::ssao() {
 	});
 }
 
-void SSAOPass::blur() {
+void SSAOPass::blur(const FrameGraph& graph) {
 	mEncoder.reset();
-	mEncoder.bindFrameBuffer("ssaoBlur");
+	mEncoder.bindFrameBuffer(graph.getResource("ssaoBlur"));
 	mEncoder.clearFrameBuffer(ClearMask::Color);
 
 	mEncoder.bindPipeline(mSSAOPipeline);
-	mEncoder.bindTexture("ssao", 0);
+	mEncoder.bindTexture(graph.getResource("ssao").texture(0), 0);
 	mEncoder.draw({
 		.vao = mQuad->vao(),
 		.vertexCount = 6,

@@ -1,15 +1,18 @@
 #pragma once
 #include <cstdint>
 #include <vector>
+#include "../texture/texture.h"
 
 class BaseFrameBuffer {
 public:
 	BaseFrameBuffer(int32_t width, int32_t height);
 
 	BaseFrameBuffer(const BaseFrameBuffer&) = delete;
+
 	BaseFrameBuffer& operator=(const BaseFrameBuffer&) = delete;
 
 	BaseFrameBuffer(BaseFrameBuffer&&) noexcept = default;
+
 	BaseFrameBuffer& operator=(BaseFrameBuffer&&) noexcept = default;
 
 	virtual ~BaseFrameBuffer();
@@ -21,7 +24,7 @@ public:
 	int32_t height() const;
 
 	[[nodiscard]]
-	uint32_t texture(const uint32_t index = 0) const {
+	TextureHandle texture(const uint32_t index = 0) const {
 		return textureImpl(index);
 	}
 
@@ -41,15 +44,12 @@ public:
 
 protected:
 	[[nodiscard]]
-	virtual uint32_t textureImpl(uint32_t index) const = 0;
+	virtual TextureHandle textureImpl(uint32_t index) const = 0;
 
 	virtual void bindTextureImpl(uint32_t slot, uint32_t index) const = 0;
 
-	uint32_t mFBO{0};
-	uint32_t mRBO{0};
-	int32_t mWidth{0};
-	int32_t mHeight{0};
-
+	uint32_t mFBO{0}, mRBO{0};
+	int32_t mWidth{0}, mHeight{0};
 };
 
 class FrameBuffer final : public BaseFrameBuffer {
@@ -57,6 +57,7 @@ public:
 	FrameBuffer(int32_t width, int32_t height);
 
 	FrameBuffer(const FrameBuffer&) = delete;
+
 	FrameBuffer& operator=(const FrameBuffer&) = delete;
 
 	FrameBuffer(FrameBuffer&& other) noexcept
@@ -110,7 +111,7 @@ public:
 
 protected:
 	[[nodiscard]]
-	uint32_t textureImpl(uint32_t index) const override;
+	TextureHandle textureImpl(uint32_t index) const override;
 
 	void bindTextureImpl(uint32_t slot, uint32_t textureIndex) const override;
 
@@ -123,9 +124,9 @@ private:
 
 	struct TextureDescription {
 		uint32_t id{0};
-		uint32_t target{0};
+		TextureTarget target{};
 	};
-	
+
 	std::vector<TextureDescription> mTextures;
 	std::vector<uint32_t> mAttachments;
 };
@@ -142,7 +143,7 @@ public:
 
 protected:
 	[[nodiscard]]
-	uint32_t textureImpl(uint32_t index) const override;
+	TextureHandle textureImpl(uint32_t index) const override;
 
 	void bindTextureImpl(uint32_t slot, uint32_t textureIndex) const override;
 

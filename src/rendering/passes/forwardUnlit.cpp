@@ -1,4 +1,6 @@
 #include "forwardUnlit.h"
+#include "../shader.h"
+#include "../frameGraph.h"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../../config/configManager.h"
@@ -45,14 +47,14 @@ void ForwardUnlitPass::configure(const RenderContext& ctx, const FrameGraph& gra
 	};
 
 	mPipeline = GraphicsPipeline(desc);
-	mEncoder = GraphicsEncoder(graph);
+	mEncoder = GraphicsEncoder{};
 
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("UnlitCommands");
 }
 
 void ForwardUnlitPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	mEncoder.reset();
-	mEncoder.bindFrameBuffer("sceneBuffer");
+	mEncoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
 	mEncoder.bindPipeline(mPipeline);
 
 	for (const auto& cmd: *mCommands) {

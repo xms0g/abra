@@ -16,16 +16,20 @@ enum TextureType {
 
 enum class TextureTarget : uint32_t {
 	Texture2D = GL_TEXTURE_2D,
-	TextureCubeMap = GL_TEXTURE_CUBE_MAP
+	Texture2DMultisample = GL_TEXTURE_2D_MULTISAMPLE,
+	Texture2DArray = GL_TEXTURE_2D_ARRAY,
+	TextureCubeMap = GL_TEXTURE_CUBE_MAP,
+	TextureCubeMapArray = GL_TEXTURE_CUBE_MAP_ARRAY
 };
-
-constexpr uint32_t toGL(const TextureTarget target) {
-	return toUnderlying(target);
-}
 
 struct TextureBinding {
 	const char* name;
 	int32_t slot;
+};
+
+struct TextureHandle {
+	uint32_t id{0};
+	TextureTarget target{};
 };
 
 struct Texture {
@@ -58,3 +62,7 @@ struct Texture {
 
 	static Texture loadHDR(const std::string& path);
 };
+
+constexpr uint32_t toGL(const TextureTarget target) {
+	return toUnderlying(target);
+}

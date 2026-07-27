@@ -73,10 +73,9 @@ void ConfigManager::load(const std::string& filepath) {
 		set("PBR.irradianceMap.size", config["pbr"]["irradiance_map_size"].value_or(32));
 		set("PBR.prefilterMap.size", config["pbr"]["prefilter_map_size"].value_or(512));
 		set("PBR.brdfLUT.size", config["pbr"]["brdf_lut_size"].value_or(512));
-		set("PBR.irradianceMap.textureSlot", config["pbr"]["irradiance_map_texture_slot"].value_or(9));
-		set("PBR.prefilterMap.textureSlot", config["pbr"]["prefilter_map_texture_slot"].value_or(10));
-		set("PBR.brdfLUT.textureSlot", config["pbr"]["brdf_lut_texture_slot"].value_or(11));
-
+		set("PBR.irradianceMap.textureSlot", config["pbr"]["texture_slots"]["irradiance_map"].value_or(9));
+		set("PBR.prefilterMap.textureSlot", config["pbr"]["texture_slots"]["prefilter_map"].value_or(10));
+		set("PBR.brdfLUT.textureSlot", config["pbr"]["texture_slots"]["brdf_lut"].value_or(11));
 		set("PBR.albedo.textureSlot", config["pbr"]["texture_slots"]["albedo"].value_or(12));
 		set("PBR.normal.textureSlot", config["pbr"]["texture_slots"]["normal"].value_or(13));
 		set("PBR.roughnessMetallic.textureSlot", config["pbr"]["texture_slots"]["rm"].value_or(14));

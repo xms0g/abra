@@ -1,11 +1,8 @@
 #include "terrain.h"
-#include "../renderCommand.h"
-#include "../graph.h"
+#include "../frameGraph.h"
+#include "../shader.h"
 #include "../context/renderContext.hpp"
-#include "../context/renderGroup.hpp"
-#include "../context/renderData.hpp"
 #include "../context/renderQueue.hpp"
-#include "../../rendering/shader.h"
 #include "../../config/configManager.h"
 
 TerrainPass::TerrainPass() = default;
@@ -57,7 +54,7 @@ void TerrainPass::configure(const RenderContext& ctx, const FrameGraph& graph, E
 	};
 
 	mPipeline = GraphicsPipeline{desc};
-	mEncoder = GraphicsEncoder{graph};
+	mEncoder = GraphicsEncoder{};
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("TerrainCommands");
 }
 
@@ -65,7 +62,7 @@ void TerrainPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	const auto& cmd = mCommands->front();
 
 	mEncoder.reset();
-	mEncoder.bindFrameBuffer("sceneBuffer");
+	mEncoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
 	mEncoder.bindPipeline(mPipeline);
 	mEncoder.bindMaterial(cmd.material);
 	mEncoder.bindTransform(cmd.transform);

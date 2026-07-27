@@ -2,7 +2,7 @@
 #include "glad/glad.h"
 #include "../shader.h"
 #include "../renderCommand.h"
-#include "../graph.h"
+#include "../frameGraph.h"
 #include "../material/material.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderData.hpp"
@@ -48,7 +48,7 @@ void SkyboxPass::configure(const RenderContext& ctx, const FrameGraph& graph, Ev
 	};
 
 	mPipeline = GraphicsPipeline{desc};
-	mEncoder = GraphicsEncoder{graph};
+	mEncoder = GraphicsEncoder{};
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("SkyboxCommands");
 }
 
@@ -56,7 +56,7 @@ void SkyboxPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	const auto& cmd = mCommands->front();
 
 	mEncoder.reset();
-	mEncoder.bindFrameBuffer("sceneBuffer");
+	mEncoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
 	mEncoder.bindPipeline(mPipeline);
 	mEncoder.bindMaterial(cmd.material);
 	mEncoder.bindTransform(cmd.transform);

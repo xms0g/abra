@@ -10,7 +10,7 @@
 #include "kernels.hpp"
 #include "../../shader.h"
 #include "../../renderCommand.h"
-#include "../../graph.h"
+#include "../../frameGraph.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../models/quad.h"
 #include "../../context/renderContext.hpp"
@@ -73,7 +73,7 @@ void PostProcessPass::configure(const RenderContext& ctx, const FrameGraph& grap
 	};
 
 	mPipeline = GraphicsPipeline{desc};
-	mEncoder = GraphicsEncoder{graph};
+	mEncoder = GraphicsEncoder{};
 	mQuad = std::make_unique<Model::SingleQuad>();
 	mRenderTargets = {&graph.getResource("ping"), &graph.getResource("pong")};
 	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessEvent>(this, &PostProcessPass::onGuiUpdate);
@@ -82,7 +82,7 @@ void PostProcessPass::configure(const RenderContext& ctx, const FrameGraph& grap
 void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	bool toggle = false;
 
-	uint32_t inputTex = graph.getResource("sceneBuffer").texture();
+	TextureHandle inputTex = graph.getResource("sceneBuffer").texture();
 	for (const auto& effect: mEffects) {
 		if (!effect->enabled())
 			continue;
@@ -95,7 +95,7 @@ void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph)
 	mEncoder.bindFrameBuffer();
 	mEncoder.bindPipeline(mPipeline);
 
-	const uint32_t textures[] = {inputTex};
+	const uint32_t textures[] = {inputTex.id};
 	mEncoder.bindMaterial({
 		.flags = 0,
 		.textureTarget = toGL(TextureTarget::Texture2D),

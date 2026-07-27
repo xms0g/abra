@@ -71,7 +71,7 @@ FrameBuffer& FrameBuffer::withTexture(const uint32_t format) {
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
-	mTextures.emplace_back(textureID, GL_TEXTURE_2D);
+	mTextures.emplace_back(textureID, TextureTarget::Texture2D);
 
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	glTexImage2D(
@@ -100,7 +100,7 @@ FrameBuffer& FrameBuffer::withTextureMultisampled(const int32_t multisampledCoun
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
-	mTextures.emplace_back(textureID, GL_TEXTURE_2D_MULTISAMPLE);
+	mTextures.emplace_back(textureID, TextureTarget::Texture2DMultisample);
 
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureID);
 	glTexImage2DMultisample(
@@ -123,7 +123,7 @@ FrameBuffer& FrameBuffer::withTextureFP(const uint32_t format) {
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
-	mTextures.emplace_back(textureID, GL_TEXTURE_2D);
+	mTextures.emplace_back(textureID, TextureTarget::Texture2D);
 
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	glTexImage2D(
@@ -156,7 +156,7 @@ FrameBuffer& FrameBuffer::withTextureFPMultisampled(
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
-	mTextures.emplace_back(textureID, GL_TEXTURE_2D_MULTISAMPLE);
+	mTextures.emplace_back(textureID, TextureTarget::Texture2DMultisample);
 
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureID);
 	glTexImage2DMultisample(
@@ -177,7 +177,7 @@ FrameBuffer& FrameBuffer::withTextureFPMultisampled(
 FrameBuffer& FrameBuffer::withTextureDepth(const int32_t internalFormat, const bool onlyForShadowMap) {
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
-	mTextures.emplace_back(textureID, GL_TEXTURE_2D);
+	mTextures.emplace_back(textureID, TextureTarget::Texture2D);
 
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	glTexImage2D(
@@ -210,7 +210,7 @@ FrameBuffer& FrameBuffer::withTextureDepthArray(
 	const bool onlyForShadowMap) {
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
-	mTextures.emplace_back(textureID, GL_TEXTURE_2D_ARRAY);
+	mTextures.emplace_back(textureID, TextureTarget::Texture2DArray);
 
 	glBindTexture(GL_TEXTURE_2D_ARRAY, textureID);
 	glTexImage3D(
@@ -240,7 +240,7 @@ FrameBuffer& FrameBuffer::withTextureDepthArray(
 FrameBuffer& FrameBuffer::withTextureCubemapDepth(const int32_t internalFormat, const bool onlyForShadowMap) {
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
-	mTextures.emplace_back(textureID, GL_TEXTURE_CUBE_MAP);
+	mTextures.emplace_back(textureID, TextureTarget::TextureCubeMap);
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 	for (uint32_t i = 0; i < 6; ++i)
@@ -274,7 +274,7 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(
 	const bool onlyForShadowMap) {
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
-	mTextures.emplace_back(textureID, GL_TEXTURE_CUBE_MAP_ARRAY);
+	mTextures.emplace_back(textureID, TextureTarget::TextureCubeMapArray);
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, textureID);
 	glTexImage3D(
@@ -363,15 +363,15 @@ void FrameBuffer::generateMipmaps() {
 	glGenerateMipmap(GL_TEXTURE_2D);
 }
 
-uint32_t FrameBuffer::textureImpl(const uint32_t index) const {
-	return mTextures[index].id;
+TextureHandle FrameBuffer::textureImpl(const uint32_t index) const {
+	return {.id = mTextures[index].id, .target = mTextures[index].target};
 }
 
 void FrameBuffer::bindTextureImpl(const uint32_t slot, const uint32_t textureIndex) const {
 	auto [id, target] = mTextures[textureIndex];
 
 	glActiveTexture(GL_TEXTURE0 + slot);
-	glBindTexture(target, id);
+	glBindTexture(toGL(target), id);
 }
 
 void FrameBuffer::setAttachment(const uint32_t textureID, const uint32_t target) {
@@ -471,8 +471,8 @@ void CubemapBuffer::generateMipmaps() {
 	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 }
 
-uint32_t CubemapBuffer::textureImpl(uint32_t index) const {
-	return mCubemapID;
+TextureHandle CubemapBuffer::textureImpl(uint32_t index) const {
+	return { .id = mCubemapID, .target = TextureTarget::TextureCubeMap};
 }
 
 void CubemapBuffer::bindTextureImpl(const uint32_t slot, uint32_t textureIndex) const {

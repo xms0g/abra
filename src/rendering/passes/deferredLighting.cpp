@@ -1,9 +1,10 @@
 #include "deferredLighting.h"
-#include "../graph.h"
+#include "../frameGraph.h"
 #include "../shader.h"
 #include "../models/quad.h"
 #include "../context/renderContext.hpp"
 #include "../../config/configManager.h"
+#include "../../resource/resourceManager.h"
 
 DeferredLightingPass::DeferredLightingPass() = default;
 
@@ -67,41 +68,58 @@ void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph&
 	};
 
 	mPipeline = GraphicsPipeline(desc);
-	mEncoder = GraphicsEncoder(graph);
+	mEncoder = GraphicsEncoder{};
+
+	const auto& gBuffer = graph.getResource("gBuffer");
 
 	mEncoder.bindTexture(
-		"gBuffer",
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureSlot"),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureIdx"));
+		gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureIdx")),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureSlot"));
+
 	mEncoder.bindTexture(
-		"gBuffer",
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot"),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureIdx"));
+		gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureIdx")),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot"));
+
 	mEncoder.bindTexture(
-		"gBuffer",
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureSlot"),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureIdx"));
+			gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureIdx")),
+			CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureSlot"));
+
 	mEncoder.bindTexture(
-		"gBuffer",
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureSlot"),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureIdx"));
-	mEncoder.bindTexture("ssaoBlur", CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.textureSlot"));
-	mEncoder.bindTexture("irradianceMap", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.textureSlot"));
-	mEncoder.bindTexture("prefilterMap", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.textureSlot"));
-	mEncoder.bindTexture("brdfLUT", CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.brdfLUT.textureSlot"));
+			gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureIdx")),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureSlot"));
+
+	mEncoder.bindTexture(
+		graph.getResource("ssaoBlur").texture(),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.textureSlot"));
+
+	mEncoder.bindTexture(
+		RESOURCE_MANAGER_INSTANCE.get<BaseFrameBuffer>("irradianceMap")->texture(),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.textureSlot"));
+
+	mEncoder.bindTexture(
+		RESOURCE_MANAGER_INSTANCE.get<BaseFrameBuffer>("prefilterMap")->texture(),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.textureSlot"));
+
+	mEncoder.bindTexture(
+		RESOURCE_MANAGER_INSTANCE.get<BaseFrameBuffer>("brdfLUT")->texture(),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.brdfLUT.textureSlot"));
+
 
 	const int32_t slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot");
-	mEncoder.bindTexture("directional", slot);
-	mEncoder.bindTexture("point", slot + 1);
-	mEncoder.bindTexture("spot", slot + 2);
+	mEncoder.bindTexture(graph.getResource("directional").texture(), slot);
+	mEncoder.bindTexture( graph.getResource("point").texture(), slot + 1);
+	mEncoder.bindTexture(graph.getResource("spot").texture(), slot + 2);
 
 	mQuad = std::make_unique<Model::SingleQuad>();
 }
 
 void DeferredLightingPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	mEncoder.reset();
-	mEncoder.blitFramebuffer("gBuffer", "sceneBuffer", BlitMask::Depth);
-	mEncoder.bindFrameBuffer("sceneBuffer");
+	const auto& gBuffer = graph.getResource("gBuffer");
+	const auto& sceneBuffer = graph.getResource("sceneBuffer");
+
+	mEncoder.blitFramebuffer(gBuffer, sceneBuffer, BlitMask::Depth);
+	mEncoder.bindFrameBuffer(sceneBuffer);
 	mEncoder.bindPipeline(mPipeline);
 	mEncoder.draw({
 		.vao = mQuad->vao(),

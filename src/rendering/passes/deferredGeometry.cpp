@@ -1,7 +1,7 @@
 #include "deferredGeometry.h"
 #include "../shader.h"
 #include "../command.hpp"
-#include "../graph.h"
+#include "../frameGraph.h"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../../config/configManager.h"
@@ -73,14 +73,15 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, const FrameGraph&
 	};
 
 	mPipeline = GraphicsPipeline(desc);
-	mEncoder = GraphicsEncoder(graph);
+	mEncoder = GraphicsEncoder{};
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("DeferredCommands");
 }
 
 void DeferredGeometryPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	mEncoder.reset();
-	mEncoder.bindFrameBuffer("gBuffer");
+	mEncoder.bindFrameBuffer(graph.getResource("gBuffer"));
 	mEncoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
+
 	mEncoder.bindPipeline(mPipeline);
 
 	for (const auto& cmd: *mCommands) {

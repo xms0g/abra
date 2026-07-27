@@ -18,14 +18,14 @@ void FXAA::configure(const FrameGraph& graph) {
 	RenderCommand::setTextureUnits(textureBindings, *mShader);
 }
 
-uint32_t FXAA::render(const uint32_t vao, const uint32_t sceneTexture, FrameBuffer* renderTarget) const {
+TextureHandle FXAA::render(const uint32_t vao, const TextureHandle sceneTexture, FrameBuffer* renderTarget) const {
 	renderTarget->bind();
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	mShader->bind();
 	mShader->setVec2("resolution", glm::vec2(renderTarget->width(), renderTarget->height()));
 
-	const uint32_t textures[] = {sceneTexture};
+	const uint32_t textures[] = {sceneTexture.id};
 	RenderCommand::drawQuad(vao, textures);
 
 	return renderTarget->texture();

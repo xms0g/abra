@@ -1,6 +1,6 @@
 #include "instancedOpaque.h"
-#include "../renderCommand.h"
-#include "../graph.h"
+#include "../frameGraph.h"
+#include "../shader.h"
 #include "../context/renderContext.hpp"
 #include "../context/renderGroup.hpp"
 #include "../context/renderData.hpp"
@@ -68,12 +68,12 @@ void InstancedOpaquePass::configure(const RenderContext& ctx, const FrameGraph& 
 	};
 
 	mPipeline = GraphicsPipeline(desc);
-	mEncoder = GraphicsEncoder(graph);
+	mEncoder = GraphicsEncoder{};
 
 	const int32_t slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot");
-	mEncoder.bindTexture("directional", slot);
-	mEncoder.bindTexture("point", slot + 1);
-	mEncoder.bindTexture("spot", slot + 2);
+	mEncoder.bindTexture(graph.getResource("directional").texture(0), slot);
+	mEncoder.bindTexture( graph.getResource("point").texture(0), slot + 1);
+	mEncoder.bindTexture(graph.getResource("spot").texture(0), slot + 2);
 
 	mObjects = std::span(
 		ctx.queueRegistry->get<RenderInstanceGroup>("opaqueInstanced").data(),
@@ -85,7 +85,7 @@ void InstancedOpaquePass::configure(const RenderContext& ctx, const FrameGraph& 
 
 void InstancedOpaquePass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	mEncoder.reset();
-	mEncoder.bindFrameBuffer("sceneBuffer");
+	mEncoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
 	mEncoder.bindPipeline(mPipeline);
 
 	for (const auto& object: mObjects) {

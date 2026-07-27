@@ -403,7 +403,7 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 	glDepthFunc(GL_LESS);
 	glEnable(GL_CULL_FACE);
 
-	return envMapBuffer->texture();
+	return envMapBuffer->texture().id;
 }
 
 void ResourceManager::createIrradianceMap() {
