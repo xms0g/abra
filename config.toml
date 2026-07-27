@@ -75,11 +75,8 @@ texture_slot = 18
 [pbr]
 envmap_size = 512
 irradiance_map_size = 32
-irradiance_map_texture_slot = 9
 prefilter_map_size = 128
-prefilter_map_texture_slot = 10
 brdf_lut_size = 512
-brdf_lut_texture_slot = 11
 
 [pbr.texture_slots]
 albedo = 0
@@ -88,6 +85,9 @@ rm = 2
 ao = 3
 emissive = 4
 height = 5
+irradiance_map = 9
+prefilter_map = 10
+brdf_lut = 11
 
 [gbuffer.indices]
 position = 0

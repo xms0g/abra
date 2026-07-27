@@ -151,6 +151,7 @@ public:
 	explicit GraphicsPipeline(PipelineRenderingInfo& desc);
 
 	GraphicsPipeline(const GraphicsPipeline& other) = delete;
+
 	GraphicsPipeline& operator=(const GraphicsPipeline& other) = delete;
 
 	GraphicsPipeline(GraphicsPipeline&& other) noexcept

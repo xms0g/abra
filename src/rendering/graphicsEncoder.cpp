@@ -1,11 +1,8 @@
 #include "graphicsEncoder.h"
 #include "glad/glad.h"
-#include "graph.h"
 #include "graphicsPipeline.h"
 #include "shader.h"
 #include "buffers/frameBuffer.h"
-#include "material/material.hpp"
-#include "../resource/resourceManager.h"
 
 static constexpr uint32_t toGL(const ClearMask mask) {
 	return toUnderlying(mask);
@@ -47,24 +44,21 @@ static constexpr uint32_t toGL(const PolygonFace face) {
 	return toUnderlying(face);
 }
 
-GraphicsEncoder::GraphicsEncoder(const FrameGraph& graph) {
-	mState.graph = &graph;
-}
-
 void GraphicsEncoder::bindFrameBuffer() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void GraphicsEncoder::bindFrameBuffer(const std::string& name) const {
-	mState.graph->getResource(name).bind();
+void GraphicsEncoder::unbindFrameBuffer() const {
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void GraphicsEncoder::bindTexture(const std::string& name, const uint32_t slot, const uint32_t idx) const {
-	try {
-		mState.graph->getResource(name).bindTexture(slot, idx);
-	} catch (...) {
-		RESOURCE_MANAGER_INSTANCE.get<BaseFrameBuffer>(name)->bindTexture(slot, idx);
-	}
+void GraphicsEncoder::bindFrameBuffer(const FrameBuffer& fb) const {
+	fb.bind();
+}
+
+void GraphicsEncoder::bindTexture(const TextureHandle handle, const uint32_t slot) const {
+	glActiveTexture(GL_TEXTURE0 + slot);
+	glBindTexture(toGL(handle.target), handle.id);
 }
 
 void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
@@ -167,15 +161,12 @@ void GraphicsEncoder::bindTransform(const TransformView& transform) const {
 	mState.pipeline->state().stage.setMat3("normalMatrix", transform.normal);
 }
 
-void GraphicsEncoder::blitFramebuffer(const std::string& src, const std::string& dst, const BlitMask mask) const {
-	const auto& destBuffer = mState.graph->getResource(dst);
-	const auto& sourceBuffer = mState.graph->getResource(src);
+void GraphicsEncoder::blitFramebuffer(const FrameBuffer& src, const FrameBuffer& dst, const BlitMask mask) const {
+	src.bindForRead();
+	dst.bindForDraw();
 
-	sourceBuffer.bindForRead();
-	destBuffer.bindForDraw();
-
-	glBlitFramebuffer(0, 0, sourceBuffer.width(), sourceBuffer.height(),
-	                  0, 0, destBuffer.width(), destBuffer.height(),
+	glBlitFramebuffer(0, 0, src.width(), src.height(),
+	                  0, 0, dst.width(), dst.height(),
 	                  toGL(mask), GL_NEAREST);
 }
 
@@ -203,6 +194,18 @@ void GraphicsEncoder::drawInstanced(const MeshView& mesh, const uint32_t count) 
 		GL_UNSIGNED_INT,
 		nullptr,
 		static_cast<int32_t>(count));
+}
+
+void GraphicsEncoder::setViewport(const int32_t x, const int32_t y, const int32_t width, const int32_t height) const {
+	glViewport(x, y, width, height);
+}
+
+void GraphicsEncoder::setCullMode(const CullMode mode) {
+	glCullFace(toGL(mode));
+}
+
+void GraphicsEncoder::attachFramebufferTextureLayer(const FrameBuffer& fb, const int32_t layer) {
+	glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, fb.texture().id, 0, layer);
 }
 
 void GraphicsEncoder::reset() {

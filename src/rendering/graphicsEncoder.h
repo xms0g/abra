@@ -3,6 +3,7 @@
 #include "glad/glad.h"
 #include "command.hpp"
 #include "enumUtils.hpp"
+#include "graphicsPipeline.h"
 #include "buffers/frameBuffer.h"
 #include "material/material.hpp"
 
@@ -29,13 +30,13 @@ class GraphicsEncoder {
 public:
 	GraphicsEncoder() = default;
 
-	explicit GraphicsEncoder(const FrameGraph& graph);
-
 	void bindFrameBuffer() const;
 
-	void bindFrameBuffer(const std::string& name) const;
+	void unbindFrameBuffer() const;
 
-	void bindTexture(const std::string& name, uint32_t slot, uint32_t idx = 0) const;
+	void bindFrameBuffer(const FrameBuffer& fb) const;
+
+	void bindTexture(TextureHandle handle, uint32_t slot) const;
 
 	void bindPipeline(GraphicsPipeline& pipeline);
 
@@ -43,7 +44,7 @@ public:
 
 	void bindTransform(const TransformView& transform) const;
 
-	void blitFramebuffer(const std::string& src, const std::string& dst, BlitMask mask) const;
+	void blitFramebuffer(const FrameBuffer& src, const FrameBuffer& dst, BlitMask mask) const;
 
 	void clearFrameBuffer(ClearMask mask) const;
 
@@ -53,14 +54,37 @@ public:
 
 	void drawInstanced(const MeshView& mesh, uint32_t count) const;
 
+	void setViewport(int32_t x, int32_t y, int32_t width, int32_t height) const;
+
+	void setCullMode(CullMode mode);
+
+	void attachFramebufferTextureLayer(const FrameBuffer& fb, int32_t layer);
+
+	template<typename T>
+	void setUniform(const std::string& name, const T& value);
+
+	template<typename T>
+	void setUniform(const std::string& name, const T* value, uint32_t count) const;
+
 	void reset();
 
 private:
 	struct EncoderState {
 		MaterialCache materialCache{};
-		const FrameGraph* graph{nullptr};
 		GraphicsPipeline* pipeline{nullptr};
 	};
 
 	EncoderState mState{};
 };
+
+template<typename T>
+void GraphicsEncoder::setUniform(const std::string& name, const T& value) {
+	assert(mState.pipeline);
+	mState.pipeline->state().stage.setValue(name, value);
+}
+
+template<typename T>
+void GraphicsEncoder::setUniform(const std::string& name, const T* value, uint32_t count) const {
+	assert(mState.pipeline);
+	mState.pipeline->state().stage.setValue(name, value, count);
+}
