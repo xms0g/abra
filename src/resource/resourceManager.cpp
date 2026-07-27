@@ -376,20 +376,20 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 	cube.meshes().at(0).front().uploadToGPU();
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
-	const auto equirectangularToCube = get<Shader>("equirectangularToCube");
+	const auto equirectangularToCube = Shader{"pbr/cubemap.vert", "pbr/equirectangularToCube.frag"};
 	const Texture hdrTexture = Texture::loadHDR(path);
 
 	// convert HDR equirectangular environment map to cubemap equivalent
-	equirectangularToCube->bind();
-	equirectangularToCube->setInt("equirectangularMap", 0);
-	equirectangularToCube->setMat4("projection", mCaptureProjection);
+	equirectangularToCube.bind();
+	equirectangularToCube.setInt("equirectangularMap", 0);
+	equirectangularToCube.setMat4("projection", mCaptureProjection);
 
 	hdrTexture.bind(0);
 
 	envMapBuffer->bind();
 	for (uint32_t i = 0; i < FACES; ++i) {
 		dynamic_cast<CubemapBuffer*>(envMapBuffer.get())->bindFace(i);
-		equirectangularToCube->setMat4("view", mCaptureViews[i]);
+		equirectangularToCube.setMat4("view", mCaptureViews[i]);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		RenderCommand::drawMesh(cubeMesh.vao().id(), cubeMesh.vertices().size(), cubeMesh.indices().size());
@@ -421,18 +421,18 @@ void ResourceManager::createIrradianceMap() {
 	cube.meshes().at(0).front().uploadToGPU();
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
-	const auto irradianceConv = get<Shader>("irradianceConv");
+	const auto irradianceConv = Shader{"pbr/cubemap.vert", "pbr/irradianceConv.frag"};
 	// solve diffuse integral by convolution to create an irradiance (cube)map.
-	irradianceConv->bind();
-	irradianceConv->setInt("environmentMap", 0);
-	irradianceConv->setMat4("projection", mCaptureProjection);
+	irradianceConv.bind();
+	irradianceConv.setInt("environmentMap", 0);
+	irradianceConv.setMat4("projection", mCaptureProjection);
 
 	envMapBuffer->bindTexture(0);
 
 	irradianceMapBuffer->bind();
 	for (uint32_t i = 0; i < FACES; ++i) {
 		dynamic_cast<const CubemapBuffer*>(irradianceMapBuffer)->bindFace(i);
-		irradianceConv->setMat4("view", mCaptureViews[i]);
+		irradianceConv.setMat4("view", mCaptureViews[i]);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		RenderCommand::drawMesh(cubeMesh.vao().id(), cubeMesh.vertices().size(), cubeMesh.indices().size());
@@ -460,12 +460,12 @@ void ResourceManager::createPrefilterMap() {
 	cube.meshes().at(0).front().uploadToGPU();
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
-	const auto prefilter = get<Shader>("prefilter");
+	const auto prefilter = Shader{"pbr/cubemap.vert", "pbr/prefilter.frag"};
 	// run a quasi monte-carlo simulation on the environment lighting to create a prefilter (cube)map.
-	prefilter->bind();
-	prefilter->setInt("environmentMap", 0);
-	prefilter->setMat4("projection", mCaptureProjection);
-	prefilter->setFloat("resolution",
+	prefilter.bind();
+	prefilter.setInt("environmentMap", 0);
+	prefilter.setMat4("projection", mCaptureProjection);
+	prefilter.setFloat("resolution",
 		static_cast<float>(CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.envMap.size")));
 
 	envMapBuffer->bindTexture(0);
@@ -479,11 +479,11 @@ void ResourceManager::createPrefilterMap() {
 		prefilterMapBuffer->resizeRenderBuffer(mipSize, mipSize);
 
 		const float roughness = static_cast<float>(i) / static_cast<float>(mipLevels - 1);
-		prefilter->setFloat("roughness", roughness);
+		prefilter.setFloat("roughness", roughness);
 
 		for (uint32_t j = 0; j < FACES; ++j) {
 			dynamic_cast<const CubemapBuffer*>(prefilterMapBuffer)->bindFace(j, i);
-			prefilter->setMat4("view", mCaptureViews[j]);
+			prefilter.setMat4("view", mCaptureViews[j]);
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			RenderCommand::drawMesh(cubeMesh.vao().id(), cubeMesh.vertices().size(), cubeMesh.indices().size());
@@ -506,8 +506,8 @@ void ResourceManager::createBrdfLUT() {
 
 	const Model::SingleQuad quad;
 	// generate a 2D LUT from the BRDF equations used.
-	const auto brdfLUTShader = get<Shader>("brdfLUT");
-	brdfLUTShader->bind();
+	const auto brdfLUTShader = Shader{"pbr/brdfLUT.vert", "pbr/brdfLUT.frag"};
+	brdfLUTShader.bind();
 
 	brdfLUTBuffer->bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
