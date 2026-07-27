@@ -1,14 +1,9 @@
 #include "ssao.h"
-#include "glad/glad.h"
 #include "../shader.h"
 #include "../frameGraph.h"
-#include "../buffers/frameBuffer.h"
-#include "../buffers/vertexBuffer.h"
 #include "../texture/texture.h"
 #include "../models/quad.h"
-#include "../mesh/vertexArray.h"
 #include "../context/renderContext.hpp"
-#include "../renderCommand.h"
 #include "../../config/configManager.h"
 #include "../../math/random.h"
 
@@ -119,7 +114,7 @@ void SSAOPass::blur(const FrameGraph& graph) {
 	mEncoder.clearFrameBuffer(ClearMask::Color);
 
 	mEncoder.bindPipeline(mSSAOPipeline);
-	mEncoder.bindTexture(graph.getResource("ssao").texture(0), 0);
+	mEncoder.bindTexture(graph.getResource("ssao").texture(), 0);
 	mEncoder.draw({
 		.vao = mQuad->vao(),
 		.vertexCount = 6,

@@ -1,12 +1,7 @@
 #include "skybox.h"
-#include "glad/glad.h"
 #include "../shader.h"
-#include "../renderCommand.h"
 #include "../frameGraph.h"
-#include "../material/material.hpp"
 #include "../context/renderContext.hpp"
-#include "../context/renderData.hpp"
-#include "../context/renderGroup.hpp"
 #include "../context/renderQueue.hpp"
 
 SkyboxPass::SkyboxPass() = default;
