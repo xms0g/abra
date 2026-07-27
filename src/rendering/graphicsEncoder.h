@@ -31,6 +31,8 @@ public:
 
 	explicit GraphicsEncoder(const FrameGraph& graph);
 
+	void bindFrameBuffer() const;
+
 	void bindFrameBuffer(const std::string& name) const;
 
 	void bindTexture(const std::string& name, uint32_t slot, uint32_t idx = 0) const;

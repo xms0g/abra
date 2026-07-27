@@ -1,5 +1,4 @@
 #include "postProcess.h"
-#include "glad/glad.h"
 #include "grayscale.h"
 #include "sepia.h"
 #include "bloom.h"
@@ -18,7 +17,11 @@
 #include "../../../event/eventBus.hpp"
 #include "../../../event/events/guiPostProcessEvent.hpp"
 
-PostProcessPass::PostProcessPass() {
+PostProcessPass::PostProcessPass() = default;
+
+PostProcessPass::~PostProcessPass() = default;
+
+void PostProcessPass::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
 	mEffects = {
 		std::make_shared<Bloom>("Bloom", false),
 		std::make_shared<ToneMapping>("Tone Mapping", false),
@@ -31,18 +34,49 @@ PostProcessPass::PostProcessPass() {
 		std::make_shared<Gamma>("Gamma Correction", true),
 		std::make_shared<FXAA>("FXAA", false),
 	};
-}
-
-PostProcessPass::~PostProcessPass() = default;
-
-void PostProcessPass::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
-	mQuad = std::make_unique<Model::Quad>();
-	mRenderTargets = {&graph.getResource("ping"), &graph.getResource("pong")};
-	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessEvent>(this, &PostProcessPass::onGuiUpdate);
 
 	for (const auto& effect: mEffects) {
 		effect->configure(graph);
 	}
+
+	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
+		.topology = PrimitiveTopology::Triangles,
+	};
+
+	constexpr PipelineRasterizationState rasterizationState = {
+		.cullMode = CullMode::Back,
+		.frontFace = FrontFace::CounterClockwise,
+		.polygonMode = PolygonMode::Fill,
+		.polygonFace = PolygonFace::FrontAndBack,
+	};
+
+	constexpr PipelineDepthStencilState depthStencilState = {
+		.depthTestEnable = false,
+		.depthWriteEnable = true,
+		.depthCompareOp = CompareOp::Less,
+	};
+
+	constexpr PipelineColorBlendState colorBlendState = {
+		.blendEnable = false,
+	};
+
+	PipelineRenderingInfo desc = {
+		.primitiveAssembly = primitiveAssemblyState,
+		.rasterization = rasterizationState,
+		.depthStencil = depthStencilState,
+		.colorBlend = colorBlendState,
+		.stage = Shader("models/quad.vert", "models/quad.frag"),
+		.samplers = {
+			{.name = "screenTexture", .slot = 0}
+		},
+		.uniforms = {}
+	};
+
+	mPipeline = GraphicsPipeline{desc};
+	mEncoder = GraphicsEncoder{graph};
+	mQuad = std::make_unique<Model::SingleQuad>();
+	mRenderTargets = {&graph.getResource("ping"), &graph.getResource("pong")};
+	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessEvent>(this, &PostProcessPass::onGuiUpdate);
 }
 
 void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
@@ -57,11 +91,22 @@ void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph)
 		toggle = !toggle;
 	}
 
-	mQuad->shader().bind();
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	mEncoder.reset();
+	mEncoder.bindFrameBuffer();
+	mEncoder.bindPipeline(mPipeline);
 
 	const uint32_t textures[] = {inputTex};
-	RenderCommand::drawQuad(mQuad->vao(), textures);
+	mEncoder.bindMaterial({
+		.flags = 0,
+		.textureTarget = toGL(TextureTarget::Texture2D),
+		.textures = std::span(textures)
+	});
+
+	mEncoder.draw({
+		.vao = mQuad->vao(),
+		.vertexCount = 6,
+		.indexCount = 0
+	});
 }
 
 void PostProcessPass::onGuiUpdate(const GuiPostProcessEvent& event) {

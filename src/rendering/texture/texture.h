@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 #include <string>
+#include "glad/glad.h"
+#include "../enumUtils.hpp"
 
 enum TextureType {
 	ALBEDO = 1,
@@ -11,6 +13,15 @@ enum TextureType {
 	AO = 10,
 	ROUGHNESS_METALLIC = 18
 };
+
+enum class TextureTarget : uint32_t {
+	Texture2D = GL_TEXTURE_2D,
+	TextureCubeMap = GL_TEXTURE_CUBE_MAP
+};
+
+constexpr uint32_t toGL(const TextureTarget target) {
+	return toUnderlying(target);
+}
 
 struct TextureBinding {
 	const char* name;

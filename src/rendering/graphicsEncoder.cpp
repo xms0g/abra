@@ -51,6 +51,10 @@ GraphicsEncoder::GraphicsEncoder(const FrameGraph& graph) {
 	mState.graph = &graph;
 }
 
+void GraphicsEncoder::bindFrameBuffer() const {
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void GraphicsEncoder::bindFrameBuffer(const std::string& name) const {
 	mState.graph->getResource(name).bind();
 }

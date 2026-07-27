@@ -3,12 +3,15 @@
 #include <vector>
 #include "basePostEffect.hpp"
 #include "../IPass.hpp"
+#include "../../graphicsPipeline.h"
+#include "../../graphicsEncoder.h"
 
 struct GuiPostProcessEvent;
 class EventBus;
 struct RenderContext;
 
 namespace Model {
+class SingleQuad;
 class Quad;
 }
 
@@ -27,7 +30,9 @@ public:
 private:
 	void onGuiUpdate(const GuiPostProcessEvent& event);
 
+	GraphicsPipeline mPipeline{};
+	GraphicsEncoder mEncoder{};
 	std::array<FrameBuffer*, 2> mRenderTargets{};
-	std::unique_ptr<Model::Quad> mQuad;
+	std::unique_ptr<Model::SingleQuad> mQuad;
 	std::vector<std::shared_ptr<BasePostEffect> > mEffects;
 };
