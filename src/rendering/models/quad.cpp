@@ -4,7 +4,7 @@
 #include "../buffers/vertexBuffer.h"
 #include "../../rendering/shader.h"
 
-IQuad::IQuad() {
+Model::Quad::Quad() {
 	constexpr float vertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
 		// positions   // texCoords
 		-1.0f,  1.0f,  0.0f, 1.0f,
@@ -36,9 +36,9 @@ IQuad::IQuad() {
 	VertexArray::unbind();
 }
 
-IQuad::~IQuad() = default;
+Model::Quad::~Quad() = default;
 
-uint32_t IQuad::vao() const {
+uint32_t Model::Quad::vao() const {
 	return mVAO->id();
 }
 

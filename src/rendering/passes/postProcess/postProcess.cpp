@@ -14,6 +14,8 @@
 #include "../../buffers/frameBuffer.h"
 #include "../../models/quad.h"
 #include "../../context/renderContext.hpp"
+#include "../../mesh/vertexArray.h"
+#include "../../buffers/vertexBuffer.h"
 #include "../../../event/eventBus.hpp"
 #include "../../../event/events/guiPostProcessEvent.hpp"
 
@@ -74,7 +76,7 @@ void PostProcessPass::configure(const RenderContext& ctx, const FrameGraph& grap
 
 	mPipeline = GraphicsPipeline{desc};
 	mEncoder = GraphicsEncoder{};
-	mQuad = std::make_unique<Model::SingleQuad>();
+	mQuad = std::make_unique<Model::Quad>();
 	mRenderTargets = {&graph.getResource("ping"), &graph.getResource("pong")};
 	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessEvent>(this, &PostProcessPass::onGuiUpdate);
 }

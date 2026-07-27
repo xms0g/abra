@@ -87,7 +87,7 @@ void SSAOPass::configure(const RenderContext& ctx, const FrameGraph& graph, Even
 		gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureIdx")),
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot"));
 
-	mQuad = std::make_unique<Model::SingleQuad>();
+	mQuad = std::make_unique<Model::Quad>();
 }
 
 void SSAOPass::execute(const RenderContext& ctx, const FrameGraph& graph) {

@@ -110,7 +110,7 @@ void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph&
 	mEncoder.bindTexture( graph.getResource("point").texture(), slot + 1);
 	mEncoder.bindTexture(graph.getResource("spot").texture(), slot + 2);
 
-	mQuad = std::make_unique<Model::SingleQuad>();
+	mQuad = std::make_unique<Model::Quad>();
 }
 
 void DeferredLightingPass::execute(const RenderContext& ctx, const FrameGraph& graph) {

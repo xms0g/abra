@@ -5,7 +5,7 @@
 #include "../graphicsEncoder.h"
 
 namespace Model {
-class SingleQuad;
+class Quad;
 }
 
 class CubemapBuffer;
@@ -25,5 +25,5 @@ public:
 private:
 	GraphicsPipeline mPipeline{};
 	GraphicsEncoder mEncoder{};
-	std::unique_ptr<Model::SingleQuad> mQuad;
+	std::unique_ptr<Model::Quad> mQuad;
 };

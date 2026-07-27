@@ -5,25 +5,18 @@ class VertexArray;
 class VertexBuffer;
 class Shader;
 
-class IQuad {
+namespace Model {
+class Quad {
 public:
-	IQuad();
+	Quad();
 
-	virtual ~IQuad();
+	~Quad();
 
 	[[nodiscard]]
 	uint32_t vao() const;
 
-protected:
+private:
 	std::unique_ptr<VertexArray> mVAO;
 	std::unique_ptr<VertexBuffer> mVBO;
-};
-
-namespace Model {
-class SingleQuad final : public IQuad {
-public:
-	SingleQuad() = default;
-
-	~SingleQuad() override = default;
 };
 }

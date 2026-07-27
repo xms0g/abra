@@ -11,7 +11,6 @@ class EventBus;
 struct RenderContext;
 
 namespace Model {
-class SingleQuad;
 class Quad;
 }
 
@@ -33,6 +32,6 @@ private:
 	GraphicsPipeline mPipeline{};
 	GraphicsEncoder mEncoder{};
 	std::array<FrameBuffer*, 2> mRenderTargets{};
-	std::unique_ptr<Model::SingleQuad> mQuad;
+	std::unique_ptr<Model::Quad> mQuad;
 	std::vector<std::shared_ptr<BasePostEffect> > mEffects;
 };
