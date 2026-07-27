@@ -129,15 +129,15 @@ void GraphicsEncoder::bindMaterial(const MaterialView& material) {
 	}
 
 	if (material.flags & HAS_HEIGHT_MAP) {
-		pipelineState.stage.setFloat("material.heightScale", material.heightScale);
+		setUniform("material.heightScale", material.heightScale);
 	}
 
 	if (material.flags & ALPHACUTOFF) {
-		pipelineState.stage.setFloat("material.alphaCutoff", material.alphaCutoff);
+		setUniform("material.alphaCutoff", material.alphaCutoff);
 	}
 
 	if (material.flags & HAS_SOLID_COLOR) [[unlikely]] {
-		pipelineState.stage.setVec3("material.color", material.color);
+		setUniform("material.color", material.color);
 	} else {
 		int slot{0};
 
@@ -156,9 +156,9 @@ void GraphicsEncoder::bindMaterial(const MaterialView& material) {
 	}
 }
 
-void GraphicsEncoder::bindTransform(const TransformView& transform) const {
-	mState.pipeline->state().stage.setMat4("model", transform.model);
-	mState.pipeline->state().stage.setMat3("normalMatrix", transform.normal);
+void GraphicsEncoder::bindTransform(const TransformView& transform) {
+	setUniform("model", transform.model);
+	setUniform("normalMatrix", transform.normal);
 }
 
 void GraphicsEncoder::blitFramebuffer(const FrameBuffer& src, const FrameBuffer& dst, const BlitMask mask) const {

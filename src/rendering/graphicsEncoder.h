@@ -42,7 +42,7 @@ public:
 
 	void bindMaterial(const MaterialView& material);
 
-	void bindTransform(const TransformView& transform) const;
+	void bindTransform(const TransformView& transform);
 
 	void blitFramebuffer(const FrameBuffer& src, const FrameBuffer& dst, BlitMask mask) const;
 
