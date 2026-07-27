@@ -72,8 +72,8 @@ void SSAOPass::configure(const RenderContext& ctx, const FrameGraph& graph, Even
 		.uniforms = {}
 	};
 
-	mSSAOPipeline = GraphicsPipeline{ssaoInfo};
-	mBlurPipeline = GraphicsPipeline{blurInfo};
+	mPipelines[0] = GraphicsPipeline{ssaoInfo};
+	mPipelines[1] = GraphicsPipeline{blurInfo};
 
 	mEncoder = GraphicsEncoder{};
 
@@ -100,7 +100,7 @@ void SSAOPass::ssao(const FrameGraph& graph) {
 	mEncoder.bindFrameBuffer(graph.getResource("ssao"));
 	mEncoder.clearFrameBuffer(ClearMask::Color);
 
-	mEncoder.bindPipeline(mSSAOPipeline);
+	mEncoder.bindPipeline(mPipelines[0]);
 	mEncoder.draw({
 		.vao = mQuad->vao(),
 		.vertexCount = 6,
@@ -113,7 +113,7 @@ void SSAOPass::blur(const FrameGraph& graph) {
 	mEncoder.bindFrameBuffer(graph.getResource("ssaoBlur"));
 	mEncoder.clearFrameBuffer(ClearMask::Color);
 
-	mEncoder.bindPipeline(mSSAOPipeline);
+	mEncoder.bindPipeline(mPipelines[1]);
 	mEncoder.bindTexture(graph.getResource("ssao").texture(), 0);
 	mEncoder.draw({
 		.vao = mQuad->vao(),

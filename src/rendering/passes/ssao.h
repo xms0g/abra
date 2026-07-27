@@ -35,8 +35,7 @@ private:
 	void createNoiseTexture();
 
 	GraphicsEncoder mEncoder{};
-	GraphicsPipeline mSSAOPipeline{};
-	GraphicsPipeline mBlurPipeline{};
+	GraphicsPipeline mPipelines[2];
 	UniformBuffer mUBO{};
 	Texture mNoiseTexture{};
 	std::unique_ptr<Model::Quad> mQuad;
