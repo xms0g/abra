@@ -2,8 +2,11 @@
 #include <cstdint>
 #include <memory>
 #include "IPass.hpp"
+#include "../graphicsPipeline.h"
+#include "../graphicsEncoder.h"
 #include "../buffers/uniformBuffer.h"
 #include "../texture/texture.h"
+
 
 class FrameBuffer;
 class Shader;
@@ -23,13 +26,18 @@ public:
 	void execute(const RenderContext& ctx, const FrameGraph& graph) override;
 
 private:
-	void ssao(const FrameGraph& graph) const;
+	void ssao();
 
-	void blur(const FrameGraph& graph) const;
+	void blur();
 
-	std::unique_ptr<Model::SingleQuad> mQuad;
-	const Shader* mShader{nullptr};
-	const Shader* mBlurShader{nullptr};
+	void createKernel();
+
+	void createNoiseTexture();
+
+	GraphicsEncoder mEncoder{};
+	GraphicsPipeline mSSAOPipeline{};
+	GraphicsPipeline mBlurPipeline{};
 	UniformBuffer mUBO{};
 	Texture mNoiseTexture{};
+	std::unique_ptr<Model::SingleQuad> mQuad;
 };

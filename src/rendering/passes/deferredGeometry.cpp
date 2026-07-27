@@ -39,18 +39,30 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, const FrameGraph&
 		.colorBlend = colorBlendState,
 		.stage = Shader("deferred/gbuffer.vert", "deferred/gbuffer.frag"),
 		.samplers = {
-			{.name = "material.texture_albedo", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.albedo.textureSlot")},
-			{.name = "material.texture_normal", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.normal.textureSlot")},
+			{
+				.name = "material.texture_albedo", .
+				slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.albedo.textureSlot")
+			},
+			{
+				.name = "material.texture_normal",
+				.slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.normal.textureSlot")
+			},
 			{
 				.name = "material.texture_roughnessMetallic",
 				.slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.roughnessMetallic.textureSlot")
 			},
-			{.name = "material.texture_ao", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.ao.textureSlot")},
+			{
+				.name = "material.texture_ao",
+				.slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.ao.textureSlot")
+			},
 			{
 				.name = "material.texture_emissive",
 				.slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.emissive.textureSlot")
 			},
-			{.name = "material.texture_height", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.height.textureSlot")},
+			{
+				.name = "material.texture_height",
+				.slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.height.textureSlot")
+			},
 		},
 		.uniforms = {
 			{
