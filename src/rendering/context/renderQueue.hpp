@@ -35,10 +35,10 @@ public:
 	void set(const std::string& queueName);
 
 	template<typename T>
-	void emplace(const std::string& queueName, T& value);
+	void emplace(const std::string& queueName, T& group);
 
 private:
-	std::unordered_map<std::string, std::unique_ptr<IRenderQueue>> mQueue;
+	std::unordered_map<std::string, std::unique_ptr<IRenderQueue> > mQueue;
 };
 
 inline bool QueueRegistry::empty(const std::string& queueName) const {
@@ -52,10 +52,14 @@ RenderQueue<T>& QueueRegistry::get(const std::string& queueName) {
 
 template<typename T>
 void QueueRegistry::set(const std::string& queueName) {
-	mQueue.emplace(queueName, std::make_unique<RenderQueue<T>>());
+	mQueue.emplace(queueName, std::make_unique<RenderQueue<T> >());
 }
 
 template<typename T>
-void QueueRegistry::emplace(const std::string& queueName, T& value) {
-	get<T>(queueName).push_back(value);
+void QueueRegistry::emplace(const std::string& queueName, T& group) {
+	try {
+		get<T>(queueName).push_back(group);
+	} catch (std::out_of_range&) {
+
+	}
 }

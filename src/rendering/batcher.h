@@ -22,10 +22,10 @@ private:
 		std::string queue;
 		std::string instancedQueue;
 	} rules[5] = {
-		{.flags = CASTSHADOW, .queue = "shadow", .instancedQueue = "shadow"},
-		{.flags = PBR, .queue = "deferred", .instancedQueue = "deferred"},
+		{.flags = CASTSHADOW, .queue = "shadow", .instancedQueue = ""},
+		{.flags = PBR, .queue = "deferred", .instancedQueue = ""},
+		{.flags = UNLIT, .queue = "unlit", .instancedQueue = ""},
 		{.flags = OPAQUE, .queue = "opaque", .instancedQueue = "opaqueInstanced"},
-		{.flags = UNLIT, .queue = "unlit", .instancedQueue = "unlit"},
 		{.flags = BLEND, .queue = "blend", .instancedQueue = "blendInstanced"},
 	};
 
