@@ -3,6 +3,8 @@
 #include "glm/glm.hpp"
 #include "../../context/renderQueue.hpp"
 
+class GraphicsPipeline;
+class GraphicsEncoder;
 class FrameGraph;
 struct RenderGroup;
 struct RenderContext;
@@ -18,11 +20,15 @@ public:
 	[[nodiscard]]
 	glm::mat4 lightSpaceMatrix() const;
 
-	void render(const RenderContext& ctx, const FrameGraph& graph, const glm::vec3& direction);
+	void render(
+		const RenderContext& ctx,
+		const FrameGraph& graph,
+		GraphicsEncoder& encoder,
+		GraphicsPipeline& pipeline,
+		const glm::vec3& direction);
 
 private:
 	float mHeight, mLeft, mRight, mBottom, mTop, mNear, mFar;
 	glm::mat4 mLightSpaceMatrix{};
-	const Shader* mDepthShader;
 	std::span<RenderGroup> mObjects;
 };

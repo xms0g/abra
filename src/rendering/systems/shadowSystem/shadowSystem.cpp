@@ -3,7 +3,7 @@
 #include "directionalShadow.h"
 #include "omnidirectionalShadow.h"
 #include "perspectiveShadow.h"
-#include "../../graph.h"
+#include "../../frameGraph.h"
 #include "../../context/renderContext.hpp"
 #include "../../buffers/uniformBuffer.h"
 #include "../../buffers/frameBuffer.h"
@@ -23,6 +23,56 @@ void ShadowSystem::configure(const RenderContext& ctx, const FrameGraph& graph, 
 	mGraph = &graph;
 	mWidth= CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width");
 	mHeight = CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height");
+
+	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
+		.topology = PrimitiveTopology::Triangles,
+	};
+
+	constexpr PipelineRasterizationState rasterizationState = {
+		.cullMode = CullMode::Front,
+		.frontFace = FrontFace::CounterClockwise,
+		.polygonMode = PolygonMode::Fill,
+		.polygonFace = PolygonFace::FrontAndBack,
+	};
+
+	constexpr PipelineDepthStencilState depthStencilState = {
+		.depthTestEnable = true,
+		.depthWriteEnable = true,
+		.depthCompareOp = CompareOp::Less,
+	};
+
+	constexpr PipelineColorBlendState colorBlendState = {
+		.blendEnable = false,
+	};
+
+	PipelineRenderingInfo depthPipeline = {
+		.primitiveAssembly = primitiveAssemblyState,
+		.rasterization = rasterizationState,
+		.depthStencil = depthStencilState,
+		.colorBlend = colorBlendState,
+		.stage = Shader("depth/depth.vert", "depth/depth.frag"),
+		.samplers = {},
+			.uniforms = {
+				{
+					.name = CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name").c_str(),
+					.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"),
+				},
+			}
+	};
+
+	PipelineRenderingInfo cubeDepthPipeline = {
+		.primitiveAssembly = primitiveAssemblyState,
+		.rasterization = rasterizationState,
+		.depthStencil = depthStencilState,
+		.colorBlend = colorBlendState,
+		.stage = Shader("depth/depthCubemap.vert", "depth/depthCubemap.frag","depth/depthCubemap.geom"),
+		.samplers = {},
+		.uniforms = {}
+	};
+
+	mPipelines[0] = GraphicsPipeline(depthPipeline);
+	mPipelines[1] = GraphicsPipeline(cubeDepthPipeline);
+	mEncoder = GraphicsEncoder{};
 
 	mDirShadow = std::make_unique<DirectionalShadow>(ctx);
 	mOmnidirShadow = std::make_unique<OmnidirectionalShadow>(ctx);
@@ -47,18 +97,18 @@ void ShadowSystem::directionalShadowPass() {
 	if (lights.empty())
 		return;
 
-	mDirShadow->render(*mCtx, *mGraph, lights[0]->direction);
+	mDirShadow->render(*mCtx, *mGraph, mEncoder, mPipelines[0], lights[0]->direction);
 	mGPUData.lightSpaceMatrix = mDirShadow->lightSpaceMatrix();
 }
 
-void ShadowSystem::omnidirectionalShadowPass() const {
+void ShadowSystem::omnidirectionalShadowPass() {
 	const auto& lights = *mCtx->light.pointLights;
 
 	if (lights.empty())
 		return;
 
-	mGraph->getResource("point").bind();
-	glClear(GL_DEPTH_BUFFER_BIT);
+	mEncoder.bindFrameBuffer(mGraph->getResource("point"));
+	mEncoder.clearFrameBuffer(ClearMask::Depth);
 
 	for (int32_t i = 0; i < lights.size(); ++i) {
 		const auto& light = lights[i];
@@ -66,10 +116,9 @@ void ShadowSystem::omnidirectionalShadowPass() const {
 		if (!light || !light->castShadow)
 			continue;
 
-		mOmnidirShadow->render(*mCtx, light->position, i);
+		mOmnidirShadow->render(*mCtx, mEncoder, mPipelines[1], light->position, i);
 	}
-
-	mGraph->getResource("point").unbind();
+	mEncoder.unbindFrameBuffer();
 }
 
 void ShadowSystem::perspectiveShadowPass() {
@@ -77,30 +126,29 @@ void ShadowSystem::perspectiveShadowPass() {
 	if (lights.empty())
 		return;
 
-	const auto& depthBuffer = mGraph->getResource("spot");
+	const auto& frameBuffer = mGraph->getResource("spot");
+	mEncoder.bindFrameBuffer(frameBuffer);
 
-	depthBuffer.bind();
 	for (int32_t i = 0; i < lights.size(); ++i) {
 		const auto& light = lights[i];
 
 		if (!light || !light->castShadow)
 			continue;
 
-		mPersShadow->render(*mCtx, light->direction, light->position, light->outerCutOff, depthBuffer.texture(), i);
+		mPersShadow->render(*mCtx, mEncoder, mPipelines[0], frameBuffer, light->direction, light->position, light->outerCutOff, i);
 		mGPUData.persLightSpaceMatrix[i] = mPersShadow->lightSpaceMatrix(i);
 	}
-	depthBuffer.unbind();
+
+	mEncoder.unbindFrameBuffer();
 }
 
 void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
-	glCullFace(GL_FRONT);
-
 	directionalShadowPass();
 	omnidirectionalShadowPass();
 	perspectiveShadowPass();
 
-	glCullFace(GL_BACK);
-	glViewport(0, 0, mWidth, mHeight);
+	mEncoder.setCullMode(CullMode::Back);
+	mEncoder.setViewport(0, 0, mWidth, mHeight);
 
 	mUBO.bind();
 	mUBO.setData(&mGPUData, sizeof(ShadowData), 0);

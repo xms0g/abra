@@ -8,28 +8,29 @@
 #include "../../context/renderQueue.hpp"
 #include "../../renderCommand.h"
 #include "../../../config/configManager.h"
+#include "../../../rendering/graphicsEncoder.h"
+#include "../../../rendering/graphicsPipeline.h"
 
 OmnidirectionalShadow::OmnidirectionalShadow(const RenderContext& ctx) {
 	mWidth = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_width");
 	mHeight = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_height");
 	mAspect = static_cast<float>(mWidth) / static_cast<float>(mHeight);
-	mDepthShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("depthCubemap");
-	mObjects = std::span(
-		ctx.queueRegistry->get<RenderGroup>("shadow").data(),
-		ctx.queueRegistry->get<RenderGroup>("shadow").size());
-
 	mNear = CONFIG_MANAGER_INSTANCE.get<float>("shadow.omnidirectional.nearPlane");
 	mFar = CONFIG_MANAGER_INSTANCE.get<float>("shadow.omnidirectional.farPlane");
 	mFovy = glm::radians(CONFIG_MANAGER_INSTANCE.get<float>("shadow.omnidirectional.fovy"));
 	mShadowProj = glm::perspective(mFovy, mAspect, mNear, mFar);
-
 	mShadowTransforms.resize(faces);
+	mObjects = std::span(
+		ctx.queueRegistry->get<RenderGroup>("shadow").data(),
+		ctx.queueRegistry->get<RenderGroup>("shadow").size());
 }
 
 OmnidirectionalShadow::~OmnidirectionalShadow() = default;
 
 void OmnidirectionalShadow::render(
 	const RenderContext& ctx,
+	GraphicsEncoder& encoder,
+	GraphicsPipeline& pipeline,
 	const glm::vec3& position,
 	const int32_t layer) {
 	mShadowTransforms.clear();
@@ -38,21 +39,24 @@ void OmnidirectionalShadow::render(
 		mShadowTransforms.push_back(mShadowProj * glm::lookAt(position, position + dir, up));
 	}
 
-	mDepthShader->bind();
-	mDepthShader->setMat4Array("shadowMatrices", mShadowTransforms.data(), mShadowTransforms.size());
-	mDepthShader->setFloat("omniFarPlane", mFar);
-	mDepthShader->setVec3("lightPos", position);
-	mDepthShader->setInt("cubeIndex", layer);
+	encoder.bindPipeline(pipeline);
+	encoder.setUniform("shadowMatrices", mShadowTransforms.data(), mShadowTransforms.size());
+	encoder.setUniform("omniFarPlane", mFar);
+	encoder.setUniform("lightPos", position);
+	encoder.setUniform("cubeIndex", layer);
 
 	for (const auto& [entityID, matBatch]: mObjects) {
-		RenderCommand::setupTransform(entityID, ctx, *mDepthShader);
+		encoder.bindTransform({
+			.model = ctx.renderData->entity.models[entityID],
+			.normal = ctx.renderData->entity.normals[entityID],
+		});
 
 		for (const auto& meshIdx: matBatch.meshIndices) {
-			const uint32_t vao = ctx.renderData->mesh.vaos[meshIdx];
-			const size_t vertexCount = ctx.renderData->mesh.vertexCounts[meshIdx];
-			const size_t indexCount = ctx.renderData->mesh.indexCounts[meshIdx];
-
-			RenderCommand::drawMesh(vao, vertexCount, indexCount);
+			encoder.drawIndexed({
+				.vao = ctx.renderData->mesh.vaos[meshIdx],
+				.vertexCount = 0,
+				.indexCount = ctx.renderData->mesh.indexCounts[meshIdx]
+			});
 		}
 	}
 }

@@ -3,9 +3,10 @@
 #include "glm/glm.hpp"
 #include "../../context/renderQueue.hpp"
 
+class GraphicsEncoder;
+class GraphicsPipeline;
 struct RenderGroup;
 struct RenderContext;
-class Shader;
 class FrameBuffer;
 
 class OmnidirectionalShadow {
@@ -14,7 +15,12 @@ public:
 
 	~OmnidirectionalShadow();
 
-	void render(const RenderContext& ctx, const glm::vec3& position, int32_t layer);
+	void render(
+		const RenderContext& ctx,
+		GraphicsEncoder& encoder,
+		GraphicsPipeline& pipeline,
+		const glm::vec3& position,
+		int32_t layer);
 
 private:
 	int32_t mWidth{0}, mHeight{0};
@@ -22,7 +28,6 @@ private:
 
 	std::vector<glm::mat4> mShadowTransforms;
 	std::span<RenderGroup> mObjects;
-	const Shader* mDepthShader;
 	glm::mat4 mShadowProj{};
 
 	struct DirUpPair {

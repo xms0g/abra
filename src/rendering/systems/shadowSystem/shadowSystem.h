@@ -1,8 +1,9 @@
 #pragma once
 #include <memory>
-#include <array>
 #include "glm/glm.hpp"
 #include "../../buffers/uniformBuffer.h"
+#include "../../graphicsEncoder.h"
+#include "../../graphicsPipeline.h"
 
 class FrameGraph;
 class EventBus;
@@ -23,19 +24,11 @@ public:
 private:
 	void directionalShadowPass();
 
-	void omnidirectionalShadowPass() const;
+	void omnidirectionalShadowPass();
 
 	void perspectiveShadowPass();
 
 	void onGuiUpdate(const UpdateShadowMapEvent& event);
-
-	int32_t mWidth{0}, mHeight{0};
-	const RenderContext* mCtx{nullptr};
-	const FrameGraph* mGraph{nullptr};
-	UniformBuffer mUBO;
-	std::unique_ptr<DirectionalShadow> mDirShadow;
-	std::unique_ptr<OmnidirectionalShadow> mOmnidirShadow;
-	std::unique_ptr<PerspectiveShadow> mPersShadow;
 
 	struct alignas(16) ShadowData {
 		glm::mat4 lightSpaceMatrix{};
@@ -44,4 +37,14 @@ private:
 	};
 
 	ShadowData mGPUData;
+
+	int32_t mWidth{0}, mHeight{0};
+	const RenderContext* mCtx{nullptr};
+	const FrameGraph* mGraph{nullptr};
+	UniformBuffer mUBO;
+	GraphicsPipeline mPipelines[2];
+	GraphicsEncoder mEncoder;
+	std::unique_ptr<DirectionalShadow> mDirShadow;
+	std::unique_ptr<OmnidirectionalShadow> mOmnidirShadow;
+	std::unique_ptr<PerspectiveShadow> mPersShadow;
 };

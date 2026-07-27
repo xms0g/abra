@@ -3,6 +3,8 @@
 #include "glm/glm.hpp"
 #include "../../context/renderQueue.hpp"
 
+class GraphicsEncoder;
+class GraphicsPipeline;
 struct RenderGroup;
 struct RenderContext;
 class Shader;
@@ -19,19 +21,17 @@ public:
 
 	void render(
 		const RenderContext& ctx,
+		GraphicsEncoder& encoder,
+		GraphicsPipeline& pipeline,
+		const FrameBuffer& frameBuffer,
 		const glm::vec3& direction,
 		const glm::vec3& position,
 		float fovy,
-		uint32_t texture,
 		int32_t layer);
 
 private:
-	int32_t mWidth{0};
-	int32_t mHeight{0};
-	float mAspect{0.0f};
-	float mFar{0.0f};
-	float mNear{0.0f};
+	int32_t mWidth{0}, mHeight{0};
+	float mAspect{0.0f}, mFar{0.0f}, mNear{0.0f};
 	glm::mat4 mLightSpaceMatrix[4]{};
-	const Shader* mDepthShader;
 	std::span<RenderGroup> mObjects;
 };
