@@ -25,7 +25,7 @@ class Mesh;
 struct Material {
 	uint32_t idx{0};
 	uint32_t flags{0};
-	uint32_t textureTarget{0};
+	TextureTarget textureTarget{};
 	glm::vec3 color{0.0f};
 	float alphaCutoff{0.0f};
 	std::vector<Texture> textures;
@@ -39,7 +39,7 @@ struct Material {
 	Material(Material&& other) noexcept
 		: idx(std::exchange(other.idx, 0)),
 		  flags(std::exchange(other.flags, 0)),
-		  textureTarget(std::exchange(other.textureTarget, 0)),
+		  textureTarget(std::exchange(other.textureTarget, {})),
 		  color(other.color),
 		  alphaCutoff(std::exchange(other.alphaCutoff, 0.0f)),
 		  textures(std::move(other.textures)) {
@@ -50,7 +50,7 @@ struct Material {
 			return *this;
 		idx = std::exchange(other.idx, 0);
 		flags = std::exchange(other.flags, 0);
-		textureTarget = std::exchange(other.textureTarget, 0);
+		textureTarget = std::exchange(other.textureTarget, {});
 		color = other.color;
 		alphaCutoff = std::exchange(other.alphaCutoff, 0.0f);
 		textures = std::move(other.textures);

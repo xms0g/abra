@@ -26,17 +26,4 @@ public:
 
 	~SingleQuad() override = default;
 };
-
-class Quad final : public IQuad {
-public:
-	Quad();
-
-	~Quad() override = default;
-
-	[[nodiscard]]
-	const Shader& shader() const;
-
-private:
-	std::unique_ptr<Shader> mShader;
-};
 }

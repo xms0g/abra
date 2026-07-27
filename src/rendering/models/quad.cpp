@@ -42,14 +42,4 @@ uint32_t IQuad::vao() const {
 	return mVAO->id();
 }
 
-Model::Quad::Quad() {
-	mShader = std::make_unique<Shader>( "models/quad.vert", "models/quad.frag");
-	mShader->bind();
-	mShader->setInt("screenTexture", 0);
-}
-
-const Shader& Model::Quad::shader() const {
-	return *mShader;
-}
-
 

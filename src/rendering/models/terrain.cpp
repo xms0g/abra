@@ -1,5 +1,4 @@
 #include "terrain.h"
-#include "glad/glad.h"
 #include "image/stb_image.h"
 #include "../mesh/mesh.h"
 #include "../mesh/vertex.hpp"
@@ -72,7 +71,7 @@ Model::Terrain::Terrain(
 
 	Material material;
 	material.flags = flags;
-	material.textureTarget = GL_TEXTURE_2D;
+	material.textureTarget = TextureTarget::Texture2D;
 	material.textures = std::move(textures);
 
 	mMaterial[0] = std::move(material);

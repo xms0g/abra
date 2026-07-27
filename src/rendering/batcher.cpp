@@ -74,7 +74,7 @@ MaterialBatch Batcher::batchMaterial(
 	material.idx = buildState.materialIndex++;
 
 	renderData.emplaceHeightScale(matComponent.heightScale);
-	renderData.emplaceMaterial(material.flags, material.textureTarget, material.color, material.alphaCutoff);
+	renderData.emplaceMaterial(material.flags, toGL(material.textureTarget), material.color, material.alphaCutoff);
 
 	for (const auto& texture: material.textures) {
 		renderData.emplaceTexture(texture.id);

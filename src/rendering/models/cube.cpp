@@ -1,5 +1,4 @@
 #include "cube.h"
-#include "glad/glad.h"
 #include "../mesh/mesh.h"
 #include "../mesh/vertex.hpp"
 #include "../texture/texture.h"
@@ -152,7 +151,7 @@ Model::Cube::Cube(
 
 	Material material;
 	material.flags = flags;
-	material.textureTarget = GL_TEXTURE_2D;
+	material.textureTarget = TextureTarget::Texture2D;
 	material.color = color;
 	material.textures = std::move(textures);
 

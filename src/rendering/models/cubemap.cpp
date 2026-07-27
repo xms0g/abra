@@ -1,5 +1,4 @@
 #include "cubemap.h"
-#include "glad/glad.h"
 #include "../mesh/mesh.h"
 #include "../mesh/vertex.hpp"
 #include "../texture/texture.h"
@@ -66,7 +65,7 @@ Model::Cubemap::Cubemap(std::vector<std::string>& faces) {
 		textures.emplace_back(0, ALBEDO,  face);
 	}
 	Material material;
-	material.textureTarget = GL_TEXTURE_CUBE_MAP;
+	material.textureTarget = TextureTarget::TextureCubeMap;
 	material.textures = std::move(textures);
 
 	mMaterial[0] = std::move(material);
