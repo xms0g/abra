@@ -50,11 +50,11 @@ void SSAOPass::configure(const RenderContext& ctx, const FrameGraph& graph, Even
 		},
 		.uniforms = {
 			{
-				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name").c_str(),
+				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name"),
 				.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"),
 			},
 			{
-				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("ssao.block_name").c_str(),
+				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("ssao.block_name"),
 				.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("ssao.ubo_binding"),
 			}
 		}
