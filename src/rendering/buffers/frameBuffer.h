@@ -39,8 +39,6 @@ public:
 
 	void resizeRenderBuffer(int32_t width, int32_t height) const;
 
-	void generateMipmaps() const;
-
 	void attachTexture(uint32_t index, Attachment attachment, int32_t mip, int32_t layer) const;
 
 	void checkStatus();
@@ -94,6 +92,8 @@ public:
 
 	FrameBuffer& withTextureDepthArray(int32_t layerCount, int32_t internalFormat, bool onlyForShadowMap);
 
+	FrameBuffer& withTextureCubeMap(bool mipmap);
+
 	FrameBuffer& withTextureCubemapDepth(int32_t internalFormat, bool onlyForShadowMap);
 
 	FrameBuffer& withTextureCubemapDepthArray(int32_t layerCount, int32_t internalFormat, bool onlyForShadowMap);
@@ -126,18 +126,4 @@ private:
 
 	std::vector<TextureDescription> mTextures;
 	std::vector<uint32_t> mAttachments;
-};
-
-class CubemapBuffer final : public BaseFrameBuffer {
-public:
-	CubemapBuffer(int32_t width, int32_t height, bool mipmap = false, bool prefilter = false);
-
-	~CubemapBuffer() override;
-
-protected:
-	[[nodiscard]]
-	TextureHandle textureImpl(uint32_t index) const override;
-
-private:
-	uint32_t mCubemapID{0};
 };

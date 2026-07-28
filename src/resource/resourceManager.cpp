@@ -333,11 +333,12 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 	auto pipeline = GraphicsPipeline{info};
 	auto encoder = GraphicsEncoder{};
 
-	auto envMap = std::make_unique<CubemapBuffer>(
+	auto envMap = std::make_unique<FrameBuffer>(
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.envMap.size"),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.envMap.size"),
-		true);
-	envMap->checkStatus();
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.envMap.size"));
+	envMap->withTextureCubeMap(true)
+			.withRenderBufferDepth(GL_DEPTH_COMPONENT24)
+			.checkStatus();
 
 	mBuffers.emplace("envMap", std::move(envMap));
 
@@ -370,8 +371,7 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 	}
 
 	encoder.unbindFrameBuffer();
-	encoder.bindTexture(envMapBuffer->texture(), 0);
-	envMapBuffer->generateMipmaps();
+	Texture::generateMipmaps(envMapBuffer->texture());
 
 	return envMapBuffer->texture().id;
 }
@@ -413,10 +413,12 @@ void ResourceManager::createIrradianceMap() {
 	auto pipeline = GraphicsPipeline{info};
 	auto encoder = GraphicsEncoder{};
 
-	auto irradianceMap = std::make_unique<CubemapBuffer>(
+	auto irradianceMap = std::make_unique<FrameBuffer>(
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.size"),
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.size"));
-	irradianceMap->checkStatus();
+	irradianceMap->withTextureCubeMap(false)
+			.withRenderBufferDepth(GL_DEPTH_COMPONENT24)
+			.checkStatus();
 
 	mBuffers.emplace("irradianceMap", std::move(irradianceMap));
 
@@ -487,12 +489,14 @@ void ResourceManager::createPrefilterMap() {
 	auto pipeline = GraphicsPipeline{info};
 	auto encoder = GraphicsEncoder{};
 
-	auto prefilterMap = std::make_unique<CubemapBuffer>(
+	auto prefilterMap = std::make_unique<FrameBuffer>(
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.size"),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.size"),
-		true,
-		true);
-	prefilterMap->checkStatus();
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.size"));
+	prefilterMap->withTextureCubeMap(true)
+			.withRenderBufferDepth(GL_DEPTH_COMPONENT24)
+			.checkStatus();
+
+	Texture::generateMipmaps(prefilterMap->texture());
 
 	mBuffers.emplace("prefilterMap", std::move(prefilterMap));
 
@@ -568,7 +572,7 @@ void ResourceManager::createBrdfLUT() {
 		.colorBlend = colorBlendState,
 		.stage = Shader("pbr/brdfLUT.vert", "pbr/brdfLUT.frag"),
 		.samplers = {
-				{.name = "environmentMap", .slot = 0}
+			{.name = "environmentMap", .slot = 0}
 		},
 		.uniforms = {}
 	};

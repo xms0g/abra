@@ -54,6 +54,8 @@ struct Texture {
 
 	static Texture generate(int32_t width, int32_t height, const float* data);
 
+	static void generateMipmaps(TextureHandle handle);
+
 	static uint32_t load(const std::string& path, uint32_t flags, bool isSRGB);
 
 	static void info(const std::string& path, int32_t& width, int32_t& height);

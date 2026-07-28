@@ -59,6 +59,11 @@ Texture Texture::generate(const int32_t width, const int32_t height, const float
 	return {textureID, 0, TextureTarget::Texture2D, ""};
 }
 
+void Texture::generateMipmaps(const TextureHandle handle) {
+	glBindTexture(toGL(handle.target), handle.id);
+	glGenerateMipmap(toGL(handle.target));
+}
+
 uint32_t Texture::load(const std::string& path, const uint32_t flags, const bool isSRGB) {
 	uint32_t textureID;
 

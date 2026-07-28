@@ -42,10 +42,6 @@ void BaseFrameBuffer::resizeRenderBuffer(const int32_t width, const int32_t heig
 	glViewport(0, 0, width, height);
 }
 
-void BaseFrameBuffer::generateMipmaps() const {
-	glGenerateMipmap(toGL(texture().target));
-}
-
 void BaseFrameBuffer::attachTexture(const uint32_t index, const Attachment attachment, const int32_t mip, const int32_t layer) const {
 	switch (auto [id, target] = texture(index); target) {
 		case TextureTarget::Texture2D:
@@ -275,6 +271,38 @@ FrameBuffer& FrameBuffer::withTextureDepthArray(
 	return *this;
 }
 
+FrameBuffer& FrameBuffer::withTextureCubeMap(const bool mipmap) {
+	uint32_t textureID;
+	glGenTextures(1, &textureID);
+	mTextures.emplace_back(textureID, TextureTarget::TextureCubeMap);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	for (uint32_t i = 0; i < 6; ++i) {
+		glTexImage2D(
+			GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+			0,
+			GL_RGB16F,
+			static_cast<int32_t>(mWidth),
+			static_cast<int32_t>(mHeight),
+			0,
+			GL_RGB,
+			GL_FLOAT,
+			nullptr);
+	}
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	return *this;
+}
+
 FrameBuffer& FrameBuffer::withTextureCubemapDepth(const int32_t internalFormat, const bool onlyForShadowMap) {
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
@@ -439,50 +467,4 @@ int32_t FrameBuffer::getInternalFormat(const uint32_t format, const bool isFloat
 	}
 
 	assert(false && "Unsupported format");
-}
-
-CubemapBuffer::CubemapBuffer(const int32_t width, const int32_t height, const bool mipmap, const bool prefilter)
-	: BaseFrameBuffer(width, height) {
-	glGenRenderbuffers(1, &mRBO);
-
-	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRBO);
-
-	glGenTextures(1, &mCubemapID);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, mCubemapID);
-
-	for (uint32_t i = 0; i < 6; ++i) {
-		glTexImage2D(
-			GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-			0,
-			GL_RGB16F,
-			static_cast<int32_t>(width),
-			static_cast<int32_t>(height),
-			0,
-			GL_RGB,
-			GL_FLOAT,
-			nullptr);
-	}
-
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	if (prefilter) {
-		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-	}
-
-	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-CubemapBuffer::~CubemapBuffer() {
-	glDeleteTextures(1, &mCubemapID);
-}
-
-TextureHandle CubemapBuffer::textureImpl(uint32_t index) const {
-	return {.id = mCubemapID, .target = TextureTarget::TextureCubeMap};
 }
