@@ -42,7 +42,7 @@ private:
 	const RenderContext* mCtx{nullptr};
 	const FrameGraph* mGraph{nullptr};
 	UniformBuffer mUBO;
-	GraphicsPipeline mPipelines[2];
+	std::array<GraphicsPipeline, 2> mPipelines;
 	GraphicsEncoder mEncoder;
 	std::unique_ptr<DirectionalShadow> mDirShadow;
 	std::unique_ptr<OmnidirectionalShadow> mOmnidirShadow;
