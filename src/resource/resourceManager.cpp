@@ -2,7 +2,6 @@
 #include <iostream>
 #include <assimp/GltfMaterial.h>
 #include <assimp/postprocess.h>
-#include "glad/glad.h"
 #include "image/stb_image.h"
 #include "../config/configManager.h"
 #include "../io/filesystem.hpp"
@@ -298,10 +297,6 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 }
 
 uint32_t ResourceManager::createEnvMap(const std::string& path) {
-	// glDisable(GL_CULL_FACE);
-	// glEnable(GL_DEPTH_TEST);
-	// glDepthFunc(GL_LEQUAL);
-
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
@@ -456,8 +451,6 @@ void ResourceManager::createIrradianceMap() {
 }
 
 void ResourceManager::createPrefilterMap() {
-	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};

@@ -44,6 +44,8 @@ Renderer::Renderer(Registry& registry, const Camera& camera, Window& window) {
 		throw std::runtime_error(std::string("ERROR::RENDERER::FAILED_TO_INIT_GLAD"));
 	}
 
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
 	createRenderQueues();
 	createSystems(registry);
 	createFrameBuffers();
