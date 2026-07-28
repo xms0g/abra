@@ -4,7 +4,6 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/norm.hpp"
 #include "shader.h"
-#include "renderCommand.h"
 #include "command.hpp"
 #include "batcher.h"
 #include "systems/lightSystem.h"

@@ -9,7 +9,6 @@
 #include "fxaa.h"
 #include "kernels.hpp"
 #include "../../shader.h"
-#include "../../renderCommand.h"
 #include "../../frameGraph.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../models/quad.h"

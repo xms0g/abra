@@ -62,7 +62,7 @@ Model::Cubemap::Cubemap(std::vector<std::string>& faces) {
 	textures.reserve(faces.size());
 
 	for (const auto& face : faces) {
-		textures.emplace_back(0, ALBEDO,  face);
+		textures.emplace_back(0, ALBEDO,TextureTarget::Texture2D,  face);
 	}
 	Material material;
 	material.textureTarget = TextureTarget::TextureCubeMap;

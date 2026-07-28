@@ -1,5 +1,4 @@
 #include "perspectiveShadow.h"
-#include "glad/glad.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "../../shader.h"
@@ -7,7 +6,6 @@
 #include "../../context/renderContext.hpp"
 #include "../../context/renderData.hpp"
 #include "../../context/renderQueue.hpp"
-#include "../../renderCommand.h"
 #include "../../../config/configManager.h"
 #include "../../../rendering/graphicsEncoder.h"
 #include "../../../rendering/graphicsPipeline.h"
@@ -39,7 +37,7 @@ void PerspectiveShadow::render(
 	const glm::vec3& position,
 	const float fovy,
 	const int32_t layer) {
-	encoder.attachFramebufferTextureLayer(frameBuffer, layer);
+	encoder.attachFramebufferTexture(frameBuffer.texture(), Attachment::Depth, 0, layer);
 	encoder.clearFrameBuffer(ClearMask::Depth);
 
 	const glm::mat4 lightProjection = glm::perspective(fovy, mAspect, mNear, mFar);

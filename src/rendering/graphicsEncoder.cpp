@@ -44,6 +44,10 @@ static constexpr uint32_t toGL(const PolygonFace face) {
 	return toUnderlying(face);
 }
 
+static constexpr uint32_t toGL(const Attachment attachment) {
+	return toUnderlying(attachment);
+}
+
 void GraphicsEncoder::bindFrameBuffer() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -52,7 +56,7 @@ void GraphicsEncoder::unbindFrameBuffer() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void GraphicsEncoder::bindFrameBuffer(const FrameBuffer& fb) const {
+void GraphicsEncoder::bindFrameBuffer(const BaseFrameBuffer& fb) const {
 	fb.bind();
 }
 
@@ -122,7 +126,8 @@ void GraphicsEncoder::bindMaterial(const MaterialView& material) {
 
 	auto& pipelineState = mState.pipeline->state();
 
-	if (mState.materialCache.lastMatFlags != material.flags || mState.materialCache.lastShader != &pipelineState.stage) {
+	if (mState.materialCache.lastMatFlags != material.flags || mState.materialCache.lastShader != &pipelineState.
+	    stage) {
 		mState.materialCache.lastMatFlags = material.flags;
 		mState.materialCache.lastShader = &pipelineState.stage;
 		pipelineState.stage.setUint("material.flags", material.flags);
@@ -204,8 +209,44 @@ void GraphicsEncoder::setCullMode(const CullMode mode) {
 	glCullFace(toGL(mode));
 }
 
-void GraphicsEncoder::attachFramebufferTextureLayer(const FrameBuffer& fb, const int32_t layer) {
-	glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, fb.texture().id, 0, layer);
+void GraphicsEncoder::attachFramebufferTexture(
+	const TextureHandle& texture,
+	const Attachment attachment,
+	const int32_t mip,
+	const int32_t layer) {
+	switch (texture.target) {
+		case TextureTarget::Texture2D:
+			glFramebufferTexture2D(
+				GL_FRAMEBUFFER,
+				toGL(attachment),
+				GL_TEXTURE_2D,
+				texture.id,
+				mip);
+			break;
+		case TextureTarget::TextureCubeMap:
+			assert(layer >= 0 && layer < 6);
+
+			glFramebufferTexture2D(
+				GL_FRAMEBUFFER,
+				toGL(attachment),
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer,
+				texture.id,
+				mip);
+			break;
+		case TextureTarget::Texture2DArray:
+		case TextureTarget::TextureCubeMapArray:
+			glFramebufferTextureLayer(
+				GL_FRAMEBUFFER,
+				toGL(attachment),
+				texture.id,
+				mip,
+				layer);
+			break;
+	}
+}
+
+void GraphicsEncoder::generateMipmaps(const TextureHandle& handle) const {
+	glGenerateMipmap(toGL(handle.target));
 }
 
 void GraphicsEncoder::reset() {

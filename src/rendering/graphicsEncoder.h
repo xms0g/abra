@@ -19,6 +19,11 @@ enum class ClearMask : uint32_t {
 	Stencil = GL_STENCIL_BUFFER_BIT,
 };
 
+enum class Attachment : uint32_t {
+	Color0 = GL_COLOR_ATTACHMENT0,
+	Depth = GL_DEPTH_ATTACHMENT,
+};
+
 constexpr ClearMask operator|(const ClearMask lhs, const ClearMask rhs) {
 	return static_cast<ClearMask>(toUnderlying(lhs) | toUnderlying(rhs));
 }
@@ -34,7 +39,7 @@ public:
 
 	void unbindFrameBuffer() const;
 
-	void bindFrameBuffer(const FrameBuffer& fb) const;
+	void bindFrameBuffer(const BaseFrameBuffer& fb) const;
 
 	void bindTexture(TextureHandle handle, uint32_t slot) const;
 
@@ -58,13 +63,15 @@ public:
 
 	void setCullMode(CullMode mode);
 
-	void attachFramebufferTextureLayer(const FrameBuffer& fb, int32_t layer);
+	void attachFramebufferTexture(const TextureHandle& texture, Attachment attachment, int32_t mip, int32_t layer);
 
 	template<typename T>
 	void setUniform(const std::string& name, const T& value);
 
 	template<typename T>
 	void setUniform(const std::string& name, const T* value, uint32_t count) const;
+
+	void generateMipmaps(const TextureHandle& handle) const;
 
 	void reset();
 

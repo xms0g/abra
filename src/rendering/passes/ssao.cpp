@@ -164,5 +164,5 @@ void SSAOPass::createNoiseTexture() {
 	noise = math::random::generateNoise(textureSize * textureSize);
 	mNoiseTexture = Texture::generate(textureSize, textureSize, noise.data());
 
-	mNoiseTexture.bind(CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.noise.textureSlot"));
+	mEncoder.bindTexture({.id = mNoiseTexture.id, .target = mNoiseTexture.target}, CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.noise.textureSlot"));
 }

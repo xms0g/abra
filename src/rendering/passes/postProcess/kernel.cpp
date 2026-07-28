@@ -1,6 +1,5 @@
 #include "kernel.h"
 #include "../../shader.h"
-#include "../../renderCommand.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../context/renderContext.hpp"
 #include "../../models/quad.h"
@@ -30,7 +29,17 @@ TextureHandle Kernel::render(
 	encoder.setUniform("kernel", mKernel, 9);
 
 	const uint32_t textures[] = {sceneTexture.id};
-	RenderCommand::drawQuad(quad.vao(), textures);
+	encoder.bindMaterial({
+		.flags = 0,
+		.textureTarget = toGL(TextureTarget::Texture2D),
+		.textures = std::span(textures)
+	});
+
+	encoder.draw({
+		.vao = quad.vao(),
+		.vertexCount = 6,
+		.indexCount = 0
+	});
 
 	return renderTarget->texture();
 }

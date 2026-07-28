@@ -1,6 +1,5 @@
 #include "toneMapping.h"
 #include "../../shader.h"
-#include "../../renderCommand.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../context/renderContext.hpp"
 #include "../../models/quad.h"

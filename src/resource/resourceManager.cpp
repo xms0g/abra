@@ -14,8 +14,9 @@
 #include "../rendering/mesh/vertex.hpp"
 #include "../rendering/texture/texture.h"
 #include "../rendering/buffers/frameBuffer.h"
-#include "../rendering/renderCommand.h"
 #include "../rendering/mesh/vertexArray.h"
+#include "../rendering/graphicsEncoder.h"
+#include "../rendering/graphicsPipeline.h"
 
 ResourceManager& ResourceManager::instance() {
 	static ResourceManager instance;
@@ -26,11 +27,9 @@ void ResourceManager::createBuffers() {
 	if (!mBuffers.contains("envMap"))
 		return;
 
-	glDisable(GL_CULL_FACE);
 	createIrradianceMap();
 	createPrefilterMap();
 	createBrdfLUT();
-	glEnable(GL_CULL_FACE);
 }
 
 void ResourceManager::asyncLoadModel(size_t entityID, const std::string& file) {
@@ -55,29 +54,30 @@ void ResourceManager::uploadModelsToGPU() {
 			if (material.textureTarget == TextureTarget::TextureCubeMap) {
 				// Handle HDR to Cubemap
 				if (material.textures.size() == 1) {
-					const std::string path = fs::path(CONFIG_MANAGER_INSTANCE.get<std::string>("path.asset") + material.textures.front().path);
+					const std::string path = fs::path(
+						CONFIG_MANAGER_INSTANCE.get<std::string>("path.asset") + material.textures.front().path);
 
 					uint32_t id = createEnvMap(path);
 
 					material.textures.clear();
-					material.textures.emplace_back(id, 0, "");
+					material.textures.emplace_back(id, 0, TextureTarget::TextureCubeMap, "");
 				} else {
 					// Handle 6 faces-cubemap
 					std::vector<std::string> paths;
 					paths.reserve(material.textures.size());
 
-					for (auto& [id, type, path]: material.textures) {
+					for (auto& [id, type, target, path]: material.textures) {
 						paths.push_back(fs::path(CONFIG_MANAGER_INSTANCE.get<std::string>("path.asset") + path));
 					}
 
 					material.textures.clear();
-					material.textures.emplace_back(Texture::loadCubemap(paths), 0, "");
+					material.textures.emplace_back(Texture::loadCubemap(paths), 0, TextureTarget::TextureCubeMap, "");
 				}
 
 				continue;
 			}
 
-			for (auto& [id, type, path]: material.textures) {
+			for (auto& [id, type, target, path]: material.textures) {
 				if (idByPath.contains(path)) {
 					id = idByPath.at(path);
 					continue;
@@ -293,14 +293,50 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 			}
 		}
 
-		material.textures.emplace_back(0, static_cast<uint32_t>(req.type), std::move(path));
+		material.textures.emplace_back(0, static_cast<uint32_t>(req.type), TextureTarget::Texture2D, std::move(path));
 	}
 }
 
 uint32_t ResourceManager::createEnvMap(const std::string& path) {
-	glDisable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
+	// glDisable(GL_CULL_FACE);
+	// glEnable(GL_DEPTH_TEST);
+	// glDepthFunc(GL_LEQUAL);
+
+	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
+		.topology = PrimitiveTopology::Triangles,
+	};
+
+	constexpr PipelineRasterizationState rasterizationState = {
+		.cullMode = CullMode::None,
+		.frontFace = FrontFace::CounterClockwise,
+		.polygonMode = PolygonMode::Fill,
+		.polygonFace = PolygonFace::FrontAndBack,
+	};
+
+	constexpr PipelineDepthStencilState depthStencilState = {
+		.depthTestEnable = true,
+		.depthWriteEnable = true,
+		.depthCompareOp = CompareOp::Lequal,
+	};
+
+	constexpr PipelineColorBlendState colorBlendState = {
+		.blendEnable = false,
+	};
+
+	PipelineRenderingInfo info = {
+		.primitiveAssembly = primitiveAssemblyState,
+		.rasterization = rasterizationState,
+		.depthStencil = depthStencilState,
+		.colorBlend = colorBlendState,
+		.stage = Shader("pbr/cubemap.vert", "pbr/equirectangularToCube.frag"),
+		.samplers = {
+			{.name = "equirectangularMap", .slot = 0}
+		},
+		.uniforms = {}
+	};
+
+	auto pipeline = GraphicsPipeline{info};
+	auto encoder = GraphicsEncoder{};
 
 	auto envMap = std::make_unique<CubemapBuffer>(
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.envMap.size"),
@@ -316,37 +352,72 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 	cube.meshes().at(0).front().uploadToGPU();
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
-	const auto equirectangularToCube = Shader{"pbr/cubemap.vert", "pbr/equirectangularToCube.frag"};
 	const Texture hdrTexture = Texture::loadHDR(path);
 
 	// convert HDR equirectangular environment map to cubemap equivalent
-	equirectangularToCube.bind();
-	equirectangularToCube.setInt("equirectangularMap", 0);
-	equirectangularToCube.setMat4("projection", mCaptureProjection);
+	encoder.bindPipeline(pipeline);
+	encoder.setUniform("projection", mCaptureProjection);
+	encoder.bindTexture({.id = hdrTexture.id, .target = hdrTexture.target}, 0);
 
-	hdrTexture.bind(0);
+	encoder.bindFrameBuffer(*envMapBuffer);
 
-	envMapBuffer->bind();
-	for (uint32_t i = 0; i < FACES; ++i) {
-		dynamic_cast<CubemapBuffer*>(envMapBuffer.get())->bindFace(i);
-		equirectangularToCube.setMat4("view", mCaptureViews[i]);
+	for (int32_t i = 0; i < FACES; ++i) {
+		encoder.attachFramebufferTexture(envMapBuffer->texture(), Attachment::Color0, 0, i);
+		encoder.setUniform("view", mCaptureViews[i]);
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		RenderCommand::drawMesh(cubeMesh.vao().id(), cubeMesh.vertices().size(), cubeMesh.indices().size());
+		encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
+
+		encoder.drawIndexed({
+			.vao = cubeMesh.vao().id(),
+			.vertexCount = 0,
+			.indexCount = cubeMesh.indices().size()
+		});
 	}
 
-	envMapBuffer->unbind();
-
-	envMapBuffer->bindTexture(0);
-	envMapBuffer->generateMipmaps();
-
-	glDepthFunc(GL_LESS);
-	glEnable(GL_CULL_FACE);
+	encoder.unbindFrameBuffer();
+	encoder.bindTexture(envMapBuffer->texture(), 0);
+	encoder.generateMipmaps(envMapBuffer->texture());
 
 	return envMapBuffer->texture().id;
 }
 
 void ResourceManager::createIrradianceMap() {
+	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
+		.topology = PrimitiveTopology::Triangles,
+	};
+
+	constexpr PipelineRasterizationState rasterizationState = {
+		.cullMode = CullMode::None,
+		.frontFace = FrontFace::CounterClockwise,
+		.polygonMode = PolygonMode::Fill,
+		.polygonFace = PolygonFace::FrontAndBack,
+	};
+
+	constexpr PipelineDepthStencilState depthStencilState = {
+		.depthTestEnable = true,
+		.depthWriteEnable = true,
+		.depthCompareOp = CompareOp::Less,
+	};
+
+	constexpr PipelineColorBlendState colorBlendState = {
+		.blendEnable = false,
+	};
+
+	PipelineRenderingInfo info = {
+		.primitiveAssembly = primitiveAssemblyState,
+		.rasterization = rasterizationState,
+		.depthStencil = depthStencilState,
+		.colorBlend = colorBlendState,
+		.stage = Shader("pbr/cubemap.vert", "pbr/irradianceConv.frag"),
+		.samplers = {
+			{.name = "environmentMap", .slot = 0}
+		},
+		.uniforms = {}
+	};
+
+	auto pipeline = GraphicsPipeline{info};
+	auto encoder = GraphicsEncoder{};
+
 	auto irradianceMap = std::make_unique<CubemapBuffer>(
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.size"),
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.size"));
@@ -361,28 +432,67 @@ void ResourceManager::createIrradianceMap() {
 	cube.meshes().at(0).front().uploadToGPU();
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
-	const auto irradianceConv = Shader{"pbr/cubemap.vert", "pbr/irradianceConv.frag"};
 	// solve diffuse integral by convolution to create an irradiance (cube)map.
-	irradianceConv.bind();
-	irradianceConv.setInt("environmentMap", 0);
-	irradianceConv.setMat4("projection", mCaptureProjection);
+	encoder.bindPipeline(pipeline);
+	encoder.setUniform("projection", mCaptureProjection);
+	encoder.bindTexture(envMapBuffer->texture(), 0);
 
-	envMapBuffer->bindTexture(0);
+	encoder.bindFrameBuffer(*irradianceMapBuffer);
 
-	irradianceMapBuffer->bind();
-	for (uint32_t i = 0; i < FACES; ++i) {
-		dynamic_cast<const CubemapBuffer*>(irradianceMapBuffer)->bindFace(i);
-		irradianceConv.setMat4("view", mCaptureViews[i]);
+	for (int32_t i = 0; i < FACES; ++i) {
+		encoder.attachFramebufferTexture(irradianceMapBuffer->texture(), Attachment::Color0, 0, i);
+		encoder.setUniform("view", mCaptureViews[i]);
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		RenderCommand::drawMesh(cubeMesh.vao().id(), cubeMesh.vertices().size(), cubeMesh.indices().size());
+		encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
+
+		encoder.drawIndexed({
+			.vao = cubeMesh.vao().id(),
+			.vertexCount = 0,
+			.indexCount = cubeMesh.indices().size()
+		});
 	}
 
-	irradianceMapBuffer->unbind();
+	encoder.unbindFrameBuffer();
 }
 
 void ResourceManager::createPrefilterMap() {
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
+		.topology = PrimitiveTopology::Triangles,
+	};
+
+	constexpr PipelineRasterizationState rasterizationState = {
+		.cullMode = CullMode::None,
+		.frontFace = FrontFace::CounterClockwise,
+		.polygonMode = PolygonMode::Fill,
+		.polygonFace = PolygonFace::FrontAndBack,
+	};
+
+	constexpr PipelineDepthStencilState depthStencilState = {
+		.depthTestEnable = true,
+		.depthWriteEnable = true,
+		.depthCompareOp = CompareOp::Less,
+	};
+
+	constexpr PipelineColorBlendState colorBlendState = {
+		.blendEnable = false,
+	};
+
+	PipelineRenderingInfo info = {
+		.primitiveAssembly = primitiveAssemblyState,
+		.rasterization = rasterizationState,
+		.depthStencil = depthStencilState,
+		.colorBlend = colorBlendState,
+		.stage = Shader("pbr/cubemap.vert", "pbr/prefilter.frag"),
+		.samplers = {
+			{.name = "environmentMap", .slot = 0}
+		},
+		.uniforms = {}
+	};
+
+	auto pipeline = GraphicsPipeline{info};
+	auto encoder = GraphicsEncoder{};
 
 	auto prefilterMap = std::make_unique<CubemapBuffer>(
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.size"),
@@ -400,40 +510,79 @@ void ResourceManager::createPrefilterMap() {
 	cube.meshes().at(0).front().uploadToGPU();
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
-	const auto prefilter = Shader{"pbr/cubemap.vert", "pbr/prefilter.frag"};
 	// run a quasi monte-carlo simulation on the environment lighting to create a prefilter (cube)map.
-	prefilter.bind();
-	prefilter.setInt("environmentMap", 0);
-	prefilter.setMat4("projection", mCaptureProjection);
-	prefilter.setFloat("resolution",
-		static_cast<float>(CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.envMap.size")));
+	encoder.bindPipeline(pipeline);
+	encoder.setUniform("projection", mCaptureProjection);
+	encoder.setUniform("resolution",
+	                   static_cast<float>(CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.envMap.size")));
 
-	envMapBuffer->bindTexture(0);
-	prefilterMapBuffer->bind();
+	encoder.bindTexture(envMapBuffer->texture(), 0);
+
+	encoder.bindFrameBuffer(*prefilterMapBuffer);
 
 	constexpr uint32_t mipLevels = 5;
 	for (int32_t i = 0; i < mipLevels; ++i) {
 		const int32_t mipSize = static_cast<int32_t>(
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.size") * std::pow(0.5, i));
-
 		prefilterMapBuffer->resizeRenderBuffer(mipSize, mipSize);
 
 		const float roughness = static_cast<float>(i) / static_cast<float>(mipLevels - 1);
-		prefilter.setFloat("roughness", roughness);
+		encoder.setUniform("roughness", roughness);
 
-		for (uint32_t j = 0; j < FACES; ++j) {
-			dynamic_cast<const CubemapBuffer*>(prefilterMapBuffer)->bindFace(j, i);
-			prefilter.setMat4("view", mCaptureViews[j]);
 
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			RenderCommand::drawMesh(cubeMesh.vao().id(), cubeMesh.vertices().size(), cubeMesh.indices().size());
+		for (int32_t j = 0; j < FACES; ++j) {
+			encoder.attachFramebufferTexture(prefilterMapBuffer->texture(), Attachment::Color0, i, j);
+			encoder.setUniform("view", mCaptureViews[j]);
+
+			encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
+			encoder.drawIndexed({
+				.vao = cubeMesh.vao().id(),
+				.vertexCount = 0,
+				.indexCount = cubeMesh.indices().size()
+			});
 		}
 	}
 
-	prefilterMapBuffer->unbind();
+	encoder.unbindFrameBuffer();
 }
 
 void ResourceManager::createBrdfLUT() {
+	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
+		.topology = PrimitiveTopology::Triangles,
+	};
+
+	constexpr PipelineRasterizationState rasterizationState = {
+		.cullMode = CullMode::None,
+		.frontFace = FrontFace::CounterClockwise,
+		.polygonMode = PolygonMode::Fill,
+		.polygonFace = PolygonFace::FrontAndBack,
+	};
+
+	constexpr PipelineDepthStencilState depthStencilState = {
+		.depthTestEnable = true,
+		.depthWriteEnable = true,
+		.depthCompareOp = CompareOp::Less,
+	};
+
+	constexpr PipelineColorBlendState colorBlendState = {
+		.blendEnable = false,
+	};
+
+	PipelineRenderingInfo info = {
+		.primitiveAssembly = primitiveAssemblyState,
+		.rasterization = rasterizationState,
+		.depthStencil = depthStencilState,
+		.colorBlend = colorBlendState,
+		.stage = Shader("pbr/brdfLUT.vert", "pbr/brdfLUT.frag"),
+		.samplers = {
+				{.name = "environmentMap", .slot = 0}
+		},
+		.uniforms = {}
+	};
+
+	auto pipeline = GraphicsPipeline{info};
+	auto encoder = GraphicsEncoder{};
+
 	auto brdfLUT = std::make_unique<FrameBuffer>(
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.brdfLUT.size"),
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.brdfLUT.size"));
@@ -446,13 +595,14 @@ void ResourceManager::createBrdfLUT() {
 
 	const Model::Quad quad;
 	// generate a 2D LUT from the BRDF equations used.
-	const auto brdfLUTShader = Shader{"pbr/brdfLUT.vert", "pbr/brdfLUT.frag"};
-	brdfLUTShader.bind();
+	encoder.bindPipeline(pipeline);
+	encoder.bindFrameBuffer(*brdfLUTBuffer);
+	encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
+	encoder.draw({
+		.vao = quad.vao(),
+		.vertexCount = 6,
+		.indexCount = 0
+	});
 
-	brdfLUTBuffer->bind();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	RenderCommand::drawQuad(quad.vao());
-
-	brdfLUTBuffer->unbind();
+	encoder.unbindFrameBuffer();
 }

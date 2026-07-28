@@ -116,15 +116,15 @@ Model::Sphere::Sphere(
 	uint32_t flags{0};
 	std::vector<Texture> textures;
 	if (!albedo.empty()) {
-		textures.emplace_back(0, ALBEDO, albedo);
+		textures.emplace_back(0, ALBEDO,TextureTarget::Texture2D, albedo);
 	}
 
 	if (!normal.empty()) {
-		textures.emplace_back(0,NORMAL,  normal);
+		textures.emplace_back(0,NORMAL,TextureTarget::Texture2D,  normal);
 	}
 
 	if (!orm.empty()) {
-		textures.emplace_back(0, ROUGHNESS_METALLIC,  orm);
+		textures.emplace_back(0, ROUGHNESS_METALLIC,TextureTarget::Texture2D,  orm);
 		flags |= PBR;
 		flags |= HAS_ORM;
 	}

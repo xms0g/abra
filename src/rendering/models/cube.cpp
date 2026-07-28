@@ -122,19 +122,19 @@ Model::Cube::Cube(
 	std::vector<Texture> textures;
 
 	if (!diffuseTexture.empty()) {
-		textures.emplace_back(0, ALBEDO, diffuseTexture);
+		textures.emplace_back(0, ALBEDO, TextureTarget::Texture2D, diffuseTexture);
 	}
 
 	if (!specularTexture.empty()) {
-		textures.emplace_back(0, SPECULAR, specularTexture);
+		textures.emplace_back(0, SPECULAR,TextureTarget::Texture2D, specularTexture);
 	}
 
 	if (!normalTexture.empty()) {
-		textures.emplace_back(0, NORMAL, normalTexture);
+		textures.emplace_back(0, NORMAL,TextureTarget::Texture2D, normalTexture);
 	}
 
 	if (!heightTexture.empty()) {
-		textures.emplace_back(0, HEIGHT, heightTexture);
+		textures.emplace_back(0, HEIGHT,TextureTarget::Texture2D, heightTexture);
 	}
 
 	uint32_t flags{0};

@@ -1,13 +1,15 @@
 #include "texture.h"
 #include <iostream>
+#include <utility>
 #include "glad/glad.h"
 #include "image/stb_image.h"
 #include "../material/material.hpp"
 
-Texture::Texture(const uint32_t id, const uint32_t type, const std::string& path)
+Texture::Texture(const uint32_t id, const uint32_t type, const TextureTarget target, std::string path)
 	: id(id),
 	  type(type),
-	  path(path) {
+	  target(target),
+	  path(std::move(path)) {
 }
 
 Texture::~Texture() {
@@ -18,6 +20,7 @@ Texture::~Texture() {
 Texture::Texture(Texture&& other) noexcept
 	: id(std::exchange(other.id, 0)),
 	  type(std::exchange(other.type, 0)),
+	  target(std::exchange(other.target, {})),
 	  path(std::move(other.path)) {
 }
 
@@ -26,13 +29,9 @@ Texture& Texture::operator=(Texture&& other) noexcept {
 		return *this;
 	id = std::exchange(other.id, 0);
 	type = std::exchange(other.type, 0);
+	target = std::exchange(other.target, {});
 	path = std::move(other.path);
 	return *this;
-}
-
-void Texture::bind(const uint32_t slot) const {
-	glActiveTexture(GL_TEXTURE0 + slot);
-	glBindTexture(GL_TEXTURE_2D, id);
 }
 
 Texture Texture::generate(const int32_t width, const int32_t height, const float* data) {
@@ -57,7 +56,7 @@ Texture Texture::generate(const int32_t width, const int32_t height, const float
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	return {textureID, GL_TEXTURE_2D, ""};
+	return {textureID, 0, TextureTarget::Texture2D, ""};
 }
 
 uint32_t Texture::load(const std::string& path, const uint32_t flags, const bool isSRGB) {
@@ -151,5 +150,5 @@ Texture Texture::loadHDR(const std::string& path) {
 
 	stbi_set_flip_vertically_on_load(false);
 
-	return {texID, GL_TEXTURE_2D, ""};
+	return {texID, 0, TextureTarget::Texture2D, ""};
 }

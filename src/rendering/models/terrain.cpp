@@ -66,7 +66,7 @@ Model::Terrain::Terrain(
 	std::vector<Texture> textures;
 	if (!heightTexture.empty()) {
 		flags |= HAS_HEIGHT_MAP;
-		textures.emplace_back(0, HEIGHT, heightTexture);
+		textures.emplace_back(0, HEIGHT,TextureTarget::Texture2D, heightTexture);
 	}
 
 	Material material;

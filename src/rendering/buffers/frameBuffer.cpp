@@ -359,19 +359,8 @@ FrameBuffer& FrameBuffer::configureAttachments() {
 	return *this;
 }
 
-void FrameBuffer::generateMipmaps() {
-	glGenerateMipmap(GL_TEXTURE_2D);
-}
-
 TextureHandle FrameBuffer::textureImpl(const uint32_t index) const {
 	return {.id = mTextures[index].id, .target = mTextures[index].target};
-}
-
-void FrameBuffer::bindTextureImpl(const uint32_t slot, const uint32_t textureIndex) const {
-	auto [id, target] = mTextures[textureIndex];
-
-	glActiveTexture(GL_TEXTURE0 + slot);
-	glBindTexture(toGL(target), id);
 }
 
 void FrameBuffer::setAttachment(const uint32_t textureID, const uint32_t target) {
@@ -456,26 +445,6 @@ CubemapBuffer::~CubemapBuffer() {
 	glDeleteTextures(1, &mCubemapID);
 }
 
-void CubemapBuffer::bindFace(const uint32_t face, const int32_t mip) const {
-	glFramebufferTexture2D(
-		GL_FRAMEBUFFER,
-		GL_COLOR_ATTACHMENT0,
-		GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
-		mCubemapID,
-		mip);
-
-	glDrawBuffer(GL_COLOR_ATTACHMENT0);
-}
-
-void CubemapBuffer::generateMipmaps() {
-	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-}
-
 TextureHandle CubemapBuffer::textureImpl(uint32_t index) const {
 	return { .id = mCubemapID, .target = TextureTarget::TextureCubeMap};
-}
-
-void CubemapBuffer::bindTextureImpl(const uint32_t slot, uint32_t textureIndex) const {
-	glActiveTexture(GL_TEXTURE0 + slot);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, mCubemapID);
 }

@@ -1,6 +1,5 @@
 #include "sepia.h"
 #include "../../shader.h"
-#include "../../renderCommand.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../models/quad.h"
 

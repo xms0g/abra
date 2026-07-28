@@ -32,21 +32,13 @@ public:
 
 	void unbind() const;
 
-	void bindTexture(const uint32_t slot, const uint32_t index = 0) const {
-		bindTextureImpl(slot, index);
-	}
-
 	void resizeRenderBuffer(int32_t width, int32_t height) const;
 
 	void checkStatus();
 
-	virtual void generateMipmaps() = 0;
-
 protected:
 	[[nodiscard]]
 	virtual TextureHandle textureImpl(uint32_t index) const = 0;
-
-	virtual void bindTextureImpl(uint32_t slot, uint32_t index) const = 0;
 
 	uint32_t mFBO{0}, mRBO{0};
 	int32_t mWidth{0}, mHeight{0};
@@ -107,13 +99,9 @@ public:
 
 	FrameBuffer& configureAttachments();
 
-	void generateMipmaps() override;
-
 protected:
 	[[nodiscard]]
 	TextureHandle textureImpl(uint32_t index) const override;
-
-	void bindTextureImpl(uint32_t slot, uint32_t textureIndex) const override;
 
 private:
 	void setAttachment(uint32_t textureID, uint32_t target);
@@ -137,15 +125,9 @@ public:
 
 	~CubemapBuffer() override;
 
-	void bindFace(uint32_t face, int32_t mip = 0) const;
-
-	void generateMipmaps() override;
-
 protected:
 	[[nodiscard]]
 	TextureHandle textureImpl(uint32_t index) const override;
-
-	void bindTextureImpl(uint32_t slot, uint32_t textureIndex) const override;
 
 private:
 	uint32_t mCubemapID{0};
