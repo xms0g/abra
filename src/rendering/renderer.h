@@ -1,6 +1,5 @@
 #pragma once
 #include <memory>
-#include <vector>
 #include "frameGraph.h"
 #include "context/renderContext.hpp"
 #include "context/renderData.hpp"
@@ -12,11 +11,9 @@ class Window;
 class SyncStateSystem;
 class EventBus;
 class ShadowSystem;
-class IPass;
 class Camera;
 class Registry;
 class LightSystem;
-class PostProcessPass;
 
 class Renderer final : public System {
 public:

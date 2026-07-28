@@ -4,45 +4,16 @@
 #include "shader.h"
 #include "buffers/frameBuffer.h"
 
-static constexpr uint32_t toGL(const ClearMask mask) {
-	return toUnderlying(mask);
-}
-
-static constexpr uint32_t toGL(const BlitMask mask) {
-	return toUnderlying(mask);
-}
-
-static constexpr uint32_t toGL(const BlendFactor factor) {
-	return toUnderlying(factor);
-}
-
-static constexpr uint32_t toGL(const BlendOp op) {
-	return toUnderlying(op);
-}
-
-static constexpr uint32_t toGL(const CompareOp op) {
-	return toUnderlying(op);
-}
-
-static constexpr uint32_t toGL(const CullMode mode) {
-	return toUnderlying(mode);
-}
-
-static constexpr uint32_t toGL(const FrontFace face) {
-	return toUnderlying(face);
-}
-
-static constexpr uint32_t toGL(const PrimitiveTopology topology) {
-	return toUnderlying(topology);
-}
-
-static constexpr uint32_t toGL(const PolygonMode mode) {
-	return toUnderlying(mode);
-}
-
-static constexpr uint32_t toGL(const PolygonFace face) {
-	return toUnderlying(face);
-}
+GL(ClearMask)
+GL(BlitMask)
+GL(BlendFactor)
+GL(BlendOp)
+GL(CompareOp)
+GL(CullMode)
+GL(FrontFace)
+GL(PrimitiveTopology)
+GL(PolygonMode)
+GL(PolygonFace)
 
 void GraphicsEncoder::bindFrameBuffer() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

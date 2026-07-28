@@ -63,6 +63,4 @@ struct Texture {
 	static Texture loadHDR(const std::string& path);
 };
 
-constexpr uint32_t toGL(const TextureTarget target) {
-	return toUnderlying(target);
-}
+GL(TextureTarget)

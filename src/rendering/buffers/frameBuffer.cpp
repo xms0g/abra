@@ -3,9 +3,7 @@
 #include <vector>
 #include "glad/glad.h"
 
-static constexpr uint32_t toGL(const Attachment attachment) {
-	return toUnderlying(attachment);
-}
+GL(Attachment)
 
 BaseFrameBuffer::BaseFrameBuffer(const int32_t width, const int32_t height)
 	: mWidth(width),
