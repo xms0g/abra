@@ -98,66 +98,6 @@ void ResourceManager::waitForAll() const {
 	mThreadPool.wait();
 }
 
-ResourceManager::ResourceManager() {
-	createShaders();
-}
-
-void ResourceManager::createShaders() {
-	// Terrain
-	mShaders.emplace(
-		"terrain",
-		std::make_unique<Shader>("models/terrain.vert","models/terrain.frag","","models/terrain.tcs","models/terrain.tes"));
-	// Deferred
-	mShaders.emplace("gBuffer", std::make_unique<Shader>("deferred/gbuffer.vert", "deferred/gbuffer.frag"));
-	mShaders.emplace("deferredLighting", std::make_unique<Shader>("models/quad.vert", "deferred/lighting.frag"));
-	// SSAO
-	mShaders.emplace("ssao", std::make_unique<Shader>("models/quad.vert", "ssao.frag"));
-	mShaders.emplace("ssaoBlur", std::make_unique<Shader>("models/quad.vert", "ssaoBlur.frag"));
-	// Forward
-	mShaders.emplace("opaque", std::make_unique<Shader>("object.vert", "opaque.frag"));
-	mShaders.emplace("blend", std::make_unique<Shader>("object.vert", "blend.frag"));
-	mShaders.emplace("unlit", std::make_unique<Shader>("unlit.vert", "unlit.frag"));
-	// Instanced
-	mShaders.emplace("opaqueInstanced", std::make_unique<Shader>("instanced.vert", "opaque.frag"));
-	mShaders.emplace("blendInstanced", std::make_unique<Shader>("instanced.vert", "blend.frag"));
-	// Skybox
-	mShaders.emplace("skybox", std::make_unique<Shader>("skybox.vert", "skybox.frag"));
-	// Depth
-	mShaders.emplace("depth", std::make_unique<Shader>("depth/depth.vert", "depth/depth.frag"));
-	mShaders.emplace(
-		"depthCubemap",
-		std::make_unique<Shader>("depth/depthCubemap.vert", "depth/depthCubemap.frag","depth/depthCubemap.geom"));
-	// Debug
-	mShaders.emplace(
-		"debugNormal",
-		std::make_unique<Shader>("debug/normal.vert", "debug/normal.frag", "debug/normal.geom"));
-	mShaders.emplace(
-		"debugWireframe",
-		std::make_unique<Shader>("debug/wireframe.vert", "debug/wireframe.frag", "debug/wireframe.geom"));
-	// PBR
-	mShaders.emplace(
-		"equirectangularToCube",
-		std::make_unique<Shader>("pbr/cubemap.vert", "pbr/equirectangularToCube.frag"));
-	mShaders.emplace("irradianceConv", std::make_unique<Shader>("pbr/cubemap.vert", "pbr/irradianceConv.frag"));
-	mShaders.emplace("prefilter", std::make_unique<Shader>("pbr/cubemap.vert", "pbr/prefilter.frag"));
-	mShaders.emplace("brdfLUT", std::make_unique<Shader>("pbr/brdfLUT.vert", "pbr/brdfLUT.frag"));
-	// PostFX
-	mShaders.emplace(
-		"bloomBF",
-		std::make_unique<Shader>("models/quad.vert", "post-processing/bloom/brightFilter.frag"));
-	mShaders.emplace("bloomBlur", std::make_unique<Shader>("models/quad.vert", "post-processing/bloom/blur.frag"));
-	mShaders.emplace(
-		"bloomCombine",
-		std::make_unique<Shader>("models/quad.vert", "post-processing/bloom/combine.frag"));
-	mShaders.emplace("toneMapping", std::make_unique<Shader>("models/quad.vert", "post-processing/toneMapping.frag"));
-	mShaders.emplace("grayscale", std::make_unique<Shader>("models/quad.vert", "post-processing/grayscale.frag"));
-	mShaders.emplace("sepia", std::make_unique<Shader>("models/quad.vert", "post-processing/sepia.frag"));
-	mShaders.emplace("kernel", std::make_unique<Shader>("models/quad.vert", "post-processing/kernel.frag"));
-	mShaders.emplace("ca", std::make_unique<Shader>("models/quad.vert", "post-processing/ca.frag"));
-	mShaders.emplace("gamma", std::make_unique<Shader>("models/quad.vert", "post-processing/gamma.frag"));
-	mShaders.emplace("fxaa", std::make_unique<Shader>("models/quad.vert", "post-processing/fxaa.frag"));
-}
-
 void ResourceManager::loadModel(const size_t entityID, const std::string& file) {
 	// read file via ASSIMP
 	Assimp::Importer importer;
@@ -504,7 +444,7 @@ void ResourceManager::createBrdfLUT() {
 
 	const auto brdfLUTBuffer = get<BaseFrameBuffer>("brdfLUT");
 
-	const Model::SingleQuad quad;
+	const Model::Quad quad;
 	// generate a 2D LUT from the BRDF equations used.
 	const auto brdfLUTShader = Shader{"pbr/brdfLUT.vert", "pbr/brdfLUT.frag"};
 	brdfLUTShader.bind();

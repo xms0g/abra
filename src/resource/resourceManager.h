@@ -38,7 +38,7 @@ public:
 	void waitForAll() const;
 
 private:
-	ResourceManager();
+	ResourceManager() = default;
 
 	~ResourceManager() = default;
 
@@ -54,8 +54,6 @@ private:
 		aiTextureType type;
 		uint32_t materialID;
 	};
-
-	void createShaders();
 
 	void loadModel(size_t entityID, const std::string& file);
 

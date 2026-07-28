@@ -60,15 +60,15 @@ void InstancedBlendPass::configure(const RenderContext& ctx, const FrameGraph& g
 		},
 		.uniforms = {
 			{
-				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name").c_str(),
+				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name"),
 				.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"),
 			},
 			{
-				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("light.block_name").c_str(),
+				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("light.block_name"),
 				.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("light.ubo_binding"),
 			},
 			{
-				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("shadow.block_name").c_str(),
+				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("shadow.block_name"),
 				.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("shadow.ubo_binding"),
 			}
 		}

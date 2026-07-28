@@ -56,6 +56,4 @@ void SkyboxPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	mEncoder.bindMaterial(cmd.material);
 	mEncoder.bindTransform(cmd.transform);
 	mEncoder.draw(cmd.mesh);
-	glDepthFunc(GL_LESS);
-	glDepthMask(GL_TRUE);
 }
