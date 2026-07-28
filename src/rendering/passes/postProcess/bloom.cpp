@@ -5,6 +5,7 @@
 #include "../../frameGraph.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../context/renderContext.hpp"
+#include "../../models/quad.h"
 
 Bloom::Bloom(const std::string& name, const bool enabled)
 	: BasePostEffect(name, enabled) {
@@ -32,14 +33,18 @@ void Bloom::configure(const FrameGraph& graph) {
 	mRenderTargets = {&graph.getResource("bloomPing"), &graph.getResource("bloomPong")};
 }
 
-TextureHandle Bloom::render(const uint32_t vao, const TextureHandle sceneTexture, FrameBuffer* renderTarget) const {
+TextureHandle Bloom::render(
+	GraphicsEncoder& encoder,
+	Model::Quad& quad,
+	const TextureHandle sceneTexture,
+	FrameBuffer* renderTarget) {
 	(void) renderTarget;
 	bool toggle = false;
 	TextureHandle inputTex = sceneTexture;
 
-	inputTex = brightFilterPass(vao, inputTex, toggle);
-	inputTex = blurPass(vao, inputTex, toggle);
-	inputTex = combinePass(vao, sceneTexture, inputTex, toggle);
+	inputTex = brightFilterPass(quad.vao(), inputTex, toggle);
+	inputTex = blurPass(quad.vao(), inputTex, toggle);
+	inputTex = combinePass(quad.vao(), sceneTexture, inputTex, toggle);
 
 	return inputTex;
 }

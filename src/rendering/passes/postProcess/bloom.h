@@ -16,7 +16,11 @@ public:
 
 	void configure(const FrameGraph& graph) override;
 
-	TextureHandle render(uint32_t vao, TextureHandle sceneTexture, FrameBuffer* renderTarget) const override;
+	TextureHandle render(
+		GraphicsEncoder& encoder,
+		Model::Quad& quad,
+		TextureHandle sceneTexture,
+		FrameBuffer* renderTarget) override;
 
 protected:
 	void updateFromEventImpl(const GuiPostProcessEvent& event) override;
@@ -27,7 +31,8 @@ private:
 	TextureHandle blurPass(uint32_t vao, TextureHandle sceneTexture, bool& toggle) const;
 
 	[[nodiscard]]
-	TextureHandle combinePass(uint32_t vao, TextureHandle sceneTexture, TextureHandle blurTexture, const bool& toggle) const;
+	TextureHandle combinePass(uint32_t vao, TextureHandle sceneTexture, TextureHandle blurTexture,
+	                          const bool& toggle) const;
 
 	std::array<FrameBuffer*, 2> mRenderTargets{};
 

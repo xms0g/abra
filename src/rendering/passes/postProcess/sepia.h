@@ -2,8 +2,6 @@
 #include "basePostEffect.hpp"
 
 class FrameBuffer;
-class Shader;
-struct RenderContext;
 
 class Sepia final : public BasePostEffect {
 public:
@@ -11,11 +9,12 @@ public:
 
 	void configure(const FrameGraph& graph) override;
 
-	TextureHandle render(uint32_t vao, TextureHandle sceneTexture, FrameBuffer* renderTarget) const override;
+	TextureHandle render(
+		GraphicsEncoder& encoder,
+		Model::Quad& quad,
+		TextureHandle sceneTexture,
+		FrameBuffer* renderTarget) override;
 
 protected:
 	void updateFromEventImpl(const GuiPostProcessEvent& event) override;
-
-private:
-	const Shader* mShader;
 };

@@ -73,13 +73,13 @@ enum class CompareOp: uint32_t {
 	Never = GL_NEVER
 };
 
-struct SampleDesc {
-	const char* name;
+struct SamplerInfo {
+	std::string name;
 	int32_t slot;
 };
 
-struct UniformBindingDesc {
-	const char* name;
+struct UniformBindingInfo {
+	std::string name;
 	uint32_t binding;
 };
 
@@ -123,8 +123,8 @@ struct PipelineRenderingInfo {
 	PipelineColorBlendState colorBlend;
 	PipelineTessellationState tessellation;
 	Shader stage;
-	std::vector<SampleDesc> samplers;
-	std::vector<UniformBindingDesc> uniforms;
+	std::vector<SamplerInfo> samplers;
+	std::vector<UniformBindingInfo> uniforms;
 };
 
 struct PipelineState {
@@ -148,7 +148,7 @@ class GraphicsPipeline {
 public:
 	GraphicsPipeline() = default;
 
-	explicit GraphicsPipeline(PipelineRenderingInfo& desc);
+	explicit GraphicsPipeline(PipelineRenderingInfo& renderingInfo);
 
 	GraphicsPipeline(const GraphicsPipeline& other) = delete;
 
@@ -167,6 +167,8 @@ public:
 
 	[[nodiscard]]
 	PipelineState& state();
+
+	static GraphicsPipeline createFullscreenQuadPipeline(Shader& shader, const std::vector<SamplerInfo>& samplers);
 
 private:
 	PipelineState mState{};

@@ -1,31 +1,43 @@
 #include "sepia.h"
-#include "glad/glad.h"
 #include "../../shader.h"
 #include "../../renderCommand.h"
 #include "../../buffers/frameBuffer.h"
-#include "../../context/renderContext.hpp"
+#include "../../models/quad.h"
 
 Sepia::Sepia(const std::string& name, const bool enabled)
 	: BasePostEffect(name, enabled) {
-	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("sepia");
 }
 
 void Sepia::configure(const FrameGraph& graph) {
-	constexpr TextureBinding textureBindings[] = {
-		{.name = "screenTexture", .slot = 0},
-	};
-
-	RenderCommand::setTextureUnits(textureBindings, *mShader);
+	auto shader = Shader{"models/quad.vert", "post-processing/sepia.frag"};
+	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
+		shader,
+		{{.name = "screenTexture", .slot = 0}});
 }
 
-TextureHandle Sepia::render(const uint32_t vao, const TextureHandle sceneTexture, FrameBuffer* renderTarget) const {
-	renderTarget->bind();
-	glClear(GL_COLOR_BUFFER_BIT);
+TextureHandle Sepia::render(
+	GraphicsEncoder& encoder,
+	Model::Quad& quad,
+	const TextureHandle sceneTexture,
+	FrameBuffer* renderTarget) {
+	encoder.reset();
+	encoder.bindFrameBuffer(*renderTarget);
+	encoder.clearFrameBuffer(ClearMask::Color);
 
-	mShader->bind();
+	encoder.bindPipeline(mPipeline);
 
 	const uint32_t textures[] = {sceneTexture.id};
-	RenderCommand::drawQuad(vao, textures);
+	encoder.bindMaterial({
+		.flags = 0,
+		.textureTarget = toGL(TextureTarget::Texture2D),
+		.textures = std::span(textures)
+	});
+
+	encoder.draw({
+		.vao = quad.vao(),
+		.vertexCount = 6,
+		.indexCount = 0
+	});
 
 	return renderTarget->texture();
 }

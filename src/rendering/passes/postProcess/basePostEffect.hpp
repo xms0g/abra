@@ -1,12 +1,16 @@
 #pragma once
-#include <memory>
-#include <array>
 #include <string>
-#include "../../types.hpp"
+#include "../../graphicsEncoder.h"
+#include "../../graphicsPipeline.h"
 #include "../../texture/texture.h"
 #include "../../../event/events/guiPostProcessEvent.hpp"
 
+namespace Model {
+class Quad;
+}
+
 class FrameGraph;
+class FrameBuffer;
 
 class BasePostEffect {
 public:
@@ -28,7 +32,7 @@ public:
 
 	virtual void configure(const FrameGraph& graph) = 0;
 
-	virtual TextureHandle render(uint32_t vao, TextureHandle sceneTexture, FrameBuffer* renderTarget) const = 0;
+	virtual TextureHandle render(GraphicsEncoder& encoder, Model::Quad& vao, TextureHandle sceneTexture, FrameBuffer* renderTarget) = 0;
 
 	void updateFromEvent(const GuiPostProcessEvent& event) {
 		this->enabled(event.enabled);
@@ -37,6 +41,7 @@ public:
 
 protected:
 	virtual void updateFromEventImpl(const GuiPostProcessEvent& event) = 0;
+	GraphicsPipeline mPipeline;
 
 private:
 	std::string mName;

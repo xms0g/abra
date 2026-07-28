@@ -13,9 +13,6 @@
 #include "../../frameGraph.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../models/quad.h"
-#include "../../context/renderContext.hpp"
-#include "../../mesh/vertexArray.h"
-#include "../../buffers/vertexBuffer.h"
 #include "../../../event/eventBus.hpp"
 #include "../../../event/events/guiPostProcessEvent.hpp"
 
@@ -41,40 +38,11 @@ void PostProcessPass::configure(const RenderContext& ctx, const FrameGraph& grap
 		effect->configure(graph);
 	}
 
-	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
-		.topology = PrimitiveTopology::Triangles,
-	};
+	auto shader = Shader{"models/quad.vert", "models/quad.frag"};
+	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
+		shader,
+		{{.name = "screenTexture", .slot = 0}});
 
-	constexpr PipelineRasterizationState rasterizationState = {
-		.cullMode = CullMode::Back,
-		.frontFace = FrontFace::CounterClockwise,
-		.polygonMode = PolygonMode::Fill,
-		.polygonFace = PolygonFace::FrontAndBack,
-	};
-
-	constexpr PipelineDepthStencilState depthStencilState = {
-		.depthTestEnable = false,
-		.depthWriteEnable = true,
-		.depthCompareOp = CompareOp::Less,
-	};
-
-	constexpr PipelineColorBlendState colorBlendState = {
-		.blendEnable = false,
-	};
-
-	PipelineRenderingInfo desc = {
-		.primitiveAssembly = primitiveAssemblyState,
-		.rasterization = rasterizationState,
-		.depthStencil = depthStencilState,
-		.colorBlend = colorBlendState,
-		.stage = Shader("models/quad.vert", "models/quad.frag"),
-		.samplers = {
-			{.name = "screenTexture", .slot = 0}
-		},
-		.uniforms = {}
-	};
-
-	mPipeline = GraphicsPipeline{desc};
 	mEncoder = GraphicsEncoder{};
 	mQuad = std::make_unique<Model::Quad>();
 	mRenderTargets = {&graph.getResource("ping"), &graph.getResource("pong")};
@@ -89,7 +57,7 @@ void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph)
 		if (!effect->enabled())
 			continue;
 
-		inputTex = effect->render(mQuad->vao(), inputTex, mRenderTargets[toggle]);
+		inputTex = effect->render(mEncoder, *mQuad, inputTex, mRenderTargets[toggle]);
 		toggle = !toggle;
 	}
 

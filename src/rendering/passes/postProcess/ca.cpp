@@ -1,32 +1,45 @@
 #include "ca.h"
-#include "glad/glad.h"
-#include "../../shader.h"
 #include "../../renderCommand.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../context/renderContext.hpp"
+#include "../../models/quad.h"
+#include "../../../event/events/guiPostProcessEvent.hpp"
 
 CA::CA(const std::string& name, const bool enabled)
 	: BasePostEffect(name, enabled) {
-	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("ca");
 }
 
 void CA::configure(const FrameGraph& graph) {
-	constexpr TextureBinding textureBindings[] = {
-		{.name = "screenTexture", .slot = 0},
-	};
-
-	RenderCommand::setTextureUnits(textureBindings, *mShader);
+	auto shader = Shader{"models/quad.vert", "post-processing/ca.frag"};
+	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
+		shader,
+		{{.name = "screenTexture", .slot = 0}});
 }
 
-TextureHandle CA::render(const uint32_t vao, const TextureHandle sceneTexture, FrameBuffer* renderTarget) const {
-	renderTarget->bind();
-	glClear(GL_COLOR_BUFFER_BIT);
+TextureHandle CA::render(
+	GraphicsEncoder& encoder,
+	Model::Quad& quad,
+	const TextureHandle sceneTexture,
+	FrameBuffer* renderTarget) {
+	encoder.reset();
+	encoder.bindFrameBuffer(*renderTarget);
+	encoder.clearFrameBuffer(ClearMask::Color);
 
-	mShader->bind();
-	mShader->setFloat("intensity", mIntensity);
+	encoder.bindPipeline(mPipeline);
+	encoder.setUniform("intensity", mIntensity);
 
 	const uint32_t textures[] = {sceneTexture.id};
-	RenderCommand::drawQuad(vao, textures);
+	encoder.bindMaterial({
+		.flags = 0,
+		.textureTarget = toGL(TextureTarget::Texture2D),
+		.textures = std::span(textures)
+	});
+
+	encoder.draw({
+		.vao = quad.vao(),
+		.vertexCount = 6,
+		.indexCount = 0
+	});
 
 	return renderTarget->texture();
 }

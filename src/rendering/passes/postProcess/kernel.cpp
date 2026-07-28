@@ -1,33 +1,36 @@
 #include "kernel.h"
-#include "glad/glad.h"
 #include "../../shader.h"
 #include "../../renderCommand.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../context/renderContext.hpp"
+#include "../../models/quad.h"
 
 Kernel::Kernel(const std::string& name, const float* kernel, const bool enabled)
 	: BasePostEffect(name, enabled),
 	  mKernel(kernel) {
-	mShader = RESOURCE_MANAGER_INSTANCE.get<Shader>("kernel");
 }
 
 void Kernel::configure(const FrameGraph& graph) {
-	constexpr TextureBinding textureBindings[] = {
-		{.name = "screenTexture", .slot = 0},
-	};
-
-	RenderCommand::setTextureUnits(textureBindings, *mShader);
+	auto shader = Shader{"models/quad.vert", "post-processing/kernel.frag"};
+	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
+		shader,
+		{{.name = "screenTexture", .slot = 0}});
 }
 
-TextureHandle Kernel::render(const uint32_t vao, const TextureHandle sceneTexture, FrameBuffer* renderTarget) const {
-	renderTarget->bind();
-	glClear(GL_COLOR_BUFFER_BIT);
+TextureHandle Kernel::render(
+	GraphicsEncoder& encoder,
+	Model::Quad& quad,
+	const TextureHandle sceneTexture,
+	FrameBuffer* renderTarget) {
+	encoder.reset();
+	encoder.bindFrameBuffer(*renderTarget);
+	encoder.clearFrameBuffer(ClearMask::Color);
 
-	mShader->bind();
-	mShader->setFloatArray("kernel", mKernel, 9);
+	encoder.bindPipeline(mPipeline);
+	encoder.setUniform("kernel", mKernel, 9);
 
 	const uint32_t textures[] = {sceneTexture.id};
-	RenderCommand::drawQuad(vao, textures);
+	RenderCommand::drawQuad(quad.vao(), textures);
 
 	return renderTarget->texture();
 }
