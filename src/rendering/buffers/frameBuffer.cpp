@@ -3,6 +3,10 @@
 #include <vector>
 #include "glad/glad.h"
 
+static constexpr uint32_t toGL(const Attachment attachment) {
+	return toUnderlying(attachment);
+}
+
 BaseFrameBuffer::BaseFrameBuffer(const int32_t width, const int32_t height)
 	: mWidth(width),
 	  mHeight(height) {
@@ -42,6 +46,38 @@ void BaseFrameBuffer::resizeRenderBuffer(const int32_t width, const int32_t heig
 
 void BaseFrameBuffer::generateMipmaps() const {
 	glGenerateMipmap(toGL(texture().target));
+}
+
+void BaseFrameBuffer::attachTexture(const uint32_t index, const Attachment attachment, const int32_t mip, const int32_t layer) const {
+	switch (auto [id, target] = texture(index); target) {
+		case TextureTarget::Texture2D:
+			glFramebufferTexture2D(
+				GL_FRAMEBUFFER,
+				toGL(attachment),
+				GL_TEXTURE_2D,
+				id,
+				mip);
+			break;
+		case TextureTarget::TextureCubeMap:
+			assert(layer >= 0 && layer < 6);
+
+			glFramebufferTexture2D(
+				GL_FRAMEBUFFER,
+				toGL(attachment),
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer,
+				id,
+				mip);
+			break;
+		case TextureTarget::Texture2DArray:
+		case TextureTarget::TextureCubeMapArray:
+			glFramebufferTextureLayer(
+				GL_FRAMEBUFFER,
+				toGL(attachment),
+				id,
+				mip,
+				layer);
+			break;
+	}
 }
 
 void BaseFrameBuffer::checkStatus() {
@@ -450,5 +486,5 @@ CubemapBuffer::~CubemapBuffer() {
 }
 
 TextureHandle CubemapBuffer::textureImpl(uint32_t index) const {
-	return { .id = mCubemapID, .target = TextureTarget::TextureCubeMap};
+	return {.id = mCubemapID, .target = TextureTarget::TextureCubeMap};
 }

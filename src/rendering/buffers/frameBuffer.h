@@ -3,6 +3,11 @@
 #include <vector>
 #include "../texture/texture.h"
 
+enum class Attachment : uint32_t {
+	Color0 = GL_COLOR_ATTACHMENT0,
+	Depth = GL_DEPTH_ATTACHMENT,
+};
+
 class BaseFrameBuffer {
 public:
 	BaseFrameBuffer(int32_t width, int32_t height);
@@ -35,6 +40,8 @@ public:
 	void resizeRenderBuffer(int32_t width, int32_t height) const;
 
 	void generateMipmaps() const;
+
+	void attachTexture(uint32_t index, Attachment attachment, int32_t mip, int32_t layer) const;
 
 	void checkStatus();
 

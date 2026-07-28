@@ -44,10 +44,6 @@ static constexpr uint32_t toGL(const PolygonFace face) {
 	return toUnderlying(face);
 }
 
-static constexpr uint32_t toGL(const Attachment attachment) {
-	return toUnderlying(attachment);
-}
-
 void GraphicsEncoder::bindFrameBuffer() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -207,42 +203,6 @@ void GraphicsEncoder::setViewport(const int32_t x, const int32_t y, const int32_
 
 void GraphicsEncoder::setCullMode(const CullMode mode) {
 	glCullFace(toGL(mode));
-}
-
-void GraphicsEncoder::attachFramebufferTexture(
-	const TextureHandle& texture,
-	const Attachment attachment,
-	const int32_t mip,
-	const int32_t layer) {
-	switch (texture.target) {
-		case TextureTarget::Texture2D:
-			glFramebufferTexture2D(
-				GL_FRAMEBUFFER,
-				toGL(attachment),
-				GL_TEXTURE_2D,
-				texture.id,
-				mip);
-			break;
-		case TextureTarget::TextureCubeMap:
-			assert(layer >= 0 && layer < 6);
-
-			glFramebufferTexture2D(
-				GL_FRAMEBUFFER,
-				toGL(attachment),
-				GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer,
-				texture.id,
-				mip);
-			break;
-		case TextureTarget::Texture2DArray:
-		case TextureTarget::TextureCubeMapArray:
-			glFramebufferTextureLayer(
-				GL_FRAMEBUFFER,
-				toGL(attachment),
-				texture.id,
-				mip,
-				layer);
-			break;
-	}
 }
 
 void GraphicsEncoder::reset() {

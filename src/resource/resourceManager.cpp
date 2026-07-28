@@ -357,7 +357,7 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 	encoder.bindFrameBuffer(*envMapBuffer);
 
 	for (int32_t i = 0; i < FACES; ++i) {
-		encoder.attachFramebufferTexture(envMapBuffer->texture(), Attachment::Color0, 0, i);
+		envMapBuffer->attachTexture(0, Attachment::Color0, 0, i);
 		encoder.setUniform("view", mCaptureViews[i]);
 
 		encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
@@ -435,7 +435,7 @@ void ResourceManager::createIrradianceMap() {
 	encoder.bindFrameBuffer(*irradianceMapBuffer);
 
 	for (int32_t i = 0; i < FACES; ++i) {
-		encoder.attachFramebufferTexture(irradianceMapBuffer->texture(), Attachment::Color0, 0, i);
+		irradianceMapBuffer->attachTexture(0, Attachment::Color0, 0, i);
 		encoder.setUniform("view", mCaptureViews[i]);
 
 		encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
@@ -524,7 +524,7 @@ void ResourceManager::createPrefilterMap() {
 
 
 		for (int32_t j = 0; j < FACES; ++j) {
-			encoder.attachFramebufferTexture(prefilterMapBuffer->texture(), Attachment::Color0, i, j);
+			prefilterMapBuffer->attachTexture(0, Attachment::Color0, i, j);
 			encoder.setUniform("view", mCaptureViews[j]);
 
 			encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);

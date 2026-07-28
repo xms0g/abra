@@ -19,11 +19,6 @@ enum class ClearMask : uint32_t {
 	Stencil = GL_STENCIL_BUFFER_BIT,
 };
 
-enum class Attachment : uint32_t {
-	Color0 = GL_COLOR_ATTACHMENT0,
-	Depth = GL_DEPTH_ATTACHMENT,
-};
-
 constexpr ClearMask operator|(const ClearMask lhs, const ClearMask rhs) {
 	return static_cast<ClearMask>(toUnderlying(lhs) | toUnderlying(rhs));
 }
@@ -62,8 +57,6 @@ public:
 	void setViewport(int32_t x, int32_t y, int32_t width, int32_t height) const;
 
 	void setCullMode(CullMode mode);
-
-	void attachFramebufferTexture(const TextureHandle& texture, Attachment attachment, int32_t mip, int32_t layer);
 
 	template<typename T>
 	void setUniform(const std::string& name, const T& value);
