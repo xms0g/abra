@@ -1,5 +1,4 @@
 #pragma once
-#include <memory>
 #include "basePostEffect.hpp"
 #include "../../texture/texture.h"
 
@@ -26,17 +25,26 @@ protected:
 	void updateFromEventImpl(const GuiPostProcessEvent& event) override;
 
 private:
-	TextureHandle brightFilterPass(uint32_t vao, TextureHandle sceneTexture, bool& toggle) const;
+	TextureHandle brightFilterPass(
+		GraphicsEncoder& encoder,
+		const Model::Quad& quad,
+		TextureHandle sceneTexture,
+		bool& toggle);
 
-	TextureHandle blurPass(uint32_t vao, TextureHandle sceneTexture, bool& toggle) const;
+	TextureHandle blurPass(
+		GraphicsEncoder& encoder,
+		const Model::Quad& quad,
+		TextureHandle sceneTexture,
+		bool& toggle);
 
 	[[nodiscard]]
-	TextureHandle combinePass(uint32_t vao, TextureHandle sceneTexture, TextureHandle blurTexture,
-	                          const bool& toggle) const;
+	TextureHandle combinePass(
+		GraphicsEncoder& encoder,
+		const Model::Quad& quad,
+		TextureHandle sceneTexture,
+		TextureHandle blurTexture,
+		const bool& toggle);
 
 	std::array<FrameBuffer*, 2> mRenderTargets{};
-
-	const Shader* mBrightFilter;
-	const Shader* mBlur;
-	const Shader* mCombine;
+	std::array<GraphicsPipeline, 3> mPipelines;
 };

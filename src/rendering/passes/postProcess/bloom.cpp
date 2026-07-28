@@ -1,5 +1,4 @@
 #include "bloom.h"
-#include "glad/glad.h"
 #include "../../shader.h"
 #include "../../renderCommand.h"
 #include "../../frameGraph.h"
@@ -9,26 +8,28 @@
 
 Bloom::Bloom(const std::string& name, const bool enabled)
 	: BasePostEffect(name, enabled) {
-	mBrightFilter = RESOURCE_MANAGER_INSTANCE.get<Shader>("bloomBF");
-	mBlur = RESOURCE_MANAGER_INSTANCE.get<Shader>("bloomBlur");
-	mCombine = RESOURCE_MANAGER_INSTANCE.get<Shader>("bloomCombine");
 }
 
 Bloom::~Bloom() = default;
 
 void Bloom::configure(const FrameGraph& graph) {
-	constexpr TextureBinding textureBindings[] = {
-		{.name = "screenTexture", .slot = 0},
-	};
+	auto shader = Shader{"models/quad.vert", "post-processing/bloom/brightFilter.frag"};
+	mPipelines[0] = GraphicsPipeline::createFullscreenQuadPipeline(
+		shader,
+		{{.name = "screenTexture", .slot = 0}});
 
-	constexpr TextureBinding combineTextureBindings[] = {
-		{.name = "screenTexture", .slot = 0},
-		{.name = "bloomBlur", .slot = 1}
-	};
+	shader = Shader{"models/quad.vert", "post-processing/bloom/blur.frag"};
+	mPipelines[1] = GraphicsPipeline::createFullscreenQuadPipeline(
+		shader,
+		{{.name = "screenTexture", .slot = 0}});
 
-	RenderCommand::setTextureUnits(textureBindings, *mBrightFilter);
-	RenderCommand::setTextureUnits(textureBindings, *mBlur);
-	RenderCommand::setTextureUnits(combineTextureBindings, *mCombine);
+	shader = Shader{"models/quad.vert", "post-processing/bloom/combine.frag"};
+	mPipelines[2] = GraphicsPipeline::createFullscreenQuadPipeline(
+		shader,
+		{
+			{.name = "screenTexture", .slot = 0},
+			{.name = "bloomBlur", .slot = 1}
+		});
 
 	mRenderTargets = {&graph.getResource("bloomPing"), &graph.getResource("bloomPong")};
 }
@@ -42,9 +43,9 @@ TextureHandle Bloom::render(
 	bool toggle = false;
 	TextureHandle inputTex = sceneTexture;
 
-	inputTex = brightFilterPass(quad.vao(), inputTex, toggle);
-	inputTex = blurPass(quad.vao(), inputTex, toggle);
-	inputTex = combinePass(quad.vao(), sceneTexture, inputTex, toggle);
+	inputTex = brightFilterPass(encoder, quad, inputTex, toggle);
+	inputTex = blurPass(encoder, quad, inputTex, toggle);
+	inputTex = combinePass(encoder, quad, sceneTexture, inputTex, toggle);
 
 	return inputTex;
 }
@@ -52,35 +53,66 @@ TextureHandle Bloom::render(
 void Bloom::updateFromEventImpl(const GuiPostProcessEvent& event) {
 }
 
-TextureHandle Bloom::brightFilterPass(const uint32_t vao, const TextureHandle sceneTexture, bool& toggle) const {
-	mRenderTargets[toggle]->bind();
-	glClear(GL_COLOR_BUFFER_BIT);
+TextureHandle Bloom::brightFilterPass(
+	GraphicsEncoder& encoder,
+	const Model::Quad& quad,
+	const TextureHandle sceneTexture,
+	bool& toggle) {
+	encoder.reset();
+	encoder.bindFrameBuffer(*mRenderTargets[toggle]);
+	encoder.clearFrameBuffer(ClearMask::Color);
 
-	mBrightFilter->bind();
+	encoder.bindPipeline(mPipelines[0]);
 
 	const uint32_t textures[] = {sceneTexture.id};
-	RenderCommand::drawQuad(vao, textures);
+	encoder.bindMaterial({
+		.flags = 0,
+		.textureTarget = toGL(TextureTarget::Texture2D),
+		.textures = std::span(textures)
+	});
 
-	const TextureHandle outTex = mRenderTargets[toggle]->texture();
+	encoder.draw({
+		.vao = quad.vao(),
+		.vertexCount = 6,
+		.indexCount = 0
+	});
+
+	const FrameBuffer* renderTarget = mRenderTargets[toggle];
 	toggle = !toggle;
 
-	return outTex;
+	return renderTarget->texture();
 }
 
-TextureHandle Bloom::blurPass(const uint32_t vao, const TextureHandle sceneTexture, bool& toggle) const {
+TextureHandle Bloom::blurPass(
+	GraphicsEncoder& encoder,
+	const Model::Quad& quad,
+	const TextureHandle sceneTexture,
+	bool& toggle) {
 	bool horizontal = true;
+
 	TextureHandle outTex = sceneTexture;
 
 	for (int i = 0; i < 10; ++i) {
-		mRenderTargets[toggle]->bind();
-		glClear(GL_COLOR_BUFFER_BIT);
+		encoder.reset();
+		encoder.bindFrameBuffer(*mRenderTargets[toggle]);
+		encoder.clearFrameBuffer(ClearMask::Color);
 
-		mBlur->bind();
-		mBlur->setBool("horizontal", horizontal);
+		encoder.bindPipeline(mPipelines[1]);
+		encoder.setUniform("horizontal", horizontal);
 		horizontal = !horizontal;
 
 		const uint32_t textures[] = {outTex.id};
-		RenderCommand::drawQuad(vao, textures);
+		encoder.bindMaterial({
+			.flags = 0,
+			.textureTarget = toGL(TextureTarget::Texture2D),
+			.textures = std::span(textures)
+		});
+
+		encoder.draw({
+			.vao = quad.vao(),
+			.vertexCount = 6,
+			.indexCount = 0
+		});
 
 		outTex = mRenderTargets[toggle]->texture();
 		toggle = !toggle;
@@ -90,15 +122,29 @@ TextureHandle Bloom::blurPass(const uint32_t vao, const TextureHandle sceneTextu
 }
 
 TextureHandle Bloom::combinePass(
-	const uint32_t vao,
+	GraphicsEncoder& encoder,
+	const Model::Quad& quad,
 	const TextureHandle sceneTexture,
 	const TextureHandle blurTexture,
-	const bool& toggle) const {
-	mRenderTargets[toggle]->bind();
-	mCombine->bind();
+	const bool& toggle) {
+	encoder.reset();
+	encoder.bindFrameBuffer(*mRenderTargets[toggle]);
+	//encoder.clearFrameBuffer(ClearMask::Color);
+
+	encoder.bindPipeline(mPipelines[2]);
 
 	const uint32_t textures[] = {sceneTexture.id, blurTexture.id};
-	RenderCommand::drawQuad(vao, textures);
+	encoder.bindMaterial({
+		.flags = 0,
+		.textureTarget = toGL(TextureTarget::Texture2D),
+		.textures = std::span(textures)
+	});
+
+	encoder.draw({
+		.vao = quad.vao(),
+		.vertexCount = 6,
+		.indexCount = 0
+	});
 
 	return mRenderTargets[toggle]->texture();
 }
