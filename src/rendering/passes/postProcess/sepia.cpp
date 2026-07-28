@@ -1,6 +1,7 @@
 #include "sepia.h"
 #include "../../shader.h"
 #include "../../buffers/frameBuffer.h"
+#include "../../mesh/vertexArray.h"
 #include "../../models/quad.h"
 
 Sepia::Sepia(const std::string& name, const bool enabled)
@@ -33,7 +34,7 @@ TextureHandle Sepia::render(
 	});
 
 	encoder.draw({
-		.vao = quad.vao(),
+		.vao = quad.vao().id(),
 		.vertexCount = 6,
 		.indexCount = 0
 	});

@@ -13,7 +13,7 @@ public:
 	~Quad();
 
 	[[nodiscard]]
-	uint32_t vao() const;
+	VertexArray& vao() const;
 
 private:
 	std::unique_ptr<VertexArray> mVAO;

@@ -38,8 +38,8 @@ Model::Quad::Quad() {
 
 Model::Quad::~Quad() = default;
 
-uint32_t Model::Quad::vao() const {
-	return mVAO->id();
+VertexArray& Model::Quad::vao() const {
+	return *mVAO;
 }
 
 

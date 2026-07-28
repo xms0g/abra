@@ -5,6 +5,7 @@
 #include "../context/renderContext.hpp"
 #include "../../config/configManager.h"
 #include "../../resource/resourceManager.h"
+#include "../mesh/vertexArray.h"
 
 DeferredLightingPass::DeferredLightingPass() = default;
 
@@ -122,7 +123,7 @@ void DeferredLightingPass::execute(const RenderContext& ctx, const FrameGraph& g
 	mEncoder.bindFrameBuffer(sceneBuffer);
 	mEncoder.bindPipeline(mPipeline);
 	mEncoder.draw({
-		.vao = mQuad->vao(),
+		.vao = mQuad->vao().id(),
 		.vertexCount = 6,
 		.indexCount = 0
 	});

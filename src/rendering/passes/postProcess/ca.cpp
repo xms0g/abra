@@ -3,6 +3,7 @@
 #include "../../context/renderContext.hpp"
 #include "../../models/quad.h"
 #include "../../../event/events/guiPostProcessEvent.hpp"
+#include "../../mesh/vertexArray.h"
 
 CA::CA(const std::string& name, const bool enabled)
 	: BasePostEffect(name, enabled) {
@@ -35,7 +36,7 @@ TextureHandle CA::render(
 	});
 
 	encoder.draw({
-		.vao = quad.vao(),
+		.vao = quad.vao().id(),
 		.vertexCount = 6,
 		.indexCount = 0
 	});

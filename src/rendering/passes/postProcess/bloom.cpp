@@ -3,6 +3,7 @@
 #include "../../frameGraph.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../context/renderContext.hpp"
+#include "../../mesh/vertexArray.h"
 #include "../../models/quad.h"
 
 Bloom::Bloom(const std::string& name, const bool enabled)
@@ -71,7 +72,7 @@ TextureHandle Bloom::brightFilterPass(
 	});
 
 	encoder.draw({
-		.vao = quad.vao(),
+		.vao = quad.vao().id(),
 		.vertexCount = 6,
 		.indexCount = 0
 	});
@@ -108,7 +109,7 @@ TextureHandle Bloom::blurPass(
 		});
 
 		encoder.draw({
-			.vao = quad.vao(),
+			.vao = quad.vao().id(),
 			.vertexCount = 6,
 			.indexCount = 0
 		});
@@ -140,7 +141,7 @@ TextureHandle Bloom::combinePass(
 	});
 
 	encoder.draw({
-		.vao = quad.vao(),
+		.vao = quad.vao().id(),
 		.vertexCount = 6,
 		.indexCount = 0
 	});

@@ -14,6 +14,7 @@
 #include "../../models/quad.h"
 #include "../../../event/eventBus.hpp"
 #include "../../../event/events/guiPostProcessEvent.hpp"
+#include "../../mesh/vertexArray.h"
 
 PostProcessPass::PostProcessPass() = default;
 
@@ -72,7 +73,7 @@ void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph)
 	});
 
 	mEncoder.draw({
-		.vao = mQuad->vao(),
+		.vao = mQuad->vao().id(),
 		.vertexCount = 6,
 		.indexCount = 0
 	});

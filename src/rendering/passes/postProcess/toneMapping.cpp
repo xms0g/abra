@@ -2,6 +2,7 @@
 #include "../../shader.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../context/renderContext.hpp"
+#include "../../mesh/vertexArray.h"
 #include "../../models/quad.h"
 
 ToneMapping::ToneMapping(const std::string& name, const bool enabled)
@@ -35,7 +36,7 @@ TextureHandle ToneMapping::render(
 	});
 
 	encoder.draw({
-		.vao = quad.vao(),
+		.vao = quad.vao().id(),
 		.vertexCount = 6,
 		.indexCount = 0
 	});

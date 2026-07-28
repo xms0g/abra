@@ -596,7 +596,7 @@ void ResourceManager::createBrdfLUT() {
 	encoder.bindFrameBuffer(*brdfLUTBuffer);
 	encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
 	encoder.draw({
-		.vao = quad.vao(),
+		.vao = quad.vao().id(),
 		.vertexCount = 6,
 		.indexCount = 0
 	});

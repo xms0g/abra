@@ -6,6 +6,7 @@
 #include "../context/renderContext.hpp"
 #include "../../config/configManager.h"
 #include "../../math/random.h"
+#include "../mesh/vertexArray.h"
 
 SSAOPass::SSAOPass() = default;
 
@@ -102,7 +103,7 @@ void SSAOPass::ssao(const FrameGraph& graph) {
 
 	mEncoder.bindPipeline(mPipelines[0]);
 	mEncoder.draw({
-		.vao = mQuad->vao(),
+		.vao = mQuad->vao().id(),
 		.vertexCount = 6,
 		.indexCount = 0
 	});
@@ -116,7 +117,7 @@ void SSAOPass::blur(const FrameGraph& graph) {
 	mEncoder.bindPipeline(mPipelines[1]);
 	mEncoder.bindTexture(graph.getResource("ssao").texture(), 0);
 	mEncoder.draw({
-		.vao = mQuad->vao(),
+		.vao = mQuad->vao().id(),
 		.vertexCount = 6,
 		.indexCount = 0
 	});

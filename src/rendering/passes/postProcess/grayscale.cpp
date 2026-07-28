@@ -2,6 +2,7 @@
 #include "../../shader.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../context/renderContext.hpp"
+#include "../../mesh/vertexArray.h"
 #include "../../models/quad.h"
 
 Grayscale::Grayscale(const std::string& name, const bool enabled)
@@ -34,7 +35,7 @@ TextureHandle Grayscale::render(
 	});
 
 	encoder.draw({
-		.vao = quad.vao(),
+		.vao = quad.vao().id(),
 		.vertexCount = 6,
 		.indexCount = 0
 	});
