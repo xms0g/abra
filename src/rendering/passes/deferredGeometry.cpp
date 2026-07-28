@@ -32,7 +32,7 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, const FrameGraph&
 		.blendEnable = false,
 	};
 
-	PipelineRenderingInfo desc = {
+	PipelineRenderingInfo info = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
@@ -72,7 +72,7 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, const FrameGraph&
 		}
 	};
 
-	mPipeline = GraphicsPipeline(desc);
+	mPipeline = GraphicsPipeline(info);
 	mEncoder = GraphicsEncoder{};
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("DeferredCommands");
 }

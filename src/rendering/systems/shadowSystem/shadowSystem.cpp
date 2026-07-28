@@ -45,7 +45,7 @@ void ShadowSystem::configure(const RenderContext& ctx, const FrameGraph& graph, 
 		.blendEnable = false,
 	};
 
-	PipelineRenderingInfo depthPipeline = {
+	PipelineRenderingInfo depthInfo = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
@@ -54,13 +54,13 @@ void ShadowSystem::configure(const RenderContext& ctx, const FrameGraph& graph, 
 		.samplers = {},
 			.uniforms = {
 				{
-					.name = CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name").c_str(),
+					.name = CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name"),
 					.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"),
 				},
 			}
 	};
 
-	PipelineRenderingInfo cubeDepthPipeline = {
+	PipelineRenderingInfo cubeDepthInfo = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
@@ -70,8 +70,8 @@ void ShadowSystem::configure(const RenderContext& ctx, const FrameGraph& graph, 
 		.uniforms = {}
 	};
 
-	mPipelines[0] = GraphicsPipeline(depthPipeline);
-	mPipelines[1] = GraphicsPipeline(cubeDepthPipeline);
+	mPipelines[0] = GraphicsPipeline(depthInfo);
+	mPipelines[1] = GraphicsPipeline(cubeDepthInfo);
 	mEncoder = GraphicsEncoder{};
 
 	mDirShadow = std::make_unique<DirectionalShadow>(ctx);

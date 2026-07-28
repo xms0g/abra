@@ -32,7 +32,7 @@ void DebugPass::configure(const RenderContext& ctx, const FrameGraph& graph, Eve
 		.blendEnable = false,
 	};
 
-	PipelineRenderingInfo normalDesc = {
+	PipelineRenderingInfo normalInfo = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
@@ -47,7 +47,7 @@ void DebugPass::configure(const RenderContext& ctx, const FrameGraph& graph, Eve
 		}
 	};
 
-	PipelineRenderingInfo wireframeDesc = {
+	PipelineRenderingInfo wireframeInfo = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
@@ -64,8 +64,8 @@ void DebugPass::configure(const RenderContext& ctx, const FrameGraph& graph, Eve
 
 	mPipelines = {
 		GraphicsPipeline{},
-		GraphicsPipeline{normalDesc},
-		GraphicsPipeline{wireframeDesc},
+		GraphicsPipeline{normalInfo},
+		GraphicsPipeline{wireframeInfo},
 	};
 
 	mEncoder = GraphicsEncoder{};

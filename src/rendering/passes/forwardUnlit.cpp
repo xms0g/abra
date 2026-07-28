@@ -31,7 +31,7 @@ void ForwardUnlitPass::configure(const RenderContext& ctx, const FrameGraph& gra
 		.blendEnable = false,
 	};
 
-	PipelineRenderingInfo desc = {
+	PipelineRenderingInfo info = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
@@ -46,7 +46,7 @@ void ForwardUnlitPass::configure(const RenderContext& ctx, const FrameGraph& gra
 		}
 	};
 
-	mPipeline = GraphicsPipeline(desc);
+	mPipeline = GraphicsPipeline(info);
 	mEncoder = GraphicsEncoder{};
 
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("UnlitCommands");

@@ -30,7 +30,7 @@ void SkyboxPass::configure(const RenderContext& ctx, const FrameGraph& graph, Ev
 		.blendEnable = false,
 	};
 
-	PipelineRenderingInfo desc = {
+	PipelineRenderingInfo info = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
@@ -42,7 +42,7 @@ void SkyboxPass::configure(const RenderContext& ctx, const FrameGraph& graph, Ev
 		.uniforms = {}
 	};
 
-	mPipeline = GraphicsPipeline{desc};
+	mPipeline = GraphicsPipeline{info};
 	mEncoder = GraphicsEncoder{};
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("SkyboxCommands");
 }

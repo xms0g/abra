@@ -35,7 +35,7 @@ void TerrainPass::configure(const RenderContext& ctx, const FrameGraph& graph, E
 		.blendEnable = false,
 	};
 
-	PipelineRenderingInfo desc = {
+	PipelineRenderingInfo info = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
@@ -53,7 +53,7 @@ void TerrainPass::configure(const RenderContext& ctx, const FrameGraph& graph, E
 		}
 	};
 
-	mPipeline = GraphicsPipeline{desc};
+	mPipeline = GraphicsPipeline{info};
 	mEncoder = GraphicsEncoder{};
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("TerrainCommands");
 }

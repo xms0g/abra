@@ -37,7 +37,7 @@ void ForwardBlendPass::configure(const RenderContext& ctx, const FrameGraph& gra
 		.colorWriteMask = ColorComponent::Red | ColorComponent::Green | ColorComponent::Blue | ColorComponent::Alpha,
 	};
 
-	PipelineRenderingInfo desc = {
+	PipelineRenderingInfo info = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
@@ -68,7 +68,7 @@ void ForwardBlendPass::configure(const RenderContext& ctx, const FrameGraph& gra
 		}
 	};
 
-	mPipeline = GraphicsPipeline(desc);
+	mPipeline = GraphicsPipeline(info);
 	mEncoder = GraphicsEncoder{};
 
 	const int32_t slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot");

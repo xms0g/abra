@@ -33,7 +33,7 @@ void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph&
 		.blendEnable = false,
 	};
 
-	PipelineRenderingInfo desc = {
+	PipelineRenderingInfo info = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
@@ -68,7 +68,7 @@ void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph&
 		}
 	};
 
-	mPipeline = GraphicsPipeline(desc);
+	mPipeline = GraphicsPipeline(info);
 	mEncoder = GraphicsEncoder{};
 
 	const auto& gBuffer = graph.getResource("gBuffer");
