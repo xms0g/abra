@@ -92,12 +92,12 @@ TextureHandle Bloom::blurPass(
 
 	TextureHandle outTex = sceneTexture;
 
+	encoder.bindPipeline(mPipelines[1]);
 	for (int i = 0; i < 10; ++i) {
 		encoder.reset();
 		encoder.bindFrameBuffer(*mRenderTargets[toggle]);
 		encoder.clearFrameBuffer(ClearMask::Color);
 
-		encoder.bindPipeline(mPipelines[1]);
 		encoder.setUniform("horizontal", horizontal);
 		horizontal = !horizontal;
 
