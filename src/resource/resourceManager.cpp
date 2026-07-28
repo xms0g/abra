@@ -371,7 +371,7 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 
 	encoder.unbindFrameBuffer();
 	encoder.bindTexture(envMapBuffer->texture(), 0);
-	encoder.generateMipmaps(envMapBuffer->texture());
+	envMapBuffer->generateMipmaps();
 
 	return envMapBuffer->texture().id;
 }

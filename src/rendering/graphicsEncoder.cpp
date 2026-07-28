@@ -245,10 +245,6 @@ void GraphicsEncoder::attachFramebufferTexture(
 	}
 }
 
-void GraphicsEncoder::generateMipmaps(const TextureHandle& handle) const {
-	glGenerateMipmap(toGL(handle.target));
-}
-
 void GraphicsEncoder::reset() {
 	mState.materialCache.reset();
 }

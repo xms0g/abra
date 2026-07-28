@@ -71,8 +71,6 @@ public:
 	template<typename T>
 	void setUniform(const std::string& name, const T* value, uint32_t count) const;
 
-	void generateMipmaps(const TextureHandle& handle) const;
-
 	void reset();
 
 private:

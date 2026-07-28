@@ -34,6 +34,8 @@ public:
 
 	void resizeRenderBuffer(int32_t width, int32_t height) const;
 
+	void generateMipmaps() const;
+
 	void checkStatus();
 
 protected:

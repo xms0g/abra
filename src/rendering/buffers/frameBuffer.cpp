@@ -40,6 +40,10 @@ void BaseFrameBuffer::resizeRenderBuffer(const int32_t width, const int32_t heig
 	glViewport(0, 0, width, height);
 }
 
+void BaseFrameBuffer::generateMipmaps() const {
+	glGenerateMipmap(toGL(texture().target));
+}
+
 void BaseFrameBuffer::checkStatus() {
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 		throw std::runtime_error("ERROR::FRAMEBUFFER::NOT_COMPLETE!\n");
