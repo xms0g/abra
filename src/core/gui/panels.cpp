@@ -170,10 +170,10 @@ void GuiPanels::renderPostProcessPanel(EventBus& eventBus) {
 		for (uint32_t i = 0; i < effectsSpan.size(); ++i) {
 			auto& fx = effectsSpan[i];
 
-			bool lightChanged = ImGui::Checkbox(fx.name, &fx.enabled);
-			lightChanged |= fx.renderExtraControls(fx);
+			bool isDirty = ImGui::Checkbox(fx.name, &fx.enabled);
+			isDirty |= fx.renderExtraControls(fx);
 
-			if (lightChanged) {
+			if (isDirty) {
 				eventBus.emitEvent<GuiPostProcessEvent>(i, fx.enabled, fx.exposure, fx.intensity);
 			}
 		}
