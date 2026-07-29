@@ -43,8 +43,8 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, const FrameGraph&
 		},
 		.samplers = {
 			{
-				.name = "material.texture_albedo", .
-				slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.albedo.textureSlot")
+				.name = "material.texture_albedo",
+				.slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.albedo.textureSlot")
 			},
 			{
 				.name = "material.texture_normal",
