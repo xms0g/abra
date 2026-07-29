@@ -31,12 +31,16 @@ void ForwardOpaquePass::configure(const RenderContext& ctx, const FrameGraph& gr
 		.blendEnable = false,
 	};
 
+	std::vector<ShaderStage> stages;
+	stages.emplace_back("object.vert", ShaderStageType::Vertex);
+	stages.emplace_back("opaque.frag", ShaderStageType::Fragment);
+
 	PipelineRenderingInfo info = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stage = Shader("object.vert", "opaque.frag"),
+		.stages = std::move(stages),
 		.samplers = {
 			{.name = "material.texture_albedo", .slot = 0},
 			{.name = "material.texture_specular", .slot = 1},

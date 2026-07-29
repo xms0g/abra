@@ -44,12 +44,16 @@ void InstancedBlendPass::configure(const RenderContext& ctx, const FrameGraph& g
 		.colorWriteMask = ColorComponent::Red | ColorComponent::Green | ColorComponent::Blue | ColorComponent::Alpha,
 	};
 
+	std::vector<ShaderStage> stages;
+	stages.emplace_back("instanced.vert", ShaderStageType::Vertex);
+	stages.emplace_back("blend.frag", ShaderStageType::Fragment);
+
 	PipelineRenderingInfo info = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stage = Shader("instanced.vert", "blend.frag"),
+		.stages = std::move(stages),
 		.samplers = {
 			{.name = "material.texture_albedo", .slot = 0},
 			{.name = "material.texture_specular", .slot = 1},

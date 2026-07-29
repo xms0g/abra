@@ -30,12 +30,16 @@ void SkyboxPass::configure(const RenderContext& ctx, const FrameGraph& graph, Ev
 		.blendEnable = false,
 	};
 
+	std::vector<ShaderStage> stages;
+	stages.emplace_back("skybox.vert", ShaderStageType::Vertex);
+	stages.emplace_back("skybox.frag", ShaderStageType::Fragment);
+
 	PipelineRenderingInfo info = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stage = Shader("skybox.vert", "skybox.frag"),
+		.stages = std::move(stages),
 		.samplers = {
 			{.name = "skybox", .slot = 0},
 		},

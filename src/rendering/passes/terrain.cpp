@@ -35,13 +35,19 @@ void TerrainPass::configure(const RenderContext& ctx, const FrameGraph& graph, E
 		.blendEnable = false,
 	};
 
+	std::vector<ShaderStage> stages;
+	stages.emplace_back("models/terrain.vert", ShaderStageType::Vertex);
+	stages.emplace_back("models/terrain.frag", ShaderStageType::Fragment);
+	stages.emplace_back("models/terrain.tcs", ShaderStageType::TessControl);
+	stages.emplace_back("models/terrain.tes", ShaderStageType::TessEvaluation);
+
 	PipelineRenderingInfo info = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
 		.tessellation = tessellationState,
-		.stage = Shader("models/terrain.vert", "models/terrain.frag", "", "models/terrain.tcs", "models/terrain.tes"),
+		.stages = std::move(stages),
 		.samplers = {
 			{.name = "material.texture_height", .slot = 0},
 		},

@@ -10,9 +10,12 @@ ToneMapping::ToneMapping(const std::string& name, const bool enabled)
 }
 
 void ToneMapping::configure(const FrameGraph& graph) {
-	auto shader = Shader{"models/quad.vert", "post-processing/toneMapping.frag"};
+	std::vector<ShaderStage> stages;
+	stages.emplace_back("models/quad.vert", ShaderStageType::Vertex);
+	stages.emplace_back("post-processing/toneMapping.frag", ShaderStageType::Fragment);
+
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
-		shader,
+		stages,
 		{{.name = "screenTexture", .slot = 0}});
 }
 

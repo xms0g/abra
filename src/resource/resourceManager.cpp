@@ -318,12 +318,16 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 		.blendEnable = false,
 	};
 
+	std::vector<ShaderStage> stages;
+	stages.emplace_back("pbr/cubemap.vert", ShaderStageType::Vertex);
+	stages.emplace_back("pbr/equirectangularToCube.frag", ShaderStageType::Fragment);
+
 	PipelineRenderingInfo info = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stage = Shader("pbr/cubemap.vert", "pbr/equirectangularToCube.frag"),
+		.stages = std::move(stages),
 		.samplers = {
 			{.name = "equirectangularMap", .slot = 0}
 		},
@@ -398,12 +402,16 @@ void ResourceManager::createIrradianceMap() {
 		.blendEnable = false,
 	};
 
+	std::vector<ShaderStage> stages;
+	stages.emplace_back("pbr/cubemap.vert", ShaderStageType::Vertex);
+	stages.emplace_back("pbr/irradianceConv.frag", ShaderStageType::Fragment);
+
 	PipelineRenderingInfo info = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stage = Shader("pbr/cubemap.vert", "pbr/irradianceConv.frag"),
+		.stages = std::move(stages),
 		.samplers = {
 			{.name = "environmentMap", .slot = 0}
 		},
@@ -474,12 +482,16 @@ void ResourceManager::createPrefilterMap() {
 		.blendEnable = false,
 	};
 
+	std::vector<ShaderStage> stages;
+	stages.emplace_back("pbr/cubemap.vert", ShaderStageType::Vertex);
+	stages.emplace_back("pbr/prefilter.frag", ShaderStageType::Fragment);
+
 	PipelineRenderingInfo info = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stage = Shader("pbr/cubemap.vert", "pbr/prefilter.frag"),
+		.stages = std::move(stages),
 		.samplers = {
 			{.name = "environmentMap", .slot = 0}
 		},
@@ -565,12 +577,16 @@ void ResourceManager::createBrdfLUT() {
 		.blendEnable = false,
 	};
 
+	std::vector<ShaderStage> stages;
+	stages.emplace_back("pbr/brdfLUT.vert", ShaderStageType::Vertex);
+	stages.emplace_back("pbr/brdfLUT.frag", ShaderStageType::Fragment);
+
 	PipelineRenderingInfo info = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stage = Shader("pbr/brdfLUT.vert", "pbr/brdfLUT.frag"),
+		.stages = std::move(stages),
 		.samplers = {
 			{.name = "environmentMap", .slot = 0}
 		},

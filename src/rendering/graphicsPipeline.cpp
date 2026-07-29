@@ -8,16 +8,20 @@ GraphicsPipeline::GraphicsPipeline(PipelineRenderingInfo& renderingInfo) {
 	mState.depthStencil = renderingInfo.depthStencil;
 	mState.colorBlend = renderingInfo.colorBlend;
 	mState.tessellation = renderingInfo.tessellation;
-	mState.stage = std::move(renderingInfo.stage);
 
-	mState.stage.bind();
+	for (const auto& stage: renderingInfo.stages) {
+		mState.shader.attachStage(stage);
+	}
+	mState.shader.link();
+
+	mState.shader.bind();
 	for (const auto& [name, slot]: renderingInfo.samplers) {
-		mState.stage.setInt(name, slot);
+		mState.shader.setInt(name, slot);
 	}
 
 	for (const auto& [name, binding]: renderingInfo.uniforms) {
-		const uint32_t ubidx = glGetUniformBlockIndex(mState.stage.id(), name.c_str());
-		glUniformBlockBinding(mState.stage.id(), ubidx, binding);
+		const uint32_t ubidx = glGetUniformBlockIndex(mState.shader.id(), name.c_str());
+		glUniformBlockBinding(mState.shader.id(), ubidx, binding);
 	}
 }
 
@@ -25,7 +29,7 @@ PipelineState& GraphicsPipeline::state() {
 	return mState;
 }
 
-GraphicsPipeline GraphicsPipeline::createFullscreenQuadPipeline(Shader& shader, const std::vector<SamplerInfo>& samplers) {
+GraphicsPipeline GraphicsPipeline::createFullscreenQuadPipeline(std::vector<ShaderStage>& stages, const std::vector<SamplerInfo>& samplers) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
@@ -52,7 +56,7 @@ GraphicsPipeline GraphicsPipeline::createFullscreenQuadPipeline(Shader& shader, 
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stage = std::move(shader),
+		.stages = std::move(stages),
 		.samplers = samplers,
 		.uniforms = {}
 	};

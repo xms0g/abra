@@ -37,12 +37,16 @@ void SSAOPass::configure(const RenderContext& ctx, const FrameGraph& graph, Even
 		.blendEnable = false,
 	};
 
+	std::vector<ShaderStage> stages0;
+	stages0.emplace_back("models/quad.vert", ShaderStageType::Vertex);
+	stages0.emplace_back("ssao.frag", ShaderStageType::Fragment);
+
 	PipelineRenderingInfo ssaoInfo = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stage = Shader("models/quad.vert", "ssao.frag"),
+		.stages = std::move(stages0),
 		.samplers = {
 			{.name = "gDepthMap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureSlot")},
 			{.name = "gNormal", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot")},
@@ -61,12 +65,16 @@ void SSAOPass::configure(const RenderContext& ctx, const FrameGraph& graph, Even
 		}
 	};
 
+	std::vector<ShaderStage> stages1;
+	stages1.emplace_back("models/quad.vert", ShaderStageType::Vertex);
+	stages1.emplace_back("ssaoBlur.frag", ShaderStageType::Fragment);
+
 	PipelineRenderingInfo blurInfo = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stage = Shader("models/quad.vert", "ssaoBlur.frag"),
+		.stages = std::move(stages1),
 		.samplers = {
 			{.name = "ssaoTexture", .slot = 0}
 		},

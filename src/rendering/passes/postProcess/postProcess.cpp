@@ -38,9 +38,12 @@ void PostProcessPass::configure(const RenderContext& ctx, const FrameGraph& grap
 		effect->configure(graph);
 	}
 
-	auto shader = Shader{"models/quad.vert", "models/quad.frag"};
+	std::vector<ShaderStage> stages;
+	stages.emplace_back("models/quad.vert", ShaderStageType::Vertex);
+	stages.emplace_back("models/quad.frag", ShaderStageType::Fragment);
+
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
-		shader,
+		stages,
 		{{.name = "screenTexture", .slot = 0}});
 
 	mEncoder = GraphicsEncoder{};

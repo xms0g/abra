@@ -4,44 +4,51 @@
 #include <stdexcept>
 #include "glad/glad.h"
 #include "glm/gtc/type_ptr.hpp"
+#include "enumUtils.hpp"
 #include "../io/filesystem.hpp"
 #include "../config/configManager.h"
 
-ShaderResource::ShaderResource(const std::string& code, const std::string& fn, const uint32_t type) {
-	handle = glCreateShader(type);
+GLu(ShaderStageType)
 
-	const char* ptr = code.c_str();
+ShaderStage::ShaderStage(const std::string& fn, const ShaderStageType type) : type(type) {
+	const auto code = fs::readFile(CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader") + fn);
+	const auto processedSource = preprocess(code);
+
+	handle = glCreateShader(toGLu(type));
+
+	const char* ptr = processedSource.c_str();
 
 	glShaderSource(handle, 1, &ptr, nullptr);
 	glCompileShader(handle);
 
-	checkCompileErrors(fn);
+	try {
+		checkCompileErrors(fn);
+	} catch (std::runtime_error& e) {
+	}
 }
 
-ShaderResource::ShaderResource(ShaderResource&& other) noexcept {
-	handle = other.handle;
-	other.handle = 0;
-}
+ShaderStage::ShaderStage(ShaderStage&& other) noexcept
+	: handle(std::exchange(other.handle, 0)),
+	  type(std::exchange(other.type, {})) {}
 
-ShaderResource& ShaderResource::operator=(ShaderResource&& other) noexcept {
-	if (this == &other) return *this;
+ShaderStage& ShaderStage::operator=(ShaderStage&& other) noexcept {
+	if (this == &other)
+		return *this;
 
-	handle = other.handle;
-	other.handle = 0;
+	if (handle)
+		glDeleteShader(handle);
+
+	handle = std::exchange(other.handle, 0);
+	type = std::exchange(other.type, {});
 	return *this;
 }
 
-ShaderResource::~ShaderResource() {
+ShaderStage::~ShaderStage() {
 	if (handle)
 		glDeleteShader(handle);
 }
 
-void ShaderResource::attach(const uint32_t programID) const {
-	if (handle)
-		glAttachShader(programID, handle);
-}
-
-void ShaderResource::checkCompileErrors(const std::string& fn) const {
+void ShaderStage::checkCompileErrors(const std::string& fn) const {
 	int32_t success;
 	glGetShaderiv(handle, GL_COMPILE_STATUS, &success);
 
@@ -57,44 +64,50 @@ void ShaderResource::checkCompileErrors(const std::string& fn) const {
 		// The program is useless now. So delete it.
 		glDeleteShader(handle);
 
-		throw std::runtime_error(std::string("Compilation Error in ") + fn + "\n" + infoLog);
+		throw std::runtime_error(std::format("Compilation Error in: {} \n {}", fn, infoLog));
 	}
 }
 
-Shader::Shader(const std::string& vs, const std::string& fs, const std::string& gs, const std::string& tcs,
-               const std::string& tes) {
-	try {
-		const std::string vertexSource = preprocess(
-			fs::loadFile(CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader") + vs));
-		const std::string fragmentSource = preprocess(
-			fs::loadFile(CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader") + fs));
-		const std::string geometrySource = preprocess(
-			fs::loadFile(CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader") + gs));
-		const std::string tessControlSource = preprocess(
-			fs::loadFile(CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader") + tcs));
-		const std::string tessEvalSource = preprocess(
-			fs::loadFile(CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader") + tes));
+std::string ShaderStage::preprocess(const std::string& source) {
+	std::unordered_set<std::string> includedFiles{};
+	return preprocess(source, includedFiles);
+}
 
-		auto vert = compileShader(vertexSource, vs, GL_VERTEX_SHADER);
-		auto frag = compileShader(fragmentSource, fs, GL_FRAGMENT_SHADER);
+std::string ShaderStage::preprocess(const std::string& source, std::unordered_set<std::string>& includedFiles) {
+	if (source.empty()) return "";
 
-		ShaderResource geo, tessControl, tessEval;
-		if (!geometrySource.empty()) {
-			geo = compileShader(geometrySource, gs, GL_GEOMETRY_SHADER);
+	std::stringstream result;
+	std::istringstream stream(source);
+	std::string line;
+
+	while (std::getline(stream, line)) {
+		if (line.find("#include") == 0) {
+			// Parse the include (e.g., #include "lighting.glsl")
+			size_t start = line.find('"');
+			size_t end = line.rfind('"');
+
+			if (start != std::string::npos && end != std::string::npos && start != end) {
+				std::string includeFile = line.substr(start + 1, end - start - 1);
+
+				// Prevent cyclic includes
+				if (includedFiles.contains(includeFile)) {
+					continue;
+				}
+				includedFiles.insert(includeFile);
+				// Load included file
+				result << preprocess(
+					fs::readFile(CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader") + includeFile),
+					includedFiles) << "\n";
+			}
+		} else {
+			result << line << "\n";
 		}
-
-		if (!tessControlSource.empty()) {
-			tessControl = compileShader(tessControlSource, tcs, GL_TESS_CONTROL_SHADER);
-		}
-
-		if (!tessEvalSource.empty()) {
-			tessEval = compileShader(tessEvalSource, tes, GL_TESS_EVALUATION_SHADER);
-		}
-
-		linkShader(mID, vert, frag, geo, tessControl, tessEval);
-	} catch (std::runtime_error& e) {
-		throw std::runtime_error(std::string("Shader ") + e.what());
 	}
+	return result.str();
+}
+
+Shader::Shader() {
+	mID = glCreateProgram();
 }
 
 Shader::~Shader() {
@@ -119,6 +132,15 @@ Shader& Shader::operator=(Shader&& other) noexcept {
 
 void Shader::bind() const {
 	glUseProgram(mID);
+}
+
+void Shader::attachStage(const ShaderStage& stage) const {
+	glAttachShader(mID, stage.handle);
+}
+
+void Shader::link() const {
+	glLinkProgram(mID);
+	checkLinkErrors();
 }
 
 void Shader::setBool(const std::string& name, const bool value) const {
@@ -181,84 +203,21 @@ void Shader::setMat4Array(const std::string& name, const glm::mat4* matrices, co
 	glUniformMatrix4fv(glGetUniformLocation(mID, name.c_str()), count, GL_FALSE, glm::value_ptr(matrices[0]));
 }
 
-std::string Shader::preprocess(const std::string& source) {
-	std::unordered_set<std::string> includedFiles{};
-	return preprocess(source, includedFiles);
-}
-
-std::string Shader::preprocess(const std::string& source, std::unordered_set<std::string>& includedFiles) {
-	if (source.empty()) return "";
-
-	std::stringstream result;
-	std::istringstream stream(source);
-	std::string line;
-
-	while (std::getline(stream, line)) {
-		if (line.find("#include") == 0) {
-			// Parse the include (e.g., #include "lighting.glsl")
-			size_t start = line.find('"');
-			size_t end = line.rfind('"');
-
-			if (start != std::string::npos && end != std::string::npos && start != end) {
-				std::string includeFile = line.substr(start + 1, end - start - 1);
-
-				// Prevent cyclic includes
-				if (includedFiles.contains(includeFile)) {
-					continue;
-				}
-				includedFiles.insert(includeFile);
-				// Load included file
-				result << preprocess(
-					fs::loadFile(CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader") + includeFile.c_str()),
-					includedFiles) << "\n";
-			}
-		} else {
-			result << line << "\n";
-		}
-	}
-	return result.str();
-}
-
-ShaderResource Shader::compileShader(const std::string& source, const std::string& fn, const uint32_t type) {
-	ShaderResource resource{source, fn, type};
-	return std::move(resource);
-}
-
-void Shader::linkShader(
-	uint32_t& programID,
-	const ShaderResource& vert,
-	const ShaderResource& frag,
-	const ShaderResource& geo,
-	const ShaderResource& tessControl,
-	const ShaderResource& tessEval) {
-	programID = glCreateProgram();
-
-	vert.attach(programID);
-	frag.attach(programID);
-	geo.attach(programID);
-	tessControl.attach(programID);
-	tessEval.attach(programID);
-
-	glLinkProgram(programID);
-
-	checkLinkErrors(programID);
-}
-
-void Shader::checkLinkErrors(const uint32_t programID) {
+void Shader::checkLinkErrors() const {
 	int32_t success;
-	glGetProgramiv(programID, GL_LINK_STATUS, &success);
+	glGetProgramiv(mID, GL_LINK_STATUS, &success);
 
 	if (!success) {
 		std::string infoLog;
 		int32_t maxLength = 0;
 
-		glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &maxLength);
+		glGetProgramiv(mID, GL_INFO_LOG_LENGTH, &maxLength);
 		infoLog.resize(maxLength);
 
-		glGetProgramInfoLog(programID, maxLength, nullptr, infoLog.data());
+		glGetProgramInfoLog(mID, maxLength, nullptr, infoLog.data());
 
 		// The program is useless now. So delete it.
-		glDeleteProgram(programID);
+		glDeleteProgram(mID);
 
 		throw std::runtime_error(std::string("Linking error:\n") + infoLog);
 	}

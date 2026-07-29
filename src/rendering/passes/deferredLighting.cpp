@@ -33,12 +33,16 @@ void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph&
 		.blendEnable = false,
 	};
 
+	std::vector<ShaderStage> stages;
+	stages.emplace_back("models/quad.vert", ShaderStageType::Vertex);
+	stages.emplace_back("deferred/lighting.frag", ShaderStageType::Fragment);
+
 	PipelineRenderingInfo info = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stage = Shader("models/quad.vert", "deferred/lighting.frag"),
+		.stages = std::move(stages),
 		.samplers = {
 			{.name = "gPosition", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureSlot")},
 			{.name = "gNormal", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot")},

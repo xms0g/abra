@@ -45,12 +45,16 @@ void ShadowSystem::configure(const RenderContext& ctx, const FrameGraph& graph, 
 		.blendEnable = false,
 	};
 
+	std::vector<ShaderStage> stages0;
+	stages0.emplace_back("depth/depth.vert", ShaderStageType::Vertex);
+	stages0.emplace_back("depth/depth.frag", ShaderStageType::Fragment);
+
 	PipelineRenderingInfo depthInfo = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stage = Shader("depth/depth.vert", "depth/depth.frag"),
+		.stages = std::move(stages0),
 		.samplers = {},
 			.uniforms = {
 				{
@@ -60,12 +64,17 @@ void ShadowSystem::configure(const RenderContext& ctx, const FrameGraph& graph, 
 			}
 	};
 
+	std::vector<ShaderStage> stages1;
+	stages1.emplace_back("depth/depthCubemap.vert", ShaderStageType::Vertex);
+	stages1.emplace_back("depth/depthCubemap.frag", ShaderStageType::Fragment);
+	stages1.emplace_back("depth/depthCubemap.geom", ShaderStageType::Geometry);
+
 	PipelineRenderingInfo cubeDepthInfo = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stage = Shader("depth/depthCubemap.vert", "depth/depthCubemap.frag","depth/depthCubemap.geom"),
+		.stages = std::move(stages1),
 		.samplers = {},
 		.uniforms = {}
 	};

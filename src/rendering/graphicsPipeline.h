@@ -122,7 +122,7 @@ struct PipelineRenderingInfo {
 	PipelineDepthStencilState depthStencil;
 	PipelineColorBlendState colorBlend;
 	PipelineTessellationState tessellation;
-	Shader stage;
+	std::vector<ShaderStage> stages;
 	std::vector<SamplerInfo> samplers;
 	std::vector<UniformBindingInfo> uniforms;
 };
@@ -133,7 +133,7 @@ struct PipelineState {
 	PipelineDepthStencilState depthStencil;
 	PipelineColorBlendState colorBlend;
 	PipelineTessellationState tessellation;
-	Shader stage;
+	Shader shader;
 };
 
 constexpr ColorComponent operator|(const ColorComponent lhs, const ColorComponent rhs) {
@@ -168,7 +168,7 @@ public:
 	[[nodiscard]]
 	PipelineState& state();
 
-	static GraphicsPipeline createFullscreenQuadPipeline(Shader& shader, const std::vector<SamplerInfo>& samplers);
+	static GraphicsPipeline createFullscreenQuadPipeline(std::vector<ShaderStage>& stages, const std::vector<SamplerInfo>& samplers);
 
 private:
 	PipelineState mState{};

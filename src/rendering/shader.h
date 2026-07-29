@@ -1,40 +1,46 @@
 #pragma once
 #include <string>
 #include <unordered_set>
+#include "glad/glad.h"
 #include "glm/glm.hpp"
 
-struct ShaderResource {
+enum class ShaderStageType: uint32_t {
+	Vertex = GL_VERTEX_SHADER,
+	Fragment = GL_FRAGMENT_SHADER,
+	Geometry = GL_GEOMETRY_SHADER,
+	TessControl = GL_TESS_CONTROL_SHADER,
+	TessEvaluation = GL_TESS_EVALUATION_SHADER
+};
+
+struct ShaderStage {
 	uint32_t handle{0};
 
-	ShaderResource() = default;
+	ShaderStageType type{};
 
-	ShaderResource(const std::string& code, const std::string& fn, uint32_t type);
+	ShaderStage() = default;
 
-	ShaderResource(const ShaderResource& other) = delete;
+	ShaderStage(const std::string& fn, ShaderStageType type);
 
-	ShaderResource& operator=(const ShaderResource& other) = delete;
+	ShaderStage(const ShaderStage& other) = delete;
 
-	ShaderResource(ShaderResource&& other) noexcept;
+	ShaderStage& operator=(const ShaderStage& other) = delete;
 
-	ShaderResource& operator=(ShaderResource&& other) noexcept;
+	ShaderStage(ShaderStage&& other) noexcept;
 
-	~ShaderResource();
+	ShaderStage& operator=(ShaderStage&& other) noexcept;
 
-	void attach(uint32_t programID) const;
+	~ShaderStage();
 
 	void checkCompileErrors(const std::string& fn) const;
+
+	static std::string preprocess(const std::string& source);
+
+	static std::string preprocess(const std::string& source, std::unordered_set<std::string>& includedFiles);
 };
 
 class Shader {
 public:
-	Shader() = default;
-
-	Shader(
-		const std::string& vs,
-		const std::string& fs,
-		const std::string& gs = "",
-		const std::string& tcs = "",
-		const std::string& tes = "");
+	Shader();
 
 	~Shader();
 
@@ -51,6 +57,10 @@ public:
 
 	// use/activate the shader
 	void bind() const;
+
+	void attachStage(const ShaderStage& stage) const;
+
+	void link() const;
 
 	template<typename T>
 	void setValue(const std::string& name, const T& value) const;
@@ -89,21 +99,7 @@ public:
 
 	void setMat4Array(const std::string& name, const glm::mat4* matrices, size_t count) const;
 
-	static std::string preprocess(const std::string& source);
-
-	static std::string preprocess(const std::string& source, std::unordered_set<std::string>& includedFiles);
-
-	static ShaderResource compileShader(const std::string& source, const std::string& fn, uint32_t type);
-
-	static void linkShader(
-		uint32_t& programID,
-		const ShaderResource& vert,
-		const ShaderResource& frag,
-		const ShaderResource& geo,
-		const ShaderResource& tessControl,
-		const ShaderResource& tessEval);
-
-	static void checkLinkErrors(uint32_t programID);
+	void checkLinkErrors() const;
 
 private:
 	// the program ID

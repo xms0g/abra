@@ -11,9 +11,12 @@ FXAA::FXAA(const std::string& name, const bool enabled)
 }
 
 void FXAA::configure(const FrameGraph& graph) {
-	auto shader = Shader{"models/quad.vert", "post-processing/fxaa.frag"};
+	std::vector<ShaderStage> stages;
+	stages.emplace_back("models/quad.vert", ShaderStageType::Vertex);
+	stages.emplace_back("post-processing/fxaa.frag", ShaderStageType::Fragment);
+
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
-		shader,
+		stages,
 		{{.name = "screenTexture", .slot = 0}});
 }
 

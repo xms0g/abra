@@ -81,7 +81,7 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 
 	glPolygonMode(toGLu(pipelineState.rasterization.polygonFace), toGLu(pipelineState.rasterization.polygonMode));
 
-	pipelineState.stage.bind();
+	pipelineState.shader.bind();
 }
 
 void GraphicsEncoder::bindMaterial(const MaterialView& material) {
@@ -94,10 +94,10 @@ void GraphicsEncoder::bindMaterial(const MaterialView& material) {
 	auto& pipelineState = mState.pipeline->state();
 
 	if (mState.materialCache.lastMatFlags != material.flags || mState.materialCache.lastShader != &pipelineState.
-	    stage) {
+	    shader) {
 		mState.materialCache.lastMatFlags = material.flags;
-		mState.materialCache.lastShader = &pipelineState.stage;
-		pipelineState.stage.setUint("material.flags", material.flags);
+		mState.materialCache.lastShader = &pipelineState.shader;
+		pipelineState.shader.setUint("material.flags", material.flags);
 	}
 
 	if (material.flags & HAS_HEIGHT_MAP) {

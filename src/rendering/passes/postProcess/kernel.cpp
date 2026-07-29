@@ -11,9 +11,12 @@ Kernel::Kernel(const std::string& name, const float* kernel, const bool enabled)
 }
 
 void Kernel::configure(const FrameGraph& graph) {
-	auto shader = Shader{"models/quad.vert", "post-processing/kernel.frag"};
+	std::vector<ShaderStage> stages;
+	stages.emplace_back("models/quad.vert", ShaderStageType::Vertex);
+	stages.emplace_back("post-processing/kernel.frag", ShaderStageType::Fragment);
+
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
-		shader,
+		stages,
 		{{.name = "screenTexture", .slot = 0}});
 }
 

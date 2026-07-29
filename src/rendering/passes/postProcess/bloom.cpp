@@ -13,19 +13,28 @@ Bloom::Bloom(const std::string& name, const bool enabled)
 Bloom::~Bloom() = default;
 
 void Bloom::configure(const FrameGraph& graph) {
-	auto shader = Shader{"models/quad.vert", "post-processing/bloom/brightFilter.frag"};
+	std::vector<ShaderStage> stages0;
+	stages0.emplace_back("models/quad.vert", ShaderStageType::Vertex);
+	stages0.emplace_back("post-processing/bloom/brightFilter.frag", ShaderStageType::Fragment);
+
 	mPipelines[0] = GraphicsPipeline::createFullscreenQuadPipeline(
-		shader,
+		stages0,
 		{{.name = "screenTexture", .slot = 0}});
 
-	shader = Shader{"models/quad.vert", "post-processing/bloom/blur.frag"};
+	std::vector<ShaderStage> stages1;
+	stages1.emplace_back("models/quad.vert", ShaderStageType::Vertex);
+	stages1.emplace_back("post-processing/bloom/blur.frag", ShaderStageType::Fragment);
+
 	mPipelines[1] = GraphicsPipeline::createFullscreenQuadPipeline(
-		shader,
+		stages1,
 		{{.name = "screenTexture", .slot = 0}});
 
-	shader = Shader{"models/quad.vert", "post-processing/bloom/combine.frag"};
+	std::vector<ShaderStage> stages2;
+	stages2.emplace_back("models/quad.vert", ShaderStageType::Vertex);
+	stages2.emplace_back("post-processing/bloom/combine.frag", ShaderStageType::Fragment);
+
 	mPipelines[2] = GraphicsPipeline::createFullscreenQuadPipeline(
-		shader,
+		stages2,
 		{
 			{.name = "screenTexture", .slot = 0},
 			{.name = "bloomBlur", .slot = 1}
