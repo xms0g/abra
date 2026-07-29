@@ -110,8 +110,6 @@ void GuiPanels::renderPointLight(const Entity& entity, PointLightComponent& poin
 
 	if (transform.isDirty) {
 		uint32_t matIdx = entity.getComponent<MaterialComponent>().materials[0].at(0).idx;
-		pointlight.position = transform.position;
-
 		eventBus.emitEvent<GuiLightEvent>(entity.id(), matIdx, pointlight.idx);
 	}
 
@@ -135,8 +133,6 @@ void GuiPanels::renderSpotLight(const Entity& entity, SpotLightComponent& spotli
 
 	if (transform.isDirty) {
 		uint32_t matIdx = entity.getComponent<MaterialComponent>().materials[0].at(0).idx;
-		spotlight.position = transform.position;
-
 		eventBus.emitEvent<GuiLightEvent>(entity.id(), matIdx, spotlight.idx);
 	}
 

@@ -29,6 +29,7 @@ private:
 	std::vector<SpotLightComponent*> mSpotLights{};
 
 	struct alignas(16) DirectionalLight {
+		glm::vec4 position;
 		glm::vec4 direction;
 		glm::vec4 ambient;
 		glm::vec4 diffuse;

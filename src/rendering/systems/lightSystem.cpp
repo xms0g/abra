@@ -7,6 +7,7 @@
 #include "../../ECS/components/directionalLight.hpp"
 #include "../../ECS/components/pointLight.hpp"
 #include "../../ECS/components/spotLight.hpp"
+#include "../../ECS/components/transform.hpp"
 #include "../../event/eventBus.hpp"
 #include "../../event/events/guiLightEvent.hpp"
 #include "../../event/events/updateShadowMapEvent.hpp"
@@ -61,8 +62,9 @@ void LightSystem::updateLightUBO() {
 
 			auto& gpuLight = destGPUData[activeCount++];
 
-			if constexpr (requires { light->direction; }) gpuLight.direction = glm::vec4(light->direction, 0.0f);
-			if constexpr (requires { light->position; }) gpuLight.position = glm::vec4(light->position, 0.0f);
+			gpuLight.position = glm::vec4(light->position, 0.0f);
+			if constexpr (requires { light->direction; })
+				gpuLight.direction = glm::vec4(light->direction, 0.0f);
 
 			gpuLight.ambient = glm::vec4(light->ambient, 0.0f);
 			gpuLight.diffuse = glm::vec4(light->diffuse, 0.0f);
@@ -103,6 +105,8 @@ void LightSystem::onGuiUpdate(const GuiLightEvent& event) {
 		std::vector<TLightComponent*>& lightList) {
 		if (const auto& light= entity.tryGetComponent<TLightComponent>()) {
 			mCtx->renderData->material.colors[e.matIdx] = light->diffuse;
+			auto& transform = entity.getComponent<TransformComponent>();
+			light->position = transform.position;
 			lightList[e.lightIdx] = light;
 		}
 	};

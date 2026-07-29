@@ -224,6 +224,7 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 			auto dl = comps["DirectionalLightComponent"];
 			entity.addComponent<DirectionalLightComponent>(
 				dl["index"].get<unsigned int>(),
+				parseVec3(dl["position"]),
 				parseVec3(dl["direction"]),
 				parseVec3(dl["ambient"]),
 				parseVec3(dl["diffuse"]),

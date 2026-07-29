@@ -4,6 +4,7 @@
 #include "common/constants.glsl"
 
 struct DirectionalLight {
+    vec4 position;
     vec4 direction;
     vec4 ambient;
     vec4 diffuse;
