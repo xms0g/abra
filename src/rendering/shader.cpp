@@ -27,7 +27,8 @@ ShaderStage::ShaderStage(const PipelineShaderStage& info) : type(info.type) {
 
 ShaderStage::ShaderStage(ShaderStage&& other) noexcept
 	: handle(std::exchange(other.handle, 0)),
-	  type(std::exchange(other.type, {})) {}
+	  type(std::exchange(other.type, {})) {
+}
 
 ShaderStage& ShaderStage::operator=(ShaderStage&& other) noexcept {
 	if (this == &other)
@@ -113,8 +114,8 @@ Shader::~Shader() {
 		glDeleteProgram(mID);
 }
 
-Shader::Shader(Shader&& other) noexcept {
-	mID = std::exchange(other.mID, 0);
+Shader::Shader(Shader&& other) noexcept
+	: mID(std::exchange(other.mID, 0)) {
 }
 
 Shader& Shader::operator=(Shader&& other) noexcept {
