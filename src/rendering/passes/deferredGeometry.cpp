@@ -72,7 +72,7 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, const FrameGraph&
 		}
 	};
 
-	mPipeline = GraphicsPipeline(info);
+	mPipeline = GraphicsPipeline{info};
 	mEncoder = GraphicsEncoder{};
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("DeferredCommands");
 }

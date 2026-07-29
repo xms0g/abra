@@ -4,16 +4,16 @@
 #include "shader.h"
 #include "buffers/frameBuffer.h"
 
-GL(ClearMask)
-GL(BlitMask)
-GL(BlendFactor)
-GL(BlendOp)
-GL(CompareOp)
-GL(CullMode)
-GL(FrontFace)
-GL(PrimitiveTopology)
-GL(PolygonMode)
-GL(PolygonFace)
+GLu(ClearMask)
+GLu(BlitMask)
+GLu(BlendFactor)
+GLu(BlendOp)
+GLu(CompareOp)
+GLu(CullMode)
+GLu(FrontFace)
+GLu(PrimitiveTopology)
+GLu(PolygonMode)
+GLu(PolygonFace)
 
 void GraphicsEncoder::bindFrameBuffer() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -29,7 +29,7 @@ void GraphicsEncoder::bindFrameBuffer(const BaseFrameBuffer& fb) const {
 
 void GraphicsEncoder::bindTexture(const TextureHandle handle, const uint32_t slot) const {
 	glActiveTexture(GL_TEXTURE0 + slot);
-	glBindTexture(toGL(handle.target), handle.id);
+	glBindTexture(toGLu(handle.target), handle.id);
 }
 
 void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
@@ -39,7 +39,7 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 
 	if (pipelineState.depthStencil.depthTestEnable) {
 		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(toGL(pipelineState.depthStencil.depthCompareOp));
+		glDepthFunc(toGLu(pipelineState.depthStencil.depthCompareOp));
 	} else {
 		glDisable(GL_DEPTH_TEST);
 	}
@@ -48,8 +48,8 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 
 	if (pipelineState.rasterization.cullMode != CullMode::None) {
 		glEnable(GL_CULL_FACE);
-		glCullFace(toGL(pipelineState.rasterization.cullMode));
-		glFrontFace(toGL(pipelineState.rasterization.frontFace));
+		glCullFace(toGLu(pipelineState.rasterization.cullMode));
+		glFrontFace(toGLu(pipelineState.rasterization.frontFace));
 	} else {
 		glDisable(GL_CULL_FACE);
 	}
@@ -57,13 +57,13 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 	if (pipelineState.colorBlend.blendEnable) {
 		glEnable(GL_BLEND);
 		glBlendFuncSeparate(
-			toGL(pipelineState.colorBlend.srcColorBlendFactor),
-			toGL(pipelineState.colorBlend.dstColorBlendFactor),
-			toGL(pipelineState.colorBlend.srcAlphaBlendFactor),
-			toGL(pipelineState.colorBlend.dstAlphaBlendFactor));
+			toGLu(pipelineState.colorBlend.srcColorBlendFactor),
+			toGLu(pipelineState.colorBlend.dstColorBlendFactor),
+			toGLu(pipelineState.colorBlend.srcAlphaBlendFactor),
+			toGLu(pipelineState.colorBlend.dstAlphaBlendFactor));
 		glBlendEquationSeparate(
-			toGL(pipelineState.colorBlend.colorBlendOp),
-			toGL(pipelineState.colorBlend.alphaBlendOp));
+			toGLu(pipelineState.colorBlend.colorBlendOp),
+			toGLu(pipelineState.colorBlend.alphaBlendOp));
 
 		glColorMask(
 			static_cast<bool>(pipelineState.colorBlend.colorWriteMask & ColorComponent::Red),
@@ -79,7 +79,7 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 		glPatchParameteri(GL_PATCH_VERTICES, pipelineState.tessellation.patchControlPoints);
 	}
 
-	glPolygonMode(toGL(pipelineState.rasterization.polygonFace), toGL(pipelineState.rasterization.polygonMode));
+	glPolygonMode(toGLu(pipelineState.rasterization.polygonFace), toGLu(pipelineState.rasterization.polygonMode));
 
 	pipelineState.stage.bind();
 }
@@ -139,29 +139,29 @@ void GraphicsEncoder::blitFramebuffer(const FrameBuffer& src, const FrameBuffer&
 
 	glBlitFramebuffer(0, 0, src.width(), src.height(),
 	                  0, 0, dst.width(), dst.height(),
-	                  toGL(mask), GL_NEAREST);
+	                  toGLu(mask), GL_NEAREST);
 }
 
 void GraphicsEncoder::clearFrameBuffer(const ClearMask mask) const {
-	glClear(toGL(mask));
+	glClear(toGLu(mask));
 }
 
 void GraphicsEncoder::draw(const MeshView& mesh) const {
 	glBindVertexArray(mesh.vao);
-	glDrawArrays(toGL(mState.pipeline->state().inputAssembly.topology), 0,
+	glDrawArrays(toGLu(mState.pipeline->state().inputAssembly.topology), 0,
 	             static_cast<int32_t>(mesh.vertexCount));
 }
 
 void GraphicsEncoder::drawIndexed(const MeshView& mesh) const {
 	glBindVertexArray(mesh.vao);
-	glDrawElements(toGL(mState.pipeline->state().inputAssembly.topology),
+	glDrawElements(toGLu(mState.pipeline->state().inputAssembly.topology),
 	               static_cast<int32_t>(mesh.indexCount), GL_UNSIGNED_INT, nullptr);
 }
 
 void GraphicsEncoder::drawInstanced(const MeshView& mesh, const uint32_t count) const {
 	glBindVertexArray(mesh.vao);
 	glDrawElementsInstanced(
-		toGL(mState.pipeline->state().inputAssembly.topology),
+		toGLu(mState.pipeline->state().inputAssembly.topology),
 		static_cast<int32_t>(mesh.indexCount),
 		GL_UNSIGNED_INT,
 		nullptr,
@@ -173,7 +173,7 @@ void GraphicsEncoder::setViewport(const int32_t x, const int32_t y, const int32_
 }
 
 void GraphicsEncoder::setCullMode(const CullMode mode) {
-	glCullFace(toGL(mode));
+	glCullFace(toGLu(mode));
 }
 
 void GraphicsEncoder::reset() {

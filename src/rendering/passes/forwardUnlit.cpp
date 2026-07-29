@@ -46,7 +46,7 @@ void ForwardUnlitPass::configure(const RenderContext& ctx, const FrameGraph& gra
 		}
 	};
 
-	mPipeline = GraphicsPipeline(info);
+	mPipeline = GraphicsPipeline{info};
 	mEncoder = GraphicsEncoder{};
 
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("UnlitCommands");

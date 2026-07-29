@@ -337,7 +337,7 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.envMap.size"),
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.envMap.size"));
 	envMap->withTextureCubeMap(true)
-			.withRenderBufferDepth(GL_DEPTH_COMPONENT24)
+			.withRenderBufferDepth(InternalFormat::Depth24)
 			.checkStatus();
 
 	mBuffers.emplace("envMap", std::move(envMap));
@@ -417,7 +417,7 @@ void ResourceManager::createIrradianceMap() {
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.size"),
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.size"));
 	irradianceMap->withTextureCubeMap(false)
-			.withRenderBufferDepth(GL_DEPTH_COMPONENT24)
+			.withRenderBufferDepth(InternalFormat::Depth24)
 			.checkStatus();
 
 	mBuffers.emplace("irradianceMap", std::move(irradianceMap));
@@ -493,7 +493,7 @@ void ResourceManager::createPrefilterMap() {
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.size"),
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.size"));
 	prefilterMap->withTextureCubeMap(true)
-			.withRenderBufferDepth(GL_DEPTH_COMPONENT24)
+			.withRenderBufferDepth(InternalFormat::Depth24)
 			.checkStatus();
 
 	Texture::generateMipmaps(prefilterMap->texture());
@@ -583,7 +583,7 @@ void ResourceManager::createBrdfLUT() {
 	auto brdfLUT = std::make_unique<FrameBuffer>(
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.brdfLUT.size"),
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.brdfLUT.size"));
-	brdfLUT->withTextureFP(GL_RG)
+	brdfLUT->withTextureFP(BaseFormat::RG)
 			.checkStatus();
 
 	mBuffers.emplace("brdfLUT", std::move(brdfLUT));

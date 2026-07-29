@@ -31,7 +31,7 @@ TextureHandle CA::render(
 	const uint32_t textures[] = {sceneTexture.id};
 	encoder.bindMaterial({
 		.flags = 0,
-		.textureTarget = toGL(TextureTarget::Texture2D),
+		.textureTarget = toGLu(TextureTarget::Texture2D),
 		.textures = std::span(textures)
 	});
 

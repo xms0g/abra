@@ -65,4 +65,4 @@ struct Texture {
 	static Texture loadHDR(const std::string& path);
 };
 
-GL(TextureTarget)
+GLu(TextureTarget)

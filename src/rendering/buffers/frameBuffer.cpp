@@ -3,7 +3,9 @@
 #include <vector>
 #include "glad/glad.h"
 
-GL(Attachment)
+GLu(Attachment)
+GLi(BaseFormat)
+GLi(InternalFormat)
 
 BaseFrameBuffer::BaseFrameBuffer(const int32_t width, const int32_t height)
 	: mWidth(width),
@@ -47,7 +49,7 @@ void BaseFrameBuffer::attachTexture(const uint32_t index, const Attachment attac
 		case TextureTarget::Texture2D:
 			glFramebufferTexture2D(
 				GL_FRAMEBUFFER,
-				toGL(attachment),
+				toGLu(attachment),
 				GL_TEXTURE_2D,
 				id,
 				mip);
@@ -57,7 +59,7 @@ void BaseFrameBuffer::attachTexture(const uint32_t index, const Attachment attac
 
 			glFramebufferTexture2D(
 				GL_FRAMEBUFFER,
-				toGL(attachment),
+				toGLu(attachment),
 				GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer,
 				id,
 				mip);
@@ -66,7 +68,7 @@ void BaseFrameBuffer::attachTexture(const uint32_t index, const Attachment attac
 		case TextureTarget::TextureCubeMapArray:
 			glFramebufferTextureLayer(
 				GL_FRAMEBUFFER,
-				toGL(attachment),
+				toGLu(attachment),
 				id,
 				mip,
 				layer);
@@ -100,8 +102,8 @@ void FrameBuffer::bindForDraw() const {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFBO);
 }
 
-FrameBuffer& FrameBuffer::withTexture(const uint32_t format) {
-	const int32_t internalFormat = getInternalFormat(format);
+FrameBuffer& FrameBuffer::withTexture(const BaseFormat format) {
+	const InternalFormat internalFormat = getInternalFormat(format);
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
@@ -111,11 +113,11 @@ FrameBuffer& FrameBuffer::withTexture(const uint32_t format) {
 	glTexImage2D(
 		GL_TEXTURE_2D,
 		0,
-		internalFormat,
+		toGLi(internalFormat),
 		mWidth,
 		mHeight,
 		0,
-		format,
+		toGLi(format),
 		GL_UNSIGNED_BYTE,
 		nullptr);
 
@@ -129,8 +131,8 @@ FrameBuffer& FrameBuffer::withTexture(const uint32_t format) {
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTextureMultisampled(const int32_t multisampledCount, const uint32_t format) {
-	const int32_t internalFormat = getInternalFormat(format);
+FrameBuffer& FrameBuffer::withTextureMultisampled(const int32_t multisampledCount, const BaseFormat format) {
+	const InternalFormat internalFormat = getInternalFormat(format);
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
@@ -140,7 +142,7 @@ FrameBuffer& FrameBuffer::withTextureMultisampled(const int32_t multisampledCoun
 	glTexImage2DMultisample(
 		GL_TEXTURE_2D_MULTISAMPLE,
 		multisampledCount,
-		internalFormat,
+		toGLi(internalFormat),
 		mWidth,
 		mHeight,
 		GL_TRUE);
@@ -152,8 +154,8 @@ FrameBuffer& FrameBuffer::withTextureMultisampled(const int32_t multisampledCoun
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTextureFP(const uint32_t format) {
-	const int32_t internalFormat = getInternalFormat(format, true);
+FrameBuffer& FrameBuffer::withTextureFP(const BaseFormat format) {
+	const InternalFormat internalFormat = getInternalFormat(format, true);
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
@@ -163,11 +165,11 @@ FrameBuffer& FrameBuffer::withTextureFP(const uint32_t format) {
 	glTexImage2D(
 		GL_TEXTURE_2D,
 		0,
-		internalFormat,
+		toGLi(internalFormat),
 		mWidth,
 		mHeight,
 		0,
-		format,
+		toGLi(format),
 		GL_FLOAT,
 		nullptr);
 
@@ -183,10 +185,8 @@ FrameBuffer& FrameBuffer::withTextureFP(const uint32_t format) {
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTextureFPMultisampled(
-	const int32_t multisampledCount,
-	const uint32_t format) {
-	const int32_t internalFormat = getInternalFormat(format, true);
+FrameBuffer& FrameBuffer::withTextureFPMultisampled(const int32_t multisampledCount, const BaseFormat format) {
+	const InternalFormat internalFormat = getInternalFormat(format, true);
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
@@ -196,7 +196,7 @@ FrameBuffer& FrameBuffer::withTextureFPMultisampled(
 	glTexImage2DMultisample(
 		GL_TEXTURE_2D_MULTISAMPLE,
 		multisampledCount,
-		internalFormat,
+		toGLi(internalFormat),
 		mWidth,
 		mHeight,
 		GL_TRUE);
@@ -208,7 +208,7 @@ FrameBuffer& FrameBuffer::withTextureFPMultisampled(
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTextureDepth(const int32_t internalFormat, const bool onlyForShadowMap) {
+FrameBuffer& FrameBuffer::withTextureDepth(const InternalFormat format, const bool onlyForShadowMap) {
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextures.emplace_back(textureID, TextureTarget::Texture2D);
@@ -217,7 +217,7 @@ FrameBuffer& FrameBuffer::withTextureDepth(const int32_t internalFormat, const b
 	glTexImage2D(
 		GL_TEXTURE_2D,
 		0,
-		internalFormat,
+		toGLi(format),
 		mWidth,
 		mHeight,
 		0,
@@ -240,7 +240,7 @@ FrameBuffer& FrameBuffer::withTextureDepth(const int32_t internalFormat, const b
 
 FrameBuffer& FrameBuffer::withTextureDepthArray(
 	const int32_t layerCount,
-	const int32_t internalFormat,
+	const InternalFormat format,
 	const bool onlyForShadowMap) {
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
@@ -250,7 +250,7 @@ FrameBuffer& FrameBuffer::withTextureDepthArray(
 	glTexImage3D(
 		GL_TEXTURE_2D_ARRAY,
 		0,
-		internalFormat,
+		toGLi(format),
 		mWidth,
 		mHeight,
 		layerCount,
@@ -303,7 +303,7 @@ FrameBuffer& FrameBuffer::withTextureCubeMap(const bool mipmap) {
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTextureCubemapDepth(const int32_t internalFormat, const bool onlyForShadowMap) {
+FrameBuffer& FrameBuffer::withTextureCubemapDepth(const InternalFormat format, const bool onlyForShadowMap) {
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextures.emplace_back(textureID, TextureTarget::TextureCubeMap);
@@ -313,7 +313,7 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepth(const int32_t internalFormat, 
 		glTexImage2D(
 			GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
 			0,
-			internalFormat,
+			toGLi(format),
 			mWidth,
 			mHeight,
 			0,
@@ -336,7 +336,7 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepth(const int32_t internalFormat, 
 
 FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(
 	const int32_t layerCount,
-	const int32_t internalFormat,
+	const InternalFormat format,
 	const bool onlyForShadowMap) {
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
@@ -346,7 +346,7 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(
 	glTexImage3D(
 		GL_TEXTURE_CUBE_MAP_ARRAY,
 		0,
-		internalFormat,
+		toGLi(format),
 		mWidth,
 		mHeight,
 		layerCount * 6,
@@ -369,46 +369,48 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withRenderBufferDepth(const uint32_t internalFormat) {
+FrameBuffer& FrameBuffer::withRenderBufferDepth(const InternalFormat format) {
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 
-	glRenderbufferStorage(GL_RENDERBUFFER, internalFormat, mWidth, mHeight);
+	glRenderbufferStorage(GL_RENDERBUFFER, toGLi(format), mWidth, mHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(const int32_t multisampledCount,
-                                                            const uint32_t internalFormat) {
+FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(
+	const int32_t multisampledCount,
+	const InternalFormat format) {
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisampledCount, internalFormat, mWidth, mHeight);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisampledCount, toGLi(format), mWidth, mHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withRenderBufferDepthStencil(const int32_t internalFormat) {
+FrameBuffer& FrameBuffer::withRenderBufferDepthStencil(const InternalFormat format) {
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 
-	glRenderbufferStorage(GL_RENDERBUFFER, internalFormat, mWidth, mHeight);
+	glRenderbufferStorage(GL_RENDERBUFFER, toGLi(format), mWidth, mHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withRenderBufferDepthStencilMultisampled(const int32_t multisampledCount,
-                                                                   const int32_t internalFormat) {
+FrameBuffer& FrameBuffer::withRenderBufferDepthStencilMultisampled(
+	const int32_t multisampledCount,
+	const InternalFormat format) {
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisampledCount, internalFormat, mWidth, mHeight);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisampledCount, toGLi(format), mWidth, mHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
@@ -449,21 +451,21 @@ void FrameBuffer::setDepthTextureParameters(const uint32_t target, const int32_t
 	glTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, borderColor);
 }
 
-int32_t FrameBuffer::getInternalFormat(const uint32_t format, const bool isFloat) {
+InternalFormat FrameBuffer::getInternalFormat(const BaseFormat format, const bool isFloat) {
 	if (isFloat) {
 		switch (format) {
-			case GL_RED: return GL_R16F;
-			case GL_RG: return GL_RG16F;
-			case GL_RGB: return GL_RGB16F;
-			default: return GL_RGBA16F;
+			case BaseFormat::Red: return InternalFormat::RedFloat;
+			case BaseFormat::RG: return InternalFormat::RGFloat;
+			case BaseFormat::RGB: return InternalFormat::RGBFloat;
+			default: return InternalFormat::RGBAFloat;
 		}
 	}
 
 	switch (format) {
-		case GL_RED: return GL_R8;
-		case GL_RG: return GL_RG8;
-		case GL_RGB: return GL_RGB8;
-		default: return GL_RGBA8;
+		case BaseFormat::Red: return InternalFormat::Red;
+		case BaseFormat::RG: return InternalFormat::RG;
+		case BaseFormat::RGB: return InternalFormat::RGB;
+		default: return InternalFormat::RGBA;
 	}
 
 	assert(false && "Unsupported format");

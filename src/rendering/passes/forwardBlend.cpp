@@ -68,7 +68,7 @@ void ForwardBlendPass::configure(const RenderContext& ctx, const FrameGraph& gra
 		}
 	};
 
-	mPipeline = GraphicsPipeline(info);
+	mPipeline = GraphicsPipeline{info};
 	mEncoder = GraphicsEncoder{};
 
 	const int32_t slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot");

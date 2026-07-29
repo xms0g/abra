@@ -8,6 +8,26 @@ enum class Attachment : uint32_t {
 	Depth = GL_DEPTH_ATTACHMENT,
 };
 
+enum class BaseFormat : int32_t {
+	Red = GL_RED,
+	RG = GL_RG,
+	RGB = GL_RGB,
+	RGBA = GL_RGBA,
+};
+
+enum class InternalFormat : int32_t {
+	Red = GL_R8,
+	RG = GL_RG8,
+	RGB = GL_RGB8,
+	RGBA = GL_RGBA8,
+	RedFloat = GL_R16F,
+	RGFloat = GL_RG16F,
+	RGBFloat = GL_RGB16F,
+	RGBAFloat = GL_RGBA16F,
+	Depth24 = GL_DEPTH_COMPONENT24,
+	Depth32F = GL_DEPTH_COMPONENT32F,
+};
+
 class BaseFrameBuffer {
 public:
 	BaseFrameBuffer(int32_t width, int32_t height);
@@ -80,31 +100,31 @@ public:
 
 	void bindForDraw() const;
 
-	FrameBuffer& withTexture(uint32_t format);
+	FrameBuffer& withTexture(BaseFormat format);
 
-	FrameBuffer& withTextureMultisampled(int32_t multisampledCount, uint32_t format);
+	FrameBuffer& withTextureMultisampled(int32_t multisampledCount, BaseFormat format);
 
-	FrameBuffer& withTextureFP(uint32_t format);
+	FrameBuffer& withTextureFP(BaseFormat format);
 
-	FrameBuffer& withTextureFPMultisampled(int32_t multisampledCount, uint32_t format);
+	FrameBuffer& withTextureFPMultisampled(int32_t multisampledCount, BaseFormat format);
 
-	FrameBuffer& withTextureDepth(int32_t internalFormat, bool onlyForShadowMap);
+	FrameBuffer& withTextureDepth(InternalFormat format, bool onlyForShadowMap);
 
-	FrameBuffer& withTextureDepthArray(int32_t layerCount, int32_t internalFormat, bool onlyForShadowMap);
+	FrameBuffer& withTextureDepthArray(int32_t layerCount, InternalFormat format, bool onlyForShadowMap);
 
 	FrameBuffer& withTextureCubeMap(bool mipmap);
 
-	FrameBuffer& withTextureCubemapDepth(int32_t internalFormat, bool onlyForShadowMap);
+	FrameBuffer& withTextureCubemapDepth(InternalFormat format, bool onlyForShadowMap);
 
-	FrameBuffer& withTextureCubemapDepthArray(int32_t layerCount, int32_t internalFormat, bool onlyForShadowMap);
+	FrameBuffer& withTextureCubemapDepthArray(int32_t layerCount, InternalFormat format, bool onlyForShadowMap);
 
-	FrameBuffer& withRenderBufferDepth(uint32_t internalFormat);
+	FrameBuffer& withRenderBufferDepth(InternalFormat format);
 
-	FrameBuffer& withRenderBufferDepthMultisampled(int32_t multisampledCount, uint32_t internalFormat);
+	FrameBuffer& withRenderBufferDepthMultisampled(int32_t multisampledCount, InternalFormat format);
 
-	FrameBuffer& withRenderBufferDepthStencil(int32_t internalFormat);
+	FrameBuffer& withRenderBufferDepthStencil(InternalFormat format);
 
-	FrameBuffer& withRenderBufferDepthStencilMultisampled(int32_t multisampledCount, int32_t internalFormat);
+	FrameBuffer& withRenderBufferDepthStencilMultisampled(int32_t multisampledCount, InternalFormat format);
 
 	FrameBuffer& configureAttachments();
 
@@ -117,7 +137,7 @@ private:
 
 	static void setDepthTextureParameters(uint32_t target, int32_t dim);
 
-	static int32_t getInternalFormat(uint32_t format, bool isFloat = false);
+	static InternalFormat getInternalFormat(BaseFormat format, bool isFloat = false);
 
 	struct TextureDescription {
 		uint32_t id{0};

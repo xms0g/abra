@@ -237,33 +237,33 @@ void Renderer::createFrameBuffers() {
 		intermediateBuffer.bind();
 
 		if (CONFIG_MANAGER_INSTANCE.get<bool>("hdr.enabled")) {
-			intermediateBuffer.withTextureFP(GL_RGBA)
-					.withRenderBufferDepth(GL_DEPTH_COMPONENT24)
+			intermediateBuffer.withTextureFP(BaseFormat::RGBA)
+					.withRenderBufferDepth(InternalFormat::Depth24)
 					.checkStatus();
 
 			sceneBuffer.bind();
-			sceneBuffer.withTextureFPMultisampled(sampleCount, GL_RGBA)
-					.withRenderBufferDepthMultisampled(sampleCount, GL_DEPTH_COMPONENT24)
+			sceneBuffer.withTextureFPMultisampled(sampleCount, BaseFormat::RGBA)
+					.withRenderBufferDepthMultisampled(sampleCount, InternalFormat::Depth24)
 					.checkStatus();
 		} else {
-			intermediateBuffer.withTexture(GL_RGBA)
-					.withRenderBufferDepth(GL_DEPTH_COMPONENT24)
+			intermediateBuffer.withTexture(BaseFormat::RGBA)
+					.withRenderBufferDepth(InternalFormat::Depth24)
 					.checkStatus();
 
 			sceneBuffer.bind();
-			sceneBuffer.withTextureMultisampled(sampleCount, GL_RGBA)
-					.withRenderBufferDepthMultisampled(sampleCount, GL_DEPTH_COMPONENT24)
+			sceneBuffer.withTextureMultisampled(sampleCount, BaseFormat::RGBA)
+					.withRenderBufferDepthMultisampled(sampleCount, InternalFormat::Depth24)
 					.checkStatus();
 		}
 	} else {
 		sceneBuffer.bind();
 		if (CONFIG_MANAGER_INSTANCE.get<bool>("hdr.enabled")) {
-			sceneBuffer.withTextureFP(GL_RGBA)
-					.withTextureDepth(GL_DEPTH_COMPONENT24, false)
+			sceneBuffer.withTextureFP(BaseFormat::RGBA)
+					.withTextureDepth(InternalFormat::Depth24, false)
 					.checkStatus();
 		} else {
-			sceneBuffer.withTexture(GL_RGBA)
-					.withTextureDepth(GL_DEPTH_COMPONENT24, false)
+			sceneBuffer.withTexture(BaseFormat::RGBA)
+					.withTextureDepth(InternalFormat::Depth24, false)
 					.checkStatus();
 		}
 	}
@@ -277,19 +277,19 @@ void Renderer::createFrameBuffers() {
 
 	auto& gBuffer = mGraph.getResource("gBuffer");
 	gBuffer.bind();
-	gBuffer.withTextureFP(GL_RGBA) // position
-			.withTextureFP(GL_RGBA); // normal
+	gBuffer.withTextureFP(BaseFormat::RGBA) // position
+			.withTextureFP(BaseFormat::RGBA); // normal
 	if (CONFIG_MANAGER_INSTANCE.get<bool>("hdr.enabled")) {
 		// albedo
-		gBuffer.withTextureFP(GL_RGBA);
+		gBuffer.withTextureFP(BaseFormat::RGBA);
 	} else {
-		gBuffer.withTexture(GL_RGBA);
+		gBuffer.withTexture(BaseFormat::RGBA);
 	}
 	// Emissive placed into alpha channels in position, normal, albedo
 
-	gBuffer.withTexture(GL_RGBA) // orm
+	gBuffer.withTexture(BaseFormat::RGBA) // orm
 			.configureAttachments()
-			.withTextureDepth(GL_DEPTH_COMPONENT24, false)
+			.withTextureDepth(InternalFormat::Depth24, false)
 			.checkStatus();
 
 	// SSAO
@@ -299,7 +299,7 @@ void Renderer::createFrameBuffers() {
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"))
 	);
 	mGraph.getResource("ssao").bind();
-	mGraph.getResource("ssao").withTexture(GL_RED).checkStatus();
+	mGraph.getResource("ssao").withTexture(BaseFormat::Red).checkStatus();
 	mGraph.getResource("ssao").unbind();
 
 	mGraph.addResource(
@@ -308,7 +308,7 @@ void Renderer::createFrameBuffers() {
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"))
 	);
 	mGraph.getResource("ssaoBlur").bind();
-	mGraph.getResource("ssaoBlur").withTexture(GL_RED).checkStatus();
+	mGraph.getResource("ssaoBlur").withTexture(BaseFormat::Red).checkStatus();
 	mGraph.getResource("ssaoBlur").unbind();
 
 	// Shadow Maps
@@ -317,7 +317,7 @@ void Renderer::createFrameBuffers() {
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_width"),
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_height")));
 	mGraph.getResource("directional").bind();
-	mGraph.getResource("directional").withTextureDepth(GL_DEPTH_COMPONENT24, true).checkStatus();
+	mGraph.getResource("directional").withTextureDepth(InternalFormat::Depth24, true).checkStatus();
 	mGraph.getResource("directional").unbind();
 
 	mGraph.addResource(
@@ -326,7 +326,7 @@ void Renderer::createFrameBuffers() {
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_height")));
 	mGraph.getResource("point").bind();
 	mGraph.getResource("point").withTextureCubemapDepthArray(
-				CONFIG_MANAGER_INSTANCE.get<int32_t>("light.max_point"), GL_DEPTH_COMPONENT24, true)
+				CONFIG_MANAGER_INSTANCE.get<int32_t>("light.max_point"), InternalFormat::Depth24, true)
 			.checkStatus();
 	mGraph.getResource("point").unbind();
 
@@ -336,7 +336,7 @@ void Renderer::createFrameBuffers() {
 			CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_height")));
 	mGraph.getResource("spot").bind();
 	mGraph.getResource("spot").withTextureDepthArray(
-				CONFIG_MANAGER_INSTANCE.get<int32_t>("light.max_spot"), GL_DEPTH_COMPONENT24, true)
+				CONFIG_MANAGER_INSTANCE.get<int32_t>("light.max_spot"), InternalFormat::Depth24, true)
 			.checkStatus();
 
 	// PostProcess Render Targets
@@ -348,9 +348,9 @@ void Renderer::createFrameBuffers() {
 
 		auto& target = mGraph.getResource(name);
 		if (CONFIG_MANAGER_INSTANCE.get<bool>("hdr.enabled")) {
-			target.withTextureFP(GL_RGBA);
+			target.withTextureFP(BaseFormat::RGBA);
 		} else {
-			target.withTexture(GL_RGBA);
+			target.withTexture(BaseFormat::RGBA);
 		}
 		target.checkStatus();
 	};

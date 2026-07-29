@@ -68,7 +68,7 @@ void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph&
 		}
 	};
 
-	mPipeline = GraphicsPipeline(info);
+	mPipeline = GraphicsPipeline{info};
 	mEncoder = GraphicsEncoder{};
 
 	const auto& gBuffer = graph.getResource("gBuffer");

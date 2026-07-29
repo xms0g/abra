@@ -68,7 +68,7 @@ void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph)
 	const uint32_t textures[] = {inputTex.id};
 	mEncoder.bindMaterial({
 		.flags = 0,
-		.textureTarget = toGL(TextureTarget::Texture2D),
+		.textureTarget = toGLu(TextureTarget::Texture2D),
 		.textures = std::span(textures)
 	});
 

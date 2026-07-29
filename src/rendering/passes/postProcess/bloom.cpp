@@ -67,7 +67,7 @@ TextureHandle Bloom::brightFilterPass(
 	const uint32_t textures[] = {sceneTexture.id};
 	encoder.bindMaterial({
 		.flags = 0,
-		.textureTarget = toGL(TextureTarget::Texture2D),
+		.textureTarget = toGLu(TextureTarget::Texture2D),
 		.textures = std::span(textures)
 	});
 
@@ -104,7 +104,7 @@ TextureHandle Bloom::blurPass(
 		const uint32_t textures[] = {outTex.id};
 		encoder.bindMaterial({
 			.flags = 0,
-			.textureTarget = toGL(TextureTarget::Texture2D),
+			.textureTarget = toGLu(TextureTarget::Texture2D),
 			.textures = std::span(textures)
 		});
 
@@ -136,7 +136,7 @@ TextureHandle Bloom::combinePass(
 	const uint32_t textures[] = {sceneTexture.id, blurTexture.id};
 	encoder.bindMaterial({
 		.flags = 0,
-		.textureTarget = toGL(TextureTarget::Texture2D),
+		.textureTarget = toGLu(TextureTarget::Texture2D),
 		.textures = std::span(textures)
 	});
 

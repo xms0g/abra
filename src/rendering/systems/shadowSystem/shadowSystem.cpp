@@ -70,8 +70,8 @@ void ShadowSystem::configure(const RenderContext& ctx, const FrameGraph& graph, 
 		.uniforms = {}
 	};
 
-	mPipelines[0] = GraphicsPipeline(depthInfo);
-	mPipelines[1] = GraphicsPipeline(cubeDepthInfo);
+	mPipelines[0] = GraphicsPipeline{depthInfo};
+	mPipelines[1] = GraphicsPipeline{cubeDepthInfo};
 	mEncoder = GraphicsEncoder{};
 
 	mDirShadow = std::make_unique<DirectionalShadow>(ctx);
