@@ -11,7 +11,7 @@ inline std::string path(const std::string& p) {
     return cwd.append(p).string();
 }
 
-inline std::string loadFile(const std::string& p) {
+inline std::string readFile(const std::string& p) {
 	std::ifstream file(path(p));
 
 	if (!file.is_open()) {
