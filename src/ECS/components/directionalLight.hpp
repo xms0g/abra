@@ -3,7 +3,7 @@
 
 struct DirectionalLightComponent {
 	uint32_t idx{};
-	glm::vec3 position;
+	glm::vec3 position{};
 	glm::vec3 direction{};
 	glm::vec3 ambient{};
 	glm::vec3 diffuse{};

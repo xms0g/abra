@@ -6,8 +6,6 @@ struct TransformComponent {
 	glm::vec3 rotation{};
 	glm::vec3 scale{};
 
-	bool isDirty{};
-
 	TransformComponent() = default;
 
 	explicit TransformComponent(
@@ -16,7 +14,6 @@ struct TransformComponent {
 		const glm::vec3 scale)
 		: position(position),
 		  rotation(rotation),
-		  scale(scale),
-		  isDirty(false) {
+		  scale(scale) {
 	}
 };

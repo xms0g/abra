@@ -7,15 +7,11 @@
 #include "../../ECS/components/transform.hpp"
 #include "../../ECS/components/debug.hpp"
 #include "../../ECS/components/directionalLight.hpp"
-#include "../../ECS/components/material.hpp"
 #include "../../ECS/components/pointLight.hpp"
 #include "../../ECS/components/spotLight.hpp"
 #include "../../event/eventBus.hpp"
 #include "../../event/events/guiDebugEvent.hpp"
 #include "../../event/events/guiPostProcessEvent.hpp"
-#include "../../event/events/guiTransformEvent.hpp"
-#include "../../event/events/guiLightEvent.hpp"
-#include "../../rendering/material/material.hpp"
 
 void GuiPanels::renderGraphicsInfoPanel(const uint32_t fps) {
 	if (ImGui::TreeNodeEx("Graphics", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -29,18 +25,12 @@ void GuiPanels::renderGraphicsInfoPanel(const uint32_t fps) {
 	}
 }
 
-void GuiPanels::renderTransformPanel(const Entity& entity, EventBus& eventBus) {
+void GuiPanels::renderTransformPanel(const Entity& entity, TransformComponent& transform, bool& transformChanged) {
 	ImGui::PushID(static_cast<int>(entity.id()));
 	if (ImGui::TreeNodeEx("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
-		auto& transform = entity.getComponent<TransformComponent>();
-
-		transform.isDirty |= ui::dragFloat3("Position", transform.position);
-		transform.isDirty |= ui::dragFloat3("Rotation", transform.rotation, 1.0f);
-		transform.isDirty |= ui::dragFloat3("Scale", transform.scale);
-
-		if (transform.isDirty) {
-			eventBus.emitEvent<GuiTransformEvent>(entity.id(), transform.position, transform.rotation, transform.scale);
-		}
+		transformChanged |= ui::dragFloat3("Position", transform.position);
+		transformChanged |= ui::dragFloat3("Rotation", transform.rotation, 1.0f);
+		transformChanged |= ui::dragFloat3("Scale", transform.scale);
 
 		ImGui::TreePop();
 	}
@@ -67,76 +57,61 @@ void GuiPanels::renderDebugViewsPanel(const Entity& entity, EventBus& eventBus) 
 	}
 }
 
-void GuiPanels::renderLightPanel(const Entity& entity, EventBus& eventBus) {
+void GuiPanels::renderLightPanel(const Entity& entity, bool& lightChanged, uint32_t& lightIdx) {
 	ImGui::PushID(static_cast<int>(entity.id()));
 
 	if (auto dirlight = entity.tryGetComponent<DirectionalLightComponent>()) {
-		renderDirLight(entity,*dirlight, eventBus);
-	} else if (auto pointlight = entity.tryGetComponent<PointLightComponent>()) {
-		renderPointLight(entity, *pointlight, eventBus);
-	} else if (auto spotlight = entity.tryGetComponent<SpotLightComponent>()) {
-		renderSpotLight(entity, *spotlight, eventBus);
+		renderDirLight(*dirlight, lightChanged, lightIdx);
+	}
+
+	if (auto pointlight = entity.tryGetComponent<PointLightComponent>()) {
+		renderPointLight(*pointlight, lightChanged, lightIdx);
+	}
+
+	if (auto spotlight = entity.tryGetComponent<SpotLightComponent>()) {
+		renderSpotLight(*spotlight, lightChanged, lightIdx);
 	}
 
 	ImGui::PopID();
 }
 
-void GuiPanels::renderDirLight(const Entity& entity, DirectionalLightComponent& dirlight, EventBus& eventBus) {
-	bool isDirty{false};
+void GuiPanels::renderDirLight(DirectionalLightComponent& dirlight,  bool& lightChanged, uint32_t& lightIdx) {
+	lightChanged |= ui::dragFloat3("Direction", dirlight.direction, 0.01f, 100);
+	lightChanged |= ui::colorField3("Ambient", dirlight.ambient, 0.01f, 100);
+	lightChanged |= ui::colorField3("Diffuse", dirlight.diffuse, 0.01f, 100);
+	lightChanged |= ui::colorField3("Specular", dirlight.specular, 0.01f, 100);
+	lightChanged |= ui::sliderFloat("Intensity", &dirlight.intensity, 100.0, 1.0, 30.0);
 
-	isDirty |= ui::dragFloat3("Direction", dirlight.direction, 0.01f, 100);
-	isDirty |= ui::colorField3("Ambient", dirlight.ambient, 0.01f, 100);
-	isDirty |= ui::colorField3("Diffuse", dirlight.diffuse, 0.01f, 100);
-	isDirty |= ui::colorField3("Specular", dirlight.specular, 0.01f, 100);
-	isDirty |= ui::sliderFloat("Intensity", &dirlight.intensity, 100.0, 1.0, 30.0);
-
-	if (isDirty) {
-		uint32_t matIdx = entity.getComponent<MaterialComponent>().materials[0].at(0).idx;
-		eventBus.emitEvent<GuiLightEvent>(entity.id(), matIdx, 0u);
-	}
+	lightIdx = 0u;
 }
 
-void GuiPanels::renderPointLight(const Entity& entity, PointLightComponent& pointlight, EventBus& eventBus) {
-	static auto& transform = entity.getComponent<TransformComponent>();
+void GuiPanels::renderPointLight(PointLightComponent& pointlight,  bool& lightChanged, uint32_t& lightIdx) {
+	lightChanged |= ui::colorField3("Ambient", pointlight.ambient, 0.01f, 100);
+	lightChanged |= ui::colorField3("Diffuse", pointlight.diffuse, 0.01f, 100);
+	lightChanged |= ui::colorField3("Specular", pointlight.specular, 0.01f, 100);
+	lightChanged |= ui::dragFloat("Constant", &pointlight.constant, 0.01f, 100);
+	lightChanged |= ui::dragFloat("Linear", &pointlight.linear, 0.01f, 100);
+	lightChanged |= ui::dragFloat("Quadratic", &pointlight.quadratic, 0.01f, 100);
+	lightChanged |= ui::sliderFloat("Intensity", &pointlight.intensity, 100.0, 1.0, 30.0);
+	lightChanged |= ImGui::Checkbox("Cast Shadow", &pointlight.castShadow);
 
-	transform.isDirty |= ui::colorField3("Ambient", pointlight.ambient, 0.01f, 100);
-	transform.isDirty |= ui::colorField3("Diffuse", pointlight.diffuse, 0.01f, 100);
-	transform.isDirty |= ui::colorField3("Specular", pointlight.specular, 0.01f, 100);
-	transform.isDirty |= ui::dragFloat("Constant", &pointlight.constant, 0.01f, 100);
-	transform.isDirty |= ui::dragFloat("Linear", &pointlight.linear, 0.01f, 100);
-	transform.isDirty |= ui::dragFloat("Quadratic", &pointlight.quadratic, 0.01f, 100);
-	transform.isDirty |= ui::sliderFloat("Intensity", &pointlight.intensity, 100.0, 1.0, 30.0);
-	transform.isDirty |= ImGui::Checkbox("Cast Shadow", &pointlight.castShadow);
-
-	if (transform.isDirty) {
-		uint32_t matIdx = entity.getComponent<MaterialComponent>().materials[0].at(0).idx;
-		eventBus.emitEvent<GuiLightEvent>(entity.id(), matIdx, pointlight.idx);
-	}
-
-	transform.isDirty = false;
+	lightIdx = pointlight.idx;
 }
 
-void GuiPanels::renderSpotLight(const Entity& entity, SpotLightComponent& spotlight, EventBus& eventBus) {
-	static auto& transform = entity.getComponent<TransformComponent>();
+void GuiPanels::renderSpotLight(SpotLightComponent& spotlight,  bool& lightChanged, uint32_t& lightIdx) {
+	lightChanged |= ui::dragFloat3("Direction", spotlight.direction, 0.01f, 100);
+	lightChanged |= ui::colorField3("Ambient", spotlight.ambient, 0.01f, 100);
+	lightChanged |= ui::colorField3("Diffuse", spotlight.diffuse, 0.01f, 100);
+	lightChanged |= ui::colorField3("Specular", spotlight.specular, 0.01f, 100);
+	lightChanged |= ui::dragFloat("Constant", &spotlight.constant, 0.01f, 100);
+	lightChanged |= ui::dragFloat("Linear", &spotlight.linear, 0.01f, 100);
+	lightChanged |= ui::dragFloat("Quadratic", &spotlight.quadratic, 0.01f, 100);
+	lightChanged |= ui::dragFloat("Cutoff", &spotlight.cutOff, 0.01f, 100);
+	lightChanged |= ui::dragFloat("OuterCutoff", &spotlight.outerCutOff, 0.01f, 100);
+	lightChanged |= ui::sliderFloat("Intensity", &spotlight.intensity, 100.0, 1.0, 30.0);
+	lightChanged |= ImGui::Checkbox("Cast Shadow", &spotlight.castShadow);
 
-	transform.isDirty |= ui::dragFloat3("Direction", spotlight.direction, 0.01f, 100);
-	transform.isDirty |= ui::colorField3("Ambient", spotlight.ambient, 0.01f, 100);
-	transform.isDirty |= ui::colorField3("Diffuse", spotlight.diffuse, 0.01f, 100);
-	transform.isDirty |= ui::colorField3("Specular", spotlight.specular, 0.01f, 100);
-	transform.isDirty |= ui::dragFloat("Constant", &spotlight.constant, 0.01f, 100);
-	transform.isDirty |= ui::dragFloat("Linear", &spotlight.linear, 0.01f, 100);
-	transform.isDirty |= ui::dragFloat("Quadratic", &spotlight.quadratic, 0.01f, 100);
-	transform.isDirty |= ui::dragFloat("Cutoff", &spotlight.cutOff, 0.01f, 100);
-	transform.isDirty |= ui::dragFloat("OuterCutoff", &spotlight.outerCutOff, 0.01f, 100);
-	transform.isDirty |= ui::sliderFloat("Intensity", &spotlight.intensity, 100.0, 1.0, 30.0);
-	transform.isDirty |= ImGui::Checkbox("Cast Shadow", &spotlight.castShadow);
-
-	if (transform.isDirty) {
-		uint32_t matIdx = entity.getComponent<MaterialComponent>().materials[0].at(0).idx;
-		eventBus.emitEvent<GuiLightEvent>(entity.id(), matIdx, spotlight.idx);
-	}
-
-	transform.isDirty = false;
+	lightIdx = spotlight.idx;
 }
 
 void GuiPanels::renderPostProcessPanel(EventBus& eventBus) {
@@ -166,10 +141,10 @@ void GuiPanels::renderPostProcessPanel(EventBus& eventBus) {
 		for (uint32_t i = 0; i < effectsSpan.size(); ++i) {
 			auto& fx = effectsSpan[i];
 
-			bool isDirty = ImGui::Checkbox(fx.name, &fx.enabled);
-			isDirty |= fx.renderExtraControls(fx);
+			bool lightChanged = ImGui::Checkbox(fx.name, &fx.enabled);
+			lightChanged |= fx.renderExtraControls(fx);
 
-			if (isDirty) {
+			if (lightChanged) {
 				eventBus.emitEvent<GuiPostProcessEvent>(i, fx.enabled, fx.exposure, fx.intensity);
 			}
 		}

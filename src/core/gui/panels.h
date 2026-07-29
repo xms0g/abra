@@ -5,23 +5,24 @@
 struct SpotLightComponent;
 struct PointLightComponent;
 struct DirectionalLightComponent;
+struct TransformComponent;
 class EventBus;
 class Entity;
 
 namespace GuiPanels {
 void renderGraphicsInfoPanel(uint32_t fps);
 
-void renderTransformPanel(const Entity& entity, EventBus& eventBus);
+void renderTransformPanel(const Entity& entity, TransformComponent& transform, bool& transformChanged);
 
 void renderDebugViewsPanel(const Entity& entity, EventBus& eventBus);
 
-void renderLightPanel(const Entity& entity, EventBus& eventBus);
+void renderLightPanel(const Entity& entity,  bool& lightChanged, uint32_t& lightIdx);
 
-void renderDirLight(const Entity& entity, DirectionalLightComponent& dirlight, EventBus& eventBus);
+void renderDirLight(DirectionalLightComponent& dirlight,  bool& lightChanged, uint32_t& lightIdx);
 
-void renderPointLight(const Entity& entity, PointLightComponent& pointlight, EventBus& eventBus);
+void renderPointLight(PointLightComponent& pointlight,  bool& lightChanged, uint32_t& lightIdx);
 
-void renderSpotLight(const Entity& entity, SpotLightComponent& spotlight, EventBus& eventBus);
+void renderSpotLight(SpotLightComponent& spotlight,  bool& lightChanged, uint32_t& lightIdx);
 
 void renderPostProcessPanel(EventBus& eventBus);
 }

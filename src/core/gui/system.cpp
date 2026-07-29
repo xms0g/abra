@@ -7,8 +7,12 @@
 #include "../../ECS/components/pointLight.hpp"
 #include "../../ECS/components/spotLight.hpp"
 #include "../../ECS/components/transform.hpp"
+#include "../../ECS/components/material.hpp"
 #include "../../ECS/components/instance.hpp"
+#include "../../rendering/material/material.hpp"
 #include "../../event/eventBus.hpp"
+#include "../../event/events/guiLightEvent.hpp"
+#include "../../event/events/guiTransformEvent.hpp"
 
 GuiSystem::GuiSystem() {
 	RequireComponent<TransformComponent>(true);
@@ -29,11 +33,28 @@ void GuiSystem::render(EventBus& eventBus) const {
 	GuiPanels::renderPostProcessPanel(eventBus);
 
 	for (const auto& entity: getSystemEntities()) {
+		uint32_t lightIdx{0};
+		bool lightChanged{false}, transformChanged{false};
+		auto& transform = entity.getComponent<TransformComponent>();
+
 		if (ui::beginEntity(entity.name())) {
-			GuiPanels::renderTransformPanel(entity, eventBus);
+			GuiPanels::renderTransformPanel(entity, transform, transformChanged);
 			GuiPanels::renderDebugViewsPanel(entity, eventBus);
-			GuiPanels::renderLightPanel(entity, eventBus);
+			GuiPanels::renderLightPanel(entity, lightChanged, lightIdx);
 			ui::endEntity();
+		}
+
+		if (transformChanged) {
+			eventBus.emitEvent<GuiTransformEvent>(entity.id(), transform.position, transform.rotation, transform.scale);
+		}
+
+		const bool isLight = entity.hasComponent<PointLightComponent>() ||
+		                     entity.hasComponent<SpotLightComponent>() ||
+		                     entity.hasComponent<DirectionalLightComponent>();
+
+		if (lightChanged || (isLight && transformChanged)) {
+			uint32_t matIdx = entity.getComponent<MaterialComponent>().materials[0].at(0).idx;
+			eventBus.emitEvent<GuiLightEvent>(entity.id(), matIdx, lightIdx);
 		}
 	}
 }
