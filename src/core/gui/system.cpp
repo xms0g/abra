@@ -8,7 +8,6 @@
 #include "../../ECS/components/spotLight.hpp"
 #include "../../ECS/components/transform.hpp"
 #include "../../ECS/components/material.hpp"
-#include "../../ECS/components/instance.hpp"
 #include "../../rendering/material/material.hpp"
 #include "../../event/eventBus.hpp"
 #include "../../event/events/guiLightEvent.hpp"
@@ -38,9 +37,13 @@ void GuiSystem::render(EventBus& eventBus) const {
 		auto& transform = entity.getComponent<TransformComponent>();
 
 		if (ui::beginEntity(entity.name())) {
-			GuiPanels::renderTransformPanel(entity, transform, transformChanged);
+			ui::pushID(entity.id());
+
+			GuiPanels::renderTransformPanel(transform, transformChanged);
 			GuiPanels::renderDebugViewsPanel(entity, eventBus);
 			GuiPanels::renderLightPanel(entity, lightChanged, lightIdx);
+
+			ui::popID();
 			ui::endEntity();
 		}
 

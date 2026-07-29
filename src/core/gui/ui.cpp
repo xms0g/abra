@@ -11,6 +11,14 @@ void ui::endEntity() {
 	ImGui::Separator();
 }
 
+void ui::pushID(const size_t id) {
+	ImGui::PushID(static_cast<int>(id));
+}
+
+void ui::popID() {
+	ImGui::PopID();
+}
+
 bool ui::colorField3(const std::string& label, glm::vec3& value, const float speed, const float sameLineOffset) {
 	bool isDirty{false};
 	ImGui::Text("%s", label.c_str());

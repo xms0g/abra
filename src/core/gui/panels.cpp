@@ -25,8 +25,7 @@ void GuiPanels::renderGraphicsInfoPanel(const uint32_t fps) {
 	}
 }
 
-void GuiPanels::renderTransformPanel(const Entity& entity, TransformComponent& transform, bool& transformChanged) {
-	ImGui::PushID(static_cast<int>(entity.id()));
+void GuiPanels::renderTransformPanel(TransformComponent& transform, bool& transformChanged) {
 	if (ImGui::TreeNodeEx("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
 		transformChanged |= ui::dragFloat3("Position", transform.position);
 		transformChanged |= ui::dragFloat3("Rotation", transform.rotation, 1.0f);
@@ -34,12 +33,10 @@ void GuiPanels::renderTransformPanel(const Entity& entity, TransformComponent& t
 
 		ImGui::TreePop();
 	}
-	ImGui::PopID();
 }
 
 void GuiPanels::renderDebugViewsPanel(const Entity& entity, EventBus& eventBus) {
 	if (const auto debug = entity.tryGetComponent<DebugComponent>()) {
-		ImGui::PushID(static_cast<int>(entity.id()));
 		if (ImGui::TreeNodeEx("Debug Views", ImGuiTreeNodeFlags_DefaultOpen)) {
 			static constexpr const char* modes[] = {"None", "Normals", "Wireframe"};
 
@@ -53,13 +50,10 @@ void GuiPanels::renderDebugViewsPanel(const Entity& entity, EventBus& eventBus) 
 			}
 			ImGui::TreePop();
 		}
-		ImGui::PopID();
 	}
 }
 
 void GuiPanels::renderLightPanel(const Entity& entity, bool& lightChanged, uint32_t& lightIdx) {
-	ImGui::PushID(static_cast<int>(entity.id()));
-
 	if (auto dirlight = entity.tryGetComponent<DirectionalLightComponent>()) {
 		renderDirLight(*dirlight, lightChanged, lightIdx);
 	}
@@ -71,11 +65,9 @@ void GuiPanels::renderLightPanel(const Entity& entity, bool& lightChanged, uint3
 	if (auto spotlight = entity.tryGetComponent<SpotLightComponent>()) {
 		renderSpotLight(*spotlight, lightChanged, lightIdx);
 	}
-
-	ImGui::PopID();
 }
 
-void GuiPanels::renderDirLight(DirectionalLightComponent& dirlight,  bool& lightChanged, uint32_t& lightIdx) {
+void GuiPanels::renderDirLight(DirectionalLightComponent& dirlight, bool& lightChanged, uint32_t& lightIdx) {
 	lightChanged |= ui::dragFloat3("Direction", dirlight.direction, 0.01f, 100);
 	lightChanged |= ui::colorField3("Ambient", dirlight.ambient, 0.01f, 100);
 	lightChanged |= ui::colorField3("Diffuse", dirlight.diffuse, 0.01f, 100);
@@ -85,7 +77,7 @@ void GuiPanels::renderDirLight(DirectionalLightComponent& dirlight,  bool& light
 	lightIdx = 0u;
 }
 
-void GuiPanels::renderPointLight(PointLightComponent& pointlight,  bool& lightChanged, uint32_t& lightIdx) {
+void GuiPanels::renderPointLight(PointLightComponent& pointlight, bool& lightChanged, uint32_t& lightIdx) {
 	lightChanged |= ui::colorField3("Ambient", pointlight.ambient, 0.01f, 100);
 	lightChanged |= ui::colorField3("Diffuse", pointlight.diffuse, 0.01f, 100);
 	lightChanged |= ui::colorField3("Specular", pointlight.specular, 0.01f, 100);
@@ -98,7 +90,7 @@ void GuiPanels::renderPointLight(PointLightComponent& pointlight,  bool& lightCh
 	lightIdx = pointlight.idx;
 }
 
-void GuiPanels::renderSpotLight(SpotLightComponent& spotlight,  bool& lightChanged, uint32_t& lightIdx) {
+void GuiPanels::renderSpotLight(SpotLightComponent& spotlight, bool& lightChanged, uint32_t& lightIdx) {
 	lightChanged |= ui::dragFloat3("Direction", spotlight.direction, 0.01f, 100);
 	lightChanged |= ui::colorField3("Ambient", spotlight.ambient, 0.01f, 100);
 	lightChanged |= ui::colorField3("Diffuse", spotlight.diffuse, 0.01f, 100);
@@ -123,16 +115,48 @@ void GuiPanels::renderPostProcessPanel(EventBus& eventBus) {
 
 		bool (* renderExtraControls)(Effect&){nullptr};
 	} static effects[] = {
-		{"Bloom", false, 1.1f, 0.01f, [](Effect& self) { return false; }},
-		{"Tone Mapping", false, 1.1f, 0.01f, [](Effect& self) { return ui::sliderFloat("Exposure", &self.exposure, 100.0f); }},
-		{"Grayscale", false, 1.1f, 0.01f, [](Effect& self) { return false; }},
-		{"Sepia", false, 1.1f, 0.01f, [](Effect& self) { return false; }},
-		{"Blur", false, 1.1f, 0.01f, [](Effect& self) { return false; }},
-		{"Edge Detection", false, 1.1f, 0.01f, [](Effect& self) { return false; }},
-		{"Sharpen", false, 1.1f, 0.01f, [](Effect& self) { return false; }},
-		{"Chromatic Aberration", false, 1.1f, 0.01f,[](Effect& self) { return ui::sliderFloat("Intensity", &self.intensity, 100.0f, 0.01f, 0.1f); }},
-		{"Gamma Correction", true, 1.1f, 0.01f, [](Effect& self) { return false; }},
-		{"FXAA", false, 1.1f, 0.01f, [](Effect& self) { return false; }}
+		{
+			.name = "Bloom", .enabled = false, .exposure = 1.1f, .intensity = 0.01f,
+			.renderExtraControls = [](Effect& self) { return false; }
+		},
+		{
+			.name = "Tone Mapping", .enabled = false, .exposure = 1.1f, .intensity = 0.01f,
+			.renderExtraControls = [](Effect& self) { return ui::sliderFloat("Exposure", &self.exposure, 100.0f); }
+		},
+		{
+			.name = "Grayscale", .enabled = false, .exposure = 1.1f, .intensity = 0.01f,
+			.renderExtraControls = [](Effect& self) { return false; }
+		},
+		{
+			.name = "Sepia", .enabled = false, .exposure = 1.1f, .intensity = 0.01f,
+			.renderExtraControls = [](Effect& self) { return false; }
+		},
+		{
+			.name = "Blur", .enabled = false, .exposure = 1.1f, .intensity = 0.01f,
+			.renderExtraControls = [](Effect& self) { return false; }
+		},
+		{
+			.name = "Edge Detection", .enabled = false, .exposure = 1.1f, .intensity = 0.01f,
+			.renderExtraControls = [](Effect& self) { return false; }
+		},
+		{
+			.name = "Sharpen", .enabled = false, .exposure = 1.1f, .intensity = 0.01f,
+			.renderExtraControls = [](Effect& self) { return false; }
+		},
+		{
+			.name = "Chromatic Aberration", .enabled = false, .exposure = 1.1f, .intensity = 0.01f,
+			.renderExtraControls = [](Effect& self) {
+				return ui::sliderFloat("Intensity", &self.intensity, 100.0f, 0.01f, 0.1f);
+			}
+		},
+		{
+			.name = "Gamma Correction", .enabled = true, .exposure = 1.1f, .intensity = 0.01f,
+			.renderExtraControls = [](Effect& self) { return false; }
+		},
+		{
+			.name = "FXAA", .enabled = false, .exposure = 1.1f, .intensity = 0.01f,
+			.renderExtraControls = [](Effect& self) { return false; }
+		}
 	};
 
 	if (ImGui::TreeNodeEx("Post-Processing", ImGuiTreeNodeFlags_DefaultOpen)) {

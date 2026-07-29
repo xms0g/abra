@@ -12,7 +12,7 @@ class Entity;
 namespace GuiPanels {
 void renderGraphicsInfoPanel(uint32_t fps);
 
-void renderTransformPanel(const Entity& entity, TransformComponent& transform, bool& transformChanged);
+void renderTransformPanel(TransformComponent& transform, bool& transformChanged);
 
 void renderDebugViewsPanel(const Entity& entity, EventBus& eventBus);
 

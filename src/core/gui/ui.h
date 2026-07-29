@@ -7,6 +7,10 @@ bool beginEntity(const std::string& label);
 
 void endEntity();
 
+void pushID(size_t id);
+
+void popID();
+
 bool colorField3(const std::string& label, glm::vec3& value, float speed = 0.01f, float sameLineOffset = 100.0f);
 
 bool dragFloat(const std::string& label, float* value, float speed = 0.01f, float sameLineOffset = 100.0f);
