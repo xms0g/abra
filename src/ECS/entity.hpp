@@ -16,7 +16,7 @@ public:
 	size_t id() const { return mID; }
 
 	[[nodiscard]]
-	const char* name() const { return mName.c_str(); }
+	const std::string& name() const { return mName; }
 
 	class Registry* registry{};
 

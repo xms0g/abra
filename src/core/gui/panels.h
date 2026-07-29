@@ -16,7 +16,7 @@ void renderTransformPanel(TransformComponent& transform, bool& transformChanged)
 
 void renderDebugViewsPanel(const Entity& entity, EventBus& eventBus);
 
-void renderLightPanel(const Entity& entity,  bool& lightChanged, uint32_t& lightIdx);
+bool renderLightPanel(const Entity& entity,  bool& lightChanged, uint32_t& lightIdx);
 
 void renderDirLight(DirectionalLightComponent& dirlight,  bool& lightChanged, uint32_t& lightIdx);
 

@@ -53,18 +53,23 @@ void GuiPanels::renderDebugViewsPanel(const Entity& entity, EventBus& eventBus) 
 	}
 }
 
-void GuiPanels::renderLightPanel(const Entity& entity, bool& lightChanged, uint32_t& lightIdx) {
-	if (auto dirlight = entity.tryGetComponent<DirectionalLightComponent>()) {
+bool GuiPanels::renderLightPanel(const Entity& entity, bool& lightChanged, uint32_t& lightIdx) {
+	if (const auto dirlight = entity.tryGetComponent<DirectionalLightComponent>()) {
 		renderDirLight(*dirlight, lightChanged, lightIdx);
+		return true;
 	}
 
-	if (auto pointlight = entity.tryGetComponent<PointLightComponent>()) {
+	if (const auto pointlight = entity.tryGetComponent<PointLightComponent>()) {
 		renderPointLight(*pointlight, lightChanged, lightIdx);
+		return true;
 	}
 
-	if (auto spotlight = entity.tryGetComponent<SpotLightComponent>()) {
+	if (const auto spotlight = entity.tryGetComponent<SpotLightComponent>()) {
 		renderSpotLight(*spotlight, lightChanged, lightIdx);
+		return true;
 	}
+
+	return false;
 }
 
 void GuiPanels::renderDirLight(DirectionalLightComponent& dirlight, bool& lightChanged, uint32_t& lightIdx) {
