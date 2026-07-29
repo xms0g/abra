@@ -11,8 +11,8 @@
 GLu(ShaderStageType)
 
 ShaderStage::ShaderStage(const std::string& fn, const ShaderStageType type) : type(type) {
-	const auto code = fs::readFile(CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader") + fn);
-	const auto processedSource = preprocess(code);
+	const auto processedSource = preprocess(
+		fs::readFile(CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader") + fn));
 
 	handle = glCreateShader(toGLu(type));
 
@@ -21,10 +21,7 @@ ShaderStage::ShaderStage(const std::string& fn, const ShaderStageType type) : ty
 	glShaderSource(handle, 1, &ptr, nullptr);
 	glCompileShader(handle);
 
-	try {
-		checkCompileErrors(fn);
-	} catch (std::runtime_error& e) {
-	}
+	checkCompileErrors(fn);
 }
 
 ShaderStage::ShaderStage(ShaderStage&& other) noexcept
