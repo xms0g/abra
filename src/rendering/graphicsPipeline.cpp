@@ -16,7 +16,7 @@ GraphicsPipeline::GraphicsPipeline(PipelineRenderingInfo& renderingInfo) {
 
 	mState.shader.bind();
 	for (const auto& [name, slot]: renderingInfo.samplers) {
-		mState.shader.setInt(name, slot);
+		mState.shader.setValue(name, slot);
 	}
 
 	for (const auto& [name, binding]: renderingInfo.uniforms) {

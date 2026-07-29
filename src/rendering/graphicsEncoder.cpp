@@ -97,7 +97,7 @@ void GraphicsEncoder::bindMaterial(const MaterialView& material) {
 	    shader) {
 		mState.materialCache.lastMatFlags = material.flags;
 		mState.materialCache.lastShader = &pipelineState.shader;
-		pipelineState.shader.setUint("material.flags", material.flags);
+		setUniform("material.flags", material.flags);
 	}
 
 	if (material.flags & HAS_HEIGHT_MAP) {

@@ -33,9 +33,9 @@ struct ShaderStage {
 
 	void checkCompileErrors(const std::string& fn) const;
 
-	static std::string preprocess(const std::string& source);
+	std::string preprocess(const std::string& source);
 
-	static std::string preprocess(const std::string& source, std::unordered_set<std::string>& includedFiles);
+	std::string preprocess(const std::string& source, std::unordered_set<std::string>& includedFiles);
 };
 
 class Shader {
@@ -68,37 +68,6 @@ public:
 	template<typename T>
 	void setValue(const std::string& name, const T* value, uint32_t count);
 
-	// utility uniform functions
-	void setBool(const std::string& name, bool value) const;
-
-	void setInt(const std::string& name, int32_t value) const;
-
-	void setUint(const std::string& name, uint32_t value) const;
-
-	void setFloat(const std::string& name, float value) const;
-
-	void setFloatArray(const std::string& name, const float* values, uint32_t count) const;
-
-	void setVec2(const std::string& name, const glm::vec2& value) const;
-
-	void setVec2(const std::string& name, float x, float y) const;
-
-	void setVec3(const std::string& name, const glm::vec3& value) const;
-
-	void setVec3(const std::string& name, float x, float y, float z) const;
-
-	void setVec4(const std::string& name, const glm::vec4& value) const;
-
-	void setVec4(const std::string& name, float x, float y, float z, float w) const;
-
-	void setMat2(const std::string& name, const glm::mat2& mat) const;
-
-	void setMat3(const std::string& name, const glm::mat3& mat) const;
-
-	void setMat4(const std::string& name, const glm::mat4& mat) const;
-
-	void setMat4Array(const std::string& name, const glm::mat4* matrices, size_t count) const;
-
 	void checkLinkErrors() const;
 
 private:
@@ -106,28 +75,61 @@ private:
 	uint32_t mID{};
 };
 
+namespace Uniform {
+void setBool(uint32_t id, const std::string& name, bool value);
+
+void setInt(uint32_t id, const std::string& name, int32_t value);
+
+void setUint(uint32_t id, const std::string& name, uint32_t value);
+
+void setFloat(uint32_t id, const std::string& name, float value);
+
+void setFloatArray(uint32_t id, const std::string& name, const float* values, uint32_t count);
+
+void setVec2(uint32_t id, const std::string& name, const glm::vec2& value);
+
+void setVec2(uint32_t id, const std::string& name, float x, float y);
+
+void setVec3(uint32_t id, const std::string& name, const glm::vec3& value);
+
+void setVec3(uint32_t id, const std::string& name, float x, float y, float z);
+
+void setVec4(uint32_t id, const std::string& name, const glm::vec4& value);
+
+void setVec4(uint32_t id, const std::string& name, float x, float y, float z, float w);
+
+void setMat2(uint32_t id, const std::string& name, const glm::mat2& mat);
+
+void setMat3(uint32_t id, const std::string& name, const glm::mat3& mat);
+
+void setMat4(uint32_t id, const std::string& name, const glm::mat4& mat);
+
+void setMat4Array(uint32_t id, const std::string& name, const glm::mat4* matrices, size_t count);
+
+}
+
 template<typename T>
 void Shader::setValue(const std::string& name, const T& value) const {
 	if constexpr (std::is_same_v<T, bool>)
-		setBool(name, value);
+		Uniform::setBool(mID, name, value);
 	else if constexpr (std::is_same_v<T, int32_t>)
-		setInt(name, value);
+		Uniform::setInt(mID, name, value);
 	else if constexpr (std::is_same_v<T, uint32_t>)
-		setUint(name, value);
+		Uniform::setUint(mID, name, value);
 	else if constexpr (std::is_same_v<T, float>)
-		setFloat(name, value);
+		Uniform::setFloat(mID, name, value);
 	else if constexpr (std::is_same_v<T, glm::vec2>)
-		setVec2(name, value);
+		Uniform::setVec2(mID, name, value);
 	else if constexpr (std::is_same_v<T, glm::vec3>)
-		setVec3(name, value);
+		Uniform::setVec3(mID, name, value);
 	else if constexpr (std::is_same_v<T, glm::vec4>)
-		setVec4(name, value);
+		Uniform::setVec4(mID, name, value);
 	else if constexpr (std::is_same_v<T, glm::mat2>)
-		setMat2(name, value);
+		Uniform::setMat2(mID, name, value);
 	else if constexpr (std::is_same_v<T, glm::mat3>)
-		setMat3(name, value);
+		Uniform::setMat3(mID, name, value);
 	else if constexpr (std::is_same_v<T, glm::mat4>)
-		setMat4(name, value);
+		Uniform::setMat4(mID, name, value);
 	else
 		static_assert(false, "Unsupported type");
 }
@@ -135,7 +137,7 @@ void Shader::setValue(const std::string& name, const T& value) const {
 template<typename T>
 void Shader::setValue(const std::string& name, const T* value, uint32_t count) {
 	if constexpr (std::is_same_v<T, float>)
-		setFloatArray(name, value, count);
+		Uniform::setFloatArray(mID, name, value, count);
 	else if constexpr (std::is_same_v<T, glm::mat4>)
-		setMat4Array(name, value, count);
+		Uniform::setMat4Array(mID, name, value, count);
 }
