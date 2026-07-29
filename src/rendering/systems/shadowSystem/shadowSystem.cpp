@@ -21,7 +21,7 @@ ShadowSystem::~ShadowSystem() = default;
 void ShadowSystem::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
 	mCtx = &ctx;
 	mGraph = &graph;
-	mWidth= CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width");
+	mWidth = CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width");
 	mHeight = CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height");
 
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
@@ -45,36 +45,34 @@ void ShadowSystem::configure(const RenderContext& ctx, const FrameGraph& graph, 
 		.blendEnable = false,
 	};
 
-	std::vector<ShaderStage> stages0;
-	stages0.emplace_back("depth/depth.vert", ShaderStageType::Vertex);
-	stages0.emplace_back("depth/depth.frag", ShaderStageType::Fragment);
-
 	PipelineRenderingInfo depthInfo = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stages = std::move(stages0),
+		.stages = {
+			{.fn = "depth/depth.vert", .type = ShaderStageType::Vertex},
+			{.fn = "depth/depth.frag", .type = ShaderStageType::Fragment}
+		},
 		.samplers = {},
-			.uniforms = {
-				{
-					.name = CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name"),
-					.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"),
-				},
-			}
+		.uniforms = {
+			{
+				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name"),
+				.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"),
+			},
+		}
 	};
-
-	std::vector<ShaderStage> stages1;
-	stages1.emplace_back("depth/depthCubemap.vert", ShaderStageType::Vertex);
-	stages1.emplace_back("depth/depthCubemap.frag", ShaderStageType::Fragment);
-	stages1.emplace_back("depth/depthCubemap.geom", ShaderStageType::Geometry);
 
 	PipelineRenderingInfo cubeDepthInfo = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stages = std::move(stages1),
+		.stages = {
+			{.fn = "depth/depthCubemap.vert", .type = ShaderStageType::Vertex},
+			{.fn = "depth/depthCubemap.frag", .type = ShaderStageType::Fragment},
+			{.fn = "depth/depthCubemap.geom", .type = ShaderStageType::Geometry},
+		},
 		.samplers = {},
 		.uniforms = {}
 	};
@@ -94,7 +92,8 @@ void ShadowSystem::configure(const RenderContext& ctx, const FrameGraph& graph, 
 
 	eventBus.subscribeToEvent<ShadowSystem, UpdateShadowMapEvent>(this, &ShadowSystem::onGuiUpdate);
 
-	mGPUData.omniFarPlane = glm::vec4(CONFIG_MANAGER_INSTANCE.get<float>("shadow.omnidirectional.farPlane"), 0.0f, 0.0f, 0.0f);
+	mGPUData.omniFarPlane = glm::vec4(CONFIG_MANAGER_INSTANCE.get<float>("shadow.omnidirectional.farPlane"), 0.0f, 0.0f,
+	                                  0.0f);
 
 	constexpr UpdateShadowMapEvent event;
 	onGuiUpdate(event);
@@ -144,7 +143,8 @@ void ShadowSystem::perspectiveShadowPass() {
 		if (!light || !light->castShadow)
 			continue;
 
-		mPersShadow->render(*mCtx, mEncoder, mPipelines[0], frameBuffer, light->direction, light->position, light->outerCutOff, i);
+		mPersShadow->render(*mCtx, mEncoder, mPipelines[0], frameBuffer, light->direction, light->position,
+		                    light->outerCutOff, i);
 		mGPUData.persLightSpaceMatrix[i] = mPersShadow->lightSpaceMatrix(i);
 	}
 

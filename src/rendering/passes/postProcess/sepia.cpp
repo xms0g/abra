@@ -9,7 +9,7 @@ Sepia::Sepia(const std::string& name, const bool enabled)
 }
 
 void Sepia::configure(const FrameGraph& graph) {
-	std::vector<ShaderStage> stages;
+	std::vector<PipelineShaderStage> stages;
 	stages.emplace_back("models/quad.vert", ShaderStageType::Vertex);
 	stages.emplace_back("post-processing/sepia.frag", ShaderStageType::Fragment);
 

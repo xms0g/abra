@@ -32,17 +32,16 @@ void DebugPass::configure(const RenderContext& ctx, const FrameGraph& graph, Eve
 		.blendEnable = false,
 	};
 
-	std::vector<ShaderStage> stages0;
-	stages0.emplace_back("debug/normal.vert", ShaderStageType::Vertex);
-	stages0.emplace_back("debug/normal.frag", ShaderStageType::Fragment);
-	stages0.emplace_back("debug/normal.geom", ShaderStageType::Geometry);
-
 	PipelineRenderingInfo normalInfo = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stages = std::move(stages0),
+		.stages = {
+			{.fn = "debug/normal.vert", .type = ShaderStageType::Vertex},
+			{.fn = "debug/normal.frag", .type = ShaderStageType::Fragment},
+			{.fn = "debug/normal.geom", .type = ShaderStageType::Geometry}
+		},
 		.samplers = {},
 		.uniforms = {
 			{
@@ -52,17 +51,16 @@ void DebugPass::configure(const RenderContext& ctx, const FrameGraph& graph, Eve
 		}
 	};
 
-	std::vector<ShaderStage> stages1;
-	stages1.emplace_back("debug/wireframe.vert", ShaderStageType::Vertex);
-	stages1.emplace_back("debug/wireframe.frag", ShaderStageType::Fragment);
-	stages1.emplace_back("debug/wireframe.geom", ShaderStageType::Geometry);
-
 	PipelineRenderingInfo wireframeInfo = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stages = std::move(stages1),
+		.stages = {
+			{.fn = "debug/wireframe.vert", .type = ShaderStageType::Vertex},
+			{.fn = "debug/wireframe.frag", .type = ShaderStageType::Fragment},
+			{.fn = "debug/wireframe.geom", .type = ShaderStageType::Geometry},
+		},
 		.samplers = {},
 		.uniforms = {
 			{

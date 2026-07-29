@@ -13,7 +13,7 @@ Bloom::Bloom(const std::string& name, const bool enabled)
 Bloom::~Bloom() = default;
 
 void Bloom::configure(const FrameGraph& graph) {
-	std::vector<ShaderStage> stages0;
+	std::vector<PipelineShaderStage> stages0;
 	stages0.emplace_back("models/quad.vert", ShaderStageType::Vertex);
 	stages0.emplace_back("post-processing/bloom/brightFilter.frag", ShaderStageType::Fragment);
 
@@ -21,7 +21,7 @@ void Bloom::configure(const FrameGraph& graph) {
 		stages0,
 		{{.name = "screenTexture", .slot = 0}});
 
-	std::vector<ShaderStage> stages1;
+	std::vector<PipelineShaderStage> stages1;
 	stages1.emplace_back("models/quad.vert", ShaderStageType::Vertex);
 	stages1.emplace_back("post-processing/bloom/blur.frag", ShaderStageType::Fragment);
 
@@ -29,7 +29,7 @@ void Bloom::configure(const FrameGraph& graph) {
 		stages1,
 		{{.name = "screenTexture", .slot = 0}});
 
-	std::vector<ShaderStage> stages2;
+	std::vector<PipelineShaderStage> stages2;
 	stages2.emplace_back("models/quad.vert", ShaderStageType::Vertex);
 	stages2.emplace_back("post-processing/bloom/combine.frag", ShaderStageType::Fragment);
 

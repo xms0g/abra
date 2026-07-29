@@ -33,16 +33,15 @@ void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph&
 		.blendEnable = false,
 	};
 
-	std::vector<ShaderStage> stages;
-	stages.emplace_back("models/quad.vert", ShaderStageType::Vertex);
-	stages.emplace_back("deferred/lighting.frag", ShaderStageType::Fragment);
-
 	PipelineRenderingInfo info = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stages = std::move(stages),
+		.stages = {
+			{.fn = "models/quad.vert", .type = ShaderStageType::Vertex},
+			{.fn = "deferred/lighting.frag", .type = ShaderStageType::Fragment}
+		},
 		.samplers = {
 			{.name = "gPosition", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureSlot")},
 			{.name = "gNormal", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot")},
@@ -86,11 +85,11 @@ void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph&
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot"));
 
 	mEncoder.bindTexture(
-			gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureIdx")),
-			CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureSlot"));
+		gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureIdx")),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureSlot"));
 
 	mEncoder.bindTexture(
-			gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureIdx")),
+		gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureIdx")),
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureSlot"));
 
 	mEncoder.bindTexture(
@@ -112,7 +111,7 @@ void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph&
 
 	const int32_t slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot");
 	mEncoder.bindTexture(graph.getResource("directional").texture(), slot);
-	mEncoder.bindTexture( graph.getResource("point").texture(), slot + 1);
+	mEncoder.bindTexture(graph.getResource("point").texture(), slot + 1);
 	mEncoder.bindTexture(graph.getResource("spot").texture(), slot + 2);
 
 	mQuad = std::make_unique<Model::Quad>();

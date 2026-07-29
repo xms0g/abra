@@ -11,7 +11,7 @@ Kernel::Kernel(const std::string& name, const float* kernel, const bool enabled)
 }
 
 void Kernel::configure(const FrameGraph& graph) {
-	std::vector<ShaderStage> stages;
+	std::vector<PipelineShaderStage> stages;
 	stages.emplace_back("models/quad.vert", ShaderStageType::Vertex);
 	stages.emplace_back("post-processing/kernel.frag", ShaderStageType::Fragment);
 

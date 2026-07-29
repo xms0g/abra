@@ -32,16 +32,15 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, const FrameGraph&
 		.blendEnable = false,
 	};
 
-	std::vector<ShaderStage> stages;
-	stages.emplace_back("deferred/gbuffer.vert", ShaderStageType::Vertex);
-	stages.emplace_back("deferred/gbuffer.frag", ShaderStageType::Fragment);
-
 	PipelineRenderingInfo info = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stages = std::move(stages),
+		.stages = {
+			{.fn = "deferred/gbuffer.vert", .type = ShaderStageType::Vertex},
+			{.fn = "deferred/gbuffer.frag", .type = ShaderStageType::Fragment}
+		},
 		.samplers = {
 			{
 				.name = "material.texture_albedo", .

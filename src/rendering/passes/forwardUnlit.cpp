@@ -31,16 +31,15 @@ void ForwardUnlitPass::configure(const RenderContext& ctx, const FrameGraph& gra
 		.blendEnable = false,
 	};
 
-	std::vector<ShaderStage> stages;
-	stages.emplace_back("unlit.vert", ShaderStageType::Vertex);
-	stages.emplace_back("unlit.frag", ShaderStageType::Fragment);
-
 	PipelineRenderingInfo info = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stages = std::move(stages),
+		.stages = {
+			{.fn = "unlit.vert", .type = ShaderStageType::Vertex},
+			{.fn = "unlit.frag", .type = ShaderStageType::Fragment}
+		},
 		.samplers = {},
 		.uniforms = {
 			{
@@ -67,4 +66,3 @@ void ForwardUnlitPass::execute(const RenderContext& ctx, const FrameGraph& graph
 		mEncoder.drawIndexed(cmd.mesh);
 	}
 }
-

@@ -7,12 +7,13 @@
 #include "enumUtils.hpp"
 #include "../io/filesystem.hpp"
 #include "../config/configManager.h"
+#include "../rendering/graphicsPipeline.h"
 
 GLu(ShaderStageType)
 
-ShaderStage::ShaderStage(const std::string& fn, const ShaderStageType type) : type(type) {
+ShaderStage::ShaderStage(const PipelineShaderStage& info) : type(info.type) {
 	const auto processedSource = preprocess(
-		fs::readFile(CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader") + fn));
+		fs::readFile(CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader") + info.fn));
 
 	handle = glCreateShader(toGLu(type));
 
@@ -21,7 +22,7 @@ ShaderStage::ShaderStage(const std::string& fn, const ShaderStageType type) : ty
 	glShaderSource(handle, 1, &ptr, nullptr);
 	glCompileShader(handle);
 
-	checkCompileErrors(fn);
+	checkCompileErrors(info.fn);
 }
 
 ShaderStage::ShaderStage(ShaderStage&& other) noexcept

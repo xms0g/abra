@@ -10,7 +10,7 @@ ToneMapping::ToneMapping(const std::string& name, const bool enabled)
 }
 
 void ToneMapping::configure(const FrameGraph& graph) {
-	std::vector<ShaderStage> stages;
+	std::vector<PipelineShaderStage> stages;
 	stages.emplace_back("models/quad.vert", ShaderStageType::Vertex);
 	stages.emplace_back("post-processing/toneMapping.frag", ShaderStageType::Fragment);
 

@@ -44,16 +44,15 @@ void InstancedBlendPass::configure(const RenderContext& ctx, const FrameGraph& g
 		.colorWriteMask = ColorComponent::Red | ColorComponent::Green | ColorComponent::Blue | ColorComponent::Alpha,
 	};
 
-	std::vector<ShaderStage> stages;
-	stages.emplace_back("instanced.vert", ShaderStageType::Vertex);
-	stages.emplace_back("blend.frag", ShaderStageType::Fragment);
-
 	PipelineRenderingInfo info = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stages = std::move(stages),
+		.stages = {
+			{.fn = "instanced.vert", .type = ShaderStageType::Vertex},
+			{.fn = "blend.frag", .type = ShaderStageType::Fragment}
+		},
 		.samplers = {
 			{.name = "material.texture_albedo", .slot = 0},
 			{.name = "material.texture_specular", .slot = 1},
@@ -83,7 +82,7 @@ void InstancedBlendPass::configure(const RenderContext& ctx, const FrameGraph& g
 
 	const int32_t slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot");
 	mEncoder.bindTexture(graph.getResource("directional").texture(0), slot);
-	mEncoder.bindTexture( graph.getResource("point").texture(0), slot + 1);
+	mEncoder.bindTexture(graph.getResource("point").texture(0), slot + 1);
 	mEncoder.bindTexture(graph.getResource("spot").texture(0), slot + 2);
 
 	mObjects = std::span(
@@ -113,11 +112,11 @@ void InstancedBlendPass::execute(const RenderContext& ctx, const FrameGraph& gra
 
 		for (const auto& meshIdx: object.matBatch.meshIndices) {
 			mEncoder.drawInstanced({
-				.vao = ctx.renderData->mesh.vaos[meshIdx],
-				.vertexCount = 0,
-				.indexCount = ctx.renderData->mesh.indexCounts[meshIdx]
-			},
-			count);
+				                       .vao = ctx.renderData->mesh.vaos[meshIdx],
+				                       .vertexCount = 0,
+				                       .indexCount = ctx.renderData->mesh.indexCounts[meshIdx]
+			                       },
+			                       count);
 		}
 	}
 }

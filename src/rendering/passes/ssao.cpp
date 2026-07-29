@@ -37,16 +37,15 @@ void SSAOPass::configure(const RenderContext& ctx, const FrameGraph& graph, Even
 		.blendEnable = false,
 	};
 
-	std::vector<ShaderStage> stages0;
-	stages0.emplace_back("models/quad.vert", ShaderStageType::Vertex);
-	stages0.emplace_back("ssao.frag", ShaderStageType::Fragment);
-
 	PipelineRenderingInfo ssaoInfo = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stages = std::move(stages0),
+		.stages = {
+			{.fn = "models/quad.vert", .type = ShaderStageType::Vertex},
+			{.fn = "ssao.frag", .type = ShaderStageType::Fragment}
+		},
 		.samplers = {
 			{.name = "gDepthMap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureSlot")},
 			{.name = "gNormal", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot")},
@@ -65,16 +64,15 @@ void SSAOPass::configure(const RenderContext& ctx, const FrameGraph& graph, Even
 		}
 	};
 
-	std::vector<ShaderStage> stages1;
-	stages1.emplace_back("models/quad.vert", ShaderStageType::Vertex);
-	stages1.emplace_back("ssaoBlur.frag", ShaderStageType::Fragment);
-
 	PipelineRenderingInfo blurInfo = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stages = std::move(stages1),
+		.stages = {
+			{.fn = "models/quad.vert", .type = ShaderStageType::Vertex},
+			{.fn = "ssaoBlur.frag", .type = ShaderStageType::Fragment}
+		},
 		.samplers = {
 			{.name = "ssaoTexture", .slot = 0}
 		},
@@ -173,5 +171,6 @@ void SSAOPass::createNoiseTexture() {
 	noise = math::random::generateNoise(textureSize * textureSize);
 	mNoiseTexture = Texture::generate(textureSize, textureSize, noise.data());
 
-	mEncoder.bindTexture({.id = mNoiseTexture.id, .target = mNoiseTexture.target}, CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.noise.textureSlot"));
+	mEncoder.bindTexture({.id = mNoiseTexture.id, .target = mNoiseTexture.target},
+	                     CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.noise.textureSlot"));
 }

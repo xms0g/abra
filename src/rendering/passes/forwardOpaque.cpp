@@ -31,16 +31,15 @@ void ForwardOpaquePass::configure(const RenderContext& ctx, const FrameGraph& gr
 		.blendEnable = false,
 	};
 
-	std::vector<ShaderStage> stages;
-	stages.emplace_back("object.vert", ShaderStageType::Vertex);
-	stages.emplace_back("opaque.frag", ShaderStageType::Fragment);
-
 	PipelineRenderingInfo info = {
 		.primitiveAssembly = primitiveAssemblyState,
 		.rasterization = rasterizationState,
 		.depthStencil = depthStencilState,
 		.colorBlend = colorBlendState,
-		.stages = std::move(stages),
+		.stages = {
+			{.fn = "object.vert", .type = ShaderStageType::Vertex},
+			{.fn = "opaque.frag", .type = ShaderStageType::Fragment}
+		},
 		.samplers = {
 			{.name = "material.texture_albedo", .slot = 0},
 			{.name = "material.texture_specular", .slot = 1},
@@ -71,7 +70,7 @@ void ForwardOpaquePass::configure(const RenderContext& ctx, const FrameGraph& gr
 
 	const int32_t slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot");
 	mEncoder.bindTexture(graph.getResource("directional").texture(0), slot);
-	mEncoder.bindTexture( graph.getResource("point").texture(0), slot + 1);
+	mEncoder.bindTexture(graph.getResource("point").texture(0), slot + 1);
 	mEncoder.bindTexture(graph.getResource("spot").texture(0), slot + 2);
 
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("OpaqueCommands");

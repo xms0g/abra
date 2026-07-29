@@ -38,7 +38,7 @@ void PostProcessPass::configure(const RenderContext& ctx, const FrameGraph& grap
 		effect->configure(graph);
 	}
 
-	std::vector<ShaderStage> stages;
+	std::vector<PipelineShaderStage> stages;
 	stages.emplace_back("models/quad.vert", ShaderStageType::Vertex);
 	stages.emplace_back("models/quad.frag", ShaderStageType::Fragment);
 

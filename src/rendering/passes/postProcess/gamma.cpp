@@ -10,7 +10,7 @@ Gamma::Gamma(const std::string& name, const bool enabled)
 }
 
 void Gamma::configure(const FrameGraph& graph) {
-	std::vector<ShaderStage> stages;
+	std::vector<PipelineShaderStage> stages;
 	stages.emplace_back("models/quad.vert", ShaderStageType::Vertex);
 	stages.emplace_back("post-processing/gamma.frag", ShaderStageType::Fragment);
 

@@ -4,6 +4,8 @@
 #include "glad/glad.h"
 #include "glm/glm.hpp"
 
+struct PipelineShaderStage;
+
 enum class ShaderStageType: uint32_t {
 	Vertex = GL_VERTEX_SHADER,
 	Fragment = GL_FRAGMENT_SHADER,
@@ -19,7 +21,7 @@ struct ShaderStage {
 
 	ShaderStage() = default;
 
-	ShaderStage(const std::string& fn, ShaderStageType type);
+	explicit ShaderStage(const PipelineShaderStage& info);
 
 	ShaderStage(const ShaderStage& other) = delete;
 
@@ -68,10 +70,9 @@ public:
 	template<typename T>
 	void setValue(const std::string& name, const T* value, uint32_t count);
 
+private:
 	void checkLinkErrors() const;
 
-private:
-	// the program ID
 	uint32_t mID{};
 };
 

@@ -9,7 +9,8 @@ GraphicsPipeline::GraphicsPipeline(PipelineRenderingInfo& renderingInfo) {
 	mState.colorBlend = renderingInfo.colorBlend;
 	mState.tessellation = renderingInfo.tessellation;
 
-	for (const auto& stage: renderingInfo.stages) {
+	for (const auto& info: renderingInfo.stages) {
+		ShaderStage stage{info};
 		mState.shader.attachStage(stage);
 	}
 	mState.shader.link();
@@ -29,7 +30,7 @@ PipelineState& GraphicsPipeline::state() {
 	return mState;
 }
 
-GraphicsPipeline GraphicsPipeline::createFullscreenQuadPipeline(std::vector<ShaderStage>& stages, const std::vector<SamplerInfo>& samplers) {
+GraphicsPipeline GraphicsPipeline::createFullscreenQuadPipeline(std::vector<PipelineShaderStage>& stages, const std::vector<SamplerInfo>& samplers) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};

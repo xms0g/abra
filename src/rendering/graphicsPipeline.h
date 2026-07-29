@@ -116,13 +116,18 @@ struct PipelineTessellationState {
 	int32_t patchControlPoints;
 };
 
+struct PipelineShaderStage {
+	std::string fn;
+	ShaderStageType type;
+};
+
 struct PipelineRenderingInfo {
 	PipelinePrimitiveAssemblyState primitiveAssembly;
 	PipelineRasterizationState rasterization;
 	PipelineDepthStencilState depthStencil;
 	PipelineColorBlendState colorBlend;
 	PipelineTessellationState tessellation;
-	std::vector<ShaderStage> stages;
+	std::vector<PipelineShaderStage> stages;
 	std::vector<SamplerInfo> samplers;
 	std::vector<UniformBindingInfo> uniforms;
 };
@@ -168,7 +173,7 @@ public:
 	[[nodiscard]]
 	PipelineState& state();
 
-	static GraphicsPipeline createFullscreenQuadPipeline(std::vector<ShaderStage>& stages, const std::vector<SamplerInfo>& samplers);
+	static GraphicsPipeline createFullscreenQuadPipeline(std::vector<PipelineShaderStage>& stages, const std::vector<SamplerInfo>& samplers);
 
 private:
 	PipelineState mState{};
