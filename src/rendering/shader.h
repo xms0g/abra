@@ -1,5 +1,4 @@
 #pragma once
-#include <filesystem>
 #include <string>
 #include <unordered_set>
 #include "glad/glad.h"
