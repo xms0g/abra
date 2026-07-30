@@ -22,8 +22,6 @@ public:
 
 	static ResourceManager& instance();
 
-	void createBuffers();
-
 	template<typename T, typename KeyType>
 	[[nodiscard]]
 	T* get(const KeyType& key) const;

@@ -272,5 +272,4 @@ void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
 	}
 
 	RESOURCE_MANAGER.uploadModelsToGPU();
-	RESOURCE_MANAGER.createBuffers();
 }

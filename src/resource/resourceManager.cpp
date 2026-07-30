@@ -22,15 +22,6 @@ ResourceManager& ResourceManager::instance() {
 	return instance;
 }
 
-void ResourceManager::createBuffers() {
-	if (!mBuffers.contains("envMap"))
-		return;
-
-	createIrradianceMap();
-	createPrefilterMap();
-	createBrdfLUT();
-}
-
 void ResourceManager::asyncLoadModel(size_t entityID, const std::string& file) {
 	mThreadPool.enqueue([this, entityID, file]() {
 		loadModel(entityID, file);
@@ -57,6 +48,9 @@ void ResourceManager::uploadModelsToGPU() {
 						CONFIG_MANAGER.get<std::string>("path.asset") + material.textures.front().path);
 
 					uint32_t id = createEnvMap(path);
+					createIrradianceMap();
+					createPrefilterMap();
+					createBrdfLUT();
 
 					material.textures.clear();
 					material.textures.emplace_back(id, 0, TextureTarget::TextureCubeMap, "");
