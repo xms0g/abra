@@ -46,6 +46,10 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 
 	glDepthMask(pipelineState.depthStencil.depthWriteEnable ? GL_TRUE : GL_FALSE);
 
+	if (pipelineState.depthStencil.stencilTestEnable) {
+		glEnable(GL_STENCIL_TEST);
+	}
+
 	if (pipelineState.rasterization.cullMode != CullMode::None) {
 		glEnable(GL_CULL_FACE);
 		glCullFace(toGLu(pipelineState.rasterization.cullMode));

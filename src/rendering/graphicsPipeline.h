@@ -97,8 +97,8 @@ struct PipelineRasterizationState {
 struct PipelineDepthStencilState {
 	bool depthTestEnable{};
 	bool depthWriteEnable{};
-	bool stencilTestEnable{};
 	CompareOp depthCompareOp{};
+	bool stencilTestEnable{};
 };
 
 struct PipelineColorBlendState {
