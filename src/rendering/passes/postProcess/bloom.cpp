@@ -73,18 +73,14 @@ TextureHandle Bloom::brightFilterPass(
 
 	encoder.bindPipeline(mPipelines[0]);
 
-	const uint32_t textures[] = {sceneTexture.id};
+	const TextureHandle textures[] = {{.id = sceneTexture.id, .target = TextureTarget::Texture2D}};
 	encoder.bindMaterial({
 		.flags = 0,
-		.textureTarget = toGLu(TextureTarget::Texture2D),
 		.textures = std::span(textures)
 	});
 
-	encoder.draw({
-		.vao = quad.vao().id(),
-		.vertexCount = 6,
-		.indexCount = 0
-	});
+	encoder.bindVertexArray(quad.vao().id());
+	encoder.draw(6);
 
 	const FrameBuffer* renderTarget = mRenderTargets[toggle];
 	toggle = !toggle;
@@ -110,18 +106,14 @@ TextureHandle Bloom::blurPass(
 		encoder.setUniform("horizontal", horizontal);
 		horizontal = !horizontal;
 
-		const uint32_t textures[] = {outTex.id};
+		const TextureHandle textures[] = {{.id = sceneTexture.id, .target = TextureTarget::Texture2D}};
 		encoder.bindMaterial({
 			.flags = 0,
-			.textureTarget = toGLu(TextureTarget::Texture2D),
 			.textures = std::span(textures)
 		});
 
-		encoder.draw({
-			.vao = quad.vao().id(),
-			.vertexCount = 6,
-			.indexCount = 0
-		});
+		encoder.bindVertexArray(quad.vao().id());
+		encoder.draw(6);
 
 		outTex = mRenderTargets[toggle]->texture();
 		toggle = !toggle;
@@ -142,18 +134,17 @@ TextureHandle Bloom::combinePass(
 
 	encoder.bindPipeline(mPipelines[2]);
 
-	const uint32_t textures[] = {sceneTexture.id, blurTexture.id};
+	const TextureHandle textures[] = {
+		{.id = sceneTexture.id, .target = TextureTarget::Texture2D},
+		{.id = blurTexture.id, .target = TextureTarget::Texture2D}
+	};
 	encoder.bindMaterial({
 		.flags = 0,
-		.textureTarget = toGLu(TextureTarget::Texture2D),
 		.textures = std::span(textures)
 	});
 
-	encoder.draw({
-		.vao = quad.vao().id(),
-		.vertexCount = 6,
-		.indexCount = 0
-	});
+	encoder.bindVertexArray(quad.vao().id());
+	encoder.draw(6);
 
 	return mRenderTargets[toggle]->texture();
 }

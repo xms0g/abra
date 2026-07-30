@@ -1,15 +1,15 @@
 #pragma once
 #include <span>
 #include "glm/glm.hpp"
+#include "texture/texture.h"
 
 struct MaterialView {
 	uint32_t idx;
 	uint32_t flags;
-	uint32_t textureTarget;
 	glm::vec3 color;
 	float alphaCutoff;
 	float heightScale;
-	std::span<const uint32_t> textures;
+	std::span<const TextureHandle> textures;
 };
 
 struct TransformView {

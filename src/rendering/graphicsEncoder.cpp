@@ -27,9 +27,19 @@ void GraphicsEncoder::bindFrameBuffer(const FrameBuffer& fb) const {
 	fb.bind();
 }
 
-void GraphicsEncoder::bindTexture(const TextureHandle handle, const uint32_t slot) const {
+void GraphicsEncoder::bindVertexArray(const uint32_t vao) const {
+	glBindVertexArray(vao);
+}
+
+void GraphicsEncoder::bindTexture(const TextureHandle& handle, const uint32_t slot) const {
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(toGLu(handle.target), handle.id);
+}
+
+void GraphicsEncoder::bindTextures(const std::span<const TextureHandle> handles, uint32_t slot) const {
+	for (const auto& handle: handles) {
+		bindTexture(handle, slot++);
+	}
 }
 
 void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
@@ -83,7 +93,8 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 		glPatchParameteri(GL_PATCH_VERTICES, pipelineState.tessellationState.patchControlPoints);
 	}
 
-	glPolygonMode(toGLu(pipelineState.rasterizationState.polygonFace), toGLu(pipelineState.rasterizationState.polygonMode));
+	glPolygonMode(toGLu(pipelineState.rasterizationState.polygonFace),
+	              toGLu(pipelineState.rasterizationState.polygonMode));
 
 	pipelineState.shader.bind();
 }
@@ -115,12 +126,8 @@ void GraphicsEncoder::bindMaterial(const MaterialView& material) {
 	if (material.flags & HAS_SOLID_COLOR) [[unlikely]] {
 		setUniform("material.color", material.color);
 	} else {
-		int slot{0};
-
-		for (const auto& texture: material.textures) {
-			glActiveTexture(GL_TEXTURE0 + slot++);
-			glBindTexture(material.textureTarget, texture);
-		}
+		constexpr int slot{0};
+		bindTextures(material.textures, slot);
 	}
 
 	if (material.flags & TWOSIDED && pipelineState.rasterizationState.cullMode != CullMode::None) [[unlikely]] {
@@ -150,23 +157,20 @@ void GraphicsEncoder::clearFrameBuffer(const ClearMask mask) const {
 	glClear(toGLu(mask));
 }
 
-void GraphicsEncoder::draw(const MeshView& mesh) const {
-	glBindVertexArray(mesh.vao);
+void GraphicsEncoder::draw(const size_t vertexCount) const {
 	glDrawArrays(toGLu(mState.pipeline->state().primitiveAssemblyState.topology), 0,
-	             static_cast<int32_t>(mesh.vertexCount));
+	             static_cast<int32_t>(vertexCount));
 }
 
-void GraphicsEncoder::drawIndexed(const MeshView& mesh) const {
-	glBindVertexArray(mesh.vao);
+void GraphicsEncoder::drawIndexed(const size_t indexCount) const {
 	glDrawElements(toGLu(mState.pipeline->state().primitiveAssemblyState.topology),
-	               static_cast<int32_t>(mesh.indexCount), GL_UNSIGNED_INT, nullptr);
+	               static_cast<int32_t>(indexCount), GL_UNSIGNED_INT, nullptr);
 }
 
-void GraphicsEncoder::drawInstanced(const MeshView& mesh, const uint32_t count) const {
-	glBindVertexArray(mesh.vao);
+void GraphicsEncoder::drawInstanced(const size_t indexCount, const uint32_t count) const {
 	glDrawElementsInstanced(
 		toGLu(mState.pipeline->state().primitiveAssemblyState.topology),
-		static_cast<int32_t>(mesh.indexCount),
+		static_cast<int32_t>(indexCount),
 		GL_UNSIGNED_INT,
 		nullptr,
 		static_cast<int32_t>(count));

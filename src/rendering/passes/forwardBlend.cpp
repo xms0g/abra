@@ -74,10 +74,13 @@ void ForwardBlendPass::configure(const RenderContext& ctx, const FrameGraph& gra
 	mPipeline = GraphicsPipeline{info};
 	mEncoder = GraphicsEncoder{};
 
-	const int32_t slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot");
-	mEncoder.bindTexture(graph.getResource("directional").texture(0), slot);
-	mEncoder.bindTexture(graph.getResource("point").texture(0), slot + 1);
-	mEncoder.bindTexture(graph.getResource("spot").texture(0), slot + 2);
+	const auto shadowTextures = std::vector{
+		graph.getResource("directional").texture(),
+		graph.getResource("point").texture(),
+		graph.getResource("spot").texture()
+	};
+
+	mEncoder.bindTextures(shadowTextures, CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot"));
 
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("BlendCommands");
 }
@@ -90,6 +93,7 @@ void ForwardBlendPass::execute(const RenderContext& ctx, const FrameGraph& graph
 	for (const auto& cmd: *mCommands) {
 		mEncoder.bindMaterial(cmd.material);
 		mEncoder.bindTransform(cmd.transform);
-		mEncoder.drawIndexed(cmd.mesh);
+		mEncoder.bindVertexArray(cmd.mesh.vao);
+		mEncoder.drawIndexed(cmd.mesh.indexCount);
 	}
 }

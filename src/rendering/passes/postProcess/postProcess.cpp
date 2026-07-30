@@ -68,18 +68,14 @@ void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph)
 	mEncoder.bindFrameBuffer();
 	mEncoder.bindPipeline(mPipeline);
 
-	const uint32_t textures[] = {inputTex.id};
+	const TextureHandle textures[] = {{.id = inputTex.id, .target = TextureTarget::Texture2D}};
 	mEncoder.bindMaterial({
 		.flags = 0,
-		.textureTarget = toGLu(TextureTarget::Texture2D),
 		.textures = std::span(textures)
 	});
 
-	mEncoder.draw({
-		.vao = mQuad->vao().id(),
-		.vertexCount = 6,
-		.indexCount = 0
-	});
+	mEncoder.bindVertexArray(mQuad->vao().id());
+	mEncoder.draw(6);
 }
 
 void PostProcessPass::onGuiUpdate(const GuiPostProcessEvent& event) {

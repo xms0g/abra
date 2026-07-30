@@ -90,6 +90,7 @@ void DebugPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 
 		mEncoder.bindPipeline(mPipelines[cmd.debugMode]);
 		mEncoder.bindTransform(cmd.transform);
-		mEncoder.drawIndexed(cmd.mesh);
+		mEncoder.bindVertexArray(cmd.mesh.vao);
+		mEncoder.drawIndexed(cmd.mesh.indexCount);
 	}
 }

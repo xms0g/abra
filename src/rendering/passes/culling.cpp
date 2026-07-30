@@ -92,11 +92,10 @@ void CullingPass::cullScene(
 					.material = {
 						.idx = matBatch.materialIndex,
 						.flags = ctx.renderData->material.flags[matBatch.materialIndex],
-						.textureTarget = ctx.renderData->material.textureTargets[matBatch.materialIndex],
 						.color = ctx.renderData->material.colors[matBatch.materialIndex],
 						.alphaCutoff = ctx.renderData->material.alphaCutoffs[matBatch.materialIndex],
 						.heightScale = ctx.renderData->entity.heightScales[entityID],
-						.textures = std::span<const uint32_t>(
+						.textures = std::span<const TextureHandle>(
 							ctx.renderData->material.textures.data() + matBatch.textureOffset,
 							matBatch.textureCount)
 					},

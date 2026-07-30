@@ -2,6 +2,7 @@
 #include <vector>
 #include "glm/glm.hpp"
 #include "../../math/matrix.h"
+#include "../texture/texture.h"
 
 struct RenderData {
 	struct {
@@ -19,8 +20,7 @@ struct RenderData {
 	struct {
 		std::vector<float> alphaCutoffs;
 		std::vector<uint32_t> flags;
-		std::vector<uint32_t> textureTargets;
-		std::vector<uint32_t> textures;
+		std::vector<TextureHandle> textures;
 		std::vector<glm::vec3> colors;
 	} material;
 
@@ -54,15 +54,14 @@ struct RenderData {
 		mesh.indexCounts.push_back(indexCount);
 	}
 
-	void emplaceMaterial(const uint32_t flags, const uint32_t textureTarget, const glm::vec3& color, const float alphaCutoff) {
+	void emplaceMaterial(const uint32_t flags, const glm::vec3& color, const float alphaCutoff) {
 		material.flags.push_back(flags);
-		material.textureTargets.push_back(textureTarget);
 		material.colors.push_back(color);
 		material.alphaCutoffs.push_back(alphaCutoff);
 	}
 
-	void emplaceTexture(const uint32_t textureID) {
-		material.textures.push_back(textureID);
+	void emplaceTexture(const uint32_t textureID, const TextureTarget textureTarget) {
+		material.textures.push_back({.id = textureID, .target = textureTarget});
 	}
 
 	void emplaceHeightScale(const float heightScale) {

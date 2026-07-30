@@ -5,6 +5,7 @@
 #include "enumUtils.hpp"
 #include "graphicsPipeline.h"
 #include "buffers/frameBuffer.h"
+#include "buffers/vertexBuffer.h"
 #include "material/material.hpp"
 
 enum class BlitMask : uint32_t {
@@ -36,7 +37,11 @@ public:
 
 	void bindFrameBuffer(const FrameBuffer& fb) const;
 
-	void bindTexture(TextureHandle handle, uint32_t slot) const;
+	void bindVertexArray(uint32_t vao) const;
+
+	void bindTexture(const TextureHandle& handle, uint32_t slot) const;
+
+	void bindTextures(std::span<const TextureHandle> handles, uint32_t slot) const;
 
 	void bindPipeline(GraphicsPipeline& pipeline);
 
@@ -48,11 +53,11 @@ public:
 
 	void clearFrameBuffer(ClearMask mask) const;
 
-	void draw(const MeshView& mesh) const;
+	void draw(size_t vertexCount) const;
 
-	void drawIndexed(const MeshView& mesh) const;
+	void drawIndexed(size_t indexCount) const;
 
-	void drawInstanced(const MeshView& mesh, uint32_t count) const;
+	void drawInstanced(size_t indexCount, uint32_t count) const;
 
 	void setViewport(int32_t x, int32_t y, int32_t width, int32_t height) const;
 

@@ -364,11 +364,8 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 
 		encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
 
-		encoder.drawIndexed({
-			.vao = cubeMesh.vao().id(),
-			.vertexCount = 0,
-			.indexCount = cubeMesh.indices().size()
-		});
+		encoder.bindVertexArray(cubeMesh.vao().id());
+		encoder.drawIndexed(cubeMesh.indices().size());
 	}
 
 	encoder.unbindFrameBuffer();
@@ -446,11 +443,8 @@ void ResourceManager::createIrradianceMap() {
 
 		encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
 
-		encoder.drawIndexed({
-			.vao = cubeMesh.vao().id(),
-			.vertexCount = 0,
-			.indexCount = cubeMesh.indices().size()
-		});
+		encoder.bindVertexArray(cubeMesh.vao().id());
+		encoder.drawIndexed(cubeMesh.indices().size());
 	}
 
 	encoder.unbindFrameBuffer();
@@ -539,11 +533,9 @@ void ResourceManager::createPrefilterMap() {
 			encoder.setUniform("view", mCaptureViews[j]);
 
 			encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
-			encoder.drawIndexed({
-				.vao = cubeMesh.vao().id(),
-				.vertexCount = 0,
-				.indexCount = cubeMesh.indices().size()
-			});
+
+			encoder.bindVertexArray(cubeMesh.vao().id());
+			encoder.drawIndexed(cubeMesh.indices().size());
 		}
 	}
 
@@ -605,11 +597,9 @@ void ResourceManager::createBrdfLUT() {
 	encoder.bindPipeline(pipeline);
 	encoder.bindFrameBuffer(*brdfLUTBuffer);
 	encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
-	encoder.draw({
-		.vao = quad.vao().id(),
-		.vertexCount = 6,
-		.indexCount = 0
-	});
+
+	encoder.bindVertexArray(quad.vao().id());
+	encoder.draw(6);
 
 	encoder.unbindFrameBuffer();
 }

@@ -75,44 +75,33 @@ void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph&
 	mEncoder = GraphicsEncoder{};
 
 	const auto& gBuffer = graph.getResource("gBuffer");
-
-	mEncoder.bindTexture(
+	const auto gbufferTextures = std::vector{
 		gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureIdx")),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureSlot"));
-
-	mEncoder.bindTexture(
 		gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureIdx")),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot"));
-
-	mEncoder.bindTexture(
 		gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureIdx")),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureSlot"));
+		gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureIdx"))
+	};
 
-	mEncoder.bindTexture(
-		gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureIdx")),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureSlot"));
-
-	mEncoder.bindTexture(
-		graph.getResource("ssaoBlur").texture(),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.textureSlot"));
-
-	mEncoder.bindTexture(
+	const auto pbrTextures = std::vector{
 		RESOURCE_MANAGER_INSTANCE.get<FrameBuffer>("irradianceMap")->texture(),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.textureSlot"));
-
-	mEncoder.bindTexture(
 		RESOURCE_MANAGER_INSTANCE.get<FrameBuffer>("prefilterMap")->texture(),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.textureSlot"));
+		RESOURCE_MANAGER_INSTANCE.get<FrameBuffer>("brdfLUT")->texture()
+	};
 
-	mEncoder.bindTexture(
-		RESOURCE_MANAGER_INSTANCE.get<FrameBuffer>("brdfLUT")->texture(),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.brdfLUT.textureSlot"));
+	const auto shadowTextures = std::vector{
+		graph.getResource("directional").texture(),
+		graph.getResource("point").texture(),
+		graph.getResource("spot").texture()
+	};
 
+	const auto ssaoTextures = std::vector{
+		graph.getResource("ssaoBlur").texture()
+	};
 
-	const int32_t slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot");
-	mEncoder.bindTexture(graph.getResource("directional").texture(), slot);
-	mEncoder.bindTexture(graph.getResource("point").texture(), slot + 1);
-	mEncoder.bindTexture(graph.getResource("spot").texture(), slot + 2);
+	mEncoder.bindTextures(gbufferTextures, CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureSlot"));
+	mEncoder.bindTextures(pbrTextures, CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.textureSlot"));
+	mEncoder.bindTextures(ssaoTextures, CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.textureSlot"));
+	mEncoder.bindTextures(shadowTextures, CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot"));
 
 	mQuad = std::make_unique<Model::Quad>();
 }
@@ -125,9 +114,6 @@ void DeferredLightingPass::execute(const RenderContext& ctx, const FrameGraph& g
 	mEncoder.blitFramebuffer(gBuffer, sceneBuffer, BlitMask::Depth);
 	mEncoder.bindFrameBuffer(sceneBuffer);
 	mEncoder.bindPipeline(mPipeline);
-	mEncoder.draw({
-		.vao = mQuad->vao().id(),
-		.vertexCount = 6,
-		.indexCount = 0
-	});
+	mEncoder.bindVertexArray(mQuad->vao().id());
+	mEncoder.draw(6);
 }

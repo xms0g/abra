@@ -73,10 +73,13 @@ void InstancedOpaquePass::configure(const RenderContext& ctx, const FrameGraph& 
 	mPipeline = GraphicsPipeline{info};
 	mEncoder = GraphicsEncoder{};
 
-	const int32_t slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot");
-	mEncoder.bindTexture(graph.getResource("directional").texture(0), slot);
-	mEncoder.bindTexture(graph.getResource("point").texture(0), slot + 1);
-	mEncoder.bindTexture(graph.getResource("spot").texture(0), slot + 2);
+	const auto shadowTextures = std::vector{
+		graph.getResource("directional").texture(),
+		graph.getResource("point").texture(),
+		graph.getResource("spot").texture()
+	};
+
+	mEncoder.bindTextures(shadowTextures, CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot"));
 
 	mObjects = std::span(
 		ctx.queueRegistry->get<RenderInstanceGroup>("opaqueInstanced").data(),
@@ -97,19 +100,14 @@ void InstancedOpaquePass::execute(const RenderContext& ctx, const FrameGraph& gr
 		mEncoder.bindMaterial({
 			.idx = object.matBatch.materialIndex,
 			.flags = ctx.renderData->material.flags[object.matBatch.materialIndex],
-			.textureTarget = ctx.renderData->material.textureTargets[object.matBatch.materialIndex],
-			.textures = std::span<const uint32_t>(
+			.textures = std::span<const TextureHandle>(
 				ctx.renderData->material.textures.data() + object.matBatch.textureOffset,
 				object.matBatch.textureCount)
 		});
 
 		for (const auto& meshIdx: object.matBatch.meshIndices) {
-			mEncoder.drawInstanced({
-				                       .vao = ctx.renderData->mesh.vaos[meshIdx],
-				                       .vertexCount = 0,
-				                       .indexCount = ctx.renderData->mesh.indexCounts[meshIdx]
-			                       },
-			                       count);
+			mEncoder.bindVertexArray(ctx.renderData->mesh.vaos[meshIdx]);
+			mEncoder.drawInstanced(ctx.renderData->mesh.indexCounts[meshIdx], count);
 		}
 	}
 }

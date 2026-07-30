@@ -71,5 +71,6 @@ void TerrainPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	mEncoder.bindPipeline(mPipeline);
 	mEncoder.bindMaterial(cmd.material);
 	mEncoder.bindTransform(cmd.transform);
-	mEncoder.draw(cmd.mesh);
+	mEncoder.bindVertexArray(cmd.mesh.vao);
+	mEncoder.draw(cmd.mesh.vertexCount);
 }

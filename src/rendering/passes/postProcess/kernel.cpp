@@ -32,18 +32,14 @@ TextureHandle Kernel::render(
 	encoder.bindPipeline(mPipeline);
 	encoder.setUniform("kernel", mKernel, 9);
 
-	const uint32_t textures[] = {sceneTexture.id};
+	const TextureHandle textures[] = {{.id = sceneTexture.id, .target = TextureTarget::Texture2D}};
 	encoder.bindMaterial({
 		.flags = 0,
-		.textureTarget = toGLu(TextureTarget::Texture2D),
 		.textures = std::span(textures)
 	});
 
-	encoder.draw({
-		.vao = quad.vao().id(),
-		.vertexCount = 6,
-		.indexCount = 0
-	});
+	encoder.bindVertexArray(quad.vao().id());
+	encoder.draw(6);
 
 	return renderTarget->texture();
 }

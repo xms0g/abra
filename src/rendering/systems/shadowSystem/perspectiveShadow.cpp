@@ -54,11 +54,8 @@ void PerspectiveShadow::render(
 		});
 
 		for (const auto& meshIdx: matBatch.meshIndices) {
-			encoder.drawIndexed({
-				.vao = ctx.renderData->mesh.vaos[meshIdx],
-				.vertexCount = 0,
-				.indexCount = ctx.renderData->mesh.indexCounts[meshIdx]
-			});
+			encoder.bindVertexArray(ctx.renderData->mesh.vaos[meshIdx]);
+			encoder.drawIndexed(ctx.renderData->mesh.indexCounts[meshIdx]);
 		}
 	}
 }

@@ -108,11 +108,8 @@ void SSAOPass::ssao(const FrameGraph& graph) {
 	mEncoder.clearFrameBuffer(ClearMask::Color);
 
 	mEncoder.bindPipeline(mPipelines[0]);
-	mEncoder.draw({
-		.vao = mQuad->vao().id(),
-		.vertexCount = 6,
-		.indexCount = 0
-	});
+	mEncoder.bindVertexArray(mQuad->vao().id());
+	mEncoder.draw(6);
 }
 
 void SSAOPass::blur(const FrameGraph& graph) {
@@ -122,11 +119,8 @@ void SSAOPass::blur(const FrameGraph& graph) {
 
 	mEncoder.bindPipeline(mPipelines[1]);
 	mEncoder.bindTexture(graph.getResource("ssao").texture(), 0);
-	mEncoder.draw({
-		.vao = mQuad->vao().id(),
-		.vertexCount = 6,
-		.indexCount = 0
-	});
+	mEncoder.bindVertexArray(mQuad->vao().id());
+	mEncoder.draw(6);
 }
 
 void SSAOPass::createKernel() {
@@ -171,6 +165,7 @@ void SSAOPass::createNoiseTexture() {
 	noise = math::random::generateNoise(textureSize * textureSize);
 	mNoiseTexture = Texture::generate(textureSize, textureSize, noise.data());
 
-	mEncoder.bindTexture({.id = mNoiseTexture.id, .target = mNoiseTexture.target},
-	                     CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.noise.textureSlot"));
+	mEncoder.bindTexture(
+		{.id = mNoiseTexture.id, .target = mNoiseTexture.target},
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.noise.textureSlot"));
 }

@@ -90,6 +90,7 @@ void DeferredGeometryPass::execute(const RenderContext& ctx, const FrameGraph& g
 	for (const auto& cmd: *mCommands) {
 		mEncoder.bindMaterial(cmd.material);
 		mEncoder.bindTransform(cmd.transform);
-		mEncoder.drawIndexed(cmd.mesh);
+		mEncoder.bindVertexArray(cmd.mesh.vao);
+		mEncoder.drawIndexed(cmd.mesh.indexCount);
 	}
 }
