@@ -83,6 +83,22 @@ struct UniformBindingInfo {
 	uint32_t binding;
 };
 
+struct Viewport {
+	int32_t x;
+	int32_t y;
+	int32_t width;
+	int32_t height;
+};
+
+class FrameBuffer;
+struct RenderingInfo {
+	FrameBuffer& framebuffer;
+	bool clearColor{};
+	bool clearDepth{};
+	bool clearStencil{};
+	Viewport viewport{};
+};
+
 struct PipelinePrimitiveAssemblyState {
 	PrimitiveTopology topology;
 };

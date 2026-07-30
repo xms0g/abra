@@ -15,6 +15,18 @@ GLu(PrimitiveTopology)
 GLu(PolygonMode)
 GLu(PolygonFace)
 
+void GraphicsEncoder::beginRendering(const RenderingInfo& info) const {
+	info.framebuffer.bind();
+
+	ClearMask mask{ClearMask::None};
+	mask |= info.clearColor ? ClearMask::Color : ClearMask::None;
+	mask |= info.clearDepth ? ClearMask::Depth : ClearMask::None;
+	mask |= info.clearStencil ? ClearMask::Stencil : ClearMask::None;
+
+	clearFrameBuffer(mask);
+	setViewport(info.viewport);
+}
+
 void GraphicsEncoder::bindFrameBuffer() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -25,6 +37,7 @@ void GraphicsEncoder::unbindFrameBuffer() const {
 
 void GraphicsEncoder::bindFrameBuffer(const FrameBuffer& fb) const {
 	fb.bind();
+	setViewport({.x = 0, .y = 0, .width = fb.width(), .height = fb.height()});
 }
 
 void GraphicsEncoder::bindVertexArray(const uint32_t vao) const {
@@ -176,8 +189,8 @@ void GraphicsEncoder::drawInstanced(const size_t indexCount, const uint32_t coun
 		static_cast<int32_t>(count));
 }
 
-void GraphicsEncoder::setViewport(const int32_t x, const int32_t y, const int32_t width, const int32_t height) const {
-	glViewport(x, y, width, height);
+void GraphicsEncoder::setViewport(const Viewport viewport) const {
+	glViewport(viewport.x, viewport.y, viewport.width, viewport.height);
 }
 
 void GraphicsEncoder::setCullMode(const CullMode mode) {

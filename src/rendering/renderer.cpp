@@ -23,6 +23,8 @@
 #include "passes/skybox.h"
 #include "passes/resolve.h"
 #include "passes/terrain.h"
+#include "passes/beginScene.h"
+#include "passes/forwardUnlit.h"
 #include "passes/postProcess/postProcess.h"
 #include "gui/backend.h"
 #include "material/material.hpp"
@@ -34,7 +36,6 @@
 #include "../ECS/components/mesh.hpp"
 #include "../event/eventBus.hpp"
 #include "../resource/resourceManager.h"
-#include "passes/forwardUnlit.h"
 
 Renderer::Renderer(Registry& registry, const Camera& camera, Window& window) {
 	RequireComponent<MeshComponent>();
@@ -204,7 +205,7 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 		"CullingPass",
 		true,
 		std::make_unique<CullingPass>(),
-		{},
+		{"sceneBegin"},
 		{"OpaqueCommands", "UnlitCommands", "BlendCommands", "DeferredCommands", "DebugCommands"});
 	mGraph.addPass(
 		"PostProcessPass",
@@ -212,6 +213,13 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 		std::make_unique<PostProcessPass>(),
 		{"sceneBuffer"},
 		{"frameBuffer"});
+	mGraph.addPass(
+		"BeginScenePass",
+		true,
+		std::make_unique<BeginScenePass>(),
+		{},
+		{"sceneBegin"});
+
 	mGraph.compile();
 	mGraph.configure(mRenderCtx, eventBus);
 }

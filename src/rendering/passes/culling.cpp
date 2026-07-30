@@ -38,6 +38,7 @@ void CullingPass::configure(const RenderContext& ctx, const FrameGraph& graph, E
 	mSkyboxGroups = std::span(
 		ctx.queueRegistry->get<RenderGroup>("skybox").data(),
 		ctx.queueRegistry->get<RenderGroup>("skybox").size());
+
 	mOpaqueCommands = &ctx.queueRegistry->get<DrawCommand>("OpaqueCommands");
 	mUnlitCommands = &ctx.queueRegistry->get<DrawCommand>("UnlitCommands");
 	mBlendCommands = &ctx.queueRegistry->get<DrawCommand>("BlendCommands");
@@ -48,9 +49,6 @@ void CullingPass::configure(const RenderContext& ctx, const FrameGraph& graph, E
 }
 
 void CullingPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
-	mEncoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
-	mEncoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
-
 	const auto frustum = ctx.camera->generateFrustum();
 
 	cullScene(ctx, frustum, mOpaqueGroups, *mOpaqueCommands);

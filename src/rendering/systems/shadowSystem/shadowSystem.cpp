@@ -141,8 +141,15 @@ void ShadowSystem::perspectiveShadowPass() {
 		if (!light || !light->castShadow)
 			continue;
 
-		mPersShadow->render(*mCtx, mEncoder, mPipelines[0], frameBuffer, light->direction, light->position,
-		                    light->outerCutOff, i);
+		mPersShadow->render(
+			*mCtx,
+			mEncoder,
+			mPipelines[0],
+			frameBuffer,
+			light->direction,
+			light->position,
+			light->outerCutOff,
+			i);
 		mGPUData.persLightSpaceMatrix[i] = mPersShadow->lightSpaceMatrix(i);
 	}
 
@@ -155,7 +162,6 @@ void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
 	perspectiveShadowPass();
 
 	mEncoder.setCullMode(CullMode::Back);
-	mEncoder.setViewport(0, 0, mWidth, mHeight);
 
 	mUBO.bind();
 	mUBO.setData(&mGPUData, sizeof(ShadowData), 0);

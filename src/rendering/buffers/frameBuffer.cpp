@@ -71,7 +71,6 @@ TextureHandle FrameBuffer::texture(uint32_t index) const {
 
 void FrameBuffer::bind() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
-	glViewport(0, 0, mWidth, mHeight);
 }
 
 void FrameBuffer::unbind() const {

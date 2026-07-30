@@ -5,7 +5,6 @@
 #include "enumUtils.hpp"
 #include "graphicsPipeline.h"
 #include "buffers/frameBuffer.h"
-#include "buffers/vertexBuffer.h"
 #include "material/material.hpp"
 
 enum class BlitMask : uint32_t {
@@ -18,9 +17,14 @@ enum class ClearMask : uint32_t {
 	Color = GL_COLOR_BUFFER_BIT,
 	Depth = GL_DEPTH_BUFFER_BIT,
 	Stencil = GL_STENCIL_BUFFER_BIT,
+	None = 0
 };
 
 constexpr ClearMask operator|(const ClearMask lhs, const ClearMask rhs) {
+	return static_cast<ClearMask>(toUnderlying(lhs) | toUnderlying(rhs));
+}
+
+constexpr ClearMask operator|=(const ClearMask lhs, const ClearMask rhs) {
 	return static_cast<ClearMask>(toUnderlying(lhs) | toUnderlying(rhs));
 }
 
@@ -30,6 +34,8 @@ class FrameGraph;
 class GraphicsEncoder {
 public:
 	GraphicsEncoder() = default;
+
+	void beginRendering(const RenderingInfo& info) const;
 
 	void bindFrameBuffer() const;
 
@@ -59,7 +65,7 @@ public:
 
 	void drawInstanced(size_t indexCount, uint32_t count) const;
 
-	void setViewport(int32_t x, int32_t y, int32_t width, int32_t height) const;
+	void setViewport(Viewport viewport) const;
 
 	void setCullMode(CullMode mode);
 
