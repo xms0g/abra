@@ -47,19 +47,19 @@ void SSAOPass::configure(const RenderContext& ctx, const FrameGraph& graph, Even
 			{.code = ShaderLoader::load("ssao.frag"), .stage = ShaderStageType::Fragment}
 		},
 		.samplers = {
-			{.name = "gDepthMap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureSlot")},
-			{.name = "gNormal", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot")},
-			{.name = "texNoise", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.noise.textureSlot")},
-			{.name = "kernelSize", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.kernelSize")}
+			{.name = "gDepthMap", .slot = CONFIG_MANAGER.get<int32_t>("gBuffer.depth.textureSlot")},
+			{.name = "gNormal", .slot = CONFIG_MANAGER.get<int32_t>("gBuffer.normal.textureSlot")},
+			{.name = "texNoise", .slot = CONFIG_MANAGER.get<int32_t>("ssao.noise.textureSlot")},
+			{.name = "kernelSize", .slot = CONFIG_MANAGER.get<int32_t>("ssao.kernelSize")}
 		},
 		.uniforms = {
 			{
-				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name"),
-				.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"),
+				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
+				.binding = CONFIG_MANAGER.get<uint32_t>("camera.ubo_binding"),
 			},
 			{
-				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("ssao.block_name"),
-				.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("ssao.ubo_binding"),
+				.name = CONFIG_MANAGER.get<std::string>("ssao.block_name"),
+				.binding = CONFIG_MANAGER.get<uint32_t>("ssao.ubo_binding"),
 			}
 		}
 	};
@@ -87,12 +87,12 @@ void SSAOPass::configure(const RenderContext& ctx, const FrameGraph& graph, Even
 	const auto& gBuffer = graph.getResource("gBuffer");
 
 	mEncoder.bindTexture(
-		gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureIdx")),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureSlot"));
+		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.depth.textureIdx")),
+		CONFIG_MANAGER.get<int32_t>("gBuffer.depth.textureSlot"));
 
 	mEncoder.bindTexture(
-		gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureIdx")),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot"));
+		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.textureIdx")),
+		CONFIG_MANAGER.get<int32_t>("gBuffer.normal.textureSlot"));
 
 	mQuad = std::make_unique<Model::Quad>();
 }
@@ -124,7 +124,7 @@ void SSAOPass::blur(const FrameGraph& graph) {
 }
 
 void SSAOPass::createKernel() {
-	const int32_t kernelSize = CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.kernelSize");
+	const int32_t kernelSize = CONFIG_MANAGER.get<int32_t>("ssao.kernelSize");
 
 	std::vector<glm::vec4> kernel;
 	kernel.resize(kernelSize);
@@ -142,22 +142,22 @@ void SSAOPass::createKernel() {
 	}
 
 	data.rbi = glm::vec4(
-		CONFIG_MANAGER_INSTANCE.get<float>("ssao.radius"),
-		CONFIG_MANAGER_INSTANCE.get<float>("ssao.bias"),
-		CONFIG_MANAGER_INSTANCE.get<float>("ssao.intensity"),
+		CONFIG_MANAGER.get<float>("ssao.radius"),
+		CONFIG_MANAGER.get<float>("ssao.bias"),
+		CONFIG_MANAGER.get<float>("ssao.intensity"),
 		0.0f);
 	data.resolution = glm::vec4(
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width"),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height"), 0.0f, 0.0f);
+		CONFIG_MANAGER.get<int32_t>("window.width"),
+		CONFIG_MANAGER.get<int32_t>("window.height"), 0.0f, 0.0f);
 
-	mUBO = UniformBuffer{DYNAMIC, sizeof(SSAOData), CONFIG_MANAGER_INSTANCE.get<uint32_t>("ssao.ubo_binding")};
+	mUBO = UniformBuffer{DYNAMIC, sizeof(SSAOData), CONFIG_MANAGER.get<uint32_t>("ssao.ubo_binding")};
 	mUBO.bind();
 	mUBO.setData(&data, sizeof(SSAOData), 0);
 	mUBO.unbind();
 }
 
 void SSAOPass::createNoiseTexture() {
-	const int32_t textureSize = CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.noise.textureSize");
+	const int32_t textureSize = CONFIG_MANAGER.get<int32_t>("ssao.noise.textureSize");
 
 	std::vector<float> noise;
 	noise.resize(textureSize * textureSize);
@@ -167,5 +167,5 @@ void SSAOPass::createNoiseTexture() {
 
 	mEncoder.bindTexture(
 		{.id = mNoiseTexture.id, .target = mNoiseTexture.target},
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.noise.textureSlot"));
+		CONFIG_MANAGER.get<int32_t>("ssao.noise.textureSlot"));
 }

@@ -50,22 +50,22 @@ void InstancedOpaquePass::configure(const RenderContext& ctx, const FrameGraph& 
 			{.name = "material.texture_albedo", .slot = 0},
 			{.name = "material.texture_specular", .slot = 1},
 			{.name = "material.texture_normal", .slot = 2},
-			{.name = "shadowMap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot")},
-			{.name = "shadowCubemap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot") + 1},
-			{.name = "persShadowMap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot") + 2}
+			{.name = "shadowMap", .slot = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot")},
+			{.name = "shadowCubemap", .slot = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot") + 1},
+			{.name = "persShadowMap", .slot = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot") + 2}
 		},
 		.uniforms = {
 			{
-				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name"),
-				.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"),
+				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
+				.binding = CONFIG_MANAGER.get<uint32_t>("camera.ubo_binding"),
 			},
 			{
-				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("light.block_name"),
-				.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("light.ubo_binding"),
+				.name = CONFIG_MANAGER.get<std::string>("light.block_name"),
+				.binding = CONFIG_MANAGER.get<uint32_t>("light.ubo_binding"),
 			},
 			{
-				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("shadow.block_name"),
-				.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("shadow.ubo_binding"),
+				.name = CONFIG_MANAGER.get<std::string>("shadow.block_name"),
+				.binding = CONFIG_MANAGER.get<uint32_t>("shadow.ubo_binding"),
 			}
 		}
 	};
@@ -79,7 +79,7 @@ void InstancedOpaquePass::configure(const RenderContext& ctx, const FrameGraph& 
 		graph.getResource("spot").texture()
 	};
 
-	mEncoder.bindTextures(shadowTextures, CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot"));
+	mEncoder.bindTextures(shadowTextures, CONFIG_MANAGER.get<int32_t>("shadow.texture_slot"));
 
 	mObjects = std::span(
 		ctx.queueRegistry->get<RenderInstanceGroup>("opaqueInstanced").data(),

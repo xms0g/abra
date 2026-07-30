@@ -43,8 +43,8 @@ void ForwardUnlitPass::configure(const RenderContext& ctx, const FrameGraph& gra
 		.samplers = {},
 		.uniforms = {
 			{
-				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name"),
-				.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"),
+				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
+				.binding = CONFIG_MANAGER.get<uint32_t>("camera.ubo_binding"),
 			}
 		}
 	};

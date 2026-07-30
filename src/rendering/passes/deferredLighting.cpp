@@ -43,30 +43,30 @@ void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph&
 			{.code = ShaderLoader::load("deferred/lighting.frag"), .stage = ShaderStageType::Fragment},
 		},
 		.samplers = {
-			{.name = "gPosition", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureSlot")},
-			{.name = "gNormal", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureSlot")},
-			{.name = "gAlbedo", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureSlot")},
-			{.name = "gORM", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureSlot")},
-			{.name = "ssao", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.textureSlot")},
-			{.name = "irradianceMap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.textureSlot")},
-			{.name = "prefilterMap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.textureSlot")},
-			{.name = "brdfLUT", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.brdfLUT.textureSlot")},
-			{.name = "shadowMap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot")},
-			{.name = "shadowCubemap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot") + 1},
-			{.name = "persShadowMap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot") + 2}
+			{.name = "gPosition", .slot = CONFIG_MANAGER.get<int32_t>("gBuffer.position.textureSlot")},
+			{.name = "gNormal", .slot = CONFIG_MANAGER.get<int32_t>("gBuffer.normal.textureSlot")},
+			{.name = "gAlbedo", .slot = CONFIG_MANAGER.get<int32_t>("gBuffer.albedo.textureSlot")},
+			{.name = "gORM", .slot = CONFIG_MANAGER.get<int32_t>("gBuffer.orm.textureSlot")},
+			{.name = "ssao", .slot = CONFIG_MANAGER.get<int32_t>("ssao.textureSlot")},
+			{.name = "irradianceMap", .slot = CONFIG_MANAGER.get<int32_t>("PBR.irradianceMap.textureSlot")},
+			{.name = "prefilterMap", .slot = CONFIG_MANAGER.get<int32_t>("PBR.prefilterMap.textureSlot")},
+			{.name = "brdfLUT", .slot = CONFIG_MANAGER.get<int32_t>("PBR.brdfLUT.textureSlot")},
+			{.name = "shadowMap", .slot = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot")},
+			{.name = "shadowCubemap", .slot = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot") + 1},
+			{.name = "persShadowMap", .slot = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot") + 2}
 		},
 		.uniforms = {
 			{
-				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name"),
-				.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"),
+				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
+				.binding = CONFIG_MANAGER.get<uint32_t>("camera.ubo_binding"),
 			},
 			{
-				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("light.block_name"),
-				.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("light.ubo_binding"),
+				.name = CONFIG_MANAGER.get<std::string>("light.block_name"),
+				.binding = CONFIG_MANAGER.get<uint32_t>("light.ubo_binding"),
 			},
 			{
-				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("shadow.block_name"),
-				.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("shadow.ubo_binding"),
+				.name = CONFIG_MANAGER.get<std::string>("shadow.block_name"),
+				.binding = CONFIG_MANAGER.get<uint32_t>("shadow.ubo_binding"),
 			}
 		}
 	};
@@ -76,16 +76,16 @@ void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph&
 
 	const auto& gBuffer = graph.getResource("gBuffer");
 	const auto gbufferTextures = std::vector{
-		gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureIdx")),
-		gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.normal.textureIdx")),
-		gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.albedo.textureIdx")),
-		gBuffer.texture(CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.orm.textureIdx"))
+		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.textureIdx")),
+		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.textureIdx")),
+		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.albedo.textureIdx")),
+		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.orm.textureIdx"))
 	};
 
 	const auto pbrTextures = std::vector{
-		RESOURCE_MANAGER_INSTANCE.get<FrameBuffer>("irradianceMap")->texture(),
-		RESOURCE_MANAGER_INSTANCE.get<FrameBuffer>("prefilterMap")->texture(),
-		RESOURCE_MANAGER_INSTANCE.get<FrameBuffer>("brdfLUT")->texture()
+		RESOURCE_MANAGER.get<FrameBuffer>("irradianceMap")->texture(),
+		RESOURCE_MANAGER.get<FrameBuffer>("prefilterMap")->texture(),
+		RESOURCE_MANAGER.get<FrameBuffer>("brdfLUT")->texture()
 	};
 
 	const auto shadowTextures = std::vector{
@@ -94,12 +94,12 @@ void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph&
 		graph.getResource("spot").texture()
 	};
 
-	mEncoder.bindTextures(gbufferTextures, CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureSlot"));
-	mEncoder.bindTextures(pbrTextures, CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.textureSlot"));
-	mEncoder.bindTextures(shadowTextures, CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot"));
+	mEncoder.bindTextures(gbufferTextures, CONFIG_MANAGER.get<int32_t>("gBuffer.position.textureSlot"));
+	mEncoder.bindTextures(pbrTextures, CONFIG_MANAGER.get<int32_t>("PBR.irradianceMap.textureSlot"));
+	mEncoder.bindTextures(shadowTextures, CONFIG_MANAGER.get<int32_t>("shadow.texture_slot"));
 	mEncoder.bindTexture(
 		graph.getResource("ssaoBlur").texture(),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.textureSlot"));
+		CONFIG_MANAGER.get<int32_t>("ssao.textureSlot"));
 	mQuad = std::make_unique<Model::Quad>();
 }
 

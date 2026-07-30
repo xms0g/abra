@@ -44,33 +44,33 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, const FrameGraph&
 		.samplers = {
 			{
 				.name = "material.texture_albedo",
-				.slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.albedo.textureSlot")
+				.slot = CONFIG_MANAGER.get<int32_t>("PBR.albedo.textureSlot")
 			},
 			{
 				.name = "material.texture_normal",
-				.slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.normal.textureSlot")
+				.slot = CONFIG_MANAGER.get<int32_t>("PBR.normal.textureSlot")
 			},
 			{
 				.name = "material.texture_roughnessMetallic",
-				.slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.roughnessMetallic.textureSlot")
+				.slot = CONFIG_MANAGER.get<int32_t>("PBR.roughnessMetallic.textureSlot")
 			},
 			{
 				.name = "material.texture_ao",
-				.slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.ao.textureSlot")
+				.slot = CONFIG_MANAGER.get<int32_t>("PBR.ao.textureSlot")
 			},
 			{
 				.name = "material.texture_emissive",
-				.slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.emissive.textureSlot")
+				.slot = CONFIG_MANAGER.get<int32_t>("PBR.emissive.textureSlot")
 			},
 			{
 				.name = "material.texture_height",
-				.slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.height.textureSlot")
+				.slot = CONFIG_MANAGER.get<int32_t>("PBR.height.textureSlot")
 			},
 		},
 		.uniforms = {
 			{
-				.name = CONFIG_MANAGER_INSTANCE.get<std::string>("camera.block_name"),
-				.binding = CONFIG_MANAGER_INSTANCE.get<uint32_t>("camera.ubo_binding"),
+				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
+				.binding = CONFIG_MANAGER.get<uint32_t>("camera.ubo_binding"),
 			},
 		}
 	};

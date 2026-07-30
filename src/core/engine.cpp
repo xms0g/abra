@@ -19,9 +19,9 @@ void Engine::init(Registry& registry) {
 	mEventBus = std::make_unique<EventBus>();
 
 	mWindow = std::make_unique<Window>(
-		CONFIG_MANAGER_INSTANCE.get<std::string>("window.title"),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("msaa.sample_count"),
-		CONFIG_MANAGER_INSTANCE.get<bool>("window.fullscreen"));
+		CONFIG_MANAGER.get<std::string>("window.title"),
+		CONFIG_MANAGER.get<int32_t>("msaa.sample_count"),
+		CONFIG_MANAGER.get<bool>("window.fullscreen"));
 
 	mGuiSystem = &registry.addSystem<GuiSystem>();
 	mRenderer = &registry.addSystem<Renderer>(registry, *mCamera, *mWindow);

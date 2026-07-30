@@ -14,13 +14,13 @@
 #include "../../../rendering/graphicsPipeline.h"
 
 DirectionalShadow::DirectionalShadow(const RenderContext& ctx) {
-	mHeight = CONFIG_MANAGER_INSTANCE.get<float>("shadow.directional.height");
-	mRight = CONFIG_MANAGER_INSTANCE.get<float>("shadow.directional.right");
-	mLeft = CONFIG_MANAGER_INSTANCE.get<float>("shadow.directional.left");
-	mTop = CONFIG_MANAGER_INSTANCE.get<float>("shadow.directional.top");
-	mBottom = CONFIG_MANAGER_INSTANCE.get<float>("shadow.directional.bottom");
-	mNear = CONFIG_MANAGER_INSTANCE.get<float>("shadow.directional.nearPlane");
-	mFar = CONFIG_MANAGER_INSTANCE.get<float>("shadow.directional.farPlane");
+	mHeight = CONFIG_MANAGER.get<float>("shadow.directional.height");
+	mRight = CONFIG_MANAGER.get<float>("shadow.directional.right");
+	mLeft = CONFIG_MANAGER.get<float>("shadow.directional.left");
+	mTop = CONFIG_MANAGER.get<float>("shadow.directional.top");
+	mBottom = CONFIG_MANAGER.get<float>("shadow.directional.bottom");
+	mNear = CONFIG_MANAGER.get<float>("shadow.directional.nearPlane");
+	mFar = CONFIG_MANAGER.get<float>("shadow.directional.farPlane");
 
 	mObjects = std::span(
 		ctx.queueRegistry->get<RenderGroup>("shadow").data(),

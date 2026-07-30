@@ -25,11 +25,10 @@ int main(int argc, char **argv) {
 		Registry registry;
 		Engine engine;
 
-		CONFIG_MANAGER_INSTANCE.load("config.toml");
+		CONFIG_MANAGER.load("config.toml");
 		engine.init(registry);
 
 		SceneLoader::loadScene(registry, sceneName);
-		RESOURCE_MANAGER_INSTANCE.createBuffers();
 
 		registry.update();
 

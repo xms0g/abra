@@ -20,9 +20,9 @@ LightSystem::LightSystem() {
 }
 
 void LightSystem::configure(RenderContext& ctx, EventBus& eventBus) {
-	mDirLights.reserve(CONFIG_MANAGER_INSTANCE.get<int32_t>("light.max_directional"));
-	mPointLights.reserve(CONFIG_MANAGER_INSTANCE.get<int32_t>("light.max_point"));
-	mSpotLights.reserve(CONFIG_MANAGER_INSTANCE.get<int32_t>("light.max_spot"));
+	mDirLights.reserve(CONFIG_MANAGER.get<int32_t>("light.max_directional"));
+	mPointLights.reserve(CONFIG_MANAGER.get<int32_t>("light.max_point"));
+	mSpotLights.reserve(CONFIG_MANAGER.get<int32_t>("light.max_spot"));
 
 	mCtx = &ctx;
 	mEventBus = &eventBus;
@@ -48,7 +48,7 @@ void LightSystem::configure(RenderContext& ctx, EventBus& eventBus) {
 	mUBO = UniformBuffer(
 		DYNAMIC,
 		sizeof(PackedLights),
-		CONFIG_MANAGER_INSTANCE.get<uint32_t>("light.ubo_binding"));
+		CONFIG_MANAGER.get<uint32_t>("light.ubo_binding"));
 
 	updateLightUBO();
 }

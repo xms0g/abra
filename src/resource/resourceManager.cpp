@@ -54,7 +54,7 @@ void ResourceManager::uploadModelsToGPU() {
 				// Handle HDR to Cubemap
 				if (material.textures.size() == 1) {
 					const std::string path = fs::path(
-						CONFIG_MANAGER_INSTANCE.get<std::string>("path.asset") + material.textures.front().path);
+						CONFIG_MANAGER.get<std::string>("path.asset") + material.textures.front().path);
 
 					uint32_t id = createEnvMap(path);
 
@@ -66,7 +66,7 @@ void ResourceManager::uploadModelsToGPU() {
 					paths.reserve(material.textures.size());
 
 					for (auto& [id, type, target, path]: material.textures) {
-						paths.push_back(fs::path(CONFIG_MANAGER_INSTANCE.get<std::string>("path.asset") + path));
+						paths.push_back(fs::path(CONFIG_MANAGER.get<std::string>("path.asset") + path));
 					}
 
 					material.textures.clear();
@@ -83,7 +83,7 @@ void ResourceManager::uploadModelsToGPU() {
 				}
 
 				id = Texture::load(
-					fs::path(CONFIG_MANAGER_INSTANCE.get<std::string>("path.asset") + path),
+					fs::path(CONFIG_MANAGER.get<std::string>("path.asset") + path),
 					material.flags,
 					type == aiTextureType_DIFFUSE || type == aiTextureType_EMISSIVE);
 
@@ -101,7 +101,7 @@ void ResourceManager::loadModel(const size_t entityID, const std::string& file) 
 	// read file via ASSIMP
 	Assimp::Importer importer;
 
-	const std::string path = fs::path(CONFIG_MANAGER_INSTANCE.get<std::string>("path.asset") + file);
+	const std::string path = fs::path(CONFIG_MANAGER.get<std::string>("path.asset") + file);
 	const aiScene* scene = importer.ReadFile(
 		path,
 		aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -335,8 +335,8 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 	auto encoder = GraphicsEncoder{};
 
 	auto envMap = std::make_unique<FrameBuffer>(
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.envMap.size"),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.envMap.size"));
+		CONFIG_MANAGER.get<int32_t>("PBR.envMap.size"),
+		CONFIG_MANAGER.get<int32_t>("PBR.envMap.size"));
 	envMap->withTextureCubeMap(true)
 			.withRenderBufferDepth(InternalFormat::Depth24)
 			.checkStatus();
@@ -416,8 +416,8 @@ void ResourceManager::createIrradianceMap() {
 	auto encoder = GraphicsEncoder{};
 
 	auto irradianceMap = std::make_unique<FrameBuffer>(
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.size"),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.size"));
+		CONFIG_MANAGER.get<int32_t>("PBR.irradianceMap.size"),
+		CONFIG_MANAGER.get<int32_t>("PBR.irradianceMap.size"));
 	irradianceMap->withTextureCubeMap(false)
 			.withRenderBufferDepth(InternalFormat::Depth24)
 			.checkStatus();
@@ -493,8 +493,8 @@ void ResourceManager::createPrefilterMap() {
 	auto encoder = GraphicsEncoder{};
 
 	auto prefilterMap = std::make_unique<FrameBuffer>(
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.size"),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.size"));
+		CONFIG_MANAGER.get<int32_t>("PBR.prefilterMap.size"),
+		CONFIG_MANAGER.get<int32_t>("PBR.prefilterMap.size"));
 	prefilterMap->withTextureCubeMap(true)
 			.withRenderBufferDepth(InternalFormat::Depth24)
 			.checkStatus();
@@ -514,7 +514,7 @@ void ResourceManager::createPrefilterMap() {
 	encoder.bindPipeline(pipeline);
 	encoder.setUniform("projection", mCaptureProjection);
 	encoder.setUniform("resolution",
-	                   static_cast<float>(CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.envMap.size")));
+	                   static_cast<float>(CONFIG_MANAGER.get<int32_t>("PBR.envMap.size")));
 
 	encoder.bindTexture(envMapBuffer->texture(), 0);
 
@@ -524,7 +524,7 @@ void ResourceManager::createPrefilterMap() {
 	constexpr uint32_t mipLevels = 5;
 	for (int32_t i = 0; i < mipLevels; ++i) {
 		const int32_t mipSize = static_cast<int32_t>(
-			CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.size") * std::pow(0.5, i));
+			CONFIG_MANAGER.get<int32_t>("PBR.prefilterMap.size") * std::pow(0.5, i));
 		prefilterMapBuffer->resizeRenderBuffer(mipSize, mipSize);
 
 		const float roughness = static_cast<float>(i) / static_cast<float>(mipLevels - 1);
@@ -586,8 +586,8 @@ void ResourceManager::createBrdfLUT() {
 	auto encoder = GraphicsEncoder{};
 
 	auto brdfLUT = std::make_unique<FrameBuffer>(
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.brdfLUT.size"),
-		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.brdfLUT.size"));
+		CONFIG_MANAGER.get<int32_t>("PBR.brdfLUT.size"),
+		CONFIG_MANAGER.get<int32_t>("PBR.brdfLUT.size"));
 	brdfLUT->withTextureFP(BaseFormat::RG)
 			.checkStatus();
 

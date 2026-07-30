@@ -94,7 +94,7 @@ std::string ShaderStage::preprocess(const std::string& source, std::unordered_se
 				includedFiles.insert(includeFile);
 				// Load included file
 				result << preprocess(
-					fs::readFile(CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader") + includeFile),
+					fs::readFile(CONFIG_MANAGER.get<std::string>("path.shader") + includeFile),
 					includedFiles) << "\n";
 			}
 		} else {
@@ -222,6 +222,6 @@ void Uniform::setMat4Array(const uint32_t id, const std::string& name, const glm
 }
 
 std::string ShaderLoader::load(const std::string_view file) {
-	const std::filesystem::path root = CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader");
+	const std::filesystem::path root = CONFIG_MANAGER.get<std::string>("path.shader");
 	return fs::readFile(root / file);
 }

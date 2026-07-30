@@ -30,8 +30,8 @@ Window::Window(const std::string& title, const int multisamples, const bool full
 	SDL_DisplayMode displayMode;
 	SDL_GetCurrentDisplayMode(0, &displayMode);
 
-	CONFIG_MANAGER_INSTANCE.set<int32_t>("window.width", std::move(displayMode.w));
-	CONFIG_MANAGER_INSTANCE.set<int32_t>("window.height", std::move(displayMode.h));
+	CONFIG_MANAGER.set<int32_t>("window.width", std::move(displayMode.w));
+	CONFIG_MANAGER.set<int32_t>("window.height", std::move(displayMode.h));
 
 	mWindow = SDL_CreateWindow(
 		mTitle.c_str(),

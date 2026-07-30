@@ -11,12 +11,12 @@
 #include "../../../rendering/graphicsPipeline.h"
 
 OmnidirectionalShadow::OmnidirectionalShadow(const RenderContext& ctx) {
-	mWidth = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_width");
-	mHeight = CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.map_height");
+	mWidth = CONFIG_MANAGER.get<int32_t>("shadow.map_width");
+	mHeight = CONFIG_MANAGER.get<int32_t>("shadow.map_height");
 	mAspect = static_cast<float>(mWidth) / static_cast<float>(mHeight);
-	mNear = CONFIG_MANAGER_INSTANCE.get<float>("shadow.omnidirectional.nearPlane");
-	mFar = CONFIG_MANAGER_INSTANCE.get<float>("shadow.omnidirectional.farPlane");
-	mFovy = glm::radians(CONFIG_MANAGER_INSTANCE.get<float>("shadow.omnidirectional.fovy"));
+	mNear = CONFIG_MANAGER.get<float>("shadow.omnidirectional.nearPlane");
+	mFar = CONFIG_MANAGER.get<float>("shadow.omnidirectional.farPlane");
+	mFovy = glm::radians(CONFIG_MANAGER.get<float>("shadow.omnidirectional.fovy"));
 	mShadowProj = glm::perspective(mFovy, mAspect, mNear, mFar);
 	mShadowTransforms.resize(faces);
 	mObjects = std::span(
