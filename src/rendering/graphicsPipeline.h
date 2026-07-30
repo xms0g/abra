@@ -133,11 +133,11 @@ struct PipelineRenderingInfo {
 };
 
 struct PipelineState {
-	PipelinePrimitiveAssemblyState inputAssembly;
-	PipelineRasterizationState rasterization;
-	PipelineDepthStencilState depthStencil;
-	PipelineColorBlendState colorBlend;
-	PipelineTessellationState tessellation;
+	PipelinePrimitiveAssemblyState primitiveAssemblyState;
+	PipelineRasterizationState rasterizationState;
+	PipelineDepthStencilState depthStencilState;
+	PipelineColorBlendState colorBlendState;
+	PipelineTessellationState tessellationState;
 	Shader shader;
 };
 

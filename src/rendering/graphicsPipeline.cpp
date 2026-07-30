@@ -1,11 +1,11 @@
 #include "graphicsPipeline.h"
 
 GraphicsPipeline::GraphicsPipeline(PipelineRenderingInfo& renderingInfo) {
-	mState.inputAssembly = renderingInfo.primitiveAssemblyState;
-	mState.rasterization = renderingInfo.rasterizationState;
-	mState.depthStencil = renderingInfo.depthStencilState;
-	mState.colorBlend = renderingInfo.colorBlendState;
-	mState.tessellation = renderingInfo.tessellationState;
+	mState.primitiveAssemblyState = renderingInfo.primitiveAssemblyState;
+	mState.rasterizationState = renderingInfo.rasterizationState;
+	mState.depthStencilState = renderingInfo.depthStencilState;
+	mState.colorBlendState = renderingInfo.colorBlendState;
+	mState.tessellationState = renderingInfo.tessellationState;
 
 	for (const auto& info: renderingInfo.stages) {
 		ShaderStage stage{info};
