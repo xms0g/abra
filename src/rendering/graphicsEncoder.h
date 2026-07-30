@@ -41,7 +41,7 @@ public:
 
 	void unbindFrameBuffer() const;
 
-	void bindFrameBuffer(const FrameBuffer& fb) const;
+	void bindFrameBuffer(const FrameBuffer& frameBuffer) const;
 
 	void bindVertexArray(uint32_t vao) const;
 

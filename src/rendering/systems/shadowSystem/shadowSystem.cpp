@@ -19,8 +19,6 @@ ShadowSystem::~ShadowSystem() = default;
 void ShadowSystem::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
 	mCtx = &ctx;
 	mGraph = &graph;
-	mWidth = CONFIG_MANAGER_INSTANCE.get<int32_t>("window.width");
-	mHeight = CONFIG_MANAGER_INSTANCE.get<int32_t>("window.height");
 
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
@@ -113,7 +111,9 @@ void ShadowSystem::omnidirectionalShadowPass() {
 	if (lights.empty())
 		return;
 
-	mEncoder.bindFrameBuffer(mGraph->getResource("point"));
+	const auto& frameBuffer = mGraph->getResource("point");
+	mEncoder.bindFrameBuffer(frameBuffer);
+	mEncoder.setViewport({.x = 0, .y = 0, .width = frameBuffer.width(), .height = frameBuffer.height()});
 	mEncoder.clearFrameBuffer(ClearMask::Depth);
 
 	for (int32_t i = 0; i < lights.size(); ++i) {
@@ -134,6 +134,7 @@ void ShadowSystem::perspectiveShadowPass() {
 
 	const auto& frameBuffer = mGraph->getResource("spot");
 	mEncoder.bindFrameBuffer(frameBuffer);
+	mEncoder.setViewport({.x = 0, .y = 0, .width = frameBuffer.width(), .height = frameBuffer.height()});
 
 	for (int32_t i = 0; i < lights.size(); ++i) {
 		const auto& light = lights[i];

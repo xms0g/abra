@@ -9,12 +9,12 @@ void BeginScenePass::configure(const RenderContext& ctx, const FrameGraph& graph
 }
 
 void BeginScenePass::execute(const RenderContext& ctx, const FrameGraph& graph) {
-	auto& framebuffer = graph.getResource("sceneBuffer");
+	auto& frameBuffer = graph.getResource("sceneBuffer");
 
 	mEncoder.beginRendering({
-		.framebuffer = framebuffer,
+		.frameBuffer = frameBuffer,
 		.clearColor = true,
 		.clearDepth = true,
-		.viewport = {.x = 0, .y = 0, .width = framebuffer.width(), .height = framebuffer.height()}
+		.viewport = {.x = 0, .y = 0, .width = frameBuffer.width(), .height = frameBuffer.height()}
 	});
 }

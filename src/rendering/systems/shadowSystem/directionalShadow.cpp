@@ -49,7 +49,9 @@ void DirectionalShadow::render(
 	encoder.setUniform("lightSpaceMatrix", mLightSpaceMatrix);
 
 	// render scene from light's point of view
-	encoder.bindFrameBuffer(graph.getResource("directional"));
+	const auto& frameBuffer = graph.getResource("directional");
+	encoder.bindFrameBuffer(frameBuffer);
+	encoder.setViewport({.x = 0, .y = 0, .width = frameBuffer.width(), .height = frameBuffer.height()});
 	encoder.clearFrameBuffer(ClearMask::Depth);
 
 	for (const auto& [entityID, matBatch]: mObjects) {

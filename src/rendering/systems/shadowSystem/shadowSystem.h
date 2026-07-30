@@ -38,7 +38,6 @@ private:
 
 	ShadowData mGPUData;
 
-	int32_t mWidth{0}, mHeight{0};
 	const RenderContext* mCtx{nullptr};
 	const FrameGraph* mGraph{nullptr};
 	UniformBuffer mUBO;

@@ -92,7 +92,7 @@ struct Viewport {
 
 class FrameBuffer;
 struct RenderingInfo {
-	FrameBuffer& framebuffer;
+	FrameBuffer& frameBuffer;
 	bool clearColor{};
 	bool clearDepth{};
 	bool clearStencil{};

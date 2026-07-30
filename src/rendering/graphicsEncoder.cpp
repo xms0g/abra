@@ -16,7 +16,7 @@ GLu(PolygonMode)
 GLu(PolygonFace)
 
 void GraphicsEncoder::beginRendering(const RenderingInfo& info) const {
-	info.framebuffer.bind();
+	info.frameBuffer.bind();
 
 	ClearMask mask{ClearMask::None};
 	mask |= info.clearColor ? ClearMask::Color : ClearMask::None;
@@ -35,9 +35,8 @@ void GraphicsEncoder::unbindFrameBuffer() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void GraphicsEncoder::bindFrameBuffer(const FrameBuffer& fb) const {
-	fb.bind();
-	setViewport({.x = 0, .y = 0, .width = fb.width(), .height = fb.height()});
+void GraphicsEncoder::bindFrameBuffer(const FrameBuffer& frameBuffer) const {
+	frameBuffer.bind();
 }
 
 void GraphicsEncoder::bindVertexArray(const uint32_t vao) const {
