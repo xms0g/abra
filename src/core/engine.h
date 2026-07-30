@@ -27,7 +27,7 @@ private:
 	bool isRunning{true};
 
 	GuiSystem* mGuiSystem{nullptr};
-	Renderer* mRenderPipeline{nullptr};
+	Renderer* mRenderer{nullptr};
 	std::unique_ptr<Window> mWindow;
 	std::unique_ptr<Camera> mCamera;
 	std::unique_ptr<EventBus> mEventBus;

@@ -24,12 +24,12 @@ void Engine::init(Registry& registry) {
 		CONFIG_MANAGER_INSTANCE.get<bool>("window.fullscreen"));
 
 	mGuiSystem = &registry.addSystem<GuiSystem>();
-	mRenderPipeline = &registry.addSystem<Renderer>(registry, *mCamera, *mWindow);
+	mRenderer = &registry.addSystem<Renderer>(registry, *mCamera, *mWindow);
 }
 
 void Engine::configure() const {
 	mCamera->configure(*mEventBus);
-	mRenderPipeline->configure(*mCamera, *mEventBus);
+	mRenderer->configure(*mCamera, *mEventBus);
 }
 
 void Engine::run() {
@@ -43,7 +43,7 @@ void Engine::run() {
 		mCamera->update();
 		mGuiSystem->update(mDeltaTime);
 
-		mRenderPipeline->render();
+		mRenderer->render();
 		mGuiSystem->render(*mEventBus);
 		Renderer::drawGui();
 
