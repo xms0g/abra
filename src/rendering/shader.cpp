@@ -11,18 +11,17 @@
 
 GLu(ShaderStageType)
 
-ShaderStage::ShaderStage(const PipelineShaderStage& info) : type(info.type) {
-	const auto processedSource = preprocess(
-		fs::readFile(CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader") + info.fn));
+ShaderStage::ShaderStage(const PipelineShaderStage& info) : type(info.stage) {
+	const auto processedSource = preprocess(info.code);
 
-	handle = glCreateShader(toGLu(type));
+	handle = glCreateShader(toGLu(info.stage));
 
 	const char* ptr = processedSource.c_str();
 
 	glShaderSource(handle, 1, &ptr, nullptr);
 	glCompileShader(handle);
 
-	checkCompileErrors(info.fn);
+	checkCompileErrors(info.code);
 }
 
 ShaderStage::ShaderStage(ShaderStage&& other) noexcept
@@ -220,4 +219,13 @@ void Uniform::setMat4(const uint32_t id, const std::string& name, const glm::mat
 
 void Uniform::setMat4Array(const uint32_t id, const std::string& name, const glm::mat4* matrices, const size_t count) {
 	glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), count, GL_FALSE, glm::value_ptr(matrices[0]));
+}
+
+static std::string loadSource(const std::string_view file) {
+	const std::filesystem::path root = CONFIG_MANAGER_INSTANCE.get<std::string>("path.shader");
+	return fs::readFile(root / file);
+}
+
+std::string ShaderLoader::load(const std::string_view file) {
+	return loadSource(file);
 }

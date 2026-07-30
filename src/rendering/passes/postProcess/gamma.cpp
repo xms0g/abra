@@ -11,12 +11,12 @@ Gamma::Gamma(const std::string& name, const bool enabled)
 
 void Gamma::configure(const FrameGraph& graph) {
 	std::vector<PipelineShaderStage> stages;
-	stages.emplace_back("models/quad.vert", ShaderStageType::Vertex);
-	stages.emplace_back("post-processing/gamma.frag", ShaderStageType::Fragment);
+	stages.emplace_back(ShaderLoader::load("models/quad.vert"), ShaderStageType::Vertex);
+	stages.emplace_back(ShaderLoader::load("post-processing/gamma.frag"), ShaderStageType::Fragment);
 
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
 		stages,
-		{{.name = "screenTexture", .slot = 0}});
+{{.name = "screenTexture", .slot = 0}});
 }
 
 TextureHandle Gamma::render(

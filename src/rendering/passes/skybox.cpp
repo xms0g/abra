@@ -31,13 +31,13 @@ void SkyboxPass::configure(const RenderContext& ctx, const FrameGraph& graph, Ev
 	};
 
 	PipelineRenderingInfo info = {
-		.primitiveAssembly = primitiveAssemblyState,
-		.rasterization = rasterizationState,
-		.depthStencil = depthStencilState,
-		.colorBlend = colorBlendState,
+		.primitiveAssemblyState = primitiveAssemblyState,
+		.rasterizationState = rasterizationState,
+		.depthStencilState = depthStencilState,
+		.colorBlendState = colorBlendState,
 		.stages = {
-			{.fn = "skybox.vert", .type = ShaderStageType::Vertex},
-			{.fn = "skybox.frag", .type = ShaderStageType::Fragment}
+			{.code = ShaderLoader::load("skybox.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("skybox.frag"), .stage = ShaderStageType::Fragment},
 		},
 		.samplers = {
 			{.name = "skybox", .slot = 0},

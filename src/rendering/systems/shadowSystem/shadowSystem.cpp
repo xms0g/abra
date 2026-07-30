@@ -46,13 +46,13 @@ void ShadowSystem::configure(const RenderContext& ctx, const FrameGraph& graph, 
 	};
 
 	PipelineRenderingInfo depthInfo = {
-		.primitiveAssembly = primitiveAssemblyState,
-		.rasterization = rasterizationState,
-		.depthStencil = depthStencilState,
-		.colorBlend = colorBlendState,
+		.primitiveAssemblyState = primitiveAssemblyState,
+		.rasterizationState = rasterizationState,
+		.depthStencilState = depthStencilState,
+		.colorBlendState = colorBlendState,
 		.stages = {
-			{.fn = "depth/depth.vert", .type = ShaderStageType::Vertex},
-			{.fn = "depth/depth.frag", .type = ShaderStageType::Fragment}
+			{.code = ShaderLoader::load("depth/depth.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("depth/depth.frag"), .stage = ShaderStageType::Fragment},
 		},
 		.samplers = {},
 		.uniforms = {
@@ -64,14 +64,14 @@ void ShadowSystem::configure(const RenderContext& ctx, const FrameGraph& graph, 
 	};
 
 	PipelineRenderingInfo cubeDepthInfo = {
-		.primitiveAssembly = primitiveAssemblyState,
-		.rasterization = rasterizationState,
-		.depthStencil = depthStencilState,
-		.colorBlend = colorBlendState,
+		.primitiveAssemblyState = primitiveAssemblyState,
+		.rasterizationState = rasterizationState,
+		.depthStencilState = depthStencilState,
+		.colorBlendState = colorBlendState,
 		.stages = {
-			{.fn = "depth/depthCubemap.vert", .type = ShaderStageType::Vertex},
-			{.fn = "depth/depthCubemap.frag", .type = ShaderStageType::Fragment},
-			{.fn = "depth/depthCubemap.geom", .type = ShaderStageType::Geometry},
+			{.code = ShaderLoader::load("depth/depthCubemap.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("depth/depthCubemap.frag"), .stage = ShaderStageType::Fragment},
+			{.code = ShaderLoader::load("depth/depthCubemap.geom"), .stage = ShaderStageType::Geometry}
 		},
 		.samplers = {},
 		.uniforms = {}

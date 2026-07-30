@@ -36,16 +36,16 @@ void TerrainPass::configure(const RenderContext& ctx, const FrameGraph& graph, E
 	};
 
 	PipelineRenderingInfo info = {
-		.primitiveAssembly = primitiveAssemblyState,
-		.rasterization = rasterizationState,
-		.depthStencil = depthStencilState,
-		.colorBlend = colorBlendState,
-		.tessellation = tessellationState,
+		.primitiveAssemblyState = primitiveAssemblyState,
+		.rasterizationState = rasterizationState,
+		.depthStencilState = depthStencilState,
+		.colorBlendState = colorBlendState,
+		.tessellationState = tessellationState,
 		.stages = {
-			{.fn = "models/terrain.vert", .type = ShaderStageType::Vertex},
-			{.fn = "models/terrain.frag", .type = ShaderStageType::Fragment},
-			{.fn = "models/terrain.tcs", .type = ShaderStageType::TessControl},
-			{.fn = "models/terrain.tes", .type = ShaderStageType::TessEvaluation},
+			{.code = ShaderLoader::load("models/terrain.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("models/terrain.frag"), .stage = ShaderStageType::Fragment},
+			{.code = ShaderLoader::load("models/terrain.tcs"), .stage = ShaderStageType::TessControl},
+			{.code = ShaderLoader::load("models/terrain.tes"), .stage = ShaderStageType::TessEvaluation},
 		},
 		.samplers = {
 			{.name = "material.texture_height", .slot = 0},

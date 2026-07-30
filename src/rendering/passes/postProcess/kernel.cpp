@@ -12,8 +12,8 @@ Kernel::Kernel(const std::string& name, const float* kernel, const bool enabled)
 
 void Kernel::configure(const FrameGraph& graph) {
 	std::vector<PipelineShaderStage> stages;
-	stages.emplace_back("models/quad.vert", ShaderStageType::Vertex);
-	stages.emplace_back("post-processing/kernel.frag", ShaderStageType::Fragment);
+	stages.emplace_back(ShaderLoader::load("models/quad.vert"), ShaderStageType::Vertex);
+	stages.emplace_back(ShaderLoader::load("post-processing/kernel.frag"), ShaderStageType::Fragment);
 
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
 		stages,

@@ -39,12 +39,12 @@ void PostProcessPass::configure(const RenderContext& ctx, const FrameGraph& grap
 	}
 
 	std::vector<PipelineShaderStage> stages;
-	stages.emplace_back("models/quad.vert", ShaderStageType::Vertex);
-	stages.emplace_back("models/quad.frag", ShaderStageType::Fragment);
+	stages.emplace_back(ShaderLoader::load("models/quad.vert"), ShaderStageType::Vertex);
+	stages.emplace_back(ShaderLoader::load("models/quad.frag"), ShaderStageType::Fragment);
 
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
 		stages,
-		{{.name = "screenTexture", .slot = 0}});
+{{.name = "screenTexture", .slot = 0}});
 
 	mEncoder = GraphicsEncoder{};
 	mQuad = std::make_unique<Model::Quad>();

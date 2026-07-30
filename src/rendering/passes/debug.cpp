@@ -33,14 +33,14 @@ void DebugPass::configure(const RenderContext& ctx, const FrameGraph& graph, Eve
 	};
 
 	PipelineRenderingInfo normalInfo = {
-		.primitiveAssembly = primitiveAssemblyState,
-		.rasterization = rasterizationState,
-		.depthStencil = depthStencilState,
-		.colorBlend = colorBlendState,
+		.primitiveAssemblyState = primitiveAssemblyState,
+		.rasterizationState = rasterizationState,
+		.depthStencilState = depthStencilState,
+		.colorBlendState = colorBlendState,
 		.stages = {
-			{.fn = "debug/normal.vert", .type = ShaderStageType::Vertex},
-			{.fn = "debug/normal.frag", .type = ShaderStageType::Fragment},
-			{.fn = "debug/normal.geom", .type = ShaderStageType::Geometry}
+			{.code = ShaderLoader::load("debug/normal.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("debug/normal.frag"), .stage = ShaderStageType::Fragment},
+			{.code = ShaderLoader::load("debug/normal.geom"), .stage = ShaderStageType::Geometry},
 		},
 		.samplers = {},
 		.uniforms = {
@@ -52,14 +52,14 @@ void DebugPass::configure(const RenderContext& ctx, const FrameGraph& graph, Eve
 	};
 
 	PipelineRenderingInfo wireframeInfo = {
-		.primitiveAssembly = primitiveAssemblyState,
-		.rasterization = rasterizationState,
-		.depthStencil = depthStencilState,
-		.colorBlend = colorBlendState,
+		.primitiveAssemblyState = primitiveAssemblyState,
+		.rasterizationState = rasterizationState,
+		.depthStencilState = depthStencilState,
+		.colorBlendState = colorBlendState,
 		.stages = {
-			{.fn = "debug/wireframe.vert", .type = ShaderStageType::Vertex},
-			{.fn = "debug/wireframe.frag", .type = ShaderStageType::Fragment},
-			{.fn = "debug/wireframe.geom", .type = ShaderStageType::Geometry},
+			{.code = ShaderLoader::load("debug/wireframe.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("debug/wireframe.frag"), .stage = ShaderStageType::Fragment},
+			{.code = ShaderLoader::load("debug/wireframe.geom"), .stage = ShaderStageType::Geometry},
 		},
 		.samplers = {},
 		.uniforms = {

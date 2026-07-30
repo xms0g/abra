@@ -317,13 +317,13 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 	};
 
 	PipelineRenderingInfo info = {
-		.primitiveAssembly = primitiveAssemblyState,
-		.rasterization = rasterizationState,
-		.depthStencil = depthStencilState,
-		.colorBlend = colorBlendState,
+		.primitiveAssemblyState = primitiveAssemblyState,
+		.rasterizationState = rasterizationState,
+		.depthStencilState = depthStencilState,
+		.colorBlendState = colorBlendState,
 		.stages = {
-			{.fn = "pbr/cubemap.vert", .type = ShaderStageType::Vertex},
-			{.fn = "pbr/equirectangularToCube.frag", .type = ShaderStageType::Fragment}
+			{.code = ShaderLoader::load("pbr/cubemap.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("pbr/equirectangularToCube.frag"), .stage = ShaderStageType::Fragment}
 		},
 		.samplers = {
 			{.name = "equirectangularMap", .slot = 0}
@@ -400,13 +400,13 @@ void ResourceManager::createIrradianceMap() {
 	};
 
 	PipelineRenderingInfo info = {
-		.primitiveAssembly = primitiveAssemblyState,
-		.rasterization = rasterizationState,
-		.depthStencil = depthStencilState,
-		.colorBlend = colorBlendState,
+		.primitiveAssemblyState = primitiveAssemblyState,
+		.rasterizationState = rasterizationState,
+		.depthStencilState = depthStencilState,
+		.colorBlendState = colorBlendState,
 		.stages = {
-			{.fn = "pbr/cubemap.vert", .type = ShaderStageType::Vertex},
-			{.fn = "pbr/irradianceConv.frag", .type = ShaderStageType::Fragment}
+			{.code = ShaderLoader::load("pbr/cubemap.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("pbr/irradianceConv.frag"), .stage = ShaderStageType::Fragment}
 		},
 		.samplers = {
 			{.name = "environmentMap", .slot = 0}
@@ -479,13 +479,13 @@ void ResourceManager::createPrefilterMap() {
 	};
 
 	PipelineRenderingInfo info = {
-		.primitiveAssembly = primitiveAssemblyState,
-		.rasterization = rasterizationState,
-		.depthStencil = depthStencilState,
-		.colorBlend = colorBlendState,
+		.primitiveAssemblyState = primitiveAssemblyState,
+		.rasterizationState = rasterizationState,
+		.depthStencilState = depthStencilState,
+		.colorBlendState = colorBlendState,
 		.stages = {
-			{.fn = "pbr/cubemap.vert", .type = ShaderStageType::Vertex},
-			{.fn = "pbr/prefilter.frag", .type = ShaderStageType::Fragment}
+			{.code = ShaderLoader::load("pbr/cubemap.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("pbr/prefilter.frag"), .stage = ShaderStageType::Fragment}
 		},
 		.samplers = {
 			{.name = "environmentMap", .slot = 0}
@@ -573,13 +573,13 @@ void ResourceManager::createBrdfLUT() {
 	};
 
 	PipelineRenderingInfo info = {
-		.primitiveAssembly = primitiveAssemblyState,
-		.rasterization = rasterizationState,
-		.depthStencil = depthStencilState,
-		.colorBlend = colorBlendState,
+		.primitiveAssemblyState = primitiveAssemblyState,
+		.rasterizationState = rasterizationState,
+		.depthStencilState = depthStencilState,
+		.colorBlendState = colorBlendState,
 		.stages = {
-			{.fn = "pbr/brdfLUT.vert", .type = ShaderStageType::Vertex},
-			{.fn = "pbr/brdfLUT.frag", .type = ShaderStageType::Fragment}
+			{.code = ShaderLoader::load("pbr/brdfLUT.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("pbr/brdfLUT.frag"), .stage = ShaderStageType::Fragment}
 		},
 		.samplers = {
 			{.name = "environmentMap", .slot = 0}

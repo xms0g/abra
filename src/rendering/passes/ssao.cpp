@@ -38,13 +38,13 @@ void SSAOPass::configure(const RenderContext& ctx, const FrameGraph& graph, Even
 	};
 
 	PipelineRenderingInfo ssaoInfo = {
-		.primitiveAssembly = primitiveAssemblyState,
-		.rasterization = rasterizationState,
-		.depthStencil = depthStencilState,
-		.colorBlend = colorBlendState,
+		.primitiveAssemblyState = primitiveAssemblyState,
+		.rasterizationState = rasterizationState,
+		.depthStencilState = depthStencilState,
+		.colorBlendState = colorBlendState,
 		.stages = {
-			{.fn = "models/quad.vert", .type = ShaderStageType::Vertex},
-			{.fn = "ssao.frag", .type = ShaderStageType::Fragment}
+			{.code = ShaderLoader::load("models/quad.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("ssao.frag"), .stage = ShaderStageType::Fragment}
 		},
 		.samplers = {
 			{.name = "gDepthMap", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.depth.textureSlot")},
@@ -65,13 +65,13 @@ void SSAOPass::configure(const RenderContext& ctx, const FrameGraph& graph, Even
 	};
 
 	PipelineRenderingInfo blurInfo = {
-		.primitiveAssembly = primitiveAssemblyState,
-		.rasterization = rasterizationState,
-		.depthStencil = depthStencilState,
-		.colorBlend = colorBlendState,
+		.primitiveAssemblyState = primitiveAssemblyState,
+		.rasterizationState = rasterizationState,
+		.depthStencilState = depthStencilState,
+		.colorBlendState = colorBlendState,
 		.stages = {
-			{.fn = "models/quad.vert", .type = ShaderStageType::Vertex},
-			{.fn = "ssaoBlur.frag", .type = ShaderStageType::Fragment}
+			{.code = ShaderLoader::load("models/quad.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("ssaoBlur.frag"), .stage = ShaderStageType::Fragment},
 		},
 		.samplers = {
 			{.name = "ssaoTexture", .slot = 0}

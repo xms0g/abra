@@ -32,13 +32,13 @@ void ForwardOpaquePass::configure(const RenderContext& ctx, const FrameGraph& gr
 	};
 
 	PipelineRenderingInfo info = {
-		.primitiveAssembly = primitiveAssemblyState,
-		.rasterization = rasterizationState,
-		.depthStencil = depthStencilState,
-		.colorBlend = colorBlendState,
+		.primitiveAssemblyState = primitiveAssemblyState,
+		.rasterizationState = rasterizationState,
+		.depthStencilState = depthStencilState,
+		.colorBlendState = colorBlendState,
 		.stages = {
-			{.fn = "object.vert", .type = ShaderStageType::Vertex},
-			{.fn = "opaque.frag", .type = ShaderStageType::Fragment}
+			{.code = ShaderLoader::load("object.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("opaque.frag"), .stage = ShaderStageType::Fragment},
 		},
 		.samplers = {
 			{.name = "material.texture_albedo", .slot = 0},

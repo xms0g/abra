@@ -45,13 +45,13 @@ void InstancedBlendPass::configure(const RenderContext& ctx, const FrameGraph& g
 	};
 
 	PipelineRenderingInfo info = {
-		.primitiveAssembly = primitiveAssemblyState,
-		.rasterization = rasterizationState,
-		.depthStencil = depthStencilState,
-		.colorBlend = colorBlendState,
+		.primitiveAssemblyState = primitiveAssemblyState,
+		.rasterizationState = rasterizationState,
+		.depthStencilState = depthStencilState,
+		.colorBlendState = colorBlendState,
 		.stages = {
-			{.fn = "instanced.vert", .type = ShaderStageType::Vertex},
-			{.fn = "blend.frag", .type = ShaderStageType::Fragment}
+			{.code = ShaderLoader::load("instanced.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("blend.frag"), .stage = ShaderStageType::Fragment},
 		},
 		.samplers = {
 			{.name = "material.texture_albedo", .slot = 0},

@@ -1,13 +1,11 @@
 #include "graphicsPipeline.h"
-#include "shader.h"
-#include "../resource/resourceManager.h"
 
 GraphicsPipeline::GraphicsPipeline(PipelineRenderingInfo& renderingInfo) {
-	mState.inputAssembly = renderingInfo.primitiveAssembly;
-	mState.rasterization = renderingInfo.rasterization;
-	mState.depthStencil = renderingInfo.depthStencil;
-	mState.colorBlend = renderingInfo.colorBlend;
-	mState.tessellation = renderingInfo.tessellation;
+	mState.inputAssembly = renderingInfo.primitiveAssemblyState;
+	mState.rasterization = renderingInfo.rasterizationState;
+	mState.depthStencil = renderingInfo.depthStencilState;
+	mState.colorBlend = renderingInfo.colorBlendState;
+	mState.tessellation = renderingInfo.tessellationState;
 
 	for (const auto& info: renderingInfo.stages) {
 		ShaderStage stage{info};
@@ -53,10 +51,10 @@ GraphicsPipeline GraphicsPipeline::createFullscreenQuadPipeline(std::vector<Pipe
 	};
 
 	PipelineRenderingInfo pipelineInfo = {
-		.primitiveAssembly = primitiveAssemblyState,
-		.rasterization = rasterizationState,
-		.depthStencil = depthStencilState,
-		.colorBlend = colorBlendState,
+		.primitiveAssemblyState = primitiveAssemblyState,
+		.rasterizationState = rasterizationState,
+		.depthStencilState = depthStencilState,
+		.colorBlendState = colorBlendState,
 		.stages = std::move(stages),
 		.samplers = samplers,
 		.uniforms = {}

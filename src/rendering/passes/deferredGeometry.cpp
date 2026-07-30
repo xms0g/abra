@@ -33,13 +33,13 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, const FrameGraph&
 	};
 
 	PipelineRenderingInfo info = {
-		.primitiveAssembly = primitiveAssemblyState,
-		.rasterization = rasterizationState,
-		.depthStencil = depthStencilState,
-		.colorBlend = colorBlendState,
+		.primitiveAssemblyState = primitiveAssemblyState,
+		.rasterizationState = rasterizationState,
+		.depthStencilState = depthStencilState,
+		.colorBlendState = colorBlendState,
 		.stages = {
-			{.fn = "deferred/gbuffer.vert", .type = ShaderStageType::Vertex},
-			{.fn = "deferred/gbuffer.frag", .type = ShaderStageType::Fragment}
+			{.code = ShaderLoader::load("deferred/gbuffer.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("deferred/gbuffer.frag"), .stage = ShaderStageType::Fragment},
 		},
 		.samplers = {
 			{

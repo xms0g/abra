@@ -117,16 +117,16 @@ struct PipelineTessellationState {
 };
 
 struct PipelineShaderStage {
-	std::string fn;
-	ShaderStageType type;
+	std::string code;
+	ShaderStageType stage;
 };
 
 struct PipelineRenderingInfo {
-	PipelinePrimitiveAssemblyState primitiveAssembly;
-	PipelineRasterizationState rasterization;
-	PipelineDepthStencilState depthStencil;
-	PipelineColorBlendState colorBlend;
-	PipelineTessellationState tessellation;
+	PipelinePrimitiveAssemblyState primitiveAssemblyState;
+	PipelineRasterizationState rasterizationState;
+	PipelineDepthStencilState depthStencilState;
+	PipelineColorBlendState colorBlendState;
+	PipelineTessellationState tessellationState;
 	std::vector<PipelineShaderStage> stages;
 	std::vector<SamplerInfo> samplers;
 	std::vector<UniformBindingInfo> uniforms;

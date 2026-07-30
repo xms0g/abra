@@ -38,13 +38,13 @@ void ForwardBlendPass::configure(const RenderContext& ctx, const FrameGraph& gra
 	};
 
 	PipelineRenderingInfo info = {
-		.primitiveAssembly = primitiveAssemblyState,
-		.rasterization = rasterizationState,
-		.depthStencil = depthStencilState,
-		.colorBlend = colorBlendState,
+		.primitiveAssemblyState = primitiveAssemblyState,
+		.rasterizationState = rasterizationState,
+		.depthStencilState = depthStencilState,
+		.colorBlendState = colorBlendState,
 		.stages = {
-			{.fn = "object.vert", .type = ShaderStageType::Vertex},
-			{.fn = "blend.frag", .type = ShaderStageType::Fragment}
+			{.code = ShaderLoader::load("object.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("blend.frag"), .stage = ShaderStageType::Fragment},
 		},
 		.samplers = {
 			{.name = "material.texture_albedo", .slot = 0},

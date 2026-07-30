@@ -1,10 +1,9 @@
 #pragma once
+#include <filesystem>
 #include <string>
 #include <unordered_set>
 #include "glad/glad.h"
 #include "glm/glm.hpp"
-
-struct PipelineShaderStage;
 
 enum class ShaderStageType: uint32_t {
 	Vertex = GL_VERTEX_SHADER,
@@ -13,6 +12,8 @@ enum class ShaderStageType: uint32_t {
 	TessControl = GL_TESS_CONTROL_SHADER,
 	TessEvaluation = GL_TESS_EVALUATION_SHADER
 };
+
+struct PipelineShaderStage;
 
 struct ShaderStage {
 	uint32_t handle{0};
@@ -106,7 +107,6 @@ void setMat3(uint32_t id, const std::string& name, const glm::mat3& mat);
 void setMat4(uint32_t id, const std::string& name, const glm::mat4& mat);
 
 void setMat4Array(uint32_t id, const std::string& name, const glm::mat4* matrices, size_t count);
-
 }
 
 template<typename T>
@@ -141,4 +141,8 @@ void Shader::setValue(const std::string& name, const T* value, uint32_t count) {
 		Uniform::setFloatArray(mID, name, value, count);
 	else if constexpr (std::is_same_v<T, glm::mat4>)
 		Uniform::setMat4Array(mID, name, value, count);
+}
+
+namespace ShaderLoader {
+std::string load(std::string_view file);
 }

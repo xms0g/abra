@@ -34,13 +34,13 @@ void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph&
 	};
 
 	PipelineRenderingInfo info = {
-		.primitiveAssembly = primitiveAssemblyState,
-		.rasterization = rasterizationState,
-		.depthStencil = depthStencilState,
-		.colorBlend = colorBlendState,
+		.primitiveAssemblyState = primitiveAssemblyState,
+		.rasterizationState = rasterizationState,
+		.depthStencilState = depthStencilState,
+		.colorBlendState = colorBlendState,
 		.stages = {
-			{.fn = "models/quad.vert", .type = ShaderStageType::Vertex},
-			{.fn = "deferred/lighting.frag", .type = ShaderStageType::Fragment}
+			{.code = ShaderLoader::load("models/quad.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("deferred/lighting.frag"), .stage = ShaderStageType::Fragment},
 		},
 		.samplers = {
 			{.name = "gPosition", .slot = CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureSlot")},
