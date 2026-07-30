@@ -82,10 +82,8 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, const FrameGraph&
 
 void DeferredGeometryPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	mEncoder.reset();
-	const auto& frameBuffer = graph.getResource("gBuffer");
-	mEncoder.bindFrameBuffer(frameBuffer);
+	mEncoder.bindFrameBuffer(graph.getResource("gBuffer"));
 	mEncoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
-	mEncoder.setViewport({.x = 0, .y = 0, .width = frameBuffer.width(), .height = frameBuffer.height()});
 
 	mEncoder.bindPipeline(mPipeline);
 

@@ -81,9 +81,7 @@ void ForwardOpaquePass::configure(const RenderContext& ctx, const FrameGraph& gr
 
 void ForwardOpaquePass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	mEncoder.reset();
-	const auto& frameBuffer = graph.getResource("sceneBuffer");
-	mEncoder.bindFrameBuffer(frameBuffer);
-	mEncoder.setViewport({.x = 0, .y = 0, .width = frameBuffer.width(), .height = frameBuffer.height()});
+	mEncoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
 	mEncoder.bindPipeline(mPipeline);
 
 	for (const auto& cmd: *mCommands) {

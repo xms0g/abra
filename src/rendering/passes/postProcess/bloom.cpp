@@ -69,7 +69,6 @@ TextureHandle Bloom::brightFilterPass(
 	bool& toggle) {
 	encoder.reset();
 	encoder.bindFrameBuffer(*mRenderTargets[toggle]);
-	encoder.setViewport({.x = 0, .y = 0, .width = mRenderTargets[toggle]->width(), .height = mRenderTargets[toggle]->height()});
 	encoder.clearFrameBuffer(ClearMask::Color);
 
 	encoder.bindPipeline(mPipelines[0]);
@@ -102,7 +101,6 @@ TextureHandle Bloom::blurPass(
 	for (int i = 0; i < 10; ++i) {
 		encoder.reset();
 		encoder.bindFrameBuffer(*mRenderTargets[toggle]);
-		encoder.setViewport({.x = 0, .y = 0, .width = mRenderTargets[toggle]->width(), .height = mRenderTargets[toggle]->height()});
 		encoder.clearFrameBuffer(ClearMask::Color);
 
 		encoder.setUniform("horizontal", horizontal);
@@ -132,7 +130,6 @@ TextureHandle Bloom::combinePass(
 	const bool& toggle) {
 	encoder.reset();
 	encoder.bindFrameBuffer(*mRenderTargets[toggle]);
-	encoder.setViewport({.x = 0, .y = 0, .width = mRenderTargets[toggle]->width(), .height = mRenderTargets[toggle]->height()});
 	//encoder.clearFrameBuffer(ClearMask::Color);
 
 	encoder.bindPipeline(mPipelines[2]);

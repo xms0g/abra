@@ -104,10 +104,8 @@ void SSAOPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 
 void SSAOPass::ssao(const FrameGraph& graph) {
 	mEncoder.reset();
-	const auto& frameBuffer = graph.getResource("ssao");
-	mEncoder.bindFrameBuffer(frameBuffer);
+	mEncoder.bindFrameBuffer(graph.getResource("ssao"));
 	mEncoder.clearFrameBuffer(ClearMask::Color);
-	mEncoder.setViewport({.x = 0, .y = 0, .width = frameBuffer.width(), .height = frameBuffer.height()});
 
 	mEncoder.bindPipeline(mPipelines[0]);
 	mEncoder.bindVertexArray(mQuad->vao().id());
@@ -116,10 +114,9 @@ void SSAOPass::ssao(const FrameGraph& graph) {
 
 void SSAOPass::blur(const FrameGraph& graph) {
 	mEncoder.reset();
-	const auto& frameBuffer = graph.getResource("ssaoBlur");
-	mEncoder.bindFrameBuffer(frameBuffer);
+	mEncoder.bindFrameBuffer(graph.getResource("ssaoBlur"));
 	mEncoder.clearFrameBuffer(ClearMask::Color);
-	mEncoder.setViewport({.x = 0, .y = 0, .width = frameBuffer.width(), .height = frameBuffer.height()});
+
 	mEncoder.bindPipeline(mPipelines[1]);
 	mEncoder.bindTexture(graph.getResource("ssao").texture(), 0);
 	mEncoder.bindVertexArray(mQuad->vao().id());
