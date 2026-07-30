@@ -19,26 +19,28 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
 
 Mesh::~Mesh() = default;
 
-Mesh::Mesh(Mesh&& other) noexcept {
-	mVertices = std::move(other.mVertices);
-	mIndices = std::move(other.mIndices);
-	mMin = other.mMin;
-	mMax = other.mMax;
-	mVAO = std::move(other.mVAO);
-	mIBO = std::move(other.mIBO);
-	mVBO = std::move(other.mVBO);
+Mesh::Mesh(Mesh&& other) noexcept
+	: mVertices(std::move(other.mVertices)),
+	  mIndices(std::move(other.mIndices)),
+	  mVAO(std::move(other.mVAO)),
+	  mVBO(std::move(other.mVBO)),
+	  mIBO(std::move(other.mIBO)),
+	  mMin(other.mMin),
+	  mMax(other.mMax) {
 }
 
 Mesh& Mesh::operator=(Mesh&& other) noexcept {
-	if (this != &other) {
-		mVertices = std::move(other.mVertices);
-		mIndices = std::move(other.mIndices);
-		mMin = other.mMin;
-		mMax = other.mMax;
-		mVAO = std::move(other.mVAO);
-		mIBO = std::move(other.mIBO);
-		mVBO = std::move(other.mVBO);
+	if (this == &other) {
+		return *this;
 	}
+
+	mVertices = std::move(other.mVertices);
+	mIndices = std::move(other.mIndices);
+	mVAO = std::move(other.mVAO);
+	mIBO = std::move(other.mIBO);
+	mVBO = std::move(other.mVBO);
+	mMin = std::exchange(other.mMin, glm::vec3(0));
+	mMax = std::exchange(other.mMax, glm::vec3(0));
 	return *this;
 }
 
@@ -81,7 +83,8 @@ void Mesh::enableInstanceAttributes(const uint32_t vao, const size_t offset) {
 	for (const auto& [type, index, size, normalized, attrOffset, divisor]: instancingLayout.attributes()) {
 		const auto finalPointer = reinterpret_cast<void*>(offset + attrOffset);
 
-		VertexArray::setAttribute(index, size, type, normalized ? GL_TRUE : GL_FALSE, instancingLayout.stride(), finalPointer, divisor);
+		VertexArray::setAttribute(index, size, type, normalized ? GL_TRUE : GL_FALSE, instancingLayout.stride(),
+		                          finalPointer, divisor);
 	}
 }
 
@@ -102,17 +105,18 @@ void Mesh::uploadToGPU() {
 
 	// set the vertex attribute pointers
 	VertexLayout layout;
-	layout.pushVector<glm::vec3>(0);	// Position
-	layout.pushVector<glm::vec3>(1);	// Normal
-	layout.pushVector<glm::vec2>(2);	// TexCoords
-	layout.pushVector<glm::vec3>(3);	// Tangent
-	layout.pushVector<glm::vec3>(4);	// Bitangent
-	layout.push<int>(5, 4);		// Bone IDs (Integers!)
-	layout.push<float>(6, 4);		// Bone Weights
+	layout.pushVector<glm::vec3>(0); // Position
+	layout.pushVector<glm::vec3>(1); // Normal
+	layout.pushVector<glm::vec2>(2); // TexCoords
+	layout.pushVector<glm::vec3>(3); // Tangent
+	layout.pushVector<glm::vec3>(4); // Bitangent
+	layout.push<int>(5, 4); // Bone IDs (Integers!)
+	layout.push<float>(6, 4); // Bone Weights
 
 	for (const auto& [type, index, size, normalized, offset, divisor]: layout.attributes()) {
 		const auto pointer = reinterpret_cast<void*>(offset);
-		VertexArray::setAttribute(index, size, type, normalized ? GL_TRUE : GL_FALSE, layout.stride(), pointer, divisor);
+		VertexArray::setAttribute(index, size, type, normalized ? GL_TRUE : GL_FALSE, layout.stride(), pointer,
+		                          divisor);
 	}
 
 	VertexArray::unbind();

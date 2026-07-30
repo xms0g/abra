@@ -7,44 +7,85 @@ GLu(Attachment)
 GLi(BaseFormat)
 GLi(InternalFormat)
 
-BaseFrameBuffer::BaseFrameBuffer(const int32_t width, const int32_t height)
+FrameBuffer::FrameBuffer(const int32_t width, const int32_t height)
 	: mWidth(width),
 	  mHeight(height) {
 	glGenFramebuffers(1, &mFBO);
 	bind();
 }
 
-BaseFrameBuffer::~BaseFrameBuffer() {
+FrameBuffer::FrameBuffer(FrameBuffer&& other) noexcept
+	: mFBO(other.mFBO),
+	  mRBO(other.mRBO),
+	  mWidth(other.mWidth),
+	  mHeight(other.mHeight),
+	  mTextures(std::move(other.mTextures)),
+	  mAttachments(std::move(other.mAttachments)) {
+}
+
+FrameBuffer& FrameBuffer::operator=(FrameBuffer&& other) noexcept {
+	if (this == &other) {
+		return *this;
+	}
+
+	if (mFBO) {
+		glDeleteFramebuffers(1, &mFBO);
+	}
+	if (mRBO) {
+		glDeleteRenderbuffers(1, &mRBO);
+	}
+
+	mFBO = std::exchange(other.mFBO, 0);
+	mRBO = std::exchange(other.mRBO, 0);
+	mWidth = std::exchange(other.mWidth, 0);
+	mHeight = std::exchange(other.mHeight, 0);
+	mTextures = std::move(other.mTextures);
+	mAttachments = std::move(other.mAttachments);
+	return *this;
+}
+
+FrameBuffer::~FrameBuffer() {
+	if (!mTextures.empty()) {
+		for (const auto& [id, target]: mTextures) {
+			glDeleteTextures(1, &id);
+		}
+	}
+
 	glDeleteFramebuffers(1, &mFBO);
 
 	if (mRBO)
 		glDeleteRenderbuffers(1, &mRBO);
 }
 
-int32_t BaseFrameBuffer::width() const {
+int32_t FrameBuffer::width() const {
 	return mWidth;
 }
 
-int32_t BaseFrameBuffer::height() const {
+int32_t FrameBuffer::height() const {
 	return mHeight;
 }
 
-void BaseFrameBuffer::bind() const {
+TextureHandle FrameBuffer::texture(uint32_t index) const {
+	return {.id = mTextures[index].id, .target = mTextures[index].target};
+}
+
+void FrameBuffer::bind() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
 	glViewport(0, 0, mWidth, mHeight);
 }
 
-void BaseFrameBuffer::unbind() const {
+void FrameBuffer::unbind() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void BaseFrameBuffer::resizeRenderBuffer(const int32_t width, const int32_t height) const {
+void FrameBuffer::resizeRenderBuffer(int32_t width, int32_t height) const {
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
 	glViewport(0, 0, width, height);
 }
 
-void BaseFrameBuffer::attachTexture(const uint32_t index, const Attachment attachment, const int32_t mip, const int32_t layer) const {
+void FrameBuffer::attachTexture(const uint32_t index, const Attachment attachment, const int32_t mip,
+                                const int32_t layer) const {
 	switch (auto [id, target] = texture(index); target) {
 		case TextureTarget::Texture2D:
 			glFramebufferTexture2D(
@@ -76,21 +117,9 @@ void BaseFrameBuffer::attachTexture(const uint32_t index, const Attachment attac
 	}
 }
 
-void BaseFrameBuffer::checkStatus() {
+void FrameBuffer::checkStatus() {
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 		throw std::runtime_error("ERROR::FRAMEBUFFER::NOT_COMPLETE!\n");
-	}
-}
-
-FrameBuffer::FrameBuffer(const int32_t width, const int32_t height)
-	: BaseFrameBuffer(width, height) {
-}
-
-FrameBuffer::~FrameBuffer() {
-	if (!mTextures.empty()) {
-		for (const auto& [id, target]: mTextures) {
-			glDeleteTextures(1, &id);
-		}
 	}
 }
 
@@ -425,10 +454,6 @@ FrameBuffer& FrameBuffer::configureAttachments() {
 	glDrawBuffers(static_cast<int32_t>(mAttachments.size()), mAttachments.data());
 
 	return *this;
-}
-
-TextureHandle FrameBuffer::textureImpl(const uint32_t index) const {
-	return {.id = mTextures[index].id, .target = mTextures[index].target};
 }
 
 void FrameBuffer::setAttachment(const uint32_t textureID, const uint32_t target) {

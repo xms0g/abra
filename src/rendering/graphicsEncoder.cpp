@@ -23,7 +23,7 @@ void GraphicsEncoder::unbindFrameBuffer() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void GraphicsEncoder::bindFrameBuffer(const BaseFrameBuffer& fb) const {
+void GraphicsEncoder::bindFrameBuffer(const FrameBuffer& fb) const {
 	fb.bind();
 }
 

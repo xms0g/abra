@@ -34,7 +34,7 @@ public:
 
 	void unbindFrameBuffer() const;
 
-	void bindFrameBuffer(const BaseFrameBuffer& fb) const;
+	void bindFrameBuffer(const FrameBuffer& fb) const;
 
 	void bindTexture(TextureHandle handle, uint32_t slot) const;
 

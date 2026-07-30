@@ -12,7 +12,7 @@
 #define RESOURCE_MANAGER_INSTANCE ResourceManager::instance()
 
 class Shader;
-class BaseFrameBuffer;
+class FrameBuffer;
 
 class ResourceManager {
 public:
@@ -80,7 +80,7 @@ private:
 	std::unordered_map<size_t, MaterialMap> mMaterialsByEntity;
 	std::unordered_map<size_t, MeshMap> mMeshesByEntity;
 	std::unordered_map<size_t, std::vector<float> > mTransformsByEntity;
-	std::unordered_map<std::string, std::unique_ptr<BaseFrameBuffer> > mBuffers;
+	std::unordered_map<std::string, std::unique_ptr<FrameBuffer> > mBuffers;
 
 	ThreadPool mThreadPool{};
 	std::mutex mResourceMutex;
@@ -115,7 +115,7 @@ T* ResourceManager::get(const KeyType& key) const {
 		return const_cast<T*>(&mMaterialsByEntity.at(key));
 	} else if constexpr (std::is_same_v<T, std::vector<float>>) {
 		return const_cast<T*>(&mTransformsByEntity.at(key));
-	} else if constexpr (std::is_same_v<T, BaseFrameBuffer>) {
+	} else if constexpr (std::is_same_v<T, FrameBuffer>) {
 		return mBuffers.at(key).get();
 	} else {
 		static_assert(false, "Unsupported type for get().");

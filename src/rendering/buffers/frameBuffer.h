@@ -28,19 +28,19 @@ enum class InternalFormat : int32_t {
 	Depth32F = GL_DEPTH_COMPONENT32F,
 };
 
-class BaseFrameBuffer {
+class FrameBuffer {
 public:
-	BaseFrameBuffer(int32_t width, int32_t height);
+	FrameBuffer(int32_t width, int32_t height);
 
-	BaseFrameBuffer(const BaseFrameBuffer&) = delete;
+	FrameBuffer(const FrameBuffer&) = delete;
 
-	BaseFrameBuffer& operator=(const BaseFrameBuffer&) = delete;
+	FrameBuffer& operator=(const FrameBuffer&) = delete;
 
-	BaseFrameBuffer(BaseFrameBuffer&&) noexcept = default;
+	FrameBuffer(FrameBuffer&& other) noexcept;
 
-	BaseFrameBuffer& operator=(BaseFrameBuffer&&) noexcept = default;
+	FrameBuffer& operator=(FrameBuffer&& other) noexcept;
 
-	virtual ~BaseFrameBuffer();
+	~FrameBuffer();
 
 	[[nodiscard]]
 	int32_t width() const;
@@ -49,9 +49,7 @@ public:
 	int32_t height() const;
 
 	[[nodiscard]]
-	TextureHandle texture(const uint32_t index = 0) const {
-		return textureImpl(index);
-	}
+	TextureHandle texture(uint32_t index = 0) const;
 
 	void bind() const;
 
@@ -62,39 +60,6 @@ public:
 	void attachTexture(uint32_t index, Attachment attachment, int32_t mip, int32_t layer) const;
 
 	void checkStatus();
-
-protected:
-	[[nodiscard]]
-	virtual TextureHandle textureImpl(uint32_t index) const = 0;
-
-	uint32_t mFBO{0}, mRBO{0};
-	int32_t mWidth{0}, mHeight{0};
-};
-
-class FrameBuffer final : public BaseFrameBuffer {
-public:
-	FrameBuffer(int32_t width, int32_t height);
-
-	FrameBuffer(const FrameBuffer&) = delete;
-
-	FrameBuffer& operator=(const FrameBuffer&) = delete;
-
-	FrameBuffer(FrameBuffer&& other) noexcept
-		: BaseFrameBuffer(std::move(other)),
-		  mTextures(std::move(other.mTextures)),
-		  mAttachments(std::move(other.mAttachments)) {
-	}
-
-	FrameBuffer& operator=(FrameBuffer&& other) noexcept {
-		if (this == &other)
-			return *this;
-		BaseFrameBuffer::operator =(std::move(other));
-		mTextures = std::move(other.mTextures);
-		mAttachments = std::move(other.mAttachments);
-		return *this;
-	}
-
-	~FrameBuffer() override;
 
 	void bindForRead() const;
 
@@ -128,16 +93,15 @@ public:
 
 	FrameBuffer& configureAttachments();
 
-protected:
-	[[nodiscard]]
-	TextureHandle textureImpl(uint32_t index) const override;
-
 private:
 	void setAttachment(uint32_t textureID, uint32_t target);
 
 	static void setDepthTextureParameters(uint32_t target, int32_t dim);
 
 	static InternalFormat getInternalFormat(BaseFormat format, bool isFloat = false);
+
+	uint32_t mFBO{0}, mRBO{0};
+	int32_t mWidth{0}, mHeight{0};
 
 	struct TextureDescription {
 		uint32_t id{0};

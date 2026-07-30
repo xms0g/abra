@@ -97,15 +97,15 @@ void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph&
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.textureSlot"));
 
 	mEncoder.bindTexture(
-		RESOURCE_MANAGER_INSTANCE.get<BaseFrameBuffer>("irradianceMap")->texture(),
+		RESOURCE_MANAGER_INSTANCE.get<FrameBuffer>("irradianceMap")->texture(),
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.textureSlot"));
 
 	mEncoder.bindTexture(
-		RESOURCE_MANAGER_INSTANCE.get<BaseFrameBuffer>("prefilterMap")->texture(),
+		RESOURCE_MANAGER_INSTANCE.get<FrameBuffer>("prefilterMap")->texture(),
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.prefilterMap.textureSlot"));
 
 	mEncoder.bindTexture(
-		RESOURCE_MANAGER_INSTANCE.get<BaseFrameBuffer>("brdfLUT")->texture(),
+		RESOURCE_MANAGER_INSTANCE.get<FrameBuffer>("brdfLUT")->texture(),
 		CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.brdfLUT.textureSlot"));
 
 

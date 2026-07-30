@@ -426,8 +426,8 @@ void ResourceManager::createIrradianceMap() {
 
 	mBuffers.emplace("irradianceMap", std::move(irradianceMap));
 
-	const auto irradianceMapBuffer = get<BaseFrameBuffer>("irradianceMap");
-	const auto envMapBuffer = get<BaseFrameBuffer>("envMap");
+	const auto irradianceMapBuffer = get<FrameBuffer>("irradianceMap");
+	const auto envMapBuffer = get<FrameBuffer>("envMap");
 
 	Model::Cube cube;
 	cube.meshes().at(0).front().uploadToGPU();
@@ -507,8 +507,8 @@ void ResourceManager::createPrefilterMap() {
 
 	mBuffers.emplace("prefilterMap", std::move(prefilterMap));
 
-	const auto prefilterMapBuffer = get<BaseFrameBuffer>("prefilterMap");
-	const auto envMapBuffer = get<BaseFrameBuffer>("envMap");
+	const auto prefilterMapBuffer = get<FrameBuffer>("prefilterMap");
+	const auto envMapBuffer = get<FrameBuffer>("envMap");
 
 	Model::Cube cube;
 	cube.meshes().at(0).front().uploadToGPU();
@@ -598,7 +598,7 @@ void ResourceManager::createBrdfLUT() {
 
 	mBuffers.emplace("brdfLUT", std::move(brdfLUT));
 
-	const auto brdfLUTBuffer = get<BaseFrameBuffer>("brdfLUT");
+	const auto brdfLUTBuffer = get<FrameBuffer>("brdfLUT");
 
 	const Model::Quad quad;
 	// generate a 2D LUT from the BRDF equations used.
