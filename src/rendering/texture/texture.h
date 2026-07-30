@@ -22,11 +22,6 @@ enum class TextureTarget : uint32_t {
 	TextureCubeMapArray = GL_TEXTURE_CUBE_MAP_ARRAY
 };
 
-struct TextureBinding {
-	const char* name;
-	int32_t slot;
-};
-
 struct TextureHandle {
 	uint32_t id{0};
 	TextureTarget target{};
