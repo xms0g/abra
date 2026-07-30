@@ -357,6 +357,7 @@ uint32_t ResourceManager::createEnvMap(const std::string& path) {
 	encoder.bindTexture({.id = hdrTexture.id, .target = hdrTexture.target}, 0);
 
 	encoder.bindFrameBuffer(*envMapBuffer);
+	encoder.setViewport({.x = 0, .y = 0, .width = envMapBuffer->width(), .height = envMapBuffer->height()});
 
 	for (int32_t i = 0; i < FACES; ++i) {
 		envMapBuffer->attachTexture(0, Attachment::Color0, 0, i);
@@ -436,6 +437,7 @@ void ResourceManager::createIrradianceMap() {
 	encoder.bindTexture(envMapBuffer->texture(), 0);
 
 	encoder.bindFrameBuffer(*irradianceMapBuffer);
+	encoder.setViewport({.x = 0, .y = 0, .width = irradianceMapBuffer->width(), .height = irradianceMapBuffer->height()});
 
 	for (int32_t i = 0; i < FACES; ++i) {
 		irradianceMapBuffer->attachTexture(0, Attachment::Color0, 0, i);
@@ -517,6 +519,7 @@ void ResourceManager::createPrefilterMap() {
 	encoder.bindTexture(envMapBuffer->texture(), 0);
 
 	encoder.bindFrameBuffer(*prefilterMapBuffer);
+	encoder.setViewport({.x = 0, .y = 0, .width = prefilterMapBuffer->width(), .height = prefilterMapBuffer->height()});
 
 	constexpr uint32_t mipLevels = 5;
 	for (int32_t i = 0; i < mipLevels; ++i) {
@@ -597,6 +600,7 @@ void ResourceManager::createBrdfLUT() {
 	encoder.bindPipeline(pipeline);
 	encoder.bindFrameBuffer(*brdfLUTBuffer);
 	encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
+	encoder.setViewport({.x = 0, .y = 0, .width = brdfLUTBuffer->width(), .height = brdfLUTBuffer->height()});
 
 	encoder.bindVertexArray(quad.vao().id());
 	encoder.draw(6);

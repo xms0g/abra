@@ -28,6 +28,7 @@ TextureHandle FXAA::render(
 	encoder.reset();
 	encoder.bindFrameBuffer(*renderTarget);
 	encoder.clearFrameBuffer(ClearMask::Color);
+	encoder.setViewport({.x = 0, .y = 0, .width = renderTarget->width(), .height = renderTarget->height()});
 
 	encoder.bindPipeline(mPipeline);
 

@@ -57,7 +57,9 @@ void ForwardUnlitPass::configure(const RenderContext& ctx, const FrameGraph& gra
 
 void ForwardUnlitPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	mEncoder.reset();
-	mEncoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
+	const auto& frameBuffer = graph.getResource("sceneBuffer");
+	mEncoder.bindFrameBuffer(frameBuffer);
+	mEncoder.setViewport({.x = 0, .y = 0, .width = frameBuffer.width(), .height = frameBuffer.height()});
 	mEncoder.bindPipeline(mPipeline);
 
 	for (const auto& cmd: *mCommands) {
