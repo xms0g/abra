@@ -94,15 +94,12 @@ void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph&
 		graph.getResource("spot").texture()
 	};
 
-	const auto ssaoTextures = std::vector{
-		graph.getResource("ssaoBlur").texture()
-	};
-
 	mEncoder.bindTextures(gbufferTextures, CONFIG_MANAGER_INSTANCE.get<int32_t>("gBuffer.position.textureSlot"));
 	mEncoder.bindTextures(pbrTextures, CONFIG_MANAGER_INSTANCE.get<int32_t>("PBR.irradianceMap.textureSlot"));
-	mEncoder.bindTextures(ssaoTextures, CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.textureSlot"));
 	mEncoder.bindTextures(shadowTextures, CONFIG_MANAGER_INSTANCE.get<int32_t>("shadow.texture_slot"));
-
+	mEncoder.bindTexture(
+		graph.getResource("ssaoBlur").texture(),
+		CONFIG_MANAGER_INSTANCE.get<int32_t>("ssao.textureSlot"));
 	mQuad = std::make_unique<Model::Quad>();
 }
 
