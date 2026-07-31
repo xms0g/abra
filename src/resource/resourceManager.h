@@ -31,7 +31,9 @@ public:
 	template<typename T>
 	void upload(size_t entityID, T& map);
 
-	void uploadModelsToGPU();
+	void uploadMeshesToGPU();
+
+	void uploadMaterialsToGPU();
 
 	void waitForAll() const;
 

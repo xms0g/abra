@@ -28,7 +28,7 @@ void ResourceManager::asyncLoadModel(size_t entityID, const std::string& file) {
 	});
 }
 
-void ResourceManager::uploadModelsToGPU() {
+void ResourceManager::uploadMeshesToGPU() {
 	for (auto& [entityID, meshByMaterialID]: mMeshesByEntity) {
 		for (auto& [matID, meshes]: meshByMaterialID) {
 			for (auto& mesh: meshes) {
@@ -36,7 +36,9 @@ void ResourceManager::uploadModelsToGPU() {
 			}
 		}
 	}
+}
 
+void ResourceManager::uploadMaterialsToGPU() {
 	std::unordered_map<std::string, uint32_t> idByPath;
 
 	for (auto& [entityID, materials]: mMaterialsByEntity) {
