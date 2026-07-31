@@ -509,9 +509,7 @@ uint32_t Renderer::createEnvMap(Texture& hdrTexture) {
 			.withRenderBufferDepth(InternalFormat::Depth24)
 			.checkStatus();
 
-	mPBRBuffers.emplace("envMap", std::move(envMap));
-
-	const auto& envMapBuffer = mPBRBuffers.at("envMap");
+	mPBRBuffers.environment = std::move(envMap);
 
 	Model::Cube cube;
 	cube.meshes().at(0).front().uploadToGPU();
@@ -522,11 +520,11 @@ uint32_t Renderer::createEnvMap(Texture& hdrTexture) {
 	encoder.setUniform("projection", mCaptureProjection);
 	encoder.bindTexture({.id = hdrTexture.id, .target = hdrTexture.target}, 0);
 
-	encoder.bindFrameBuffer(*envMapBuffer);
-	encoder.setViewport({.x = 0, .y = 0, .width = envMapBuffer->width(), .height = envMapBuffer->height()});
+	encoder.bindFrameBuffer(*mPBRBuffers.environment);
+	encoder.setViewport({.x = 0, .y = 0, .width = mPBRBuffers.environment->width(), .height = mPBRBuffers.environment->height()});
 
 	for (int32_t i = 0; i < FACES; ++i) {
-		envMapBuffer->attachTexture(0, Attachment::Color0, 0, i);
+		mPBRBuffers.environment->attachTexture(0, Attachment::Color0, 0, i);
 		encoder.setUniform("view", mCaptureViews[i]);
 
 		encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
@@ -536,9 +534,9 @@ uint32_t Renderer::createEnvMap(Texture& hdrTexture) {
 	}
 
 	encoder.unbindFrameBuffer();
-	Texture::generateMipmaps(envMapBuffer->texture());
+	Texture::generateMipmaps(mPBRBuffers.environment->texture());
 
-	return envMapBuffer->texture().id;
+	return mPBRBuffers.environment->texture().id;
 }
 
 void Renderer::createIrradianceMap() {
@@ -588,10 +586,7 @@ void Renderer::createIrradianceMap() {
 			.withRenderBufferDepth(InternalFormat::Depth24)
 			.checkStatus();
 
-	mPBRBuffers.emplace("irradianceMap", std::move(irradianceMap));
-
-	const auto& irradianceMapBuffer = mPBRBuffers.at("irradianceMap");
-	const auto& envMapBuffer = mPBRBuffers.at("envMap");
+	mPBRBuffers.irradiance = std::move(irradianceMap);
 
 	Model::Cube cube;
 	cube.meshes().at(0).front().uploadToGPU();
@@ -600,13 +595,13 @@ void Renderer::createIrradianceMap() {
 	// solve diffuse integral by convolution to create an irradiance (cube)map.
 	encoder.bindPipeline(pipeline);
 	encoder.setUniform("projection", mCaptureProjection);
-	encoder.bindTexture(envMapBuffer->texture(), 0);
+	encoder.bindTexture(mPBRBuffers.environment->texture(), 0);
 
-	encoder.bindFrameBuffer(*irradianceMapBuffer);
-	encoder.setViewport({.x = 0, .y = 0, .width = irradianceMapBuffer->width(), .height = irradianceMapBuffer->height()});
+	encoder.bindFrameBuffer(*mPBRBuffers.irradiance);
+	encoder.setViewport({.x = 0, .y = 0, .width = mPBRBuffers.irradiance->width(), .height = mPBRBuffers.irradiance->height()});
 
 	for (int32_t i = 0; i < FACES; ++i) {
-		irradianceMapBuffer->attachTexture(0, Attachment::Color0, 0, i);
+		mPBRBuffers.irradiance->attachTexture(0, Attachment::Color0, 0, i);
 		encoder.setUniform("view", mCaptureViews[i]);
 
 		encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
@@ -667,10 +662,7 @@ void Renderer::createPrefilterMap() {
 
 	Texture::generateMipmaps(prefilterMap->texture());
 
-	mPBRBuffers.emplace("prefilterMap", std::move(prefilterMap));
-
-	const auto& prefilterMapBuffer = mPBRBuffers.at("prefilterMap");
-	const auto& envMapBuffer = mPBRBuffers.at("envMap");
+	mPBRBuffers.prefilter = std::move(prefilterMap);
 
 	Model::Cube cube;
 	cube.meshes().at(0).front().uploadToGPU();
@@ -682,23 +674,23 @@ void Renderer::createPrefilterMap() {
 	encoder.setUniform("resolution",
 	                   static_cast<float>(CONFIG_MANAGER.get<int32_t>("PBR.envMap.size")));
 
-	encoder.bindTexture(envMapBuffer->texture(), 0);
+	encoder.bindTexture(mPBRBuffers.environment->texture(), 0);
 
-	encoder.bindFrameBuffer(*prefilterMapBuffer);
-	encoder.setViewport({.x = 0, .y = 0, .width = prefilterMapBuffer->width(), .height = prefilterMapBuffer->height()});
+	encoder.bindFrameBuffer(*mPBRBuffers.prefilter);
+	encoder.setViewport({.x = 0, .y = 0, .width = mPBRBuffers.prefilter->width(), .height = mPBRBuffers.prefilter->height()});
 
 	constexpr uint32_t mipLevels = 5;
 	for (int32_t i = 0; i < mipLevels; ++i) {
 		const int32_t mipSize = static_cast<int32_t>(
 			CONFIG_MANAGER.get<int32_t>("PBR.prefilterMap.size") * std::pow(0.5, i));
-		prefilterMapBuffer->resizeRenderBuffer(mipSize, mipSize);
+		mPBRBuffers.prefilter->resizeRenderBuffer(mipSize, mipSize);
 
 		const float roughness = static_cast<float>(i) / static_cast<float>(mipLevels - 1);
 		encoder.setUniform("roughness", roughness);
 
 
 		for (int32_t j = 0; j < FACES; ++j) {
-			prefilterMapBuffer->attachTexture(0, Attachment::Color0, i, j);
+			mPBRBuffers.prefilter->attachTexture(0, Attachment::Color0, i, j);
 			encoder.setUniform("view", mCaptureViews[j]);
 
 			encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
@@ -757,16 +749,14 @@ void Renderer::createBrdfLUT() {
 	brdfLUT->withTextureFP(BaseFormat::RG)
 			.checkStatus();
 
-	mPBRBuffers.emplace("brdfLUT", std::move(brdfLUT));
-
-	const auto& brdfLUTBuffer = mPBRBuffers.at("brdfLUT");
+	mPBRBuffers.brdfLUT = std::move(brdfLUT);
 
 	const Model::Quad quad;
 	// generate a 2D LUT from the BRDF equations used.
 	encoder.bindPipeline(pipeline);
-	encoder.bindFrameBuffer(*brdfLUTBuffer);
+	encoder.bindFrameBuffer(*mPBRBuffers.brdfLUT);
 	encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
-	encoder.setViewport({.x = 0, .y = 0, .width = brdfLUTBuffer->width(), .height = brdfLUTBuffer->height()});
+	encoder.setViewport({.x = 0, .y = 0, .width = mPBRBuffers.brdfLUT->width(), .height = mPBRBuffers.brdfLUT->height()});
 
 	encoder.bindVertexArray(quad.vao().id());
 	encoder.draw(6);

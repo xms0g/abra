@@ -1,11 +1,10 @@
 #pragma once
 #include <span>
-#include <memory>
-#include <unordered_map>
 
 class FrameBuffer;
 class QueueRegistry;
 class Camera;
+struct PBRBuffers;
 struct RenderData;
 struct DirectionalLightComponent;
 struct PointLightComponent;
@@ -14,7 +13,7 @@ struct SpotLightComponent;
 struct RenderContext {
 	RenderData* renderData{};
 	QueueRegistry* queueRegistry{};
-	std::unordered_map<std::string, std::unique_ptr<FrameBuffer> >* pbrBuffers{};
+	PBRBuffers* pbrBuffers{};
 
 	struct {
 		std::span<DirectionalLightComponent*> dirLights;

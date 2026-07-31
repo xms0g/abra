@@ -9,6 +9,13 @@
 #include "buffers/uniformBuffer.h"
 #include "../ECS/system.hpp"
 
+struct PBRBuffers {
+	std::unique_ptr<FrameBuffer> environment;
+	std::unique_ptr<FrameBuffer> irradiance;
+	std::unique_ptr<FrameBuffer> prefilter;
+	std::unique_ptr<FrameBuffer> brdfLUT;
+};
+
 class Window;
 class SyncStateSystem;
 class EventBus;
@@ -70,7 +77,7 @@ private:
 	// Render context
 	RenderContext mRenderCtx{};
 	// Frame Buffers
-	std::unordered_map<std::string, std::unique_ptr<FrameBuffer> > mPBRBuffers;
+	PBRBuffers mPBRBuffers{};
 
 	static constexpr uint32_t FACES = 6;
 
