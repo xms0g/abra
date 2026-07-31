@@ -1,4 +1,5 @@
 #include "lightSystem.h"
+#include <span>
 #include "glm/gtc/type_ptr.hpp"
 #include "../buffers/uniformBuffer.h"
 #include "../context/renderContext.hpp"
@@ -41,9 +42,9 @@ void LightSystem::configure(RenderContext& ctx, EventBus& eventBus) {
 		}
 	}
 
-	mCtx->light.dirLights = &mDirLights;
-	mCtx->light.pointLights = &mPointLights;
-	mCtx->light.spotLights = &mSpotLights;
+	mCtx->light.dirLights = std::span(mDirLights.data(), mDirLights.size());
+	mCtx->light.pointLights = std::span(mPointLights.data(), mPointLights.size());
+	mCtx->light.spotLights = std::span(mSpotLights.data(), mSpotLights.size());
 
 	mUBO = UniformBuffer(
 		DYNAMIC,

@@ -96,7 +96,7 @@ void ShadowSystem::configure(const RenderContext& ctx, const FrameGraph& graph, 
 }
 
 void ShadowSystem::directionalShadowPass() {
-	const auto& lights = *mCtx->light.dirLights;
+	const auto& lights = mCtx->light.dirLights;
 
 	if (lights.empty())
 		return;
@@ -106,7 +106,7 @@ void ShadowSystem::directionalShadowPass() {
 }
 
 void ShadowSystem::omnidirectionalShadowPass() {
-	const auto& lights = *mCtx->light.pointLights;
+	const auto& lights = mCtx->light.pointLights;
 
 	if (lights.empty())
 		return;
@@ -128,7 +128,7 @@ void ShadowSystem::omnidirectionalShadowPass() {
 }
 
 void ShadowSystem::perspectiveShadowPass() {
-	const auto& lights = *mCtx->light.spotLights;
+	const auto& lights = mCtx->light.spotLights;
 	if (lights.empty())
 		return;
 

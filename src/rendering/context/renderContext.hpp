@@ -1,8 +1,7 @@
 #pragma once
-#include <vector>
+#include <span>
 #include <memory>
 #include <unordered_map>
-#include "../material/material.hpp"
 
 class FrameBuffer;
 class QueueRegistry;
@@ -16,12 +15,11 @@ struct RenderContext {
 	RenderData* renderData{};
 	QueueRegistry* queueRegistry{};
 	std::unordered_map<std::string, std::unique_ptr<FrameBuffer> >* pbrBuffers{};
-	mutable MaterialCache materialCache;
 
 	struct {
-		const std::vector<DirectionalLightComponent*>* dirLights;
-		const std::vector<PointLightComponent*>* pointLights;
-		const std::vector<SpotLightComponent*>* spotLights;
+		std::span<DirectionalLightComponent*> dirLights;
+		std::span<PointLightComponent*> pointLights;
+		std::span<SpotLightComponent*> spotLights;
 	} light{};
 
 	const Camera* camera{};
