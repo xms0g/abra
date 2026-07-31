@@ -63,7 +63,7 @@ Texture Texture::generate(const int32_t width, const int32_t height, const float
 	return {textureID, 0, TextureTarget::Texture2D, ""};
 }
 
-void Texture::generateMipmaps(const TextureHandle handle) {
+void Texture::generateMipmaps(const TextureView handle) {
 	glBindTexture(toGLu(handle.target), handle.id);
 	glGenerateMipmap(toGLu(handle.target));
 }

@@ -18,10 +18,10 @@ void Sepia::configure(const FrameGraph& graph) {
 {{.name = "screenTexture", .slot = 0}});
 }
 
-TextureHandle Sepia::render(
+TextureView Sepia::render(
 	GraphicsEncoder& encoder,
 	Model::Quad& quad,
-	const TextureHandle sceneTexture,
+	const TextureView sceneTexture,
 	FrameBuffer* renderTarget) {
 	encoder.reset();
 	encoder.bindFrameBuffer(*renderTarget);
@@ -29,7 +29,7 @@ TextureHandle Sepia::render(
 
 	encoder.bindPipeline(mPipeline);
 
-	const TextureHandle textures[] = {{.id = sceneTexture.id, .target = TextureTarget::Texture2D}};
+	const TextureView textures[] = {{.id = sceneTexture.id, .target = TextureTarget::Texture2D}};
 	encoder.bindMaterial({
 		.flags = 0,
 		.textures = std::span(textures)

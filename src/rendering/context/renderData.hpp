@@ -20,7 +20,7 @@ struct RenderData {
 	struct {
 		std::vector<float> alphaCutoffs;
 		std::vector<uint32_t> flags;
-		std::vector<TextureHandle> textures;
+		std::vector<TextureView> textures;
 		std::vector<glm::vec3> colors;
 	} material;
 

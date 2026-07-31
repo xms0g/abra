@@ -15,34 +15,34 @@ public:
 
 	void configure(const FrameGraph& graph) override;
 
-	TextureHandle render(
+	TextureView render(
 		GraphicsEncoder& encoder,
 		Model::Quad& quad,
-		TextureHandle sceneTexture,
+		TextureView sceneTexture,
 		FrameBuffer* renderTarget) override;
 
 protected:
 	void updateFromEventImpl(const GuiPostProcessEvent& event) override;
 
 private:
-	TextureHandle brightFilterPass(
+	TextureView brightFilterPass(
 		GraphicsEncoder& encoder,
 		const Model::Quad& quad,
-		TextureHandle sceneTexture,
+		TextureView sceneTexture,
 		bool& toggle);
 
-	TextureHandle blurPass(
+	TextureView blurPass(
 		GraphicsEncoder& encoder,
 		const Model::Quad& quad,
-		TextureHandle sceneTexture,
+		TextureView sceneTexture,
 		bool& toggle);
 
 	[[nodiscard]]
-	TextureHandle combinePass(
+	TextureView combinePass(
 		GraphicsEncoder& encoder,
 		const Model::Quad& quad,
-		TextureHandle sceneTexture,
-		TextureHandle blurTexture,
+		TextureView sceneTexture,
+		TextureView blurTexture,
 		const bool& toggle);
 
 	std::array<FrameBuffer*, 2> mRenderTargets{};

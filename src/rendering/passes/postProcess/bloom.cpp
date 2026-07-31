@@ -43,14 +43,14 @@ void Bloom::configure(const FrameGraph& graph) {
 	mRenderTargets = {&graph.getResource("bloomPing"), &graph.getResource("bloomPong")};
 }
 
-TextureHandle Bloom::render(
+TextureView Bloom::render(
 	GraphicsEncoder& encoder,
 	Model::Quad& quad,
-	const TextureHandle sceneTexture,
+	const TextureView sceneTexture,
 	FrameBuffer* renderTarget) {
 	(void) renderTarget;
 	bool toggle = false;
-	TextureHandle inputTex = sceneTexture;
+	TextureView inputTex = sceneTexture;
 
 	inputTex = brightFilterPass(encoder, quad, inputTex, toggle);
 	inputTex = blurPass(encoder, quad, inputTex, toggle);
@@ -62,10 +62,10 @@ TextureHandle Bloom::render(
 void Bloom::updateFromEventImpl(const GuiPostProcessEvent& event) {
 }
 
-TextureHandle Bloom::brightFilterPass(
+TextureView Bloom::brightFilterPass(
 	GraphicsEncoder& encoder,
 	const Model::Quad& quad,
-	const TextureHandle sceneTexture,
+	const TextureView sceneTexture,
 	bool& toggle) {
 	encoder.reset();
 	encoder.bindFrameBuffer(*mRenderTargets[toggle]);
@@ -73,7 +73,7 @@ TextureHandle Bloom::brightFilterPass(
 
 	encoder.bindPipeline(mPipelines[0]);
 
-	const TextureHandle textures[] = {{.id = sceneTexture.id, .target = TextureTarget::Texture2D}};
+	const TextureView textures[] = {{.id = sceneTexture.id, .target = TextureTarget::Texture2D}};
 	encoder.bindMaterial({
 		.flags = 0,
 		.textures = std::span(textures)
@@ -88,14 +88,14 @@ TextureHandle Bloom::brightFilterPass(
 	return renderTarget->texture();
 }
 
-TextureHandle Bloom::blurPass(
+TextureView Bloom::blurPass(
 	GraphicsEncoder& encoder,
 	const Model::Quad& quad,
-	const TextureHandle sceneTexture,
+	const TextureView sceneTexture,
 	bool& toggle) {
 	bool horizontal = true;
 
-	TextureHandle outTex = sceneTexture;
+	TextureView outTex = sceneTexture;
 
 	encoder.bindPipeline(mPipelines[1]);
 	for (int i = 0; i < 10; ++i) {
@@ -106,7 +106,7 @@ TextureHandle Bloom::blurPass(
 		encoder.setUniform("horizontal", horizontal);
 		horizontal = !horizontal;
 
-		const TextureHandle textures[] = {{.id = sceneTexture.id, .target = TextureTarget::Texture2D}};
+		const TextureView textures[] = {{.id = sceneTexture.id, .target = TextureTarget::Texture2D}};
 		encoder.bindMaterial({
 			.flags = 0,
 			.textures = std::span(textures)
@@ -122,11 +122,11 @@ TextureHandle Bloom::blurPass(
 	return outTex;
 }
 
-TextureHandle Bloom::combinePass(
+TextureView Bloom::combinePass(
 	GraphicsEncoder& encoder,
 	const Model::Quad& quad,
-	const TextureHandle sceneTexture,
-	const TextureHandle blurTexture,
+	const TextureView sceneTexture,
+	const TextureView blurTexture,
 	const bool& toggle) {
 	encoder.reset();
 	encoder.bindFrameBuffer(*mRenderTargets[toggle]);
@@ -134,7 +134,7 @@ TextureHandle Bloom::combinePass(
 
 	encoder.bindPipeline(mPipelines[2]);
 
-	const TextureHandle textures[] = {
+	const TextureView textures[] = {
 		{.id = sceneTexture.id, .target = TextureTarget::Texture2D},
 		{.id = blurTexture.id, .target = TextureTarget::Texture2D}
 	};

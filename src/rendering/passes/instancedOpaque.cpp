@@ -100,7 +100,7 @@ void InstancedOpaquePass::execute(const RenderContext& ctx, const FrameGraph& gr
 		mEncoder.bindMaterial({
 			.idx = object.matBatch.materialIndex,
 			.flags = ctx.renderData->material.flags[object.matBatch.materialIndex],
-			.textures = std::span<const TextureHandle>(
+			.textures = std::span<const TextureView>(
 				ctx.renderData->material.textures.data() + object.matBatch.textureOffset,
 				object.matBatch.textureCount)
 		});

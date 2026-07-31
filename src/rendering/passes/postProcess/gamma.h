@@ -9,10 +9,10 @@ public:
 
 	void configure(const FrameGraph& graph) override;
 
-	TextureHandle render(
+	TextureView render(
 		GraphicsEncoder& encoder,
 		Model::Quad& quad,
-		TextureHandle sceneTexture,
+		TextureView sceneTexture,
 		FrameBuffer* renderTarget) override;
 
 protected:

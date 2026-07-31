@@ -9,7 +9,7 @@ struct MaterialView {
 	glm::vec3 color;
 	float alphaCutoff;
 	float heightScale;
-	std::span<const TextureHandle> textures;
+	std::span<const TextureView> textures;
 };
 
 struct TransformView {

@@ -43,12 +43,12 @@ void GraphicsEncoder::bindVertexArray(const uint32_t vao) const {
 	glBindVertexArray(vao);
 }
 
-void GraphicsEncoder::bindTexture(const TextureHandle& handle, const uint32_t slot) const {
+void GraphicsEncoder::bindTexture(const TextureView& handle, const uint32_t slot) const {
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(toGLu(handle.target), handle.id);
 }
 
-void GraphicsEncoder::bindTextures(const std::span<const TextureHandle> handles, uint32_t slot) const {
+void GraphicsEncoder::bindTextures(const std::span<const TextureView> handles, uint32_t slot) const {
 	for (const auto& handle: handles) {
 		bindTexture(handle, slot++);
 	}

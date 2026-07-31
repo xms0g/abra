@@ -20,10 +20,10 @@ void Kernel::configure(const FrameGraph& graph) {
 		{{.name = "screenTexture", .slot = 0}});
 }
 
-TextureHandle Kernel::render(
+TextureView Kernel::render(
 	GraphicsEncoder& encoder,
 	Model::Quad& quad,
-	const TextureHandle sceneTexture,
+	const TextureView sceneTexture,
 	FrameBuffer* renderTarget) {
 	encoder.reset();
 	encoder.bindFrameBuffer(*renderTarget);
@@ -32,7 +32,7 @@ TextureHandle Kernel::render(
 	encoder.bindPipeline(mPipeline);
 	encoder.setUniform("kernel", mKernel, 9);
 
-	const TextureHandle textures[] = {{.id = sceneTexture.id, .target = TextureTarget::Texture2D}};
+	const TextureView textures[] = {{.id = sceneTexture.id, .target = TextureTarget::Texture2D}};
 	encoder.bindMaterial({
 		.flags = 0,
 		.textures = std::span(textures)

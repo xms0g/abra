@@ -65,7 +65,7 @@ int32_t FrameBuffer::height() const {
 	return mHeight;
 }
 
-TextureHandle FrameBuffer::texture(uint32_t index) const {
+TextureView FrameBuffer::texture(uint32_t index) const {
 	return {.id = mTextures[index].id, .target = mTextures[index].target};
 }
 

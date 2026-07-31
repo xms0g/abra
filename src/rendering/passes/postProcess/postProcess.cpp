@@ -55,7 +55,7 @@ void PostProcessPass::configure(const RenderContext& ctx, const FrameGraph& grap
 void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
 	bool toggle = false;
 
-	TextureHandle inputTex = graph.getResource("sceneBuffer").texture();
+	TextureView inputTex = graph.getResource("sceneBuffer").texture();
 	for (const auto& effect: mEffects) {
 		if (!effect->enabled())
 			continue;
@@ -68,7 +68,7 @@ void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph)
 	mEncoder.bindFrameBuffer();
 	mEncoder.bindPipeline(mPipeline);
 
-	const TextureHandle textures[] = {{.id = inputTex.id, .target = TextureTarget::Texture2D}};
+	const TextureView textures[] = {{.id = inputTex.id, .target = TextureTarget::Texture2D}};
 	mEncoder.bindMaterial({
 		.flags = 0,
 		.textures = std::span(textures)

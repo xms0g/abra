@@ -49,7 +49,7 @@ public:
 	int32_t height() const;
 
 	[[nodiscard]]
-	TextureHandle texture(uint32_t index = 0) const;
+	TextureView texture(uint32_t index = 0) const;
 
 	void bind() const;
 

@@ -22,7 +22,7 @@ enum class TextureTarget : uint32_t {
 	TextureCubeMapArray = GL_TEXTURE_CUBE_MAP_ARRAY
 };
 
-struct TextureHandle {
+struct TextureView {
 	uint32_t id{0};
 	TextureTarget target{};
 };
@@ -49,7 +49,7 @@ struct Texture {
 
 	static Texture generate(int32_t width, int32_t height, const float* data);
 
-	static void generateMipmaps(TextureHandle handle);
+	static void generateMipmaps(TextureView handle);
 
 	static uint32_t load(const std::string& path, uint32_t flags, bool isSRGB);
 
