@@ -4,17 +4,17 @@
 #include <stdexcept>
 #include "glad/glad.h"
 #include "glm/gtc/type_ptr.hpp"
-#include "enumUtils.hpp"
+#include "glUtils.hpp"
 #include "../io/filesystem.hpp"
 #include "../config/configManager.h"
 #include "../rendering/graphicsPipeline.h"
 
-GLu(ShaderStageType)
+GL(ShaderStageType)
 
 ShaderStage::ShaderStage(const PipelineShaderStage& info) : type(info.stage) {
 	const auto processedSource = preprocess(info.code);
 
-	handle = glCreateShader(toGLu(info.stage));
+	handle = glCreateShader(toGL(info.stage));
 
 	const char* ptr = processedSource.c_str();
 

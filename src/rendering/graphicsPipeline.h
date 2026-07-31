@@ -2,7 +2,7 @@
 #include <vector>
 #include "glad/glad.h"
 #include "shader.h"
-#include "enumUtils.hpp"
+#include "glUtils.hpp"
 
 enum class CullMode: uint32_t {
 	None = GL_NONE,

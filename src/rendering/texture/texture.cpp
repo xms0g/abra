@@ -64,8 +64,8 @@ Texture Texture::generate(const int32_t width, const int32_t height, const float
 }
 
 void Texture::generateMipmaps(const TextureView handle) {
-	glBindTexture(toGLu(handle.target), handle.id);
-	glGenerateMipmap(toGLu(handle.target));
+	glBindTexture(toGL(handle.target), handle.id);
+	glGenerateMipmap(toGL(handle.target));
 }
 
 uint32_t Texture::load(const std::string& path, const uint32_t flags, const bool isSRGB) {

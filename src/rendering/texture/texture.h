@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include "glad/glad.h"
-#include "../enumUtils.hpp"
+#include "../glUtils.hpp"
 
 enum TextureType {
 	ALBEDO = 1,
@@ -60,4 +60,4 @@ struct Texture {
 	static Texture loadHDR(const std::string& path);
 };
 
-GLu(TextureTarget)
+GL(TextureTarget)

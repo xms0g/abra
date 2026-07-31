@@ -2,7 +2,7 @@
 #include <string>
 #include "glad/glad.h"
 #include "command.hpp"
-#include "enumUtils.hpp"
+#include "glUtils.hpp"
 #include "graphicsPipeline.h"
 #include "buffers/frameBuffer.h"
 #include "material/material.hpp"

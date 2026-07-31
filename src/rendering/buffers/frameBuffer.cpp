@@ -3,9 +3,9 @@
 #include <vector>
 #include "glad/glad.h"
 
-GLu(Attachment)
-GLi(BaseFormat)
-GLi(InternalFormat)
+GL(Attachment)
+GL(BaseFormat)
+GL(InternalFormat)
 
 FrameBuffer::FrameBuffer(const int32_t width, const int32_t height)
 	: mWidth(width),
@@ -89,7 +89,7 @@ void FrameBuffer::attachTexture(const uint32_t index, const Attachment attachmen
 		case TextureTarget::Texture2D:
 			glFramebufferTexture2D(
 				GL_FRAMEBUFFER,
-				toGLu(attachment),
+				toGL(attachment),
 				GL_TEXTURE_2D,
 				id,
 				mip);
@@ -99,7 +99,7 @@ void FrameBuffer::attachTexture(const uint32_t index, const Attachment attachmen
 
 			glFramebufferTexture2D(
 				GL_FRAMEBUFFER,
-				toGLu(attachment),
+				toGL(attachment),
 				GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer,
 				id,
 				mip);
@@ -108,7 +108,7 @@ void FrameBuffer::attachTexture(const uint32_t index, const Attachment attachmen
 		case TextureTarget::TextureCubeMapArray:
 			glFramebufferTextureLayer(
 				GL_FRAMEBUFFER,
-				toGLu(attachment),
+				toGL(attachment),
 				id,
 				mip,
 				layer);
@@ -141,11 +141,11 @@ FrameBuffer& FrameBuffer::withTexture(const BaseFormat format) {
 	glTexImage2D(
 		GL_TEXTURE_2D,
 		0,
-		toGLi(internalFormat),
+		toGL(internalFormat),
 		mWidth,
 		mHeight,
 		0,
-		toGLi(format),
+		toGL(format),
 		GL_UNSIGNED_BYTE,
 		nullptr);
 
@@ -170,7 +170,7 @@ FrameBuffer& FrameBuffer::withTextureMultisampled(const int32_t multisampledCoun
 	glTexImage2DMultisample(
 		GL_TEXTURE_2D_MULTISAMPLE,
 		multisampledCount,
-		toGLi(internalFormat),
+		toGL(internalFormat),
 		mWidth,
 		mHeight,
 		GL_TRUE);
@@ -193,11 +193,11 @@ FrameBuffer& FrameBuffer::withTextureFP(const BaseFormat format) {
 	glTexImage2D(
 		GL_TEXTURE_2D,
 		0,
-		toGLi(internalFormat),
+		toGL(internalFormat),
 		mWidth,
 		mHeight,
 		0,
-		toGLi(format),
+		toGL(format),
 		GL_FLOAT,
 		nullptr);
 
@@ -224,7 +224,7 @@ FrameBuffer& FrameBuffer::withTextureFPMultisampled(const int32_t multisampledCo
 	glTexImage2DMultisample(
 		GL_TEXTURE_2D_MULTISAMPLE,
 		multisampledCount,
-		toGLi(internalFormat),
+		toGL(internalFormat),
 		mWidth,
 		mHeight,
 		GL_TRUE);
@@ -245,7 +245,7 @@ FrameBuffer& FrameBuffer::withTextureDepth(const InternalFormat format, const bo
 	glTexImage2D(
 		GL_TEXTURE_2D,
 		0,
-		toGLi(format),
+		toGL(format),
 		mWidth,
 		mHeight,
 		0,
@@ -278,7 +278,7 @@ FrameBuffer& FrameBuffer::withTextureDepthArray(
 	glTexImage3D(
 		GL_TEXTURE_2D_ARRAY,
 		0,
-		toGLi(format),
+		toGL(format),
 		mWidth,
 		mHeight,
 		layerCount,
@@ -341,7 +341,7 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepth(const InternalFormat format, c
 		glTexImage2D(
 			GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
 			0,
-			toGLi(format),
+			toGL(format),
 			mWidth,
 			mHeight,
 			0,
@@ -374,7 +374,7 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(
 	glTexImage3D(
 		GL_TEXTURE_CUBE_MAP_ARRAY,
 		0,
-		toGLi(format),
+		toGL(format),
 		mWidth,
 		mHeight,
 		layerCount * 6,
@@ -401,7 +401,7 @@ FrameBuffer& FrameBuffer::withRenderBufferDepth(const InternalFormat format) {
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 
-	glRenderbufferStorage(GL_RENDERBUFFER, toGLi(format), mWidth, mHeight);
+	glRenderbufferStorage(GL_RENDERBUFFER, toGL(format), mWidth, mHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
@@ -414,7 +414,7 @@ FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisampledCount, toGLi(format), mWidth, mHeight);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisampledCount, toGL(format), mWidth, mHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
@@ -425,7 +425,7 @@ FrameBuffer& FrameBuffer::withRenderBufferDepthStencil(const InternalFormat form
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 
-	glRenderbufferStorage(GL_RENDERBUFFER, toGLi(format), mWidth, mHeight);
+	glRenderbufferStorage(GL_RENDERBUFFER, toGL(format), mWidth, mHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
@@ -438,7 +438,7 @@ FrameBuffer& FrameBuffer::withRenderBufferDepthStencilMultisampled(
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisampledCount, toGLi(format), mWidth, mHeight);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisampledCount, toGL(format), mWidth, mHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
