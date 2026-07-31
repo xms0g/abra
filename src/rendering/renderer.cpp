@@ -128,9 +128,10 @@ void Renderer::createPBRBuffers() {
 	const auto& matComponent = entityIt->getComponent<MaterialComponent>();
 	auto& textures = matComponent.materials->at(0).textures;
 
-	const uint32_t id = createEnvMap(textures.front());
+	const TextureView view = createEnvMap(textures.front());
+
 	textures.clear();
-	textures.emplace_back(id, 0, TextureTarget::TextureCubeMap, "");
+	textures.emplace_back(view.id, 0, view.target, "");
 
 	createIrradianceMap();
 	createPrefilterMap();
@@ -462,7 +463,7 @@ void Renderer::sortEntities() {
 	// }
 }
 
-uint32_t Renderer::createEnvMap(Texture& hdrTexture) {
+TextureView Renderer::createEnvMap(Texture& hdrTexture) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
@@ -536,7 +537,7 @@ uint32_t Renderer::createEnvMap(Texture& hdrTexture) {
 	encoder.unbindFrameBuffer();
 	Texture::generateMipmaps(mPBRBuffers.environment->texture());
 
-	return mPBRBuffers.environment->texture().id;
+	return mPBRBuffers.environment->texture();
 }
 
 void Renderer::createIrradianceMap() {
