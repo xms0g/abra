@@ -75,8 +75,7 @@ uint32_t Texture::load(const std::string& path, const uint32_t flags, const bool
 	unsigned char* data = stbi_load(path.c_str(), &width, &height, &channel, 4);
 
 	if (!data) {
-		std::cerr << "Texture failed to load at path: " << path << std::endl;
-		exit(1);
+		throw std::runtime_error(std::format("Texture failed to load at path: {}", path));
 	}
 
 	const int32_t internalFormat = isSRGB ? GL_SRGB8_ALPHA8 : GL_RGBA8;
@@ -103,7 +102,7 @@ void Texture::info(const std::string& path, int32_t& width, int32_t& height) {
 	stbi_info(path.c_str(), &width, &height, &channel);
 }
 
-uint32_t Texture::loadCubemap(const std::vector<std::string>& faces) {
+Texture Texture::loadCubemap(const std::vector<std::string>& faces) {
 	uint32_t textureID;
 
 	glGenTextures(1, &textureID);
@@ -114,9 +113,8 @@ uint32_t Texture::loadCubemap(const std::vector<std::string>& faces) {
 		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &depth, 0);
 
 		if (!data) {
-			std::cerr << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
 			glDeleteTextures(1, &textureID);
-			return 0;
+			throw std::runtime_error(std::format("Cubemap texture failed to load at path: {}", faces[i]));
 		}
 
 		const GLenum format = depth == 4 ? GL_RGBA : GL_RGB;
@@ -131,7 +129,7 @@ uint32_t Texture::loadCubemap(const std::vector<std::string>& faces) {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-	return textureID;
+	return {textureID, 0, TextureTarget::TextureCubeMap, ""};
 }
 
 Texture Texture::loadHDR(const std::string& path) {
@@ -142,8 +140,7 @@ Texture Texture::loadHDR(const std::string& path) {
 
 	float* data = stbi_loadf(path.c_str(), &width, &height, &channel, 0);
 	if (!data) {
-		std::cerr << "HDR texture failed to load at path: " << path << std::endl;
-		return {};
+		throw std::runtime_error(std::format("HDR texture failed to load at path: {}", path));
 	}
 
 	glGenTextures(1, &texID);

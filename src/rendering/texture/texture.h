@@ -55,7 +55,7 @@ struct Texture {
 
 	static void info(const std::string& path, int32_t& width, int32_t& height);
 
-	static uint32_t loadCubemap(const std::vector<std::string>& faces);
+	static Texture loadCubemap(const std::vector<std::string>& faces);
 
 	static Texture loadHDR(const std::string& path);
 };

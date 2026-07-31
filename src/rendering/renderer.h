@@ -1,5 +1,7 @@
 #pragma once
 #include <memory>
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 #include "frameGraph.h"
 #include "context/renderContext.hpp"
 #include "context/renderData.hpp"
@@ -32,6 +34,8 @@ private:
 
 	void createUniformBuffers(const Camera& camera);
 
+	void createPBRBuffers();
+
 	void createRenderQueues();
 
 	void createRenderPasses(EventBus& eventBus);
@@ -43,6 +47,14 @@ private:
 	void refreshCameraData() const;
 
 	void sortEntities();
+
+	uint32_t createEnvMap(Texture& hdrTexture);
+
+	void createIrradianceMap();
+
+	void createPrefilterMap();
+
+	void createBrdfLUT();
 
 	FrameGraph mGraph{};
 	// Systems
@@ -57,4 +69,18 @@ private:
 	QueueRegistry mQueueRegistry{};
 	// Render context
 	RenderContext mRenderCtx{};
+	// Frame Buffers
+	std::unordered_map<std::string, std::unique_ptr<FrameBuffer> > mPBRBuffers;
+
+	static constexpr uint32_t FACES = 6;
+
+	glm::mat4 mCaptureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+	glm::mat4 mCaptureViews[FACES] = {
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)),
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f))
+	};
 };

@@ -4,8 +4,6 @@
 #include <unordered_set>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 #include "../job/threadPool.h"
 #include "../rendering/types.hpp"
 
@@ -69,18 +67,9 @@ private:
 
 	static void loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& materialLoadCtx);
 
-	uint32_t createEnvMap(const std::string& path);
-
-	void createIrradianceMap();
-
-	void createPrefilterMap();
-
-	void createBrdfLUT();
-
 	std::unordered_map<size_t, MaterialMap> mMaterialsByEntity;
 	std::unordered_map<size_t, MeshMap> mMeshesByEntity;
 	std::unordered_map<size_t, std::vector<float> > mTransformsByEntity;
-	std::unordered_map<std::string, std::unique_ptr<FrameBuffer> > mBuffers;
 
 	ThreadPool mThreadPool{};
 	std::mutex mResourceMutex;
@@ -93,18 +82,6 @@ private:
 		aiTextureType_EMISSIVE,
 		aiTextureType_HEIGHT
 	};
-
-	static constexpr uint32_t FACES = 6;
-
-	glm::mat4 mCaptureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
-	glm::mat4 mCaptureViews[FACES] = {
-		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
-		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
-		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
-		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)),
-		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
-		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f))
-	};
 };
 
 template<typename T, typename KeyType>
@@ -115,8 +92,6 @@ T* ResourceManager::get(const KeyType& key) const {
 		return const_cast<T*>(&mMaterialsByEntity.at(key));
 	} else if constexpr (std::is_same_v<T, std::vector<float>>) {
 		return const_cast<T*>(&mTransformsByEntity.at(key));
-	} else if constexpr (std::is_same_v<T, FrameBuffer>) {
-		return mBuffers.at(key).get();
 	} else {
 		static_assert(false, "Unsupported type for get().");
 	}

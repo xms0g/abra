@@ -2,10 +2,9 @@
 #include "../frameGraph.h"
 #include "../shader.h"
 #include "../models/quad.h"
+#include "../mesh/vertexArray.h"
 #include "../context/renderContext.hpp"
 #include "../../config/configManager.h"
-#include "../../resource/resourceManager.h"
-#include "../mesh/vertexArray.h"
 
 DeferredLightingPass::DeferredLightingPass() = default;
 
@@ -83,9 +82,9 @@ void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph&
 	};
 
 	const auto pbrTextures = std::vector{
-		RESOURCE_MANAGER.get<FrameBuffer>("irradianceMap")->texture(),
-		RESOURCE_MANAGER.get<FrameBuffer>("prefilterMap")->texture(),
-		RESOURCE_MANAGER.get<FrameBuffer>("brdfLUT")->texture()
+		ctx.pbrBuffers->at("irradianceMap")->texture(),
+		ctx.pbrBuffers->at("prefilterMap")->texture(),
+		ctx.pbrBuffers->at("brdfLUT")->texture()
 	};
 
 	const auto shadowTextures = std::vector{

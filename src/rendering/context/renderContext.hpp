@@ -1,9 +1,10 @@
 #pragma once
 #include <vector>
-#include "glm/glm.hpp"
+#include <memory>
+#include <unordered_map>
 #include "../material/material.hpp"
-#include "../../resource/resourceManager.h"
 
+class FrameBuffer;
 class QueueRegistry;
 class Camera;
 struct RenderData;
@@ -14,6 +15,7 @@ struct SpotLightComponent;
 struct RenderContext {
 	RenderData* renderData{};
 	QueueRegistry* queueRegistry{};
+	std::unordered_map<std::string, std::unique_ptr<FrameBuffer> >* pbrBuffers{};
 	mutable MaterialCache materialCache;
 
 	struct {
