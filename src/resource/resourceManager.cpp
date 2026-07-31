@@ -201,7 +201,7 @@ void ResourceManager::processMaterials(const aiScene* scene, MaterialLoadContext
 	for (const auto& matID: materialLoadCtx.materialsToLoad) {
 		const aiMaterial* material = scene->mMaterials[matID];
 
-		for (const auto& type: textureBindings) {
+		for (const auto& type: textureTypes) {
 			TextureLoadRequest req{.mat = material, .type = type, .materialID = matID};
 			loadMaterialTextures(req, materialLoadCtx);
 		}

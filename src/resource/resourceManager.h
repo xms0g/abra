@@ -74,7 +74,7 @@ private:
 	ThreadPool mThreadPool{};
 	std::mutex mResourceMutex;
 
-	static constexpr aiTextureType textureBindings[] = {
+	static constexpr aiTextureType textureTypes[] = {
 		aiTextureType_DIFFUSE,
 		aiTextureType_NORMALS,
 		aiTextureType_UNKNOWN,
