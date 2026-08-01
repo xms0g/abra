@@ -1,5 +1,5 @@
 #pragma once
-#include "../event.hpp"
+#include "event.hpp"
 
 struct GuiPostProcessEvent : Event {
 	explicit GuiPostProcessEvent(const uint32_t i, const bool e, const float exp, const float intens)

@@ -90,8 +90,8 @@ T* ResourceManager::get(const KeyType& key) const {
 		return const_cast<T*>(&mMeshesByEntity.at(key));
 	} else if constexpr (std::is_same_v<T, MaterialMap>) {
 		return const_cast<T*>(&mMaterialsByEntity.at(key));
-	} else if constexpr (std::is_same_v<T, std::vector<float>>) {
-		return const_cast<T*>(&mTransformsByEntity.at(key));
+	} else if constexpr (std::is_same_v<T, float>) {
+		return const_cast<T*>(mTransformsByEntity.at(key).data());
 	} else {
 		static_assert(false, "Unsupported type for get().");
 	}

@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
 #include "glm/glm.hpp"
-#include "../../math/matrix.h"
 #include "../texture/texture.h"
+#include "../../math/matrix.h"
 
 struct RenderData {
 	struct {

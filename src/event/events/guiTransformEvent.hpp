@@ -1,6 +1,6 @@
 #pragma once
 #include "glm/glm.hpp"
-#include "../event.hpp"
+#include "event.hpp"
 
 struct GuiTransformEvent : Event {
 	explicit GuiTransformEvent(const size_t id, const glm::vec3& p, const glm::vec3& r, const glm::vec3& s)

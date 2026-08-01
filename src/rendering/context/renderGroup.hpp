@@ -1,4 +1,5 @@
 #pragma once
+#include <span>
 #include "../material/material.hpp"
 
 struct RenderGroup {
@@ -7,5 +8,5 @@ struct RenderGroup {
 };
 
 struct RenderInstanceGroup : RenderGroup {
-	std::vector<float> transforms{}; // P,R,S data
+	std::span<const float> transforms{}; // P,R,S data
 };

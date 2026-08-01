@@ -120,6 +120,7 @@
         },
         "DirectionalLightComponent": {
           "index": 0,
+          "position": [0.0, 0.0, 0.0],
           "direction": [-0.2, -1.0, -0.3],
           "ambient": [0.1, 0.1, 0.1],
           "diffuse": [0.4, 0.4, 0.4],

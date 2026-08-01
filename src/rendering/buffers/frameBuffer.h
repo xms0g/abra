@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdint>
 #include <vector>
 #include "../texture/texture.h"
 

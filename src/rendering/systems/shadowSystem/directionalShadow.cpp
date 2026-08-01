@@ -1,5 +1,4 @@
 #include "directionalShadow.h"
-#include "glad/glad.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "../../mesh/mesh.h"
 #include "../../shader.h"

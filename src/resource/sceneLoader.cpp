@@ -195,9 +195,11 @@ void SceneLoader::loadScene(Registry& registry, const std::string_view filePath)
 		// Instance Component
 		if (comps.contains("InstanceComponent")) {
 			auto transforms = comps["InstanceComponent"]["transforms"].get<std::vector<float> >();
+			size_t count = transforms.size();
 			RESOURCE_MANAGER.upload<decltype(transforms)>(entity.id(), transforms);
 
-			entity.addComponent<InstanceComponent>(RESOURCE_MANAGER.get<decltype(transforms)>(entity.id()));
+			auto transform = std::span<const float>(RESOURCE_MANAGER.get<float>(entity.id()), count);
+			entity.addComponent<InstanceComponent>(transform);
 		}
 
 		// Material Component

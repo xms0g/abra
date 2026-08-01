@@ -97,7 +97,7 @@ MaterialBatch Batcher::batchMaterial(
 void Batcher::enqueueRenderGroup(const Entity& entity, QueueRegistry& queueRegistry, const MaterialBatch& matBatch) {
 	if (matBatch.renderFlag == INSTANCED_PASS) {
 		const auto& instComponent = entity.getComponent<InstanceComponent>();
-		RenderInstanceGroup group{entity.id(), matBatch, *instComponent.transforms};
+		RenderInstanceGroup group{entity.id(), matBatch, instComponent.transforms};
 
 		for (const auto& rule: rules) {
 			if (matBatch.materialFlags & rule.flags) {

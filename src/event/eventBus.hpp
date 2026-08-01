@@ -2,7 +2,7 @@
 #include <list>
 #include <typeindex>
 #include <unordered_map>
-#include "event.hpp"
+#include "events/event.hpp"
 
 class IEventCallBack {
 public:
@@ -17,7 +17,7 @@ private:
 };
 
 template<typename TOwner, typename TEvent>
-class EventCallBack : public IEventCallBack {
+class EventCallBack final : public IEventCallBack {
 public:
 	typedef void (TOwner::* CallBackFunction)(const TEvent&);
 

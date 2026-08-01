@@ -1,5 +1,5 @@
 #pragma once
-#include "../event.hpp"
+#include "event.hpp"
 
 struct MouseMovementEvent : Event {
 	explicit MouseMovementEvent(const float x_, const float y_)

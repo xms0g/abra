@@ -1,9 +1,9 @@
 #pragma once
-#include <vector>
+#include <span>
 
 struct InstanceComponent {
-	std::vector<float>* transforms{};
+	std::span<const float> transforms{};
 
 	InstanceComponent() = default;
-	explicit InstanceComponent(std::vector<float>* t) : transforms(t) {}
+	explicit InstanceComponent(const std::span<const float> t) : transforms(t) {}
 };

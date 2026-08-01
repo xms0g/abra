@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include "../event.hpp"
+#include "event.hpp"
 
 struct GuiDebugEvent : Event {
 	explicit GuiDebugEvent(const size_t id, const uint32_t m)

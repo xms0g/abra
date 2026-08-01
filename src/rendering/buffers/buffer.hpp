@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdint>
 #include <utility>
 #include "glad/glad.h"
 
@@ -59,5 +58,5 @@ public:
 protected:
 	uint32_t mID{0};
 	uint32_t mTarget{0};
-	BufferUsage mUsage;
+	BufferUsage mUsage{};
 };

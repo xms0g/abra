@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include "../event.hpp"
+#include "event.hpp"
 
 struct KeyPressedEvent : Event {
 	explicit KeyPressedEvent(const uint32_t dir, const float dt)

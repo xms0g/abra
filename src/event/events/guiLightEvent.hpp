@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include "../event.hpp"
+#include "event.hpp"
 
 struct GuiLightEvent : Event {
 	size_t entityID;

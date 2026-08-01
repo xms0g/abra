@@ -1,5 +1,5 @@
 #pragma once
-#include "../event.hpp"
+#include "event.hpp"
 
 struct UpdateShadowMapEvent : Event {
 	explicit UpdateShadowMapEvent() = default;
