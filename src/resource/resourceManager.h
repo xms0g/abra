@@ -24,7 +24,7 @@ public:
 	[[nodiscard]]
 	T* get(const KeyType& key) const;
 
-	void asyncLoadModel(size_t entityID, const std::string& file);
+	void asyncLoadModel(size_t entityID, std::string modelPath, std::string texturePath);
 
 	template<typename T>
 	void upload(size_t entityID, T& map);
@@ -42,7 +42,7 @@ private:
 
 	struct MaterialLoadContext {
 		MaterialMap materials;
-		std::string baseDir;
+		std::string textureDir;
 		std::string roughMetalPath;
 		std::unordered_set<uint32_t> materialsToLoad;
 	};
@@ -53,7 +53,7 @@ private:
 		uint32_t materialID;
 	};
 
-	void loadModel(size_t entityID, const std::string& file);
+	void loadModel(size_t entityID,  std::string_view modelPath, std::string_view texturePath);
 
 	static void processMeshes(
 		const aiNode* node,

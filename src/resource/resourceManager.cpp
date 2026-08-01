@@ -15,9 +15,9 @@ ResourceManager& ResourceManager::instance() {
 	return instance;
 }
 
-void ResourceManager::asyncLoadModel(size_t entityID, const std::string& file) {
-	mThreadPool.enqueue([this, entityID, file]() {
-		loadModel(entityID, file);
+void ResourceManager::asyncLoadModel(size_t entityID,  std::string modelPath, std::string texturePath) {
+	mThreadPool.enqueue([this, entityID, modelPath = std::move(modelPath), texturePath = std::move(texturePath)]() {
+		loadModel(entityID, modelPath, texturePath);
 	});
 }
 
@@ -87,12 +87,12 @@ void ResourceManager::waitForAll() const {
 	mThreadPool.wait();
 }
 
-void ResourceManager::loadModel(const size_t entityID, const std::string& file) {
+void ResourceManager::loadModel(const size_t entityID, std::string_view modelPath, std::string_view texturePath) {
 	// read file via ASSIMP
 	Assimp::Importer importer;
 	const std::filesystem::path assetRoot = CONFIG_MANAGER.get<std::string>("path.asset");
 
-	const std::string path = fs::resolvePath(assetRoot / file);
+	const std::string path = fs::resolvePath(assetRoot / modelPath);
 	const aiScene* scene = importer.ReadFile(
 		path,
 		aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -104,7 +104,7 @@ void ResourceManager::loadModel(const size_t entityID, const std::string& file) 
 
 	// process ASSIMP's root node recursively
 	MeshMap meshesByMatID;
-	MaterialLoadContext mlCtx{.baseDir = file.substr(0, file.find_last_of('/')).append("/")};
+	MaterialLoadContext mlCtx{.textureDir = texturePath.data()};
 
 	processMeshes(scene->mRootNode, scene, meshesByMatID, mlCtx);
 	processMaterials(scene, mlCtx);
@@ -261,7 +261,7 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 		aiString str;
 
 		req.mat->GetTexture(req.type, i, &str);
-		std::string path = materialLoadCtx.baseDir + str.C_Str();
+		std::string path = materialLoadCtx.textureDir + str.C_Str();
 
 		switch (req.type) {
 			case aiTextureType_HEIGHT:

@@ -60,7 +60,8 @@ void SceneLoader::loadScene(Registry& registry, const std::string_view filePath)
 
 		if (entityData.contains("model_path")) {
 			std::string modelPath = entityData["model_path"];
-			RESOURCE_MANAGER.asyncLoadModel(entity.id(), modelPath);
+			std::string texturePath = entityData["texture_path"];
+			RESOURCE_MANAGER.asyncLoadModel(entity.id(), modelPath, texturePath);
 		}
 
 		DeferredEntity deferred{entity, entityData["components"]};
