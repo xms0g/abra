@@ -7,9 +7,9 @@ ConfigManager& ConfigManager::instance() {
 	return ins;
 }
 
-void ConfigManager::load(const std::string& filepath) {
+void ConfigManager::load(const std::string_view filepath) {
 	try {
-		auto config = toml::parse_file(fs::path(filepath));
+		auto config = toml::parse_file(fs::resolvePath(filepath));
 
 		set("path.shader", std::string(config["paths"]["shader_dir"].value_or("")));
 		set("path.asset", std::string(config["paths"]["asset_dir"].value_or("")));

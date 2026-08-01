@@ -19,7 +19,7 @@ public:
 	template<typename T>
 	void set(const std::string& key, T&& value);
 
-	void load(const std::string& filepath);
+	void load(std::string_view filepath);
 
 private:
 	explicit ConfigManager() = default;

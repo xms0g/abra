@@ -5,5 +5,5 @@ struct Config;
 class Registry;
 
 namespace  SceneLoader {
-void loadScene(Registry& registry, const std::string& filePath);
+void loadScene(Registry& registry, std::string_view filePath);
 }

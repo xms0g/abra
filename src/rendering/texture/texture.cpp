@@ -70,11 +70,11 @@ void Texture::generateMipmaps(const TextureView handle) {
 	glBindTexture(toGL(handle.target), 0);
 }
 
-uint32_t Texture::load(const std::string& path, const uint32_t flags, const bool isSRGBA) {
+uint32_t Texture::load(const std::string_view path, const uint32_t flags, const bool isSRGBA) {
 	uint32_t textureID;
 
 	int32_t width, height, channel;
-	unsigned char* data = stbi_load(path.c_str(), &width, &height, &channel, 4);
+	unsigned char* data = stbi_load(path.data(), &width, &height, &channel, 4);
 
 	if (!data) {
 		throw std::runtime_error(std::format("Texture failed to load at path: {}", path));
@@ -98,9 +98,9 @@ uint32_t Texture::load(const std::string& path, const uint32_t flags, const bool
 	return textureID;
 }
 
-void Texture::info(const std::string& path, int32_t& width, int32_t& height) {
+void Texture::info(const std::string_view path, int32_t& width, int32_t& height) {
 	int32_t channel;
-	stbi_info(path.c_str(), &width, &height, &channel);
+	stbi_info(path.data(), &width, &height, &channel);
 }
 
 Texture Texture::loadCubemap(const std::vector<std::string>& faces) {
@@ -135,13 +135,13 @@ Texture Texture::loadCubemap(const std::vector<std::string>& faces) {
 	return {textureID, 0, TextureTarget::TextureCubeMap, ""};
 }
 
-Texture Texture::loadHDR(const std::string& path) {
+Texture Texture::loadHDR(const std::string_view path) {
 	uint32_t texID;
 	int32_t width, height, channel;
 
 	stbi_set_flip_vertically_on_load(true);
 
-	float* data = stbi_loadf(path.c_str(), &width, &height, &channel, 0);
+	float* data = stbi_loadf(path.data(), &width, &height, &channel, 0);
 	if (!data) {
 		throw std::runtime_error(std::format("HDR texture failed to load at path: {}", path));
 	}

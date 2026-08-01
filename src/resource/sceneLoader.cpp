@@ -32,8 +32,8 @@ glm::vec3 parseVec3(const json& j) {
 	return glm::vec3(j[0].get<float>(), j[1].get<float>(), j[2].get<float>());
 }
 
-void SceneLoader::loadScene(Registry& registry, const std::string& filePath) {
-	std::ifstream file(fs::path(CONFIG_MANAGER.get<std::string>("path.scene") + filePath));
+void SceneLoader::loadScene(Registry& registry, const std::string_view filePath) {
+	std::ifstream file(fs::resolvePath(CONFIG_MANAGER.get<std::string>("path.scene").append(filePath)));
 	if (!file.is_open()) {
 		throw std::runtime_error(std::format("Failed to open scene file: {}", filePath));
 	}

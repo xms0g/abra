@@ -51,13 +51,13 @@ struct Texture {
 
 	static void generateMipmaps(TextureView handle);
 
-	static uint32_t load(const std::string& path, uint32_t flags, bool isSRGBA);
+	static uint32_t load(std::string_view path, uint32_t flags, bool isSRGBA);
 
-	static void info(const std::string& path, int32_t& width, int32_t& height);
+	static void info(std::string_view path, int32_t& width, int32_t& height);
 
 	static Texture loadCubemap(const std::vector<std::string>& faces);
 
-	static Texture loadHDR(const std::string& path);
+	static Texture loadHDR(std::string_view path);
 };
 
 GL(TextureTarget)

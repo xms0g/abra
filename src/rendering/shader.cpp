@@ -224,5 +224,6 @@ void Uniform::setMat4Array(const uint32_t id, const std::string& name, const glm
 
 std::string ShaderLoader::load(const std::string_view file) {
 	const std::filesystem::path root = CONFIG_MANAGER.get<std::string>("path.shader");
-	return fs::readFile(root / file);
+	const auto path = root / file;
+	return fs::readFile(path.string());
 }

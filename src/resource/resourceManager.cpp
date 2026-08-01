@@ -39,7 +39,7 @@ void ResourceManager::uploadMaterialsToGPU() {
 			if (material.textureTarget == TextureTarget::TextureCubeMap) {
 				// HDR texture
 				if (material.textures.size() == 1) {
-					const std::string path = fs::path(
+					const std::string path = fs::resolvePath(
 						CONFIG_MANAGER.get<std::string>("path.asset") + material.textures.front().path);
 
 					Texture texture = Texture::loadHDR(path);
@@ -52,7 +52,7 @@ void ResourceManager::uploadMaterialsToGPU() {
 					paths.reserve(material.textures.size());
 
 					for (auto& texture: material.textures) {
-						paths.push_back(fs::path(CONFIG_MANAGER.get<std::string>("path.asset") + texture.path));
+						paths.push_back(fs::resolvePath(CONFIG_MANAGER.get<std::string>("path.asset") + texture.path));
 					}
 
 					Texture texture = Texture::loadCubemap(paths);
@@ -71,9 +71,8 @@ void ResourceManager::uploadMaterialsToGPU() {
 					continue;
 				}
 
-				texture.id = Texture::load(
-					fs::path(CONFIG_MANAGER.get<std::string>("path.asset") + texture.path),
-					material.flags,
+				auto p = fs::resolvePath(CONFIG_MANAGER.get<std::string>("path.asset") + texture.path);
+				texture.id = Texture::load(p, material.flags,
 					texture.type == aiTextureType_DIFFUSE || texture.type == aiTextureType_EMISSIVE);
 
 				Texture::generateMipmaps({.id = texture.id, .target = texture.target});
@@ -92,7 +91,7 @@ void ResourceManager::loadModel(const size_t entityID, const std::string& file) 
 	// read file via ASSIMP
 	Assimp::Importer importer;
 
-	const std::string path = fs::path(CONFIG_MANAGER.get<std::string>("path.asset") + file);
+	const std::string path = fs::resolvePath(CONFIG_MANAGER.get<std::string>("path.asset") + file);
 	const aiScene* scene = importer.ReadFile(
 		path,
 		aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);

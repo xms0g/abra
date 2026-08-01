@@ -6,16 +6,16 @@
 
 namespace fs {
 
-inline std::string path(const std::string& p) {
-    auto cwd = std::filesystem::current_path().parent_path();
-    return cwd.append(p).string();
+inline std::string resolvePath(const std::string_view p) {
+    static const auto cwd = std::filesystem::current_path().parent_path();
+    return cwd / p;
 }
 
-inline std::string readFile(const std::string& p) {
-	std::ifstream file(path(p));
+inline std::string readFile(const std::string_view p) {
+	std::ifstream file(resolvePath(p));
 
 	if (!file.is_open()) {
-		throw std::runtime_error(std::string("Failed to open the file: ") + p);
+		throw std::runtime_error(std::format("Failed to open the file: {}", p));
 	}
 
 	std::stringstream ss;
