@@ -57,9 +57,9 @@ private:
 
 	TextureView createEnvMap(Texture& hdrTexture);
 
-	void createIrradianceMap();
+	void createIrradianceMap(const TextureView& environment);
 
-	void createPrefilterMap();
+	void createPrefilterMap(const TextureView& environment);
 
 	void createBrdfLUT();
 

@@ -77,7 +77,7 @@ public:
 
 	FrameBuffer& withTextureDepthArray(int32_t layerCount, InternalFormat format, bool onlyForShadowMap);
 
-	FrameBuffer& withTextureCubeMap(bool mipmap);
+	FrameBuffer& withTextureCubeMap();
 
 	FrameBuffer& withTextureCubemapDepth(InternalFormat format, bool onlyForShadowMap);
 

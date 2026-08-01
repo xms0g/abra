@@ -66,9 +66,11 @@ Texture Texture::generate(const int32_t width, const int32_t height, const float
 void Texture::generateMipmaps(const TextureView handle) {
 	glBindTexture(toGL(handle.target), handle.id);
 	glGenerateMipmap(toGL(handle.target));
+	glTexParameteri(toGL(handle.target), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glBindTexture(toGL(handle.target), 0);
 }
 
-uint32_t Texture::load(const std::string& path, const uint32_t flags, const bool isSRGB) {
+uint32_t Texture::load(const std::string& path, const uint32_t flags, const bool isSRGBA) {
 	uint32_t textureID;
 
 	int32_t width, height, channel;
@@ -78,17 +80,16 @@ uint32_t Texture::load(const std::string& path, const uint32_t flags, const bool
 		throw std::runtime_error(std::format("Texture failed to load at path: {}", path));
 	}
 
-	const int32_t internalFormat = isSRGB ? GL_SRGB8_ALPHA8 : GL_RGBA8;
+	const int32_t internalFormat = isSRGBA ? GL_SRGB8_ALPHA8 : GL_RGBA8;
 
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, flags & BLEND ? GL_CLAMP_TO_EDGE : GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, flags & BLEND ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	stbi_image_free(data);

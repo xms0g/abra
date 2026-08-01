@@ -75,6 +75,8 @@ void ResourceManager::uploadMaterialsToGPU() {
 					material.flags,
 					texture.type == aiTextureType_DIFFUSE || texture.type == aiTextureType_EMISSIVE);
 
+				Texture::generateMipmaps({.id = texture.id, .target = texture.target});
+
 				idByPath.emplace(texture.path, texture.id);
 			}
 		}
