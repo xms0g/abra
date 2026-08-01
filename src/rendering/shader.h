@@ -35,9 +35,9 @@ struct ShaderStage {
 
 	void checkCompileErrors(const std::string& fn) const;
 
-	static std::string preprocess(const std::string& source);
+	static void preprocess(std::string_view source, std::string& output);
 
-	static std::string preprocess(const std::string& source, std::unordered_set<std::string>& includedFiles);
+	static void preprocess(std::string_view source, std::string& output, std::unordered_set<std::string>& includedFiles);
 };
 
 class Shader {

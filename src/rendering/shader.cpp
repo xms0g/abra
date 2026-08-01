@@ -12,7 +12,8 @@
 GL(ShaderStageType)
 
 ShaderStage::ShaderStage(const PipelineShaderStage& info) : type(info.stage) {
-	const auto processedSource = preprocess(info.code);
+	std::string processedSource;
+	preprocess(info.code, processedSource);
 
 	handle = glCreateShader(toGL(info.stage));
 
@@ -66,42 +67,42 @@ void ShaderStage::checkCompileErrors(const std::string& fn) const {
 	}
 }
 
-std::string ShaderStage::preprocess(const std::string& source) {
+void ShaderStage::preprocess(const std::string_view source, std::string& output) {
 	std::unordered_set<std::string> includedFiles{};
-	return preprocess(source, includedFiles);
+	preprocess(source, output, includedFiles);
 }
 
-std::string ShaderStage::preprocess(const std::string& source, std::unordered_set<std::string>& includedFiles) {
-	if (source.empty()) return "";
+void ShaderStage::preprocess(const std::string_view source, std::string& output, std::unordered_set<std::string>& includedFiles) {
+	if (source.empty()) return;
 
-	std::stringstream result;
-	std::istringstream stream(source);
+	static std::filesystem::path shaderRoot = CONFIG_MANAGER.get<std::string>("path.shader");
+
+	std::istringstream stream(source.data());
 	std::string line;
 
 	while (std::getline(stream, line)) {
 		if (line.find("#include") == 0) {
 			// Parse the include (e.g., #include "lighting.glsl")
-			size_t start = line.find('"');
-			size_t end = line.rfind('"');
+			const size_t start = line.find('"');
+			const size_t end = line.rfind('"');
 
 			if (start != std::string::npos && end != std::string::npos && start != end) {
-				std::string includeFile = line.substr(start + 1, end - start - 1);
+				std::string_view includeFile{line.data() + start + 1, end - start - 1};
 
 				// Prevent cyclic includes
-				if (includedFiles.contains(includeFile)) {
+				if (includedFiles.contains(includeFile.data())) {
 					continue;
 				}
-				includedFiles.insert(includeFile);
+				includedFiles.emplace(includeFile);
 				// Load included file
-				result << preprocess(
-					fs::readFile(CONFIG_MANAGER.get<std::string>("path.shader") + includeFile),
-					includedFiles) << "\n";
+				auto includePath = shaderRoot / includeFile;
+				preprocess(fs::readFile(includePath), output, includedFiles);
 			}
 		} else {
-			result << line << "\n";
+			output += line;
+			output += '\n';
 		}
 	}
-	return result.str();
 }
 
 Shader::Shader() {
@@ -225,5 +226,5 @@ void Uniform::setMat4Array(const uint32_t id, const std::string& name, const glm
 std::string ShaderLoader::load(const std::string_view file) {
 	const std::filesystem::path root = CONFIG_MANAGER.get<std::string>("path.shader");
 	const auto path = root / file;
-	return fs::readFile(path.string());
+	return fs::readFile(path);
 }
