@@ -33,14 +33,14 @@ void ResourceManager::uploadMeshesToGPU() {
 
 void ResourceManager::uploadMaterialsToGPU() {
 	std::unordered_map<std::string, uint32_t> idByPath;
+	static std::filesystem::path assetRoot = CONFIG_MANAGER.get<std::string>("path.asset");
 
 	for (auto& [entityID, materials]: mMaterialsByEntity) {
 		for (auto& [matID, material]: materials) {
 			if (material.textureTarget == TextureTarget::TextureCubeMap) {
 				// HDR texture
 				if (material.textures.size() == 1) {
-					const std::string path = fs::resolvePath(
-						CONFIG_MANAGER.get<std::string>("path.asset") + material.textures.front().path);
+					const std::string path = fs::resolvePath(assetRoot / material.textures.front().path);
 
 					Texture texture = Texture::loadHDR(path);
 
@@ -52,7 +52,7 @@ void ResourceManager::uploadMaterialsToGPU() {
 					paths.reserve(material.textures.size());
 
 					for (auto& texture: material.textures) {
-						paths.push_back(fs::resolvePath(CONFIG_MANAGER.get<std::string>("path.asset") + texture.path));
+						paths.push_back(fs::resolvePath(assetRoot / texture.path));
 					}
 
 					Texture texture = Texture::loadCubemap(paths);
@@ -71,7 +71,7 @@ void ResourceManager::uploadMaterialsToGPU() {
 					continue;
 				}
 
-				auto p = fs::resolvePath(CONFIG_MANAGER.get<std::string>("path.asset") + texture.path);
+				auto p = fs::resolvePath(assetRoot / texture.path);
 				texture.id = Texture::load(p, material.flags,
 					texture.type == aiTextureType_DIFFUSE || texture.type == aiTextureType_EMISSIVE);
 
@@ -90,8 +90,9 @@ void ResourceManager::waitForAll() const {
 void ResourceManager::loadModel(const size_t entityID, const std::string& file) {
 	// read file via ASSIMP
 	Assimp::Importer importer;
+	const std::filesystem::path assetRoot = CONFIG_MANAGER.get<std::string>("path.asset");
 
-	const std::string path = fs::resolvePath(CONFIG_MANAGER.get<std::string>("path.asset") + file);
+	const std::string path = fs::resolvePath(assetRoot / file);
 	const aiScene* scene = importer.ReadFile(
 		path,
 		aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
