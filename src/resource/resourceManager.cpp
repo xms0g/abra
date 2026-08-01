@@ -51,11 +51,12 @@ void ResourceManager::uploadMaterialsToGPU() {
 					std::vector<std::string> paths;
 					paths.reserve(material.textures.size());
 
-					for (auto& [id, type, target, path]: material.textures) {
-						paths.push_back(fs::path(CONFIG_MANAGER.get<std::string>("path.asset") + path));
+					for (auto& texture: material.textures) {
+						paths.push_back(fs::path(CONFIG_MANAGER.get<std::string>("path.asset") + texture.path));
 					}
 
 					Texture texture = Texture::loadCubemap(paths);
+					Texture::generateMipmaps({.id = texture.id, .target = texture.target});
 
 					material.textures.clear();
 					material.textures.push_back(std::move(texture));

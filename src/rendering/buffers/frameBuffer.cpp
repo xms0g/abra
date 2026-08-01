@@ -113,6 +113,8 @@ void FrameBuffer::attachTexture(const uint32_t index, const Attachment attachmen
 				mip,
 				layer);
 			break;
+		case TextureTarget::Texture2DMultisample:
+			break;
 	}
 }
 
