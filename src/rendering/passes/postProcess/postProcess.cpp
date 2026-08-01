@@ -44,7 +44,7 @@ void PostProcessPass::configure(const RenderContext& ctx, const FrameGraph& grap
 
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
 		stages,
-{{.name = "screenTexture", .slot = 0}});
+		{{.name = "screenTexture", .slot = 0}});
 
 	mEncoder = GraphicsEncoder{};
 	mQuad = std::make_unique<Model::Quad>();
@@ -68,7 +68,7 @@ void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph)
 	mEncoder.bindFrameBuffer();
 	mEncoder.bindPipeline(mPipeline);
 
-	const TextureView textures[] = {{.id = inputTex.id, .target = TextureTarget::Texture2D}};
+	const TextureView textures[] = {inputTex};
 	mEncoder.bindMaterial({
 		.flags = 0,
 		.textures = std::span(textures)

@@ -31,7 +31,7 @@ TextureView FXAA::render(
 
 	encoder.bindPipeline(mPipeline);
 
-	const TextureView textures[] = {{.id = sceneTexture.id, .target = TextureTarget::Texture2D}};
+	const TextureView textures[] = {sceneTexture};
 	encoder.bindMaterial({
 		.flags = 0,
 		.textures = std::span(textures)

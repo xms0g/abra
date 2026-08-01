@@ -15,7 +15,7 @@ void Sepia::configure(const FrameGraph& graph) {
 
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
 		stages,
-{{.name = "screenTexture", .slot = 0}});
+		{{.name = "screenTexture", .slot = 0}});
 }
 
 TextureView Sepia::render(
@@ -29,7 +29,7 @@ TextureView Sepia::render(
 
 	encoder.bindPipeline(mPipeline);
 
-	const TextureView textures[] = {{.id = sceneTexture.id, .target = TextureTarget::Texture2D}};
+	const TextureView textures[] = {sceneTexture};
 	encoder.bindMaterial({
 		.flags = 0,
 		.textures = std::span(textures)
