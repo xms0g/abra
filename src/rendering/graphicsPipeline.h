@@ -175,16 +175,9 @@ public:
 
 	GraphicsPipeline& operator=(const GraphicsPipeline& other) = delete;
 
-	GraphicsPipeline(GraphicsPipeline&& other) noexcept
-		: mState(std::move(other.mState)) {
-	}
+	GraphicsPipeline(GraphicsPipeline&& other) noexcept;
 
-	GraphicsPipeline& operator=(GraphicsPipeline&& other) noexcept {
-		if (this == &other)
-			return *this;
-		mState = std::move(other.mState);
-		return *this;
-	}
+	GraphicsPipeline& operator=(GraphicsPipeline&& other) noexcept;
 
 	[[nodiscard]]
 	PipelineState& state();

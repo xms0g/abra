@@ -46,14 +46,14 @@ struct Material {
 	}
 
 	Material& operator=(Material&& other) noexcept {
-		if (this == &other)
-			return *this;
-		idx = std::exchange(other.idx, 0);
-		flags = std::exchange(other.flags, 0);
-		textureTarget = std::exchange(other.textureTarget, {});
-		color = other.color;
-		alphaCutoff = std::exchange(other.alphaCutoff, 0.0f);
-		textures = std::move(other.textures);
+		if (this != &other) {
+			idx = std::exchange(other.idx, 0);
+			flags = std::exchange(other.flags, 0);
+			textureTarget = std::exchange(other.textureTarget, {});
+			color = other.color;
+			alphaCutoff = std::exchange(other.alphaCutoff, 0.0f);
+			textures = std::move(other.textures);
+		}
 		return *this;
 	}
 };

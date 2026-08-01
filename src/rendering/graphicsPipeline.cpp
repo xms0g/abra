@@ -24,11 +24,24 @@ GraphicsPipeline::GraphicsPipeline(PipelineRenderingInfo& renderingInfo) {
 	}
 }
 
+GraphicsPipeline::GraphicsPipeline(GraphicsPipeline&& other) noexcept
+	: mState(std::move(other.mState)) {
+}
+
+GraphicsPipeline& GraphicsPipeline::operator=(GraphicsPipeline&& other) noexcept {
+	if (this != &other) {
+		mState = std::move(other.mState);
+	}
+
+	return *this;
+}
+
 PipelineState& GraphicsPipeline::state() {
 	return mState;
 }
 
-GraphicsPipeline GraphicsPipeline::createFullscreenQuadPipeline(std::vector<PipelineShaderStage>& stages, const std::vector<SamplerInfo>& samplers) {
+GraphicsPipeline GraphicsPipeline::createFullscreenQuadPipeline(std::vector<PipelineShaderStage>& stages,
+                                                                const std::vector<SamplerInfo>& samplers) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};

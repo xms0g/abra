@@ -30,14 +30,14 @@ ShaderStage::ShaderStage(ShaderStage&& other) noexcept
 }
 
 ShaderStage& ShaderStage::operator=(ShaderStage&& other) noexcept {
-	if (this == &other)
-		return *this;
+	if (this != &other) {
+		if (handle)
+			glDeleteShader(handle);
 
-	if (handle)
-		glDeleteShader(handle);
+		handle = std::exchange(other.handle, 0);
+		type = std::exchange(other.type, {});
+	}
 
-	handle = std::exchange(other.handle, 0);
-	type = std::exchange(other.type, {});
 	return *this;
 }
 
@@ -201,7 +201,8 @@ void Uniform::setVec4(const uint32_t id, const std::string& name, const glm::vec
 	glUniform4fv(glGetUniformLocation(id, name.c_str()), 1, &value[0]);
 }
 
-void Uniform::setVec4(const uint32_t id, const std::string& name, const float x, const float y, const float z, const float w) {
+void Uniform::setVec4(const uint32_t id, const std::string& name, const float x, const float y, const float z,
+                      const float w) {
 	glUniform4f(glGetUniformLocation(id, name.c_str()), x, y, z, w);
 }
 

@@ -30,17 +30,16 @@ Mesh::Mesh(Mesh&& other) noexcept
 }
 
 Mesh& Mesh::operator=(Mesh&& other) noexcept {
-	if (this == &other) {
-		return *this;
+	if (this != &other) {
+		mVertices = std::move(other.mVertices);
+		mIndices = std::move(other.mIndices);
+		mVAO = std::move(other.mVAO);
+		mIBO = std::move(other.mIBO);
+		mVBO = std::move(other.mVBO);
+		mMin = std::exchange(other.mMin, glm::vec3(0));
+		mMax = std::exchange(other.mMax, glm::vec3(0));
 	}
 
-	mVertices = std::move(other.mVertices);
-	mIndices = std::move(other.mIndices);
-	mVAO = std::move(other.mVAO);
-	mIBO = std::move(other.mIBO);
-	mVBO = std::move(other.mVBO);
-	mMin = std::exchange(other.mMin, glm::vec3(0));
-	mMax = std::exchange(other.mMax, glm::vec3(0));
 	return *this;
 }
 

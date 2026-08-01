@@ -24,23 +24,21 @@ FrameBuffer::FrameBuffer(FrameBuffer&& other) noexcept
 }
 
 FrameBuffer& FrameBuffer::operator=(FrameBuffer&& other) noexcept {
-	if (this == &other) {
-		return *this;
-	}
+	if (this != &other) {
+		if (mFBO) {
+			glDeleteFramebuffers(1, &mFBO);
+		}
+		if (mRBO) {
+			glDeleteRenderbuffers(1, &mRBO);
+		}
 
-	if (mFBO) {
-		glDeleteFramebuffers(1, &mFBO);
+		mFBO = std::exchange(other.mFBO, 0);
+		mRBO = std::exchange(other.mRBO, 0);
+		mWidth = std::exchange(other.mWidth, 0);
+		mHeight = std::exchange(other.mHeight, 0);
+		mTextures = std::move(other.mTextures);
+		mAttachments = std::move(other.mAttachments);
 	}
-	if (mRBO) {
-		glDeleteRenderbuffers(1, &mRBO);
-	}
-
-	mFBO = std::exchange(other.mFBO, 0);
-	mRBO = std::exchange(other.mRBO, 0);
-	mWidth = std::exchange(other.mWidth, 0);
-	mHeight = std::exchange(other.mHeight, 0);
-	mTextures = std::move(other.mTextures);
-	mAttachments = std::move(other.mAttachments);
 	return *this;
 }
 

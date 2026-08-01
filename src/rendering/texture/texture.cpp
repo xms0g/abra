@@ -25,16 +25,16 @@ Texture::Texture(Texture&& other) noexcept
 }
 
 Texture& Texture::operator=(Texture&& other) noexcept {
-	if (this == &other)
-		return *this;
+	if (this != &other) {
+		if (id != 0)
+			glDeleteTextures(1, &id);
 
-	if (id != 0)
-		glDeleteTextures(1, &id);
+		id = std::exchange(other.id, 0);
+		type = std::exchange(other.type, 0);
+		target = std::exchange(other.target, {});
+		path = std::move(other.path);
+	}
 
-	id = std::exchange(other.id, 0);
-	type = std::exchange(other.type, 0);
-	target = std::exchange(other.target, {});
-	path = std::move(other.path);
 	return *this;
 }
 
@@ -120,7 +120,8 @@ Texture Texture::loadCubemap(const std::vector<std::string>& faces) {
 
 		const GLenum format = depth == 4 ? GL_RGBA : GL_RGB;
 		const GLenum internalFormat = depth == 4 ? GL_SRGB_ALPHA : GL_SRGB;
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE,
+		             data);
 
 		stbi_image_free(data);
 	}
