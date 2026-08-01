@@ -18,7 +18,7 @@ GL(PolygonFace)
 void GraphicsEncoder::beginRendering(const RenderingInfo& info) const {
 	info.frameBuffer.bind();
 
-	ClearMask mask{ClearMask::None};
+	constexpr auto mask{ClearMask::None};
 	mask |= info.clearColor ? ClearMask::Color : ClearMask::None;
 	mask |= info.clearDepth ? ClearMask::Depth : ClearMask::None;
 	mask |= info.clearStencil ? ClearMask::Stencil : ClearMask::None;
