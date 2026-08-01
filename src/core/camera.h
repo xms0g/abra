@@ -7,13 +7,6 @@ struct MouseMovementEvent;
 struct KeyPressedEvent;
 class EventBus;
 
-enum CameraMovement: uint8_t {
-	FORWARD = 26,
-	BACKWARD = 22,
-	LEFT = 4,
-	RIGHT = 7,
-};
-
 class Camera {
 public:
 	explicit Camera(

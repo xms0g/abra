@@ -1,4 +1,5 @@
 #include "camera.h"
+#include <SDL.h>
 #include "glm/gtc/matrix_transform.hpp"
 #include "../config/configManager.h"
 #include "../event/eventBus.hpp"
@@ -86,13 +87,14 @@ void Camera::update() {
 
 void Camera::processKeyboard(const KeyPressedEvent& event) {
 	const float velocity = mMovementSpeed * event.deltaTime;
-	if (event.direction == FORWARD)
+
+	if (event.direction == SDL_SCANCODE_W)
 		mPosition += mFront * velocity;
-	if (event.direction == BACKWARD)
+	if (event.direction == SDL_SCANCODE_S)
 		mPosition -= mFront * velocity;
-	if (event.direction == LEFT)
+	if (event.direction == SDL_SCANCODE_A)
 		mPosition -= mRight * velocity;
-	if (event.direction == RIGHT)
+	if (event.direction == SDL_SCANCODE_D)
 		mPosition += mRight * velocity;
 }
 
