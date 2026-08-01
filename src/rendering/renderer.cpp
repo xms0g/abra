@@ -688,14 +688,14 @@ void Renderer::createPrefilterMap(const TextureView& environment) {
 	});
 
 	constexpr uint32_t mipLevels = 5;
+	const int32_t prefilterMapSize = CONFIG_MANAGER.get<int32_t>("PBR.prefilterMap.size");
+
 	for (int32_t i = 0; i < mipLevels; ++i) {
-		const int32_t mipSize = static_cast<int32_t>(
-			CONFIG_MANAGER.get<int32_t>("PBR.prefilterMap.size") * std::pow(0.5, i));
+		const auto mipSize = static_cast<int32_t>(prefilterMapSize * std::pow(0.5, i));
 		mPBRBuffers.prefilter->resizeRenderBuffer(mipSize, mipSize);
 
 		const float roughness = static_cast<float>(i) / static_cast<float>(mipLevels - 1);
 		encoder.setUniform("roughness", roughness);
-
 
 		for (int32_t j = 0; j < FACES; ++j) {
 			mPBRBuffers.prefilter->attachTexture(0, Attachment::Color0, i, j);
