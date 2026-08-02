@@ -73,10 +73,7 @@ void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph,
 	encoder.bindPipeline(mPipeline);
 
 	const TextureView textures[] = {inputTex};
-	encoder.bindMaterial({
-		.flags = 0,
-		.textures = std::span(textures)
-	});
+	encoder.bindMaterial({.textures = std::span(textures)});
 
 	encoder.bindVertexArray(mQuad->vao().id());
 	encoder.draw(6);
