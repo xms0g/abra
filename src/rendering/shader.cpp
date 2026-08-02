@@ -47,7 +47,7 @@ ShaderStage::~ShaderStage() {
 		glDeleteShader(handle);
 }
 
-void ShaderStage::checkCompileErrors(const std::string& fn) const {
+void ShaderStage::checkCompileErrors(const std::string_view code) const {
 	int32_t success;
 	glGetShaderiv(handle, GL_COMPILE_STATUS, &success);
 
@@ -63,7 +63,7 @@ void ShaderStage::checkCompileErrors(const std::string& fn) const {
 		// The program is useless now. So delete it.
 		glDeleteShader(handle);
 
-		throw std::runtime_error(std::format("Compilation Error in: {} \n {}", fn, infoLog));
+		throw std::runtime_error(std::format("Compilation Error in: {} \n {}", code, infoLog));
 	}
 }
 
@@ -224,7 +224,7 @@ void Uniform::setMat4Array(const uint32_t id, const std::string& name, const glm
 }
 
 std::string ShaderLoader::load(const std::string_view file) {
-	const std::filesystem::path root = CONFIG_MANAGER.get<std::string>("path.shader");
+	static const std::filesystem::path root = CONFIG_MANAGER.get<std::string>("path.shader");
 	const auto path = root / file;
 	return fs::readFile(path);
 }

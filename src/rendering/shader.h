@@ -33,7 +33,7 @@ struct ShaderStage {
 
 	~ShaderStage();
 
-	void checkCompileErrors(const std::string& fn) const;
+	void checkCompileErrors(std::string_view code) const;
 
 	static void preprocess(std::string_view source, std::string& output);
 
