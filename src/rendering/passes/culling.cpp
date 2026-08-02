@@ -2,6 +2,7 @@
 #include "../frameGraph.h"
 #include "../mesh/mesh.h"
 #include "../command.hpp"
+#include "../graphicsEncoder.h"
 #include "../context/renderData.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderGroup.hpp"
@@ -14,9 +15,11 @@ CullingPass::CullingPass() = default;
 
 CullingPass::~CullingPass() = default;
 
-void CullingPass::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
-	mEncoder = GraphicsEncoder{};
-
+void CullingPass::configure(
+	const RenderContext& ctx,
+	const FrameGraph& graph,
+	GraphicsEncoder& encoder,
+	EventBus& eventBus) {
 	mOpaqueGroups = std::span(
 		ctx.queueRegistry->get<RenderGroup>("opaque").data(),
 		ctx.queueRegistry->get<RenderGroup>("opaque").size());
@@ -48,7 +51,7 @@ void CullingPass::configure(const RenderContext& ctx, const FrameGraph& graph, E
 	mSkyboxCommands = &ctx.queueRegistry->get<DrawCommand>("SkyboxCommands");
 }
 
-void CullingPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
+void CullingPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
 	const auto frustum = ctx.camera->generateFrustum();
 
 	cullScene(ctx, frustum, mOpaqueGroups, *mOpaqueCommands);

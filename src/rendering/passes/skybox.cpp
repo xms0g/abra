@@ -1,6 +1,7 @@
 #include "skybox.h"
 #include "../shader.h"
 #include "../frameGraph.h"
+#include "../graphicsEncoder.h"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 
@@ -8,7 +9,11 @@ SkyboxPass::SkyboxPass() = default;
 
 SkyboxPass::~SkyboxPass() = default;
 
-void SkyboxPass::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
+void SkyboxPass::configure(
+	const RenderContext& ctx,
+	const FrameGraph& graph,
+	GraphicsEncoder& encoder,
+	EventBus& eventBus) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
@@ -46,18 +51,17 @@ void SkyboxPass::configure(const RenderContext& ctx, const FrameGraph& graph, Ev
 	};
 
 	mPipeline = GraphicsPipeline{info};
-	mEncoder = GraphicsEncoder{};
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("SkyboxCommands");
 }
 
-void SkyboxPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
+void SkyboxPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
 	const auto& cmd = mCommands->front();
 
-	mEncoder.reset();
-	mEncoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
-	mEncoder.bindPipeline(mPipeline);
-	mEncoder.bindMaterial(cmd.material);
-	mEncoder.bindTransform(cmd.transform);
-	mEncoder.bindVertexArray(cmd.mesh.vao);
-	mEncoder.draw(cmd.mesh.vertexCount);
+	encoder.reset();
+	encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
+	encoder.bindPipeline(mPipeline);
+	encoder.bindMaterial(cmd.material);
+	encoder.bindTransform(cmd.transform);
+	encoder.bindVertexArray(cmd.mesh.vao);
+	encoder.draw(cmd.mesh.vertexCount);
 }

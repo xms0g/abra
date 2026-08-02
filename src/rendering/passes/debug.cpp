@@ -1,6 +1,8 @@
 #include "debug.h"
 #include "../shader.h"
 #include "../frameGraph.h"
+#include "../graphicsEncoder.h"
+#include "../command.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../../ECS/components/debug.hpp"
@@ -10,7 +12,11 @@ DebugPass::DebugPass() = default;
 
 DebugPass::~DebugPass() = default;
 
-void DebugPass::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
+void DebugPass::configure(
+	const RenderContext& ctx,
+	const FrameGraph& graph,
+	GraphicsEncoder& encoder,
+	EventBus& eventBus) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
@@ -76,21 +82,20 @@ void DebugPass::configure(const RenderContext& ctx, const FrameGraph& graph, Eve
 		GraphicsPipeline{wireframeInfo},
 	};
 
-	mEncoder = GraphicsEncoder{};
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("DebugCommands");
 }
 
-void DebugPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
-	mEncoder.reset();
-	mEncoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
+void DebugPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
+	encoder.reset();
+	encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
 
 	for (const auto& cmd: *mCommands) {
 		if (cmd.debugMode == None)
 			continue;
 
-		mEncoder.bindPipeline(mPipelines[cmd.debugMode]);
-		mEncoder.bindTransform(cmd.transform);
-		mEncoder.bindVertexArray(cmd.mesh.vao);
-		mEncoder.drawIndexed(cmd.mesh.indexCount);
+		encoder.bindPipeline(mPipelines[cmd.debugMode]);
+		encoder.bindTransform(cmd.transform);
+		encoder.bindVertexArray(cmd.mesh.vao);
+		encoder.drawIndexed(cmd.mesh.indexCount);
 	}
 }

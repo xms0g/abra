@@ -3,6 +3,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "frameGraph.h"
+#include "graphicsEncoder.h"
 #include "context/renderContext.hpp"
 #include "context/renderData.hpp"
 #include "context/renderQueue.hpp"
@@ -70,14 +71,16 @@ private:
 	std::unique_ptr<SyncStateSystem> mSyncStateSystem;
 	// Uniform Buffers
 	UniformBuffer mCameraUBO{};
+	// Frame Buffers
+	PBRBuffers mPBRBuffers{};
 	// Render Data
 	RenderData mRenderData{};
 	// Render Queue
 	QueueRegistry mQueueRegistry{};
 	// Render context
 	RenderContext mRenderCtx{};
-	// Frame Buffers
-	PBRBuffers mPBRBuffers{};
+	// Encoder
+	GraphicsEncoder mEncoder{};
 
 	static constexpr uint32_t FACES = 6;
 

@@ -2,6 +2,7 @@
 #include "../shader.h"
 #include "../command.hpp"
 #include "../frameGraph.h"
+#include "../graphicsEncoder.h"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../../config/configManager.h"
@@ -10,7 +11,11 @@ DeferredGeometryPass::DeferredGeometryPass() = default;
 
 DeferredGeometryPass::~DeferredGeometryPass() = default;
 
-void DeferredGeometryPass::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
+void DeferredGeometryPass::configure(
+	const RenderContext& ctx,
+	const FrameGraph& graph,
+	GraphicsEncoder& encoder,
+	EventBus& eventBus) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
@@ -76,21 +81,20 @@ void DeferredGeometryPass::configure(const RenderContext& ctx, const FrameGraph&
 	};
 
 	mPipeline = GraphicsPipeline{info};
-	mEncoder = GraphicsEncoder{};
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("DeferredCommands");
 }
 
-void DeferredGeometryPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
-	mEncoder.reset();
-	mEncoder.bindFrameBuffer(graph.getResource("gBuffer"));
-	mEncoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
+void DeferredGeometryPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
+	encoder.reset();
+	encoder.bindFrameBuffer(graph.getResource("gBuffer"));
+	encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
 
-	mEncoder.bindPipeline(mPipeline);
+	encoder.bindPipeline(mPipeline);
 
 	for (const auto& cmd: *mCommands) {
-		mEncoder.bindMaterial(cmd.material);
-		mEncoder.bindTransform(cmd.transform);
-		mEncoder.bindVertexArray(cmd.mesh.vao);
-		mEncoder.drawIndexed(cmd.mesh.indexCount);
+		encoder.bindMaterial(cmd.material);
+		encoder.bindTransform(cmd.transform);
+		encoder.bindVertexArray(cmd.mesh.vao);
+		encoder.drawIndexed(cmd.mesh.indexCount);
 	}
 }

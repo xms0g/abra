@@ -1,6 +1,7 @@
 #include "ssao.h"
 #include "../shader.h"
 #include "../frameGraph.h"
+#include "../graphicsEncoder.h"
 #include "../texture/texture.h"
 #include "../models/quad.h"
 #include "../context/renderContext.hpp"
@@ -12,8 +13,12 @@ SSAOPass::SSAOPass() = default;
 
 SSAOPass::~SSAOPass() = default;
 
-void SSAOPass::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
-	createNoiseTexture();
+void SSAOPass::configure(
+	const RenderContext& ctx,
+	const FrameGraph& graph,
+	GraphicsEncoder& encoder,
+	EventBus& eventBus) {
+	createNoiseTexture(encoder);
 	createKernel();
 
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
@@ -82,45 +87,45 @@ void SSAOPass::configure(const RenderContext& ctx, const FrameGraph& graph, Even
 	mPipelines[0] = GraphicsPipeline{ssaoInfo};
 	mPipelines[1] = GraphicsPipeline{blurInfo};
 
-	mEncoder = GraphicsEncoder{};
+	encoder = GraphicsEncoder{};
 
 	const auto& gBuffer = graph.getResource("gBuffer");
 
-	mEncoder.bindTexture(
+	encoder.bindTexture(
 		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.depth.textureIdx")),
 		CONFIG_MANAGER.get<int32_t>("gBuffer.depth.textureSlot"));
 
-	mEncoder.bindTexture(
+	encoder.bindTexture(
 		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.textureIdx")),
 		CONFIG_MANAGER.get<int32_t>("gBuffer.normal.textureSlot"));
 
 	mQuad = std::make_unique<Model::Quad>();
 }
 
-void SSAOPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
-	ssao(graph);
-	blur(graph);
+void SSAOPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
+	ssao(graph, encoder);
+	blur(graph, encoder);
 }
 
-void SSAOPass::ssao(const FrameGraph& graph) {
-	mEncoder.reset();
-	mEncoder.bindFrameBuffer(graph.getResource("ssao"));
-	mEncoder.clearFrameBuffer(ClearMask::Color);
+void SSAOPass::ssao(const FrameGraph& graph, GraphicsEncoder& encoder) {
+	encoder.reset();
+	encoder.bindFrameBuffer(graph.getResource("ssao"));
+	encoder.clearFrameBuffer(ClearMask::Color);
 
-	mEncoder.bindPipeline(mPipelines[0]);
-	mEncoder.bindVertexArray(mQuad->vao().id());
-	mEncoder.draw(6);
+	encoder.bindPipeline(mPipelines[0]);
+	encoder.bindVertexArray(mQuad->vao().id());
+	encoder.draw(6);
 }
 
-void SSAOPass::blur(const FrameGraph& graph) {
-	mEncoder.reset();
-	mEncoder.bindFrameBuffer(graph.getResource("ssaoBlur"));
-	mEncoder.clearFrameBuffer(ClearMask::Color);
+void SSAOPass::blur(const FrameGraph& graph, GraphicsEncoder& encoder) {
+	encoder.reset();
+	encoder.bindFrameBuffer(graph.getResource("ssaoBlur"));
+	encoder.clearFrameBuffer(ClearMask::Color);
 
-	mEncoder.bindPipeline(mPipelines[1]);
-	mEncoder.bindTexture(graph.getResource("ssao").texture(), 0);
-	mEncoder.bindVertexArray(mQuad->vao().id());
-	mEncoder.draw(6);
+	encoder.bindPipeline(mPipelines[1]);
+	encoder.bindTexture(graph.getResource("ssao").texture(), 0);
+	encoder.bindVertexArray(mQuad->vao().id());
+	encoder.draw(6);
 }
 
 void SSAOPass::createKernel() {
@@ -156,7 +161,7 @@ void SSAOPass::createKernel() {
 	mUBO.unbind();
 }
 
-void SSAOPass::createNoiseTexture() {
+void SSAOPass::createNoiseTexture(GraphicsEncoder& encoder) {
 	const int32_t textureSize = CONFIG_MANAGER.get<int32_t>("ssao.noise.textureSize");
 
 	std::vector<float> noise;
@@ -165,7 +170,7 @@ void SSAOPass::createNoiseTexture() {
 	noise = math::random::generateNoise(textureSize * textureSize);
 	mNoiseTexture = Texture::generate(textureSize, textureSize, noise.data());
 
-	mEncoder.bindTexture(
+	encoder.bindTexture(
 		{.id = mNoiseTexture.id, .target = mNoiseTexture.target},
 		CONFIG_MANAGER.get<int32_t>("ssao.noise.textureSlot"));
 }

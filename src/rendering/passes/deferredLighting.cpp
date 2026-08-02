@@ -2,6 +2,7 @@
 #include "../frameGraph.h"
 #include "../renderer.h"
 #include "../shader.h"
+#include "../graphicsEncoder.h"
 #include "../models/quad.h"
 #include "../mesh/vertexArray.h"
 #include "../context/renderContext.hpp"
@@ -11,7 +12,11 @@ DeferredLightingPass::DeferredLightingPass() = default;
 
 DeferredLightingPass::~DeferredLightingPass() = default;
 
-void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
+void DeferredLightingPass::configure(
+	const RenderContext& ctx,
+	const FrameGraph& graph,
+	GraphicsEncoder& encoder,
+	EventBus& eventBus) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
@@ -72,7 +77,6 @@ void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph&
 	};
 
 	mPipeline = GraphicsPipeline{info};
-	mEncoder = GraphicsEncoder{};
 
 	const auto& gBuffer = graph.getResource("gBuffer");
 	const auto gbufferTextures = std::vector{
@@ -94,23 +98,23 @@ void DeferredLightingPass::configure(const RenderContext& ctx, const FrameGraph&
 		graph.getResource("spot").texture()
 	};
 
-	mEncoder.bindTextures(gbufferTextures, CONFIG_MANAGER.get<int32_t>("gBuffer.position.textureSlot"));
-	mEncoder.bindTextures(pbrTextures, CONFIG_MANAGER.get<int32_t>("PBR.irradianceMap.textureSlot"));
-	mEncoder.bindTextures(shadowTextures, CONFIG_MANAGER.get<int32_t>("shadow.texture_slot"));
-	mEncoder.bindTexture(
+	encoder.bindTextures(gbufferTextures, CONFIG_MANAGER.get<int32_t>("gBuffer.position.textureSlot"));
+	encoder.bindTextures(pbrTextures, CONFIG_MANAGER.get<int32_t>("PBR.irradianceMap.textureSlot"));
+	encoder.bindTextures(shadowTextures, CONFIG_MANAGER.get<int32_t>("shadow.texture_slot"));
+	encoder.bindTexture(
 		graph.getResource("ssaoBlur").texture(),
 		CONFIG_MANAGER.get<int32_t>("ssao.textureSlot"));
 	mQuad = std::make_unique<Model::Quad>();
 }
 
-void DeferredLightingPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
-	mEncoder.reset();
+void DeferredLightingPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
+	encoder.reset();
 	const auto& gBuffer = graph.getResource("gBuffer");
 	const auto& sceneBuffer = graph.getResource("sceneBuffer");
 
-	mEncoder.blitFramebuffer(gBuffer, sceneBuffer, BlitMask::Depth);
-	mEncoder.bindFrameBuffer(sceneBuffer);
-	mEncoder.bindPipeline(mPipeline);
-	mEncoder.bindVertexArray(mQuad->vao().id());
-	mEncoder.draw(6);
+	encoder.blitFramebuffer(gBuffer, sceneBuffer, BlitMask::Depth);
+	encoder.bindFrameBuffer(sceneBuffer);
+	encoder.bindPipeline(mPipeline);
+	encoder.bindVertexArray(mQuad->vao().id());
+	encoder.draw(6);
 }

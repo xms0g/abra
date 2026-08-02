@@ -4,7 +4,6 @@
 #include "basePostEffect.hpp"
 #include "../IPass.hpp"
 #include "../../graphicsPipeline.h"
-#include "../../graphicsEncoder.h"
 
 struct GuiPostProcessEvent;
 class EventBus;
@@ -22,15 +21,18 @@ public:
 
 	~PostProcessPass() override;
 
-	void configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) override;
+	void configure(
+		const RenderContext& ctx,
+		const FrameGraph& graph,
+		GraphicsEncoder& encoder,
+		EventBus& eventBus) override;
 
-	void execute(const RenderContext& ctx, const FrameGraph& graph) override;
+	void execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) override;
 
 private:
 	void onGuiUpdate(const GuiPostProcessEvent& event);
 
 	GraphicsPipeline mPipeline{};
-	GraphicsEncoder mEncoder{};
 	std::array<FrameBuffer*, 2> mRenderTargets{};
 	std::unique_ptr<Model::Quad> mQuad;
 	std::vector<std::shared_ptr<BasePostEffect> > mEffects;

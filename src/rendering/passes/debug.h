@@ -2,9 +2,9 @@
 #include <array>
 #include "IPass.hpp"
 #include "../graphicsPipeline.h"
-#include "../graphicsEncoder.h"
 #include "../context/renderQueue.hpp"
 
+struct DrawCommand;
 struct VisibleObject;
 class Shader;
 
@@ -14,12 +14,15 @@ public:
 
 	~DebugPass() override;
 
-	void configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) override;
+	void configure(
+		const RenderContext& ctx,
+		const FrameGraph& graph,
+		GraphicsEncoder& encoder,
+		EventBus& eventBus) override;
 
-	void execute(const RenderContext& ctx, const FrameGraph& graph) override;
+	void execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) override;
 
 private:
-	GraphicsEncoder mEncoder{};
 	std::array<GraphicsPipeline, 3> mPipelines{};
 	RenderQueue<DrawCommand>* mCommands{nullptr};
 };

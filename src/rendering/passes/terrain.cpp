@@ -1,6 +1,8 @@
 #include "terrain.h"
 #include "../frameGraph.h"
 #include "../shader.h"
+#include "../graphicsEncoder.h"
+#include "../command.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../../config/configManager.h"
@@ -9,7 +11,11 @@ TerrainPass::TerrainPass() = default;
 
 TerrainPass::~TerrainPass() = default;
 
-void TerrainPass::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
+void TerrainPass::configure(
+	const RenderContext& ctx,
+	const FrameGraph& graph,
+	GraphicsEncoder& encoder,
+	EventBus& eventBus) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Patches,
 	};
@@ -59,18 +65,17 @@ void TerrainPass::configure(const RenderContext& ctx, const FrameGraph& graph, E
 	};
 
 	mPipeline = GraphicsPipeline{info};
-	mEncoder = GraphicsEncoder{};
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("TerrainCommands");
 }
 
-void TerrainPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
+void TerrainPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
 	const auto& cmd = mCommands->front();
 
-	mEncoder.reset();
-	mEncoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
-	mEncoder.bindPipeline(mPipeline);
-	mEncoder.bindMaterial(cmd.material);
-	mEncoder.bindTransform(cmd.transform);
-	mEncoder.bindVertexArray(cmd.mesh.vao);
-	mEncoder.draw(cmd.mesh.vertexCount);
+	encoder.reset();
+	encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
+	encoder.bindPipeline(mPipeline);
+	encoder.bindMaterial(cmd.material);
+	encoder.bindTransform(cmd.transform);
+	encoder.bindVertexArray(cmd.mesh.vao);
+	encoder.draw(cmd.mesh.vertexCount);
 }

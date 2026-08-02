@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <vector>
 
+class GraphicsEncoder;
 class EventBus;
 class FrameBuffer;
 struct RenderContext;
@@ -24,9 +25,9 @@ public:
 
 	void compile();
 
-	void configure(const RenderContext& ctx, EventBus& eventBus) const;
+	void configure(const RenderContext& ctx, GraphicsEncoder& encoder, EventBus& eventBus) const;
 
-	void execute(const RenderContext& ctx) const;
+	void execute(const RenderContext& ctx, GraphicsEncoder& encoder) const;
 
 private:
 	struct PassNode {

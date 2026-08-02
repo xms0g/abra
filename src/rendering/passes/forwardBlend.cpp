@@ -1,5 +1,6 @@
 #include "forwardBlend.h"
 #include "../frameGraph.h"
+#include "../graphicsEncoder.h"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../../config/configManager.h"
@@ -8,7 +9,11 @@ ForwardBlendPass::ForwardBlendPass() = default;
 
 ForwardBlendPass::~ForwardBlendPass() = default;
 
-void ForwardBlendPass::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
+void ForwardBlendPass::configure(
+	const RenderContext& ctx,
+	const FrameGraph& graph,
+	GraphicsEncoder& encoder,
+	EventBus& eventBus) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
@@ -72,7 +77,6 @@ void ForwardBlendPass::configure(const RenderContext& ctx, const FrameGraph& gra
 	};
 
 	mPipeline = GraphicsPipeline{info};
-	mEncoder = GraphicsEncoder{};
 
 	const auto shadowTextures = std::vector{
 		graph.getResource("directional").texture(),
@@ -80,20 +84,20 @@ void ForwardBlendPass::configure(const RenderContext& ctx, const FrameGraph& gra
 		graph.getResource("spot").texture()
 	};
 
-	mEncoder.bindTextures(shadowTextures, CONFIG_MANAGER.get<int32_t>("shadow.texture_slot"));
+	encoder.bindTextures(shadowTextures, CONFIG_MANAGER.get<int32_t>("shadow.texture_slot"));
 
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("BlendCommands");
 }
 
-void ForwardBlendPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
-	mEncoder.reset();
-	mEncoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
-	mEncoder.bindPipeline(mPipeline);
+void ForwardBlendPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
+	encoder.reset();
+	encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
+	encoder.bindPipeline(mPipeline);
 
 	for (const auto& cmd: *mCommands) {
-		mEncoder.bindMaterial(cmd.material);
-		mEncoder.bindTransform(cmd.transform);
-		mEncoder.bindVertexArray(cmd.mesh.vao);
-		mEncoder.drawIndexed(cmd.mesh.indexCount);
+		encoder.bindMaterial(cmd.material);
+		encoder.bindTransform(cmd.transform);
+		encoder.bindVertexArray(cmd.mesh.vao);
+		encoder.drawIndexed(cmd.mesh.indexCount);
 	}
 }

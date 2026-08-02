@@ -9,6 +9,7 @@
 #include "fxaa.h"
 #include "kernels.hpp"
 #include "../../shader.h"
+#include "../../graphicsEncoder.h"
 #include "../../frameGraph.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../models/quad.h"
@@ -20,7 +21,11 @@ PostProcessPass::PostProcessPass() = default;
 
 PostProcessPass::~PostProcessPass() = default;
 
-void PostProcessPass::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
+void PostProcessPass::configure(
+	const RenderContext& ctx,
+	const FrameGraph& graph,
+	GraphicsEncoder& encoder,
+	EventBus& eventBus) {
 	mEffects = {
 		std::make_shared<Bloom>("Bloom", false),
 		std::make_shared<ToneMapping>("Tone Mapping", false),
@@ -46,13 +51,12 @@ void PostProcessPass::configure(const RenderContext& ctx, const FrameGraph& grap
 		stages,
 		{{.name = "screenTexture", .slot = 0}});
 
-	mEncoder = GraphicsEncoder{};
 	mQuad = std::make_unique<Model::Quad>();
 	mRenderTargets = {&graph.getResource("ping"), &graph.getResource("pong")};
 	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessEvent>(this, &PostProcessPass::onGuiUpdate);
 }
 
-void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
+void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
 	bool toggle = false;
 
 	TextureView inputTex = graph.getResource("sceneBuffer").texture();
@@ -60,22 +64,22 @@ void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph)
 		if (!effect->enabled())
 			continue;
 
-		inputTex = effect->render(mEncoder, *mQuad, inputTex, mRenderTargets[toggle]);
+		inputTex = effect->render(encoder, *mQuad, inputTex, mRenderTargets[toggle]);
 		toggle = !toggle;
 	}
 
-	mEncoder.reset();
-	mEncoder.bindFrameBuffer();
-	mEncoder.bindPipeline(mPipeline);
+	encoder.reset();
+	encoder.bindFrameBuffer();
+	encoder.bindPipeline(mPipeline);
 
 	const TextureView textures[] = {inputTex};
-	mEncoder.bindMaterial({
+	encoder.bindMaterial({
 		.flags = 0,
 		.textures = std::span(textures)
 	});
 
-	mEncoder.bindVertexArray(mQuad->vao().id());
-	mEncoder.draw(6);
+	encoder.bindVertexArray(mQuad->vao().id());
+	encoder.draw(6);
 }
 
 void PostProcessPass::onGuiUpdate(const GuiPostProcessEvent& event) {

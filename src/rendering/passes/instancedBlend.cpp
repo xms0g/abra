@@ -1,6 +1,7 @@
 #include "instancedBlend.h"
 #include "../frameGraph.h"
 #include "../shader.h"
+#include "../graphicsEncoder.h"
 #include "../context/renderContext.hpp"
 #include "../context/renderGroup.hpp"
 #include "../context/renderData.hpp"
@@ -15,7 +16,11 @@ InstancedBlendPass::InstancedBlendPass() = default;
 
 InstancedBlendPass::~InstancedBlendPass() = default;
 
-void InstancedBlendPass::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
+void InstancedBlendPass::configure(
+	const RenderContext& ctx,
+	const FrameGraph& graph,
+	GraphicsEncoder& encoder,
+	EventBus& eventBus) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
@@ -78,7 +83,6 @@ void InstancedBlendPass::configure(const RenderContext& ctx, const FrameGraph& g
 	};
 
 	mPipeline = GraphicsPipeline{info};
-	mEncoder = GraphicsEncoder{};
 
 	const auto shadowTextures = std::vector{
 		graph.getResource("directional").texture(),
@@ -86,7 +90,7 @@ void InstancedBlendPass::configure(const RenderContext& ctx, const FrameGraph& g
 		graph.getResource("spot").texture()
 	};
 
-	mEncoder.bindTextures(shadowTextures, CONFIG_MANAGER.get<int32_t>("shadow.texture_slot"));
+	encoder.bindTextures(shadowTextures, CONFIG_MANAGER.get<int32_t>("shadow.texture_slot"));
 
 	mObjects = std::span(
 		ctx.queueRegistry->get<RenderInstanceGroup>("blendInstanced").data(),
@@ -96,15 +100,15 @@ void InstancedBlendPass::configure(const RenderContext& ctx, const FrameGraph& g
 	uploadInstanceData();
 }
 
-void InstancedBlendPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
-	mEncoder.reset();
-	mEncoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
-	mEncoder.bindPipeline(mPipeline);
+void InstancedBlendPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
+	encoder.reset();
+	encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
+	encoder.bindPipeline(mPipeline);
 
 	for (const auto& object: mObjects) {
 		const size_t count = object.transforms.size() / 9;
 
-		mEncoder.bindMaterial({
+		encoder.bindMaterial({
 			.idx = object.matBatch.materialIndex,
 			.flags = ctx.renderData->material.flags[object.matBatch.materialIndex],
 			.textures = std::span<const TextureView>(
@@ -113,8 +117,8 @@ void InstancedBlendPass::execute(const RenderContext& ctx, const FrameGraph& gra
 		});
 
 		for (const auto& meshIdx: object.matBatch.meshIndices) {
-			mEncoder.bindVertexArray(ctx.renderData->mesh.vaos[meshIdx]);
-			mEncoder.drawInstanced(ctx.renderData->mesh.indexCounts[meshIdx], count);
+			encoder.bindVertexArray(ctx.renderData->mesh.vaos[meshIdx]);
+			encoder.drawInstanced(ctx.renderData->mesh.indexCounts[meshIdx], count);
 		}
 	}
 }

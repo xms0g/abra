@@ -1,17 +1,22 @@
 #include "beginScene.h"
 #include "../frameGraph.h"
+#include "../graphicsEncoder.h"
 
 BeginScenePass::BeginScenePass() = default;
 
 BeginScenePass::~BeginScenePass() = default;
 
-void BeginScenePass::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
+void BeginScenePass::configure(
+	const RenderContext& ctx,
+	const FrameGraph& graph,
+	GraphicsEncoder& encoder,
+	EventBus& eventBus) {
 }
 
-void BeginScenePass::execute(const RenderContext& ctx, const FrameGraph& graph) {
+void BeginScenePass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
 	auto& frameBuffer = graph.getResource("sceneBuffer");
 
-	mEncoder.beginRendering({
+	encoder.beginRendering({
 		.frameBuffer = frameBuffer,
 		.clearColor = true,
 		.clearDepth = true,

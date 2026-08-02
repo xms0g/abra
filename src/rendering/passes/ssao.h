@@ -3,7 +3,6 @@
 #include <memory>
 #include "IPass.hpp"
 #include "../graphicsPipeline.h"
-#include "../graphicsEncoder.h"
 #include "../buffers/uniformBuffer.h"
 #include "../texture/texture.h"
 
@@ -21,20 +20,23 @@ public:
 
 	~SSAOPass() override;
 
-	void configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) override;
+	void configure(
+		const RenderContext& ctx,
+		const FrameGraph& graph,
+		GraphicsEncoder& encoder,
+		EventBus& eventBus) override;
 
-	void execute(const RenderContext& ctx, const FrameGraph& graph) override;
+	void execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) override;
 
 private:
-	void ssao(const FrameGraph& graph);
+	void ssao(const FrameGraph& graph, GraphicsEncoder& encoder);
 
-	void blur(const FrameGraph& graph);
+	void blur(const FrameGraph& graph, GraphicsEncoder& encoder);
 
 	void createKernel();
 
-	void createNoiseTexture();
+	void createNoiseTexture(GraphicsEncoder& encoder);
 
-	GraphicsEncoder mEncoder{};
 	std::array<GraphicsPipeline, 2> mPipelines;
 	UniformBuffer mUBO{};
 	Texture mNoiseTexture{};

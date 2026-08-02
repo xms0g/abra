@@ -62,6 +62,7 @@ Renderer::Renderer(Registry& registry, const Camera& camera, Window& window) {
 	mRenderCtx.pbrBuffers = &mPBRBuffers;
 	mRenderCtx.camera = &camera;
 
+	mEncoder = GraphicsEncoder{};
 	GuiBackend::init(&*window, window.glContext(), "#version 410");
 }
 
@@ -85,7 +86,7 @@ void Renderer::render() {
 	refreshCameraData();
 	sortEntities();
 
-	mGraph.execute(mRenderCtx);
+	mGraph.execute(mRenderCtx, mEncoder);
 }
 
 void Renderer::drawGui() {
@@ -250,7 +251,7 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 		{"sceneBegin"});
 
 	mGraph.compile();
-	mGraph.configure(mRenderCtx, eventBus);
+	mGraph.configure(mRenderCtx, mEncoder, eventBus);
 }
 
 void Renderer::createFrameBuffers() {

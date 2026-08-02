@@ -1,7 +1,6 @@
 #pragma once
 #include "IPass.hpp"
 #include <span>
-#include "../graphicsEncoder.h"
 #include "../context/renderQueue.hpp"
 
 struct DrawCommand;
@@ -18,9 +17,13 @@ public:
 
 	~CullingPass() override;
 
-	void configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) override;
+	void configure(
+		const RenderContext& ctx,
+		const FrameGraph& graph,
+		GraphicsEncoder& encoder,
+		EventBus& eventBus) override;
 
-	void execute(const RenderContext& ctx, const FrameGraph& graph) override;
+	void execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) override;
 
 private:
 	static void cullScene(
@@ -28,8 +31,6 @@ private:
 		const math::Frustum& frustum,
 		std::span<RenderGroup> groups,
 		RenderQueue<DrawCommand>& outQueue);
-
-	GraphicsEncoder mEncoder{};
 
 	std::span<RenderGroup> mOpaqueGroups{};
 	std::span<RenderGroup> mUnlitGroups{};

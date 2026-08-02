@@ -5,7 +5,6 @@
 #include "glm/glm.hpp"
 #include "IPass.hpp"
 #include "../graphicsPipeline.h"
-#include "../graphicsEncoder.h"
 #include "../context/renderQueue.hpp"
 
 class VertexBuffer;
@@ -17,9 +16,13 @@ public:
 
 	~InstancedBlendPass() override;
 
-	void configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) override;
+	void configure(
+		const RenderContext& ctx,
+		const FrameGraph& graph,
+		GraphicsEncoder& encoder,
+		EventBus& eventBus) override;
 
-	void execute(const RenderContext& ctx, const FrameGraph& graph) override;
+	void execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) override;
 
 private:
 	struct InstanceData {
@@ -33,7 +36,6 @@ private:
 	void uploadInstanceData() const;
 
 	GraphicsPipeline mPipeline{};
-	GraphicsEncoder mEncoder{};
 	std::unique_ptr<VertexBuffer> mVBO;
 	std::span<RenderInstanceGroup> mObjects;
 };

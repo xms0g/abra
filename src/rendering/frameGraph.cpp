@@ -1,6 +1,7 @@
 #include "frameGraph.h"
 #include <numeric>
 #include <queue>
+#include "graphicsEncoder.h"
 #include "buffers/frameBuffer.h"
 #include "passes/IPass.hpp"
 #include "../event/eventBus.hpp"
@@ -94,14 +95,14 @@ void FrameGraph::compile() {
 	}
 }
 
-void FrameGraph::configure(const RenderContext& ctx, EventBus& eventBus) const {
+void FrameGraph::configure(const RenderContext& ctx, GraphicsEncoder& encoder, EventBus& eventBus) const {
 	for (const size_t index: mExecutionOrder) {
-		mPasses[index].pass->configure(ctx, *this, eventBus);
+		mPasses[index].pass->configure(ctx, *this, encoder, eventBus);
 	}
 }
 
-void FrameGraph::execute(const RenderContext& ctx) const {
+void FrameGraph::execute(const RenderContext& ctx, GraphicsEncoder& encoder) const {
 	for (const size_t index: mExecutionOrder) {
-		mPasses[index].pass->execute(ctx, *this);
+		mPasses[index].pass->execute(ctx, *this, encoder);
 	}
 }

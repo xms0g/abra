@@ -1,6 +1,7 @@
 #include "forwardUnlit.h"
 #include "../shader.h"
 #include "../frameGraph.h"
+#include "../graphicsEncoder.h"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../../config/configManager.h"
@@ -9,7 +10,11 @@ ForwardUnlitPass::ForwardUnlitPass() = default;
 
 ForwardUnlitPass::~ForwardUnlitPass() = default;
 
-void ForwardUnlitPass::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
+void ForwardUnlitPass::configure(
+	const RenderContext& ctx,
+	const FrameGraph& graph,
+	GraphicsEncoder& encoder,
+	EventBus& eventBus) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
@@ -50,20 +55,19 @@ void ForwardUnlitPass::configure(const RenderContext& ctx, const FrameGraph& gra
 	};
 
 	mPipeline = GraphicsPipeline{info};
-	mEncoder = GraphicsEncoder{};
 
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("UnlitCommands");
 }
 
-void ForwardUnlitPass::execute(const RenderContext& ctx, const FrameGraph& graph) {
-	mEncoder.reset();
-	mEncoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
-	mEncoder.bindPipeline(mPipeline);
+void ForwardUnlitPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
+	encoder.reset();
+	encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
+	encoder.bindPipeline(mPipeline);
 
 	for (const auto& cmd: *mCommands) {
-		mEncoder.bindMaterial(cmd.material);
-		mEncoder.bindTransform(cmd.transform);
-		mEncoder.bindVertexArray(cmd.mesh.vao);
-		mEncoder.drawIndexed(cmd.mesh.indexCount);
+		encoder.bindMaterial(cmd.material);
+		encoder.bindTransform(cmd.transform);
+		encoder.bindVertexArray(cmd.mesh.vao);
+		encoder.drawIndexed(cmd.mesh.indexCount);
 	}
 }

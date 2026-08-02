@@ -1,7 +1,6 @@
 #pragma once
 #include "IPass.hpp"
 #include "../graphicsPipeline.h"
-#include "../graphicsEncoder.h"
 #include "../context/renderQueue.hpp"
 
 struct DrawCommand;
@@ -14,12 +13,15 @@ public:
 
 	~DeferredGeometryPass() override;
 
-	void configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) override;
+	void configure(
+		const RenderContext& ctx,
+		const FrameGraph& graph,
+		GraphicsEncoder& encoder,
+		EventBus& eventBus) override;
 
-	void execute(const RenderContext& ctx, const FrameGraph& graph) override;
+	void execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) override;
 
 private:
 	GraphicsPipeline mPipeline{};
-	GraphicsEncoder mEncoder{};
 	RenderQueue<DrawCommand>* mCommands{nullptr};
 };
