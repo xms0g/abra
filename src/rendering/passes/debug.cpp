@@ -86,7 +86,6 @@ void DebugPass::configure(
 }
 
 void DebugPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
-	encoder.reset();
 	encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
 
 	for (const auto& cmd: *mCommands) {

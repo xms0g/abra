@@ -108,7 +108,6 @@ void SSAOPass::execute(const RenderContext& ctx, const FrameGraph& graph, Graphi
 }
 
 void SSAOPass::ssao(const FrameGraph& graph, GraphicsEncoder& encoder) {
-	encoder.reset();
 	encoder.bindFrameBuffer(graph.getResource("ssao"));
 	encoder.clearFrameBuffer(ClearMask::Color);
 
@@ -118,7 +117,6 @@ void SSAOPass::ssao(const FrameGraph& graph, GraphicsEncoder& encoder) {
 }
 
 void SSAOPass::blur(const FrameGraph& graph, GraphicsEncoder& encoder) {
-	encoder.reset();
 	encoder.bindFrameBuffer(graph.getResource("ssaoBlur"));
 	encoder.clearFrameBuffer(ClearMask::Color);
 

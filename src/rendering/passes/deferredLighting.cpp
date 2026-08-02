@@ -108,7 +108,6 @@ void DeferredLightingPass::configure(
 }
 
 void DeferredLightingPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
-	encoder.reset();
 	const auto& gBuffer = graph.getResource("gBuffer");
 	const auto& sceneBuffer = graph.getResource("sceneBuffer");
 

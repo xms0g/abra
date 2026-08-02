@@ -101,7 +101,6 @@ void InstancedBlendPass::configure(
 }
 
 void InstancedBlendPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
-	encoder.reset();
 	encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
 	encoder.bindPipeline(mPipeline);
 

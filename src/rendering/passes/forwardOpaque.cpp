@@ -84,7 +84,6 @@ void ForwardOpaquePass::configure(
 }
 
 void ForwardOpaquePass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
-	encoder.reset();
 	encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
 	encoder.bindPipeline(mPipeline);
 
