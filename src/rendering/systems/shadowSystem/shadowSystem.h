@@ -2,9 +2,9 @@
 #include <memory>
 #include "glm/glm.hpp"
 #include "../../buffers/uniformBuffer.h"
-#include "../../graphicsEncoder.h"
 #include "../../graphicsPipeline.h"
 
+class GraphicsEncoder;
 class FrameGraph;
 class EventBus;
 struct UpdateShadowMapEvent;
@@ -19,7 +19,7 @@ public:
 
 	~ShadowSystem();
 
-	void configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus);
+	void configure(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder, EventBus& eventBus);
 
 private:
 	void directionalShadowPass();
@@ -40,9 +40,9 @@ private:
 
 	const RenderContext* mCtx{nullptr};
 	const FrameGraph* mGraph{nullptr};
+	GraphicsEncoder* mEncoder{nullptr};
 	UniformBuffer mUBO;
 	std::array<GraphicsPipeline, 2> mPipelines;
-	GraphicsEncoder mEncoder;
 	std::unique_ptr<DirectionalShadow> mDirShadow;
 	std::unique_ptr<OmnidirectionalShadow> mOmnidirShadow;
 	std::unique_ptr<PerspectiveShadow> mPersShadow;

@@ -405,7 +405,7 @@ void Renderer::createFrameBuffers() {
 void Renderer::configureSystems(EventBus& eventBus) {
 	mLightSystem->configure(mRenderCtx, eventBus);
 	mSyncStateSystem->configure(mRenderCtx, eventBus);
-	mShadowSystem->configure(mRenderCtx, mGraph, eventBus);
+	mShadowSystem->configure(mRenderCtx, mGraph, mEncoder, eventBus);
 }
 
 void Renderer::refreshCameraData() const {

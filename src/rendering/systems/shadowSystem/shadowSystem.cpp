@@ -3,6 +3,7 @@
 #include "omnidirectionalShadow.h"
 #include "perspectiveShadow.h"
 #include "../../frameGraph.h"
+#include "../../graphicsEncoder.h"
 #include "../../context/renderContext.hpp"
 #include "../../buffers/uniformBuffer.h"
 #include "../../../ECS/components/directionalLight.hpp"
@@ -16,9 +17,10 @@ ShadowSystem::ShadowSystem() = default;
 
 ShadowSystem::~ShadowSystem() = default;
 
-void ShadowSystem::configure(const RenderContext& ctx, const FrameGraph& graph, EventBus& eventBus) {
+void ShadowSystem::configure(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder, EventBus& eventBus) {
 	mCtx = &ctx;
 	mGraph = &graph;
+	mEncoder = &encoder;
 
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
@@ -75,7 +77,6 @@ void ShadowSystem::configure(const RenderContext& ctx, const FrameGraph& graph, 
 
 	mPipelines[0] = GraphicsPipeline{depthInfo};
 	mPipelines[1] = GraphicsPipeline{cubeDepthInfo};
-	mEncoder = GraphicsEncoder{};
 
 	mDirShadow = std::make_unique<DirectionalShadow>(ctx);
 	mOmnidirShadow = std::make_unique<OmnidirectionalShadow>(ctx);
@@ -101,7 +102,7 @@ void ShadowSystem::directionalShadowPass() {
 	if (lights.empty())
 		return;
 
-	mDirShadow->render(*mCtx, *mGraph, mEncoder, mPipelines[0], lights[0]->direction);
+	mDirShadow->render(*mCtx, *mGraph, *mEncoder, mPipelines[0], lights[0]->direction);
 	mGPUData.lightSpaceMatrix = mDirShadow->lightSpaceMatrix();
 }
 
@@ -112,9 +113,9 @@ void ShadowSystem::omnidirectionalShadowPass() {
 		return;
 
 	const auto& frameBuffer = mGraph->getResource("point");
-	mEncoder.bindFrameBuffer(frameBuffer);
-	mEncoder.setViewport({.x = 0, .y = 0, .width = frameBuffer.width(), .height = frameBuffer.height()});
-	mEncoder.clearFrameBuffer(ClearMask::Depth);
+	mEncoder->bindFrameBuffer(frameBuffer);
+	mEncoder->setViewport({.x = 0, .y = 0, .width = frameBuffer.width(), .height = frameBuffer.height()});
+	mEncoder->clearFrameBuffer(ClearMask::Depth);
 
 	for (int32_t i = 0; i < lights.size(); ++i) {
 		const auto& light = lights[i];
@@ -122,9 +123,9 @@ void ShadowSystem::omnidirectionalShadowPass() {
 		if (!light || !light->castShadow)
 			continue;
 
-		mOmnidirShadow->render(*mCtx, mEncoder, mPipelines[1], light->position, i);
+		mOmnidirShadow->render(*mCtx, *mEncoder, mPipelines[1], light->position, i);
 	}
-	mEncoder.unbindFrameBuffer();
+	mEncoder->unbindFrameBuffer();
 }
 
 void ShadowSystem::perspectiveShadowPass() {
@@ -133,8 +134,8 @@ void ShadowSystem::perspectiveShadowPass() {
 		return;
 
 	const auto& frameBuffer = mGraph->getResource("spot");
-	mEncoder.bindFrameBuffer(frameBuffer);
-	mEncoder.setViewport({.x = 0, .y = 0, .width = frameBuffer.width(), .height = frameBuffer.height()});
+	mEncoder->bindFrameBuffer(frameBuffer);
+	mEncoder->setViewport({.x = 0, .y = 0, .width = frameBuffer.width(), .height = frameBuffer.height()});
 
 	for (int32_t i = 0; i < lights.size(); ++i) {
 		const auto& light = lights[i];
@@ -144,17 +145,18 @@ void ShadowSystem::perspectiveShadowPass() {
 
 		mPersShadow->render(
 			*mCtx,
-			mEncoder,
+			*mEncoder,
 			mPipelines[0],
 			frameBuffer,
 			light->direction,
 			light->position,
 			light->outerCutOff,
 			i);
+
 		mGPUData.persLightSpaceMatrix[i] = mPersShadow->lightSpaceMatrix(i);
 	}
 
-	mEncoder.unbindFrameBuffer();
+	mEncoder->unbindFrameBuffer();
 }
 
 void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
@@ -162,7 +164,7 @@ void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
 	omnidirectionalShadowPass();
 	perspectiveShadowPass();
 
-	mEncoder.setCullMode(CullMode::Back);
+	mEncoder->setCullMode(CullMode::Back);
 
 	mUBO.bind();
 	mUBO.setData(&mGPUData, sizeof(ShadowData), 0);
