@@ -129,7 +129,7 @@ void Renderer::createPBRBuffers() {
 	auto& textures = matComponent.materials->at(0).textures;
 
 	if (const auto& texture = textures.front(); texture.target == TextureTarget::Texture2D) {
-		const TextureView view = createEnvMap(textures.front());
+		const TextureView view = createEnvMap(texture);
 		textures.clear();
 		textures.emplace_back(view.id, 0, view.target, "");
 	}
@@ -464,7 +464,7 @@ void Renderer::sortEntities() {
 	// }
 }
 
-TextureView Renderer::createEnvMap(Texture& hdrTexture) {
+TextureView Renderer::createEnvMap(const Texture& hdrTexture) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};

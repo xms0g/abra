@@ -198,8 +198,8 @@ void SceneLoader::loadScene(Registry& registry, const std::string_view filePath)
 			size_t count = transforms.size();
 			RESOURCE_MANAGER.upload<decltype(transforms)>(entity.id(), transforms);
 
-			auto transform = std::span<const float>(RESOURCE_MANAGER.get<float>(entity.id()), count);
-			entity.addComponent<InstanceComponent>(transform);
+			auto transformsView = std::span<const float>(RESOURCE_MANAGER.get<float>(entity.id()), count);
+			entity.addComponent<InstanceComponent>(transformsView);
 		}
 
 		// Material Component

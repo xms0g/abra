@@ -110,7 +110,7 @@ void ResourceManager::loadModel(const size_t entityID, std::string_view modelPat
 	processMaterials(scene, mlCtx);
 
 	{
-		std::lock_guard<std::mutex> lock(mResourceMutex);
+		std::lock_guard lock(mResourceMutex);
 		mMeshesByEntity.emplace(entityID, std::move(meshesByMatID));
 		mMaterialsByEntity.emplace(entityID, std::move(mlCtx.materials));
 	}

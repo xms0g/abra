@@ -14,7 +14,7 @@ height = 0
 fullscreen = false
 
 [hdr]
-enabled = true
+enabled = false
 
 [msaa]
 enabled = false
