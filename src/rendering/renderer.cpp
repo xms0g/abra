@@ -127,15 +127,16 @@ void Renderer::createPBRBuffers() {
 
 	const auto& matComponent = entityIt->getComponent<MaterialComponent>();
 	auto& textures = matComponent.materials->at(0).textures;
+	const auto& texture = textures.front();
 
-	if (const auto& texture = textures.front(); texture.target == TextureTarget::Texture2D) {
+	if (texture.target == TextureTarget::Texture2D) {
 		const TextureView view = createEnvMap(texture);
 		textures.clear();
 		textures.emplace_back(view.id, 0, view.target, "");
 	}
 
-	createIrradianceMap({.id = textures.front().id, .target = textures.front().target});
-	createPrefilterMap({.id = textures.front().id, .target = textures.front().target});
+	createIrradianceMap({.id = texture.id, .target = texture.target});
+	createPrefilterMap({.id = texture.id, .target = texture.target});
 	createBrdfLUT();
 }
 
@@ -543,7 +544,7 @@ TextureView Renderer::createEnvMap(const Texture& hdrTexture) {
 	return mPBRBuffers.environment->texture();
 }
 
-void Renderer::createIrradianceMap(const TextureView& environment) {
+void Renderer::createIrradianceMap(const TextureView environment) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
@@ -619,7 +620,7 @@ void Renderer::createIrradianceMap(const TextureView& environment) {
 	encoder.unbindFrameBuffer();
 }
 
-void Renderer::createPrefilterMap(const TextureView& environment) {
+void Renderer::createPrefilterMap(const TextureView environment) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
