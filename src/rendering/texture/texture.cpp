@@ -119,7 +119,7 @@ Texture Texture::loadCubemap(const std::vector<std::string>& faces) {
 		}
 
 		const GLenum format = depth == 4 ? GL_RGBA : GL_RGB;
-		const int32_t internalFormat = depth == 4 ? GL_SRGB_ALPHA : GL_SRGB;
+		const int32_t internalFormat = depth == 4 ? GL_SRGB8_ALPHA8 : GL_SRGB8;
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE,
 		             data);
 

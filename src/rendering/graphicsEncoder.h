@@ -24,8 +24,9 @@ constexpr ClearMask operator|(const ClearMask lhs, const ClearMask rhs) {
 	return static_cast<ClearMask>(toUnderlying(lhs) | toUnderlying(rhs));
 }
 
-constexpr ClearMask operator|=(const ClearMask lhs, const ClearMask rhs) {
-	return static_cast<ClearMask>(toUnderlying(lhs) | toUnderlying(rhs));
+constexpr ClearMask& operator|=(ClearMask& lhs, const ClearMask rhs) {
+	lhs = static_cast<ClearMask>(toUnderlying(lhs) | toUnderlying(rhs));
+	return lhs;
 }
 
 class GraphicsPipeline;
