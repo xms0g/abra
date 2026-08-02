@@ -28,7 +28,6 @@
 #include "passes/skybox.h"
 #include "passes/resolve.h"
 #include "passes/terrain.h"
-#include "passes/beginScene.h"
 #include "passes/forwardUnlit.h"
 #include "passes/postProcess/postProcess.h"
 #include "gui/backend.h"
@@ -85,6 +84,16 @@ void Renderer::render() {
 	GuiBackend::newFrame();
 	refreshCameraData();
 	sortEntities();
+
+	mEncoder.reset();
+
+	auto& frameBuffer = mGraph.getResource("sceneBuffer");
+	mEncoder.beginRendering({
+		.frameBuffer = frameBuffer,
+		.clearColor = true,
+		.clearDepth = true,
+		.viewport = {.x = 0, .y = 0, .width = frameBuffer.width(), .height = frameBuffer.height()}
+	});
 
 	mGraph.execute(mRenderCtx, mEncoder);
 }
@@ -235,7 +244,7 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 		"CullingPass",
 		true,
 		std::make_unique<CullingPass>(),
-		{"sceneBegin"},
+		{},
 		{"OpaqueCommands", "UnlitCommands", "BlendCommands", "DeferredCommands", "DebugCommands"});
 	mGraph.addPass(
 		"PostProcessPass",
@@ -243,12 +252,6 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 		std::make_unique<PostProcessPass>(),
 		{"sceneBuffer"},
 		{"frameBuffer"});
-	mGraph.addPass(
-		"BeginScenePass",
-		true,
-		std::make_unique<BeginScenePass>(),
-		{},
-		{"sceneBegin"});
 
 	mGraph.compile();
 	mGraph.configure(mRenderCtx, mEncoder, eventBus);
