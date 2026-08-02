@@ -106,7 +106,7 @@ TextureView Bloom::blurPass(
 		encoder.setUniform("horizontal", horizontal);
 		horizontal = !horizontal;
 
-		const TextureView textures[] = {sceneTexture};
+		const TextureView textures[] = {outTex};
 		encoder.bindMaterial({
 			.flags = 0,
 			.textures = std::span(textures)
