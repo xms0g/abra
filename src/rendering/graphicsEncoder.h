@@ -68,7 +68,9 @@ public:
 
 	void setViewport(Viewport viewport) const;
 
-	void setCullMode(CullMode mode);
+	void setCullEnabled(bool enabled);
+
+	void setCullFace(CullMode mode);
 
 	template<typename T>
 	void setUniform(const std::string& name, const T& value);

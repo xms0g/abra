@@ -164,7 +164,7 @@ void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
 	omnidirectionalShadowPass();
 	perspectiveShadowPass();
 
-	mEncoder->setCullMode(CullMode::Back);
+	mEncoder->setCullFace(CullMode::Back);
 
 	mUBO.bind();
 	mUBO.setData(&mGPUData, sizeof(ShadowData), 0);

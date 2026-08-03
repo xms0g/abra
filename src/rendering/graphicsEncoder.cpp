@@ -189,7 +189,14 @@ void GraphicsEncoder::setViewport(const Viewport viewport) const {
 	glViewport(viewport.x, viewport.y, viewport.width, viewport.height);
 }
 
-void GraphicsEncoder::setCullMode(const CullMode mode) {
+void GraphicsEncoder::setCullEnabled(const bool enabled) {
+	if (enabled)
+		glEnable(GL_CULL_FACE);
+	else
+		glDisable(GL_CULL_FACE);
+}
+
+void GraphicsEncoder::setCullFace(const CullMode mode) {
 	glCullFace(toGL(mode));
 }
 
