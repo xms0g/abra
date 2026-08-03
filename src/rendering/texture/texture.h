@@ -61,5 +61,3 @@ struct Texture {
 
 	static Texture loadHDR(std::string_view path);
 };
-
-GL(TextureTarget)

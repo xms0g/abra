@@ -9,13 +9,11 @@
 #include "../config/configManager.h"
 #include "../rendering/graphicsPipeline.h"
 
-GL(ShaderStageType)
-
 ShaderStage::ShaderStage(const PipelineShaderStage& info) : type(info.stage) {
 	std::string processedSource;
 	preprocess(info.code, processedSource);
 
-	handle = glCreateShader(toGL(info.stage));
+	handle = glCreateShader(toUnderlying(info.stage));
 
 	const char* ptr = processedSource.c_str();
 

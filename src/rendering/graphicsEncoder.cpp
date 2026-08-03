@@ -4,17 +4,6 @@
 #include "shader.h"
 #include "buffers/frameBuffer.h"
 
-GL(ClearMask)
-GL(BlitMask)
-GL(BlendFactor)
-GL(BlendOp)
-GL(CompareOp)
-GL(CullMode)
-GL(FrontFace)
-GL(PrimitiveTopology)
-GL(PolygonMode)
-GL(PolygonFace)
-
 void GraphicsEncoder::beginRendering(const RenderingInfo& info) {
 	info.frameBuffer.bind();
 
@@ -51,7 +40,7 @@ void GraphicsEncoder::bindVertexArray(const uint32_t vao) {
 
 void GraphicsEncoder::bindTexture(const TextureView& handle, const uint32_t slot) {
 	glActiveTexture(GL_TEXTURE0 + slot);
-	glBindTexture(toGL(handle.target), handle.id);
+	glBindTexture(toUnderlying(handle.target), handle.id);
 }
 
 void GraphicsEncoder::bindTextures(const std::span<const TextureView> handles, uint32_t slot) {
@@ -87,7 +76,7 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 
 	if (mState.glStateCache.depthCompareOp != pipelineState.depthStencilState.depthCompareOp) {
 		mState.glStateCache.depthCompareOp = pipelineState.depthStencilState.depthCompareOp;
-		glDepthFunc(toGL(pipelineState.depthStencilState.depthCompareOp));
+		glDepthFunc(toUnderlying(pipelineState.depthStencilState.depthCompareOp));
 	}
 
 	if (mState.glStateCache.stencilTest != pipelineState.depthStencilState.stencilTestEnable) {
@@ -113,7 +102,7 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 
 	if (mState.glStateCache.frontFace != pipelineState.rasterizationState.frontFace) {
 		mState.glStateCache.frontFace = pipelineState.rasterizationState.frontFace;
-		glFrontFace(toGL(pipelineState.rasterizationState.frontFace));
+		glFrontFace(toUnderlying(pipelineState.rasterizationState.frontFace));
 	}
 
 	if (mState.glStateCache.blendEnable != pipelineState.colorBlendState.blendEnable) {
@@ -122,13 +111,13 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 		if (pipelineState.colorBlendState.blendEnable) {
 			glEnable(GL_BLEND);
 			glBlendFuncSeparate(
-				toGL(pipelineState.colorBlendState.srcColorBlendFactor),
-				toGL(pipelineState.colorBlendState.dstColorBlendFactor),
-				toGL(pipelineState.colorBlendState.srcAlphaBlendFactor),
-				toGL(pipelineState.colorBlendState.dstAlphaBlendFactor));
+				toUnderlying(pipelineState.colorBlendState.srcColorBlendFactor),
+				toUnderlying(pipelineState.colorBlendState.dstColorBlendFactor),
+				toUnderlying(pipelineState.colorBlendState.srcAlphaBlendFactor),
+				toUnderlying(pipelineState.colorBlendState.dstAlphaBlendFactor));
 			glBlendEquationSeparate(
-				toGL(pipelineState.colorBlendState.colorBlendOp),
-				toGL(pipelineState.colorBlendState.alphaBlendOp));
+				toUnderlying(pipelineState.colorBlendState.colorBlendOp),
+				toUnderlying(pipelineState.colorBlendState.alphaBlendOp));
 
 			glColorMask(
 				static_cast<bool>(pipelineState.colorBlendState.colorWriteMask & ColorComponent::Red),
@@ -149,8 +138,8 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 		mState.glStateCache.polygonMode = pipelineState.rasterizationState.polygonMode;
 
 		glPolygonMode(
-			toGL(pipelineState.rasterizationState.polygonFace),
-			toGL(pipelineState.rasterizationState.polygonMode));
+			toUnderlying(pipelineState.rasterizationState.polygonFace),
+			toUnderlying(pipelineState.rasterizationState.polygonMode));
 	}
 
 	if (mState.glStateCache.program != pipelineState.shader.id()) {
@@ -202,26 +191,26 @@ void GraphicsEncoder::blitFramebuffer(const FrameBuffer& src, const FrameBuffer&
 
 	glBlitFramebuffer(0, 0, src.width(), src.height(),
 	                  0, 0, dst.width(), dst.height(),
-	                  toGL(mask), GL_NEAREST);
+	                  toUnderlying(mask), GL_NEAREST);
 }
 
 void GraphicsEncoder::clearFrameBuffer(const ClearMask mask) const {
-	glClear(toGL(mask));
+	glClear(toUnderlying(mask));
 }
 
 void GraphicsEncoder::draw(const size_t vertexCount) const {
-	glDrawArrays(toGL(mState.pipeline->state().primitiveAssemblyState.topology), 0,
+	glDrawArrays(toUnderlying(mState.pipeline->state().primitiveAssemblyState.topology), 0,
 	             static_cast<int32_t>(vertexCount));
 }
 
 void GraphicsEncoder::drawIndexed(const size_t indexCount) const {
-	glDrawElements(toGL(mState.pipeline->state().primitiveAssemblyState.topology),
+	glDrawElements(toUnderlying(mState.pipeline->state().primitiveAssemblyState.topology),
 	               static_cast<int32_t>(indexCount), GL_UNSIGNED_INT, nullptr);
 }
 
 void GraphicsEncoder::drawInstanced(const size_t indexCount, const uint32_t count) const {
 	glDrawElementsInstanced(
-		toGL(mState.pipeline->state().primitiveAssemblyState.topology),
+		toUnderlying(mState.pipeline->state().primitiveAssemblyState.topology),
 		static_cast<int32_t>(indexCount),
 		GL_UNSIGNED_INT,
 		nullptr,
@@ -244,7 +233,7 @@ void GraphicsEncoder::setCullEnabled(const bool enabled) {
 }
 
 void GraphicsEncoder::setCullFace(const CullMode mode) {
-	glCullFace(toGL(mode));
+	glCullFace(toUnderlying(mode));
 }
 
 void GraphicsEncoder::reset() {

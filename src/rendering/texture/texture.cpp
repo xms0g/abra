@@ -64,10 +64,10 @@ Texture Texture::generate(const int32_t width, const int32_t height, const float
 }
 
 void Texture::generateMipmaps(const TextureView handle) {
-	glBindTexture(toGL(handle.target), handle.id);
-	glGenerateMipmap(toGL(handle.target));
-	glTexParameteri(toGL(handle.target), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glBindTexture(toGL(handle.target), 0);
+	glBindTexture(toUnderlying(handle.target), handle.id);
+	glGenerateMipmap(toUnderlying(handle.target));
+	glTexParameteri(toUnderlying(handle.target), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glBindTexture(toUnderlying(handle.target), 0);
 }
 
 uint32_t Texture::load(const std::string_view path, const uint32_t flags, const bool isSRGBA) {
