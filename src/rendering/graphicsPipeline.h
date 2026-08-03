@@ -183,8 +183,8 @@ public:
 	PipelineState& state();
 
 	static GraphicsPipeline createFullscreenQuadPipeline(
-		std::vector<PipelineShaderStage>& stages,
-		const std::vector<SamplerInfo>& samplers);
+		std::vector<PipelineShaderStage> stages,
+		std::vector<SamplerInfo> samplers);
 
 private:
 	PipelineState mState{};

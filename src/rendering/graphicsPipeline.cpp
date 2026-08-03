@@ -41,14 +41,14 @@ PipelineState& GraphicsPipeline::state() {
 }
 
 GraphicsPipeline GraphicsPipeline::createFullscreenQuadPipeline(
-	std::vector<PipelineShaderStage>& stages,
-	const std::vector<SamplerInfo>& samplers) {
+	std::vector<PipelineShaderStage> stages,
+	std::vector<SamplerInfo> samplers) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
 
 	constexpr PipelineRasterizationState rasterizationState = {
-		.cullMode = CullMode::Back,
+		.cullMode = CullMode::None,
 		.frontFace = FrontFace::CounterClockwise,
 		.polygonMode = PolygonMode::Fill,
 		.polygonFace = PolygonFace::FrontAndBack,
@@ -70,7 +70,7 @@ GraphicsPipeline GraphicsPipeline::createFullscreenQuadPipeline(
 		.depthStencilState = depthStencilState,
 		.colorBlendState = colorBlendState,
 		.stages = std::move(stages),
-		.samplers = samplers,
+		.samplers = std::move(samplers),
 		.uniforms = {}
 	};
 
