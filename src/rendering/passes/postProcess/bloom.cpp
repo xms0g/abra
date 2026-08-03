@@ -67,7 +67,6 @@ TextureView Bloom::brightFilterPass(
 	const Model::Quad& quad,
 	const TextureView sceneTexture,
 	bool& toggle) {
-	encoder.reset();
 	encoder.bindFrameBuffer(*mRenderTargets[toggle]);
 	encoder.clearFrameBuffer(ClearMask::Color);
 
@@ -96,7 +95,6 @@ TextureView Bloom::blurPass(
 
 	encoder.bindPipeline(mPipelines[1]);
 	for (int i = 0; i < 10; ++i) {
-		encoder.reset();
 		encoder.bindFrameBuffer(*mRenderTargets[toggle]);
 		encoder.clearFrameBuffer(ClearMask::Color);
 
@@ -122,7 +120,6 @@ TextureView Bloom::combinePass(
 	const TextureView sceneTexture,
 	const TextureView blurTexture,
 	const bool& toggle) {
-	encoder.reset();
 	encoder.bindFrameBuffer(*mRenderTargets[toggle]);
 	//encoder.clearFrameBuffer(ClearMask::Color);
 

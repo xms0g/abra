@@ -23,7 +23,6 @@ TextureView Sepia::render(
 	Model::Quad& quad,
 	const TextureView sceneTexture,
 	FrameBuffer* renderTarget) {
-	encoder.reset();
 	encoder.bindFrameBuffer(*renderTarget);
 	encoder.clearFrameBuffer(ClearMask::Color);
 

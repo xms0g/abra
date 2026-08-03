@@ -68,7 +68,6 @@ void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph,
 		toggle = !toggle;
 	}
 
-	encoder.reset();
 	encoder.bindFrameBuffer();
 	encoder.bindPipeline(mPipeline);
 
