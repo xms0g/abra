@@ -74,10 +74,7 @@ TextureView Bloom::brightFilterPass(
 	encoder.bindPipeline(mPipelines[0]);
 
 	const TextureView textures[] = {sceneTexture};
-	encoder.bindMaterial({
-		.flags = 0,
-		.textures = std::span(textures)
-	});
+	encoder.bindMaterial({.textures = std::span(textures)});
 
 	encoder.bindVertexArray(quad.vao().id());
 	encoder.draw(6);
@@ -107,10 +104,7 @@ TextureView Bloom::blurPass(
 		horizontal = !horizontal;
 
 		const TextureView textures[] = {outTex};
-		encoder.bindMaterial({
-			.flags = 0,
-			.textures = std::span(textures)
-		});
+		encoder.bindMaterial({.textures = std::span(textures)});
 
 		encoder.bindVertexArray(quad.vao().id());
 		encoder.draw(6);
@@ -135,10 +129,7 @@ TextureView Bloom::combinePass(
 	encoder.bindPipeline(mPipelines[2]);
 
 	const TextureView textures[] = {sceneTexture, blurTexture};
-	encoder.bindMaterial({
-		.flags = 0,
-		.textures = std::span(textures)
-	});
+	encoder.bindMaterial({.textures = std::span(textures)});
 
 	encoder.bindVertexArray(quad.vao().id());
 	encoder.draw(6);

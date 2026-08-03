@@ -31,10 +31,7 @@ TextureView Gamma::render(
 	encoder.bindPipeline(mPipeline);
 
 	const TextureView textures[] = {sceneTexture};
-	encoder.bindMaterial({
-		.flags = 0,
-		.textures = std::span(textures)
-	});
+	encoder.bindMaterial({.textures = std::span(textures)});
 
 	encoder.bindVertexArray(quad.vao().id());
 	encoder.draw(6);
