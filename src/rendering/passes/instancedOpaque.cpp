@@ -94,10 +94,10 @@ void InstancedOpaquePass::configure(
 }
 
 void InstancedOpaquePass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
-	encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
-	encoder.bindPipeline(mPipeline);
-
 	for (const auto& object: mObjects) {
+		encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
+		encoder.bindPipeline(mPipeline);
+
 		const size_t count = object.transforms.size() / 9;
 
 		encoder.bindMaterial({

@@ -90,10 +90,9 @@ void ForwardBlendPass::configure(
 }
 
 void ForwardBlendPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
-	encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
-	encoder.bindPipeline(mPipeline);
-
 	for (const auto& cmd: *mCommands) {
+		encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
+		encoder.bindPipeline(mPipeline);
 		encoder.bindMaterial(cmd.material);
 		encoder.bindTransform(cmd.transform);
 		encoder.bindVertexArray(cmd.mesh.vao);

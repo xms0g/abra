@@ -185,11 +185,10 @@ void GraphicsEncoder::bindMaterial(const MaterialView& material) {
 		bindTextures(material.textures, slot);
 	}
 
-	// if (material.flags & TWOSIDED && pipelineState.rasterizationState.cullMode != CullMode::None) [[unlikely]] {
-	// 	glDisable(GL_CULL_FACE);
-	// } else if (!(material.flags & TWOSIDED) && pipelineState.rasterizationState.cullMode == CullMode::None) {
-	// 	glEnable(GL_CULL_FACE);
-	// }
+	if (material.flags & TWOSIDED && pipelineState.rasterizationState.cullMode != CullMode::None) [[unlikely]] {
+		mState.glStateCache.cullMode = CullMode::None;
+		setCullEnabled(false);
+	}
 }
 
 void GraphicsEncoder::bindTransform(const TransformView& transform) {
