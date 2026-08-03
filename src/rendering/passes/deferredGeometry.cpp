@@ -85,7 +85,6 @@ void DeferredGeometryPass::configure(
 }
 
 void DeferredGeometryPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
-	encoder.reset();
 	encoder.bindFrameBuffer(graph.getResource("gBuffer"));
 	encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
 

@@ -70,8 +70,7 @@ void TerrainPass::configure(
 
 void TerrainPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
 	const auto& cmd = mCommands->front();
-
-	encoder.reset();
+	
 	encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
 	encoder.bindPipeline(mPipeline);
 	encoder.bindMaterial(cmd.material);
