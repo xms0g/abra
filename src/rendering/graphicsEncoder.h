@@ -46,9 +46,9 @@ public:
 
 	void bindVertexArray(uint32_t vao) const;
 
-	void bindTexture(const TextureView& handle, uint32_t slot) const;
+	void bindTexture(const TextureView& handle, uint32_t slot);
 
-	void bindTextures(std::span<const TextureView> handles, uint32_t slot) const;
+	void bindTextures(std::span<const TextureView> handles, uint32_t slot);
 
 	void bindPipeline(GraphicsPipeline& pipeline);
 

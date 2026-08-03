@@ -25,6 +25,8 @@ enum class TextureTarget : uint32_t {
 struct TextureView {
 	uint32_t id{0};
 	TextureTarget target{};
+
+	bool operator==(const TextureView& other) const = default;
 };
 
 struct Texture {

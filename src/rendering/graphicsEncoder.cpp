@@ -43,14 +43,19 @@ void GraphicsEncoder::bindVertexArray(const uint32_t vao) const {
 	glBindVertexArray(vao);
 }
 
-void GraphicsEncoder::bindTexture(const TextureView& handle, const uint32_t slot) const {
+void GraphicsEncoder::bindTexture(const TextureView& handle, const uint32_t slot) {
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(toGL(handle.target), handle.id);
 }
 
-void GraphicsEncoder::bindTextures(const std::span<const TextureView> handles, uint32_t slot) const {
+void GraphicsEncoder::bindTextures(const std::span<const TextureView> handles, uint32_t slot) {
 	for (const auto& handle: handles) {
-		bindTexture(handle, slot++);
+		if (mState.materialCache.textures[slot] != handle) {
+			mState.materialCache.textures[slot] = handle;
+			bindTexture(handle, slot);
+		}
+
+		++slot;
 	}
 }
 
@@ -112,16 +117,10 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 }
 
 void GraphicsEncoder::bindMaterial(const MaterialView& material) {
-	if (mState.materialCache.lastMaterialIdx == material.idx) {
-		return;
-	}
+	const auto& pipelineState = mState.pipeline->state();
 
-	mState.materialCache.lastMaterialIdx = material.idx;
-
-	auto& pipelineState = mState.pipeline->state();
-
-	if (mState.materialCache.lastMatFlags != material.flags || mState.materialCache.lastShader != &pipelineState.
-	    shader) {
+	if (mState.materialCache.lastMatFlags != material.flags ||
+	    mState.materialCache.lastShader != &pipelineState.shader) {
 		mState.materialCache.lastMatFlags = material.flags;
 		mState.materialCache.lastShader = &pipelineState.shader;
 		setUniform("material.flags", material.flags);
@@ -142,13 +141,11 @@ void GraphicsEncoder::bindMaterial(const MaterialView& material) {
 		bindTextures(material.textures, slot);
 	}
 
-	if (material.flags & TWOSIDED && pipelineState.rasterizationState.cullMode != CullMode::None) [[unlikely]] {
-		glDisable(GL_CULL_FACE);
-		pipelineState.rasterizationState.cullMode = CullMode::None;
-	} else if (!(material.flags & TWOSIDED) && pipelineState.rasterizationState.cullMode == CullMode::None) {
-		glEnable(GL_CULL_FACE);
-		pipelineState.rasterizationState.cullMode = CullMode::Back;
-	}
+	// if (material.flags & TWOSIDED && pipelineState.rasterizationState.cullMode != CullMode::None) [[unlikely]] {
+	// 	glDisable(GL_CULL_FACE);
+	// } else if (!(material.flags & TWOSIDED) && pipelineState.rasterizationState.cullMode == CullMode::None) {
+	// 	glEnable(GL_CULL_FACE);
+	// }
 }
 
 void GraphicsEncoder::bindTransform(const TransformView& transform) {

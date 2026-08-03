@@ -68,13 +68,13 @@ struct MaterialBatch {
 };
 
 struct MaterialCache {
-	uint32_t lastMaterialIdx{std::numeric_limits<uint32_t>::max()};
 	uint32_t lastMatFlags{0};
+	TextureView textures[32];
 	const Shader* lastShader{nullptr};
 
 	void reset() {
-		lastMaterialIdx = std::numeric_limits<uint32_t>::max();
 		lastMatFlags = 0;
 		lastShader = nullptr;
+		textures[0] = {};
 	}
 };
