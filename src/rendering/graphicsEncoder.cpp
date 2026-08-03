@@ -15,7 +15,7 @@ GL(PrimitiveTopology)
 GL(PolygonMode)
 GL(PolygonFace)
 
-void GraphicsEncoder::beginRendering(const RenderingInfo& info) const {
+void GraphicsEncoder::beginRendering(const RenderingInfo& info) {
 	info.frameBuffer.bind();
 
 	auto mask{ClearMask::None};
@@ -35,12 +35,18 @@ void GraphicsEncoder::unbindFrameBuffer() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void GraphicsEncoder::bindFrameBuffer(const FrameBuffer& frameBuffer) const {
-	frameBuffer.bind();
+void GraphicsEncoder::bindFrameBuffer(const FrameBuffer& frameBuffer) {
+	if (mState.glStateCache.framebuffer != frameBuffer.id()) {
+		mState.glStateCache.framebuffer = frameBuffer.id();
+		frameBuffer.bind();
+	}
 }
 
-void GraphicsEncoder::bindVertexArray(const uint32_t vao) const {
-	glBindVertexArray(vao);
+void GraphicsEncoder::bindVertexArray(const uint32_t vao) {
+	if (mState.glStateCache.vao != vao) {
+		mState.glStateCache.vao = vao;
+		glBindVertexArray(vao);
+	}
 }
 
 void GraphicsEncoder::bindTexture(const TextureView& handle, const uint32_t slot) {
@@ -64,56 +70,94 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 
 	const auto& pipelineState = mState.pipeline->state();
 
-	if (pipelineState.depthStencilState.depthTestEnable) {
-		glEnable(GL_DEPTH_TEST);
+	if (mState.glStateCache.depthTest != pipelineState.depthStencilState.depthTestEnable) {
+		mState.glStateCache.depthTest = pipelineState.depthStencilState.depthTestEnable;
+
+		if (pipelineState.depthStencilState.depthTestEnable) {
+			glEnable(GL_DEPTH_TEST);
+		} else {
+			glDisable(GL_DEPTH_TEST);
+		}
+	}
+
+	if (mState.glStateCache.depthWrite != pipelineState.depthStencilState.depthWriteEnable) {
+		mState.glStateCache.depthWrite = pipelineState.depthStencilState.depthWriteEnable;
+		glDepthMask(pipelineState.depthStencilState.depthWriteEnable ? GL_TRUE : GL_FALSE);
+	}
+
+	if (mState.glStateCache.depthCompareOp != pipelineState.depthStencilState.depthCompareOp) {
+		mState.glStateCache.depthCompareOp = pipelineState.depthStencilState.depthCompareOp;
 		glDepthFunc(toGL(pipelineState.depthStencilState.depthCompareOp));
-	} else {
-		glDisable(GL_DEPTH_TEST);
 	}
 
-	glDepthMask(pipelineState.depthStencilState.depthWriteEnable ? GL_TRUE : GL_FALSE);
+	if (mState.glStateCache.stencilTest != pipelineState.depthStencilState.stencilTestEnable) {
+		mState.glStateCache.stencilTest = pipelineState.depthStencilState.stencilTestEnable;
 
-	if (pipelineState.depthStencilState.stencilTestEnable) {
-		glEnable(GL_STENCIL_TEST);
+		if (pipelineState.depthStencilState.stencilTestEnable) {
+			glEnable(GL_STENCIL_TEST);
+		} else {
+			glDisable(GL_STENCIL_TEST);
+		}
 	}
 
-	if (pipelineState.rasterizationState.cullMode != CullMode::None) {
-		glEnable(GL_CULL_FACE);
-		glCullFace(toGL(pipelineState.rasterizationState.cullMode));
+	if (mState.glStateCache.cullMode != pipelineState.rasterizationState.cullMode) {
+		mState.glStateCache.cullMode = pipelineState.rasterizationState.cullMode;
+
+		if (pipelineState.rasterizationState.cullMode != CullMode::None) {
+			setCullEnabled(true);
+			setCullFace(pipelineState.rasterizationState.cullMode);
+		} else {
+			glDisable(GL_CULL_FACE);
+		}
+	}
+
+	if (mState.glStateCache.frontFace != pipelineState.rasterizationState.frontFace) {
+		mState.glStateCache.frontFace = pipelineState.rasterizationState.frontFace;
 		glFrontFace(toGL(pipelineState.rasterizationState.frontFace));
-	} else {
-		glDisable(GL_CULL_FACE);
 	}
 
-	if (pipelineState.colorBlendState.blendEnable) {
-		glEnable(GL_BLEND);
-		glBlendFuncSeparate(
-			toGL(pipelineState.colorBlendState.srcColorBlendFactor),
-			toGL(pipelineState.colorBlendState.dstColorBlendFactor),
-			toGL(pipelineState.colorBlendState.srcAlphaBlendFactor),
-			toGL(pipelineState.colorBlendState.dstAlphaBlendFactor));
-		glBlendEquationSeparate(
-			toGL(pipelineState.colorBlendState.colorBlendOp),
-			toGL(pipelineState.colorBlendState.alphaBlendOp));
+	if (mState.glStateCache.blendEnable != pipelineState.colorBlendState.blendEnable) {
+		mState.glStateCache.blendEnable = pipelineState.colorBlendState.blendEnable;
 
-		glColorMask(
-			static_cast<bool>(pipelineState.colorBlendState.colorWriteMask & ColorComponent::Red),
-			static_cast<bool>(pipelineState.colorBlendState.colorWriteMask & ColorComponent::Green),
-			static_cast<bool>(pipelineState.colorBlendState.colorWriteMask & ColorComponent::Blue),
-			static_cast<bool>(pipelineState.colorBlendState.colorWriteMask & ColorComponent::Alpha)
-		);
-	} else {
-		glDisable(GL_BLEND);
+		if (pipelineState.colorBlendState.blendEnable) {
+			glEnable(GL_BLEND);
+			glBlendFuncSeparate(
+				toGL(pipelineState.colorBlendState.srcColorBlendFactor),
+				toGL(pipelineState.colorBlendState.dstColorBlendFactor),
+				toGL(pipelineState.colorBlendState.srcAlphaBlendFactor),
+				toGL(pipelineState.colorBlendState.dstAlphaBlendFactor));
+			glBlendEquationSeparate(
+				toGL(pipelineState.colorBlendState.colorBlendOp),
+				toGL(pipelineState.colorBlendState.alphaBlendOp));
+
+			glColorMask(
+				static_cast<bool>(pipelineState.colorBlendState.colorWriteMask & ColorComponent::Red),
+				static_cast<bool>(pipelineState.colorBlendState.colorWriteMask & ColorComponent::Green),
+				static_cast<bool>(pipelineState.colorBlendState.colorWriteMask & ColorComponent::Blue),
+				static_cast<bool>(pipelineState.colorBlendState.colorWriteMask & ColorComponent::Alpha)
+			);
+		} else {
+			glDisable(GL_BLEND);
+		}
 	}
 
 	if (pipelineState.tessellationState.patchControlPoints > 0) {
 		glPatchParameteri(GL_PATCH_VERTICES, pipelineState.tessellationState.patchControlPoints);
 	}
 
-	glPolygonMode(toGL(pipelineState.rasterizationState.polygonFace),
-	              toGL(pipelineState.rasterizationState.polygonMode));
+	if (mState.glStateCache.polygonMode != pipelineState.rasterizationState.polygonMode) {
+		mState.glStateCache.polygonMode = pipelineState.rasterizationState.polygonMode;
 
-	pipelineState.shader.bind();
+		glPolygonMode(
+			toGL(pipelineState.rasterizationState.polygonFace),
+			toGL(pipelineState.rasterizationState.polygonMode));
+	}
+
+	if (mState.glStateCache.program != pipelineState.shader.id()) {
+		mState.glStateCache.program = pipelineState.shader.id();
+
+		pipelineState.shader.bind();
+	}
 }
 
 void GraphicsEncoder::bindMaterial(const MaterialView& material) {
@@ -185,8 +229,12 @@ void GraphicsEncoder::drawInstanced(const size_t indexCount, const uint32_t coun
 		static_cast<int32_t>(count));
 }
 
-void GraphicsEncoder::setViewport(const Viewport viewport) const {
-	glViewport(viewport.x, viewport.y, viewport.width, viewport.height);
+void GraphicsEncoder::setViewport(const Viewport viewport) {
+	if (mState.glStateCache.viewport != viewport) {
+		mState.glStateCache.viewport = viewport;
+
+		glViewport(viewport.x, viewport.y, viewport.width, viewport.height);
+	}
 }
 
 void GraphicsEncoder::setCullEnabled(const bool enabled) {
@@ -202,4 +250,5 @@ void GraphicsEncoder::setCullFace(const CullMode mode) {
 
 void GraphicsEncoder::reset() {
 	mState.materialCache.reset();
+	mState.glStateCache.reset();
 }

@@ -88,6 +88,8 @@ struct Viewport {
 	int32_t y;
 	int32_t width;
 	int32_t height;
+
+	bool operator==(const Viewport& other) const = default;
 };
 
 class FrameBuffer;

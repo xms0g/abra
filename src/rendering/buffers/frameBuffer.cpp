@@ -55,6 +55,10 @@ FrameBuffer::~FrameBuffer() {
 		glDeleteRenderbuffers(1, &mRBO);
 }
 
+uint32_t FrameBuffer::id() const {
+	return mFBO;
+}
+
 int32_t FrameBuffer::width() const {
 	return mWidth;
 }

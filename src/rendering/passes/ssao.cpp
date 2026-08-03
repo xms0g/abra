@@ -35,7 +35,7 @@ void SSAOPass::configure(
 	constexpr PipelineDepthStencilState depthStencilState = {
 		.depthTestEnable = false,
 		.depthWriteEnable = false,
-		.depthCompareOp = CompareOp::Never,
+		.depthCompareOp = CompareOp::Less,
 	};
 
 	constexpr PipelineColorBlendState colorBlendState = {

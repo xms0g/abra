@@ -36,15 +36,15 @@ class GraphicsEncoder {
 public:
 	GraphicsEncoder() = default;
 
-	void beginRendering(const RenderingInfo& info) const;
+	void beginRendering(const RenderingInfo& info);
 
 	void bindFrameBuffer() const;
 
 	void unbindFrameBuffer() const;
 
-	void bindFrameBuffer(const FrameBuffer& frameBuffer) const;
+	void bindFrameBuffer(const FrameBuffer& frameBuffer);
 
-	void bindVertexArray(uint32_t vao) const;
+	void bindVertexArray(uint32_t vao);
 
 	void bindTexture(const TextureView& handle, uint32_t slot);
 
@@ -66,7 +66,7 @@ public:
 
 	void drawInstanced(size_t indexCount, uint32_t count) const;
 
-	void setViewport(Viewport viewport) const;
+	void setViewport(Viewport viewport);
 
 	void setCullEnabled(bool enabled);
 
@@ -81,8 +81,39 @@ public:
 	void reset();
 
 private:
+	struct GLStateCache {
+		uint32_t program{0};
+		uint32_t vao{0};
+		uint32_t framebuffer{0};
+		bool depthTest{};
+		CompareOp depthCompareOp{};
+		bool depthWrite{};
+		bool stencilTest{};
+		CullMode cullMode{};
+		FrontFace frontFace{};
+		bool blendEnable{};
+		PolygonMode polygonMode{};
+		Viewport viewport{};
+
+		void reset() {
+			program = 0;
+			vao = 0;
+			framebuffer = 0;
+			depthTest = false;
+			depthCompareOp = {};
+			depthWrite = false;
+			stencilTest = false;
+			cullMode = {};
+			frontFace = {};
+			blendEnable = false;
+			polygonMode = {};
+			viewport = {};
+		}
+	};
+
 	struct EncoderState {
 		MaterialCache materialCache{};
+		GLStateCache glStateCache{};
 		GraphicsPipeline* pipeline{nullptr};
 	};
 

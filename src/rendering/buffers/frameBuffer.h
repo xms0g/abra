@@ -42,6 +42,9 @@ public:
 	~FrameBuffer();
 
 	[[nodiscard]]
+	uint32_t id() const;
+
+	[[nodiscard]]
 	int32_t width() const;
 
 	[[nodiscard]]
