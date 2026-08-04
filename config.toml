@@ -5,7 +5,7 @@
 [paths]
 shader_dir = "shaders/"
 asset_dir = "assets/"
-scene_dir = "scenes/"
+scene_dir = "assets/scenes/"
 
 [window]
 title = "abra"
