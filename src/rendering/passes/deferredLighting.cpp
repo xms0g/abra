@@ -22,7 +22,7 @@ void DeferredLightingPass::configure(
 	};
 
 	constexpr PipelineRasterizationState rasterizationState = {
-		.cullMode = CullMode::Back,
+		.cullMode = CullMode::None,
 		.frontFace = FrontFace::CounterClockwise,
 		.polygonMode = PolygonMode::Fill,
 		.polygonFace = PolygonFace::FrontAndBack,
