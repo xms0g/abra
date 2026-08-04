@@ -74,7 +74,7 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 	}
 
 	if (mState.glStateCache.depthStencil.depthCompareOp != pipelineState.depthStencilState.depthCompareOp &&
-		pipelineState.depthStencilState.depthCompareOp != CompareOp::Never) {
+	    pipelineState.depthStencilState.depthCompareOp != CompareOp::Never) {
 		mState.glStateCache.depthStencil.depthCompareOp = pipelineState.depthStencilState.depthCompareOp;
 		glDepthFunc(toUnderlying(pipelineState.depthStencilState.depthCompareOp));
 	}
@@ -173,9 +173,18 @@ void GraphicsEncoder::bindMaterial(const MaterialView& material) {
 		bindTextures(material.textures, slot);
 	}
 
-	if (material.flags & TWOSIDED && pipelineState.rasterizationState.cullMode != CullMode::None) [[unlikely]] {
+	if (material.flags & TWOSIDED &&
+	    mState.glStateCache.cull.cullMode != CullMode::None &&
+	    pipelineState.rasterizationState.cullMode != CullMode::None) [[unlikely]] {
 		mState.glStateCache.cull.cullMode = CullMode::None;
 		setCullEnabled(false);
+	}
+
+	if (!(material.flags & TWOSIDED) &&
+	    mState.glStateCache.cull.cullMode == CullMode::None &&
+	    pipelineState.rasterizationState.cullMode != CullMode::None) [[unlikely]] {
+		mState.glStateCache.cull.cullMode = pipelineState.rasterizationState.cullMode;
+		setCullEnabled(true);
 	}
 }
 
