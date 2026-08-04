@@ -81,32 +81,47 @@ public:
 	void reset();
 
 private:
-	struct GLStateCache {
+	struct HandleCache {
 		uint32_t program{0};
 		uint32_t vao{0};
 		uint32_t framebuffer{0};
-		bool depthTest{};
+	};
+
+	struct DepthStencilCache {
+		bool depthTestEnable{};
 		CompareOp depthCompareOp{};
-		bool depthWrite{};
-		bool stencilTest{};
+		bool depthWriteEnable{};
+		bool stencilTestEnable{};
+	};
+
+	struct CullCache {
 		CullMode cullMode{};
 		FrontFace frontFace{};
-		bool blendEnable{};
+	};
+
+	struct PolygonCache {
 		PolygonMode polygonMode{};
+		PolygonFace polygonFace{};
+	};
+
+	struct BlendCache {
+		bool blendEnable{};
+	};
+
+	struct GLStateCache {
+		HandleCache handles{};
+		DepthStencilCache depthStencil{};
+		CullCache cull{};
+		BlendCache blend{};
+		PolygonCache polygon{};
 		Viewport viewport{};
 
 		void reset() {
-			program = 0;
-			vao = 0;
-			framebuffer = 0;
-			depthTest = false;
-			depthCompareOp = {};
-			depthWrite = false;
-			stencilTest = false;
-			cullMode = {};
-			frontFace = {};
-			blendEnable = false;
-			polygonMode = {};
+			handles = {};
+			depthStencil = {};
+			cull = {};
+			blend = {};
+			polygon = {};
 			viewport = {};
 		}
 	};
