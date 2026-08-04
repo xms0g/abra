@@ -1,5 +1,4 @@
 #include "graphicsEncoder.h"
-#include "glad/glad.h"
 #include "graphicsPipeline.h"
 #include "shader.h"
 #include "buffers/frameBuffer.h"
