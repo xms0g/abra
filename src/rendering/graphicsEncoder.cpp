@@ -96,7 +96,7 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 			setCullEnabled(true);
 			setCullFace(pipelineState.rasterizationState.cullMode);
 		} else {
-			glDisable(GL_CULL_FACE);
+			setCullEnabled(false);
 		}
 	}
 
@@ -152,10 +152,9 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 void GraphicsEncoder::bindMaterial(const MaterialView& material) {
 	const auto& pipelineState = mState.pipeline->state();
 
-	if (mState.materialCache.lastMatFlags != material.flags ||
-	    mState.materialCache.lastShader != &pipelineState.shader) {
+	if (mState.materialCache.lastMatFlags != material.flags || mState.materialCache.lastShader != pipelineState.shader.id()) {
 		mState.materialCache.lastMatFlags = material.flags;
-		mState.materialCache.lastShader = &pipelineState.shader;
+		mState.materialCache.lastShader = pipelineState.shader.id();
 		setUniform("material.flags", material.flags);
 	}
 

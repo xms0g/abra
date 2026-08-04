@@ -69,12 +69,12 @@ struct MaterialBatch {
 
 struct MaterialCache {
 	uint32_t lastMatFlags{0};
-	TextureView textures[32];
-	const Shader* lastShader{nullptr};
+	uint32_t lastShader{0};
+	std::array<TextureView, 32> textures;
 
 	void reset() {
 		lastMatFlags = 0;
-		lastShader = nullptr;
-		textures[0] = {};
+		lastShader = 0;
+		textures.fill({});
 	}
 };
