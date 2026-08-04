@@ -89,17 +89,14 @@ TextureView Bloom::blurPass(
 	const Model::Quad& quad,
 	const TextureView sceneTexture,
 	bool& toggle) {
-	bool horizontal = true;
 
 	TextureView outTex = sceneTexture;
 
 	encoder.bindPipeline(mPipelines[1]);
 	for (int i = 0; i < 10; ++i) {
 		encoder.bindFrameBuffer(*mRenderTargets[toggle]);
-		encoder.clearFrameBuffer(ClearMask::Color);
 
-		encoder.setUniform("horizontal", horizontal);
-		horizontal = !horizontal;
+		encoder.setUniform("horizontal", (i & 1) == 0);
 
 		const TextureView textures[] = {outTex};
 		encoder.bindMaterial({.textures = std::span(textures)});
