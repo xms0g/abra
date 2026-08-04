@@ -158,11 +158,11 @@ void GraphicsEncoder::bindMaterial(const MaterialView& material) {
 		setUniform("material.flags", material.flags);
 	}
 
-	if (material.flags & HAS_HEIGHT_MAP) {
+	if (material.flags & HAS_HEIGHT_MAP) [[unlikely]] {
 		setUniform("material.heightScale", material.heightScale);
 	}
 
-	if (material.flags & ALPHACUTOFF) {
+	if (material.flags & ALPHACUTOFF) [[unlikely]] {
 		setUniform("material.alphaCutoff", material.alphaCutoff);
 	}
 
