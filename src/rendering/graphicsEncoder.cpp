@@ -73,7 +73,8 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 		glDepthMask(pipelineState.depthStencilState.depthWriteEnable ? GL_TRUE : GL_FALSE);
 	}
 
-	if (mState.glStateCache.depthStencil.depthCompareOp != pipelineState.depthStencilState.depthCompareOp) {
+	if (mState.glStateCache.depthStencil.depthCompareOp != pipelineState.depthStencilState.depthCompareOp &&
+		pipelineState.depthStencilState.depthCompareOp != CompareOp::Never) {
 		mState.glStateCache.depthStencil.depthCompareOp = pipelineState.depthStencilState.depthCompareOp;
 		glDepthFunc(toUnderlying(pipelineState.depthStencilState.depthCompareOp));
 	}

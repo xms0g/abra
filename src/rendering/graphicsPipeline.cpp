@@ -57,7 +57,7 @@ GraphicsPipeline GraphicsPipeline::createFullscreenQuadPipeline(
 	constexpr PipelineDepthStencilState depthStencilState = {
 		.depthTestEnable = false,
 		.depthWriteEnable = true,
-		.depthCompareOp = CompareOp::Less,
+		.depthCompareOp = CompareOp::Never,
 	};
 
 	constexpr PipelineColorBlendState colorBlendState = {

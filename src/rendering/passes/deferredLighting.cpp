@@ -31,7 +31,7 @@ void DeferredLightingPass::configure(
 	constexpr PipelineDepthStencilState depthStencilState = {
 		.depthTestEnable = false,
 		.depthWriteEnable = false,
-		.depthCompareOp = CompareOp::Less,
+		.depthCompareOp = CompareOp::Never,
 	};
 
 	constexpr PipelineColorBlendState colorBlendState = {
