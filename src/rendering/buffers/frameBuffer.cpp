@@ -75,7 +75,7 @@ void FrameBuffer::unbind() const {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void FrameBuffer::resizeRenderBuffer(int32_t width, int32_t height) const {
+void FrameBuffer::resizeRenderBuffer(const int32_t width, const int32_t height) const {
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
 	glViewport(0, 0, width, height);
@@ -408,9 +408,7 @@ FrameBuffer& FrameBuffer::withRenderBufferDepth(const InternalFormat format) {
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(
-	const int32_t multisampledCount,
-	const InternalFormat format) {
+FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(const int32_t multisampledCount, const InternalFormat format) {
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 
@@ -432,9 +430,7 @@ FrameBuffer& FrameBuffer::withRenderBufferDepthStencil(const InternalFormat form
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withRenderBufferDepthStencilMultisampled(
-	const int32_t multisampledCount,
-	const InternalFormat format) {
+FrameBuffer& FrameBuffer::withRenderBufferDepthStencilMultisampled(const int32_t multisampledCount, const InternalFormat format) {
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 

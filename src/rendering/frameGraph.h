@@ -15,13 +15,13 @@ public:
 	FrameBuffer& getResource(const std::string& key) const;
 
 	void addPass(
-		const std::string& name,
+		std::string name,
 		bool active,
 		std::unique_ptr<IPass> pass,
-		const std::vector<std::string>& inputs,
-		const std::vector<std::string>& outputs);
+		std::vector<std::string> inputs,
+		std::vector<std::string> outputs);
 
-	void addResource(const std::string& key, std::unique_ptr<FrameBuffer> resource);
+	void addResource(std::string key, std::unique_ptr<FrameBuffer> resource);
 
 	void compile();
 

@@ -1,6 +1,7 @@
 #include "frameGraph.h"
 #include <numeric>
 #include <queue>
+#include <utility>
 #include "graphicsEncoder.h"
 #include "buffers/frameBuffer.h"
 #include "passes/IPass.hpp"
@@ -11,22 +12,21 @@ FrameBuffer& FrameGraph::getResource(const std::string& key) const {
 }
 
 void FrameGraph::addPass(
-	const std::string& name,
+	std::string name,
 	const bool active,
 	std::unique_ptr<IPass> pass,
-	const std::vector<std::string>& inputs,
-	const std::vector<std::string>& outputs) {
-	mPasses.push_back({
-		.name = name,
-		.isActive = active,
-		.pass = std::move(pass),
-		.inputs = inputs,
-		.outputs = outputs
-	});
+	std::vector<std::string> inputs,
+	std::vector<std::string> outputs) {
+	mPasses.emplace_back(
+		std::move(name),
+		active,
+		std::move(pass),
+		std::move(inputs),
+		std::move(outputs));
 }
 
-void FrameGraph::addResource(const std::string& key, std::unique_ptr<FrameBuffer> resource) {
-	mResources.emplace(key, std::move(resource));
+void FrameGraph::addResource(std::string key, std::unique_ptr<FrameBuffer> resource) {
+	mResources.emplace(std::move(key), std::move(resource));
 }
 
 void FrameGraph::compile() {
