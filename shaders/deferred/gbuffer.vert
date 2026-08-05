@@ -13,18 +13,19 @@ uniform mat3 normalMatrix;
 out VS_OUT
 {
     vec2 TexCoord;
-    vec3 WorldPos;
+    vec3 ViewPos;
     mat3 TBN;
     vec3 TangentViewDir;
 } vs_out;
 
 void main() {
     vs_out.TBN = TBN(model, aTangent, normalMatrix, aNormal);
-    vs_out.WorldPos = vec3(model * vec4(aPos, 1.0));
+    vec4 worldPos = model * vec4(aPos, 1.0);
+    vs_out.ViewPos = vec3(view * worldPos);
     vs_out.TexCoord = aTexCoord;
 
-    vec3 viewDir = normalize(viewPos.xyz - vs_out.WorldPos);
+    vec3 viewDir = normalize(cameraPos.xyz - worldPos.xyz);
     vs_out.TangentViewDir = normalize(transpose(vs_out.TBN) * viewDir);
 
-    gl_Position = projection * view * vec4(vs_out.WorldPos, 1.0);
+    gl_Position = projection * vec4(vs_out.ViewPos, 1.0);
 }

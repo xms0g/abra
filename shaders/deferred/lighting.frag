@@ -19,9 +19,9 @@ out vec4 fragColor;
 void main() {
     vec4 positionSample = texture(gPosition, fs_in.TexCoord);
     vec4 normalSample = texture(gNormal, fs_in.TexCoord);
-    vec3 worldPos = positionSample.xyz;
+    vec3 fragWorldPos = (inverseView * vec4(positionSample.xyz, 1.0)).xyz;
     vec3 N = normalSample.xyz;
-    vec3 V = normalize(viewPos.xyz - worldPos);
+    vec3 V = normalize(cameraPos.xyz - fragWorldPos);
     vec3 R = reflect(-V, N);
 
     vec4 albedoSample = texture(gAlbedo, fs_in.TexCoord);
@@ -36,9 +36,9 @@ void main() {
 
     vec3 emissive = vec3(positionSample.w, normalSample.w, albedoSample.a);
 
-    vec4 fragPosLightSpace = lightSpaceMatrix * vec4(worldPos, 1.0);
+    vec4 fragPosLightSpace = lightSpaceMatrix * vec4(fragWorldPos, 1.0);
 
-    vec3 result = calculateLights(N, V, R, worldPos, fragPosLightSpace, albedo, metallic, roughness, finalAO) + emissive;
+    vec3 result = calculateLights(N, V, R, fragWorldPos, fragPosLightSpace, albedo, metallic, roughness, finalAO) + emissive;
 
     fragColor = vec4(result, 1.0);
 }

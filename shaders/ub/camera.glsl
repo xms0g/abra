@@ -4,10 +4,10 @@
 layout (std140) uniform CameraBlock
 {
     mat4 view;
+    mat4 inverseView;
     mat4 skyView;
-    vec4 viewPos;
+    vec4 cameraPos;
     mat4 projection;
-    mat4 inverseProjection;
 };
 
 #endif

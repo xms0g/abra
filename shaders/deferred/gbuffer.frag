@@ -2,7 +2,7 @@
 in VS_OUT
 {
     vec2 TexCoord;
-    vec3 WorldPos;
+    vec3 ViewPos;
     mat3 TBN;
     vec3 TangentViewDir;
 } fs_in;
@@ -25,7 +25,7 @@ void main() {
     }
 
     // store the fragment position vector in the first gbuffer texture
-    gPosition.rgb = fs_in.WorldPos;
+    gPosition.rgb = fs_in.ViewPos;
     // also store the per-fragment normals into the gbuffer
     gNormal.rgb = normal(fs_in.TBN, texCoord, true);
     // and the diffuse per-fragment color

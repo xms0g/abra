@@ -122,11 +122,8 @@ void Renderer::createUniformBuffers(const Camera& camera) {
 			CONFIG_MANAGER.get<int32_t>("window.height")),
 		camera.znear(), camera.zfar());
 
-	const glm::mat4 invProjectionMat = glm::inverse(projectionMat);
-
 	mCameraUBO.bind();
-	mCameraUBO.setData(glm::value_ptr(projectionMat), sizeof(glm::mat4), 2 * sizeof(glm::mat4) + sizeof(glm::vec4));
-	mCameraUBO.setData(glm::value_ptr(invProjectionMat), sizeof(glm::mat4), 3 * sizeof(glm::mat4) + sizeof(glm::vec4));
+	mCameraUBO.setData(glm::value_ptr(projectionMat), sizeof(glm::mat4), 3 * sizeof(glm::mat4) + sizeof(glm::vec4));
 	mCameraUBO.unbind();
 }
 
@@ -411,14 +408,16 @@ void Renderer::configureSystems(EventBus& eventBus) {
 void Renderer::refreshCameraData() const {
 	struct alignas(16) PackedView {
 		glm::mat4 view;
+		glm::mat4 inverseView;
 		glm::mat4 skyView;
-		glm::vec4 viewPos;
+		glm::vec4 cameraPos;
 	};
 
 	const PackedView packed = {
 		.view = mRenderCtx.camera->viewMatrix(),
+		.inverseView = glm::inverse(mRenderCtx.camera->viewMatrix()),
 		.skyView = glm::mat4(glm::mat3(mRenderCtx.camera->viewMatrix())),
-		.viewPos = glm::vec4(mRenderCtx.camera->position(), 1.0)
+		.cameraPos = glm::vec4(mRenderCtx.camera->position(), 1.0)
 	};
 
 	mCameraUBO.bind();

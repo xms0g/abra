@@ -52,7 +52,7 @@ void SSAOPass::configure(
 			{.code = ShaderLoader::load("ssao.frag"), .stage = ShaderStageType::Fragment}
 		},
 		.samplers = {
-			{.name = "gDepthMap", .slot = CONFIG_MANAGER.get<int32_t>("gBuffer.depth.textureSlot")},
+			{.name = "gPosition", .slot = CONFIG_MANAGER.get<int32_t>("gBuffer.position.textureSlot")},
 			{.name = "gNormal", .slot = CONFIG_MANAGER.get<int32_t>("gBuffer.normal.textureSlot")},
 			{.name = "texNoise", .slot = CONFIG_MANAGER.get<int32_t>("ssao.noise.textureSlot")},
 			{.name = "kernelSize", .slot = CONFIG_MANAGER.get<int32_t>("ssao.kernelSize")}
@@ -92,8 +92,8 @@ void SSAOPass::configure(
 	const auto& gBuffer = graph.getResource("gBuffer");
 
 	encoder.bindTexture(
-		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.depth.textureIdx")),
-		CONFIG_MANAGER.get<int32_t>("gBuffer.depth.textureSlot"));
+		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.textureIdx")),
+		CONFIG_MANAGER.get<int32_t>("gBuffer.position.textureSlot"));
 
 	encoder.bindTexture(
 		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.textureIdx")),
