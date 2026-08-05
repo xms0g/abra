@@ -25,10 +25,10 @@ const vec3 gridSamplingDisk[20] = vec3[](
 );
 
 float calculateDirectionalShadow(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir);
-float calculateOmnidirectionalShadow(vec3 worldPos, vec3 normal, vec3 lightPos, vec3 viewPos, int lightIndex);
+float calculateOmnidirectionalShadow(vec3 fragWorldPos, vec3 normal, vec3 lightPos, vec3 cameraPos, int lightIndex);
 float calculatePerspectiveShadow(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir, int lightIndex);
 
-vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 worldPos, vec4 fragPosLightSpace, vec3 albedo, float metallic, float roughness, float ao) {
+vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 fragWorldPos, vec4 fragPosLightSpace, vec3 albedo, float metallic, float roughness, float ao) {
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo, metallic);
 
@@ -41,26 +41,26 @@ vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 worldPos, vec4 fragPosLightSpa
 
         float shadow = calculateDirectionalShadow(fragPosLightSpace, N, lightDir);
 
-        Lo += brdf(lightPos, N, V, F0, worldPos, radiance, albedo, metallic, roughness, ao) * (1.0 - shadow);
+        Lo += brdf(lightPos, N, V, F0, fragWorldPos, radiance, albedo, metallic, roughness, ao) * (1.0 - shadow);
     }
 
     for (int i = 0; i < lightCount.y; ++i) {
         PointLight light = pointLights[i];
         vec3 lightPos = light.position.xyz;
-        float distance = length(lightPos - worldPos);
+        float distance = length(lightPos - fragWorldPos);
         float attenuation = 1.0 / (light.attenuation.x + light.attenuation.y * distance + light.attenuation.z * (distance * distance));
         vec3 radiance = light.diffuse.rgb * light.intensity.x * attenuation;
 
-        float shadow = light.attenuation.w == 1.0 ? calculateOmnidirectionalShadow(worldPos, N, lightPos, viewPos.xyz, i) : 0.0;
+        float shadow = light.attenuation.w == 1.0 ? calculateOmnidirectionalShadow(fragWorldPos, N, lightPos, cameraPos.xyz, i) : 0.0;
 
-        Lo += brdf(lightPos, N, V, F0, worldPos, radiance, albedo, metallic, roughness, ao) * (1.0 - shadow);
+        Lo += brdf(lightPos, N, V, F0, fragWorldPos, radiance, albedo, metallic, roughness, ao) * (1.0 - shadow);
     }
 
     for (int i = 0; i < lightCount.z; ++i) {
         SpotLight light = spotLights[i];
         vec3 lightPos = light.position.xyz;
-        vec3 lightDir = normalize(lightPos - worldPos);
-        float distance = length(lightPos - worldPos);
+        vec3 lightDir = normalize(lightPos - fragWorldPos);
+        float distance = length(lightPos - fragWorldPos);
         float attenuation = 1.0 / (light.attenuation.x + light.attenuation.y * distance + light.attenuation.z * (distance * distance));
         // spotlight intensity
         float theta = dot(lightDir, normalize(-light.direction.xyz));
@@ -69,11 +69,11 @@ vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 worldPos, vec4 fragPosLightSpa
 
         vec3 radiance = light.diffuse.rgb * light.cutOff.z * intensity * attenuation;
 
-        vec4 fragPosPersLightSpace = persLightSpaceMatrix[i] * vec4(worldPos, 1.0);
+        vec4 fragPosPersLightSpace = persLightSpaceMatrix[i] * vec4(fragWorldPos, 1.0);
 
         float shadow = light.attenuation.w == 1.0 ? calculatePerspectiveShadow(fragPosPersLightSpace, N, lightDir, i) : 0.0;
 
-        Lo += brdf(lightPos, N, V, F0, worldPos, radiance, albedo, metallic, roughness, ao) * (1.0 - shadow);
+        Lo += brdf(lightPos, N, V, F0, fragWorldPos, radiance, albedo, metallic, roughness, ao) * (1.0 - shadow);
     }
 
     vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
@@ -125,12 +125,12 @@ float calculateDirectionalShadow(vec4 fragPosLightSpace, vec3 normal, vec3 light
     return shadow;
 }
 
-float calculateOmnidirectionalShadow(vec3 worldPos, vec3 normal, vec3 lightPos, vec3 viewPos, int lightIndex) {
-    vec3 lightToFrag = worldPos - lightPos;
+float calculateOmnidirectionalShadow(vec3 fragWorldPos, vec3 normal, vec3 lightPos, vec3 cameraPos, int lightIndex) {
+    vec3 lightToFrag = fragWorldPos - lightPos;
     float currentDepth = length(lightToFrag);
-    vec3 lightDir = normalize(lightPos - worldPos);
+    vec3 lightDir = normalize(lightPos - fragWorldPos);
     float bias = max(0.1 * (1.0 - dot(normal, lightDir)), 0.01);
-    float viewDistance = length(viewPos - worldPos);
+    float viewDistance = length(cameraPos - fragWorldPos);
     float diskRadius = (1.0 + (viewDistance / omniFarPlane.x)) * 0.005;
     float shadow = 0.0;
     int samples = 20;

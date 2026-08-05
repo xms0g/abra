@@ -16,7 +16,7 @@ out VS_OUT
 {
     vec2 TexCoord;
     mat3 TBN;
-    vec3 FragPos;
+    vec3 WorldPos;
     vec4 FragPosLightSpace;
     vec3 ViewDir;
     vec3 TangentViewDir;
@@ -25,9 +25,9 @@ out VS_OUT
 void main() {
     vs_out.TBN = TBN(model, aTangent, normalMatrix, aNormal);
     vs_out.TexCoord = aTexCoord;
-    vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
-    vs_out.FragPosLightSpace = lightSpaceMatrix * vec4(vs_out.FragPos, 1.0);
-    vs_out.ViewDir = normalize(viewPos.xyz - vs_out.FragPos);
+    vs_out.WorldPos = vec3(model * vec4(aPos, 1.0));
+    vs_out.FragPosLightSpace = lightSpaceMatrix * vec4(vs_out.WorldPos, 1.0);
+    vs_out.ViewDir = normalize(cameraPos.xyz - vs_out.WorldPos);
     vs_out.TangentViewDir = normalize(transpose(vs_out.TBN) * vs_out.ViewDir);
 
     gl_Position = projection * view  * model * vec4(aPos, 1.0);

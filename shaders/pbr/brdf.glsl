@@ -50,8 +50,8 @@ float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness, bool isIBL) {
     return ggx1 * ggx2;
 }
 
-vec3 brdf(vec3 lightPos, vec3 N, vec3 V, vec3 F0, vec3 worldPos, vec3 radiance, vec3 albedo, float metallic, float roughness, float ao) {
-    vec3 L = normalize(lightPos - worldPos);
+vec3 brdf(vec3 lightPos, vec3 N, vec3 V, vec3 F0, vec3 fragWorldPos, vec3 radiance, vec3 albedo, float metallic, float roughness, float ao) {
+    vec3 L = normalize(lightPos - fragWorldPos);
     vec3 H = normalize(V + L);
     // Cook-Torrance BRDF
     float NDF = distributionGGX(N, H, roughness);
