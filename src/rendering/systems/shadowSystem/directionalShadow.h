@@ -20,12 +20,11 @@ public:
 	[[nodiscard]]
 	glm::mat4 lightSpaceMatrix() const;
 
-	void render(
-		const RenderContext& ctx,
-		const FrameGraph& graph,
-		GraphicsEncoder& encoder,
-		GraphicsPipeline& pipeline,
-		const glm::vec3& direction);
+	void render(const RenderContext& ctx,
+	            const FrameGraph& graph,
+	            GraphicsEncoder& encoder,
+	            GraphicsPipeline& pipeline,
+	            const glm::vec3& direction);
 
 private:
 	float mHeight, mLeft, mRight, mBottom, mTop, mNear, mFar;

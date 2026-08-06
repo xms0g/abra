@@ -15,11 +15,10 @@ CullingPass::CullingPass() = default;
 
 CullingPass::~CullingPass() = default;
 
-void CullingPass::configure(
-	const RenderContext& ctx,
-	const FrameGraph& graph,
-	GraphicsEncoder& encoder,
-	EventBus& eventBus) {
+void CullingPass::configure(const RenderContext& ctx,
+                            const FrameGraph& graph,
+                            GraphicsEncoder& encoder,
+                            EventBus& eventBus) {
 	mOpaqueGroups = std::span(
 		ctx.queueRegistry->get<RenderGroup>("opaque").data(),
 		ctx.queueRegistry->get<RenderGroup>("opaque").size());

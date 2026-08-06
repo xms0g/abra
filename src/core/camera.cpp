@@ -6,9 +6,8 @@
 #include "../event/events/keyPressedEvent.hpp"
 #include "../event/events/mouseMovementEvent.hpp"
 
-Camera::Camera(
-	const glm::vec3& position,
-	const glm::vec3& up)
+Camera::Camera(const glm::vec3& position,
+               const glm::vec3& up)
 	: mPosition(position),
 	  mFront(0.0f, 0.0f, -1.0f),
 	  mWorldUp(up) {

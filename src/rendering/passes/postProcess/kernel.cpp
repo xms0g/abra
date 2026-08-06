@@ -20,11 +20,10 @@ void Kernel::configure(const FrameGraph& graph) {
 		{{.name = "screenTexture", .slot = 0}});
 }
 
-TextureView Kernel::render(
-	GraphicsEncoder& encoder,
-	Model::Quad& quad,
-	const TextureView sceneTexture,
-	FrameBuffer* renderTarget) {
+TextureView Kernel::render(GraphicsEncoder& encoder,
+                           Model::Quad& quad,
+                           const TextureView sceneTexture,
+                           FrameBuffer* renderTarget) {
 	encoder.bindFrameBuffer(*renderTarget);
 	encoder.clearFrameBuffer(ClearMask::Color);
 

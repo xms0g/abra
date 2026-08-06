@@ -40,9 +40,8 @@ PipelineState& GraphicsPipeline::state() {
 	return mState;
 }
 
-GraphicsPipeline GraphicsPipeline::createFullscreenQuadPipeline(
-	std::vector<PipelineShaderStage> stages,
-	std::vector<SamplerInfo> samplers) {
+GraphicsPipeline GraphicsPipeline::createFullscreenQuadPipeline(std::vector<PipelineShaderStage> stages,
+                                                                std::vector<SamplerInfo> samplers) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};

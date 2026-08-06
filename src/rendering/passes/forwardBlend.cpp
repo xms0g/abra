@@ -9,11 +9,10 @@ ForwardBlendPass::ForwardBlendPass() = default;
 
 ForwardBlendPass::~ForwardBlendPass() = default;
 
-void ForwardBlendPass::configure(
-	const RenderContext& ctx,
-	const FrameGraph& graph,
-	GraphicsEncoder& encoder,
-	EventBus& eventBus) {
+void ForwardBlendPass::configure(const RenderContext& ctx,
+                                 const FrameGraph& graph,
+                                 GraphicsEncoder& encoder,
+                                 EventBus& eventBus) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};

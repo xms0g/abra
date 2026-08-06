@@ -15,12 +15,11 @@ public:
 
 	~OmnidirectionalShadow();
 
-	void render(
-		const RenderContext& ctx,
-		GraphicsEncoder& encoder,
-		GraphicsPipeline& pipeline,
-		const glm::vec3& position,
-		int32_t layer);
+	void render(const RenderContext& ctx,
+	            GraphicsEncoder& encoder,
+	            GraphicsPipeline& pipeline,
+	            const glm::vec3& position,
+	            int32_t layer);
 
 private:
 	int32_t mWidth{0}, mHeight{0};

@@ -39,11 +39,10 @@ private:
 
 	std::vector<uint32_t> batchMeshes(RenderData& renderData, const std::vector<Mesh>& meshes);
 
-	MaterialBatch batchMaterial(
-		uint32_t matID,
-		const Entity& entity,
-		RenderData& renderData,
-		const std::vector<uint32_t>& meshIndices);
+	MaterialBatch batchMaterial(uint32_t matID,
+	                            const Entity& entity,
+	                            RenderData& renderData,
+	                            const std::vector<uint32_t>& meshIndices);
 
 	void enqueueRenderGroup(const Entity& entity, QueueRegistry& queueRegistry, const MaterialBatch& matBatch);
 };

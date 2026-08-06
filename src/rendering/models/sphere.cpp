@@ -4,12 +4,11 @@
 #include "../texture/texture.h"
 #include "../material/material.hpp"
 
-Model::Sphere::Sphere(
-	glm::vec3 color,
-	bool unlit,
-	const std::string& albedo,
-	const std::string& normal,
-	const std::string& orm) {
+Model::Sphere::Sphere(glm::vec3 color,
+                      bool unlit,
+                      const std::string& albedo,
+                      const std::string& normal,
+                      const std::string& orm) {
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec2> uv;
@@ -116,15 +115,15 @@ Model::Sphere::Sphere(
 	uint32_t flags{0};
 	std::vector<Texture> textures;
 	if (!albedo.empty()) {
-		textures.emplace_back(0, ALBEDO,TextureTarget::Texture2D, albedo);
+		textures.emplace_back(0, ALBEDO, TextureTarget::Texture2D, albedo);
 	}
 
 	if (!normal.empty()) {
-		textures.emplace_back(0,NORMAL,TextureTarget::Texture2D,  normal);
+		textures.emplace_back(0, NORMAL, TextureTarget::Texture2D, normal);
 	}
 
 	if (!orm.empty()) {
-		textures.emplace_back(0, ROUGHNESS_METALLIC,TextureTarget::Texture2D,  orm);
+		textures.emplace_back(0, ROUGHNESS_METALLIC, TextureTarget::Texture2D, orm);
 		flags |= PBR;
 		flags |= HAS_ORM;
 	}

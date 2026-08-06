@@ -41,11 +41,10 @@ bool math::Sphere::isOnOrForwardPlane(const Plane& plane) const {
 	return plane.computeSignedDistanceToPlane(mCenter) > -mRadius;
 }
 
-bool math::AABB::isOnFrustum(
-	const Frustum& camFrustum,
-	const glm::mat4& model,
-	const glm::vec3& center,
-	const glm::vec3& extents) {
+bool math::AABB::isOnFrustum(const Frustum& camFrustum,
+                             const glm::mat4& model,
+                             const glm::vec3& center,
+                             const glm::vec3& extents) {
 	const glm::vec3 globalCenter{model * glm::vec4(center, 1.f)};
 	// Scaled orientation
 	const glm::vec3 right = model[0] * extents.x;
@@ -66,11 +65,10 @@ bool math::AABB::isOnFrustum(
 	       globalAABB.isOnOrForwardPlane(camFrustum.farFace);
 }
 
-bool math::AABB::isMeshInFrustum(
-	const Frustum& camFrustum,
-	const glm::vec3& min,
-	const glm::vec3& max,
-	const glm::mat4& model) {
+bool math::AABB::isMeshInFrustum(const Frustum& camFrustum,
+                                 const glm::vec3& min,
+                                 const glm::vec3& max,
+                                 const glm::mat4& model) {
 	// Define local corners
 	const glm::vec3 localCorners[8] = {
 		{min.x, min.y, min.z}, {max.x, min.y, min.z},

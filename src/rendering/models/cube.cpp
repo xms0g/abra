@@ -4,13 +4,12 @@
 #include "../texture/texture.h"
 #include "../material/material.hpp"
 
-Model::Cube::Cube(
-	glm::vec3 color,
-	bool unlit,
-	const std::string& diffuseTexture,
-	const std::string& specularTexture,
-	const std::string& normalTexture,
-	const std::string& heightTexture) {
+Model::Cube::Cube(glm::vec3 color,
+                  bool unlit,
+                  const std::string& diffuseTexture,
+                  const std::string& specularTexture,
+                  const std::string& normalTexture,
+                  const std::string& heightTexture) {
 	constexpr float v[] = {
 		// Back face (-Z)
 		-0.5f, -0.5f, -0.5f, 0, 0, -1, 0, 0,
@@ -126,15 +125,15 @@ Model::Cube::Cube(
 	}
 
 	if (!specularTexture.empty()) {
-		textures.emplace_back(0, SPECULAR,TextureTarget::Texture2D, specularTexture);
+		textures.emplace_back(0, SPECULAR, TextureTarget::Texture2D, specularTexture);
 	}
 
 	if (!normalTexture.empty()) {
-		textures.emplace_back(0, NORMAL,TextureTarget::Texture2D, normalTexture);
+		textures.emplace_back(0, NORMAL, TextureTarget::Texture2D, normalTexture);
 	}
 
 	if (!heightTexture.empty()) {
-		textures.emplace_back(0, HEIGHT,TextureTarget::Texture2D, heightTexture);
+		textures.emplace_back(0, HEIGHT, TextureTarget::Texture2D, heightTexture);
 	}
 
 	uint32_t flags{0};

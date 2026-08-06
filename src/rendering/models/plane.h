@@ -7,13 +7,12 @@
 namespace Model {
 class Plane {
 public:
-	explicit Plane(
-		glm::vec3 color = glm::vec3(1.0f),
-		bool unlit = false,
-		const std::string& diffuseTexture = "",
-		const std::string& specularTexture = "",
-		const std::string& normalTexture = "",
-		const std::string& heightTexture = "");
+	explicit Plane(glm::vec3 color = glm::vec3(1.0f),
+	               bool unlit = false,
+	               const std::string& diffuseTexture = "",
+	               const std::string& specularTexture = "",
+	               const std::string& normalTexture = "",
+	               const std::string& heightTexture = "");
 
 	~Plane();
 

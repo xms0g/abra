@@ -43,11 +43,10 @@ void Bloom::configure(const FrameGraph& graph) {
 	mRenderTargets = {&graph.getResource("bloomPing"), &graph.getResource("bloomPong")};
 }
 
-TextureView Bloom::render(
-	GraphicsEncoder& encoder,
-	Model::Quad& quad,
-	const TextureView sceneTexture,
-	FrameBuffer* renderTarget) {
+TextureView Bloom::render(GraphicsEncoder& encoder,
+                          Model::Quad& quad,
+                          const TextureView sceneTexture,
+                          FrameBuffer* renderTarget) {
 	(void) renderTarget;
 	bool toggle = false;
 	TextureView inputTex = sceneTexture;
@@ -62,11 +61,10 @@ TextureView Bloom::render(
 void Bloom::updateFromEventImpl(const GuiPostProcessEvent& event) {
 }
 
-TextureView Bloom::brightFilterPass(
-	GraphicsEncoder& encoder,
-	const Model::Quad& quad,
-	const TextureView sceneTexture,
-	bool& toggle) {
+TextureView Bloom::brightFilterPass(GraphicsEncoder& encoder,
+                                    const Model::Quad& quad,
+                                    const TextureView sceneTexture,
+                                    bool& toggle) {
 	encoder.bindFrameBuffer(*mRenderTargets[toggle]);
 	encoder.clearFrameBuffer(ClearMask::Color);
 
@@ -84,12 +82,10 @@ TextureView Bloom::brightFilterPass(
 	return renderTarget->texture();
 }
 
-TextureView Bloom::blurPass(
-	GraphicsEncoder& encoder,
-	const Model::Quad& quad,
-	const TextureView sceneTexture,
-	bool& toggle) {
-
+TextureView Bloom::blurPass(GraphicsEncoder& encoder,
+                            const Model::Quad& quad,
+                            const TextureView sceneTexture,
+                            bool& toggle) {
 	TextureView outTex = sceneTexture;
 
 	encoder.bindPipeline(mPipelines[1]);
@@ -111,12 +107,11 @@ TextureView Bloom::blurPass(
 	return outTex;
 }
 
-TextureView Bloom::combinePass(
-	GraphicsEncoder& encoder,
-	const Model::Quad& quad,
-	const TextureView sceneTexture,
-	const TextureView blurTexture,
-	const bool& toggle) {
+TextureView Bloom::combinePass(GraphicsEncoder& encoder,
+                               const Model::Quad& quad,
+                               const TextureView sceneTexture,
+                               const TextureView blurTexture,
+                               const bool& toggle) {
 	encoder.bindFrameBuffer(*mRenderTargets[toggle]);
 	//encoder.clearFrameBuffer(ClearMask::Color);
 

@@ -63,7 +63,7 @@ int32_t FrameBuffer::height() const {
 	return mHeight;
 }
 
-TextureView FrameBuffer::texture(uint32_t index) const {
+TextureView FrameBuffer::texture(const uint32_t index) const {
 	return {.id = mTextures[index].id, .target = mTextures[index].target};
 }
 
@@ -81,7 +81,9 @@ void FrameBuffer::resizeRenderBuffer(const int32_t width, const int32_t height) 
 	glViewport(0, 0, width, height);
 }
 
-void FrameBuffer::attachTexture(const uint32_t index, const Attachment attachment, const int32_t mip,
+void FrameBuffer::attachTexture(const uint32_t index,
+                                const Attachment attachment,
+                                const int32_t mip,
                                 const int32_t layer) const {
 	switch (auto [id, target] = texture(index); target) {
 		case TextureTarget::Texture2D:
@@ -266,10 +268,9 @@ FrameBuffer& FrameBuffer::withTextureDepth(const InternalFormat format, const bo
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTextureDepthArray(
-	const int32_t layerCount,
-	const InternalFormat format,
-	const bool onlyForShadowMap) {
+FrameBuffer& FrameBuffer::withTextureDepthArray(const int32_t layerCount,
+                                                const InternalFormat format,
+                                                const bool onlyForShadowMap) {
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextures.emplace_back(textureID, TextureTarget::Texture2DArray);
@@ -362,10 +363,9 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepth(const InternalFormat format, c
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(
-	const int32_t layerCount,
-	const InternalFormat format,
-	const bool onlyForShadowMap) {
+FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(const int32_t layerCount,
+                                                       const InternalFormat format,
+                                                       const bool onlyForShadowMap) {
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextures.emplace_back(textureID, TextureTarget::TextureCubeMapArray);
@@ -408,7 +408,8 @@ FrameBuffer& FrameBuffer::withRenderBufferDepth(const InternalFormat format) {
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(const int32_t multisampledCount, const InternalFormat format) {
+FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(const int32_t multisampledCount,
+                                                            const InternalFormat format) {
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 
@@ -430,7 +431,8 @@ FrameBuffer& FrameBuffer::withRenderBufferDepthStencil(const InternalFormat form
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withRenderBufferDepthStencilMultisampled(const int32_t multisampledCount, const InternalFormat format) {
+FrameBuffer& FrameBuffer::withRenderBufferDepthStencilMultisampled(const int32_t multisampledCount,
+                                                                   const InternalFormat format) {
 	glGenRenderbuffers(1, &mRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
 

@@ -17,7 +17,10 @@ ShadowSystem::ShadowSystem() = default;
 
 ShadowSystem::~ShadowSystem() = default;
 
-void ShadowSystem::configure(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder, EventBus& eventBus) {
+void ShadowSystem::configure(const RenderContext& ctx,
+                             const FrameGraph& graph,
+                             GraphicsEncoder& encoder,
+                             EventBus& eventBus) {
 	mCtx = &ctx;
 	mGraph = &graph;
 	mEncoder = &encoder;

@@ -16,11 +16,10 @@ InstancedBlendPass::InstancedBlendPass() = default;
 
 InstancedBlendPass::~InstancedBlendPass() = default;
 
-void InstancedBlendPass::configure(
-	const RenderContext& ctx,
-	const FrameGraph& graph,
-	GraphicsEncoder& encoder,
-	EventBus& eventBus) {
+void InstancedBlendPass::configure(const RenderContext& ctx,
+                                   const FrameGraph& graph,
+                                   GraphicsEncoder& encoder,
+                                   EventBus& eventBus) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};

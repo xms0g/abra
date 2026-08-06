@@ -10,11 +10,10 @@ ForwardUnlitPass::ForwardUnlitPass() = default;
 
 ForwardUnlitPass::~ForwardUnlitPass() = default;
 
-void ForwardUnlitPass::configure(
-	const RenderContext& ctx,
-	const FrameGraph& graph,
-	GraphicsEncoder& encoder,
-	EventBus& eventBus) {
+void ForwardUnlitPass::configure(const RenderContext& ctx,
+                                 const FrameGraph& graph,
+                                 GraphicsEncoder& encoder,
+                                 EventBus& eventBus) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};

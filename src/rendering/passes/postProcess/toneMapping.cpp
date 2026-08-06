@@ -16,14 +16,13 @@ void ToneMapping::configure(const FrameGraph& graph) {
 
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
 		stages,
-{{.name = "screenTexture", .slot = 0}});
+		{{.name = "screenTexture", .slot = 0}});
 }
 
-TextureView ToneMapping::render(
-	GraphicsEncoder& encoder,
-	Model::Quad& quad,
-	const TextureView sceneTexture,
-	FrameBuffer* renderTarget) {
+TextureView ToneMapping::render(GraphicsEncoder& encoder,
+                                Model::Quad& quad,
+                                const TextureView sceneTexture,
+                                FrameBuffer* renderTarget) {
 	encoder.bindFrameBuffer(*renderTarget);
 	encoder.clearFrameBuffer(ClearMask::Color);
 

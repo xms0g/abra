@@ -16,11 +16,10 @@ InstancedOpaquePass::InstancedOpaquePass() = default;
 
 InstancedOpaquePass::~InstancedOpaquePass() = default;
 
-void InstancedOpaquePass::configure(
-	const RenderContext& ctx,
-	const FrameGraph& graph,
-	GraphicsEncoder& encoder,
-	EventBus& eventBus) {
+void InstancedOpaquePass::configure(const RenderContext& ctx,
+                                    const FrameGraph& graph,
+                                    GraphicsEncoder& encoder,
+                                    EventBus& eventBus) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};

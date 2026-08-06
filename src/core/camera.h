@@ -8,9 +8,8 @@ class EventBus;
 
 class Camera {
 public:
-	explicit Camera(
-		const glm::vec3& position = glm::vec3{0.0f, 0.0f, 0.0f},
-		const glm::vec3& up = glm::vec3(0.0f, 1.0f, 0.0f));
+	explicit Camera(const glm::vec3& position = glm::vec3{0.0f, 0.0f, 0.0f},
+	                const glm::vec3& up = glm::vec3(0.0f, 1.0f, 0.0f));
 
 	[[nodiscard]]
 	glm::mat4 viewMatrix() const;

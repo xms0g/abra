@@ -14,14 +14,13 @@ public:
 
 	static void unbind();
 
-	static void setAttribute(
-		uint32_t index,
-		int32_t size,
-		int32_t type,
-		bool normalized,
-		int32_t stride,
-		const void* offset,
-		uint32_t divisor);
+	static void setAttribute(uint32_t index,
+	                         int32_t size,
+	                         int32_t type,
+	                         bool normalized,
+	                         int32_t stride,
+	                         const void* offset,
+	                         uint32_t divisor);
 
 private:
 	uint32_t mID{};

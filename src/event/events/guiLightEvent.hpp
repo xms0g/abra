@@ -7,10 +7,9 @@ struct GuiLightEvent : Event {
 	uint32_t matIdx;
 	uint32_t lightIdx;
 
-	explicit GuiLightEvent(
-		const size_t id,
-		const uint32_t midx,
-		const uint32_t lidx)
+	explicit GuiLightEvent(const size_t id,
+	                       const uint32_t midx,
+	                       const uint32_t lidx)
 		: entityID(id),
 		  matIdx(midx),
 		  lightIdx(lidx) {

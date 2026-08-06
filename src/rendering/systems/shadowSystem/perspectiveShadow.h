@@ -18,15 +18,14 @@ public:
 	[[nodiscard]]
 	glm::mat4 lightSpaceMatrix(int layer) const;
 
-	void render(
-		const RenderContext& ctx,
-		GraphicsEncoder& encoder,
-		GraphicsPipeline& pipeline,
-		const FrameBuffer& frameBuffer,
-		const glm::vec3& direction,
-		const glm::vec3& position,
-		float fovy,
-		int32_t layer);
+	void render(const RenderContext& ctx,
+	            GraphicsEncoder& encoder,
+	            GraphicsPipeline& pipeline,
+	            const FrameBuffer& frameBuffer,
+	            const glm::vec3& direction,
+	            const glm::vec3& position,
+	            float fovy,
+	            int32_t layer);
 
 private:
 	int32_t mWidth{0}, mHeight{0};

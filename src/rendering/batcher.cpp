@@ -64,11 +64,10 @@ std::vector<uint32_t> Batcher::batchMeshes(RenderData& renderData, const std::ve
 	return meshIndices;
 }
 
-MaterialBatch Batcher::batchMaterial(
-	const uint32_t matID,
-	const Entity& entity,
-	RenderData& renderData,
-	const std::vector<uint32_t>& meshIndices) {
+MaterialBatch Batcher::batchMaterial(const uint32_t matID,
+                                     const Entity& entity,
+                                     RenderData& renderData,
+                                     const std::vector<uint32_t>& meshIndices) {
 	const auto& matComponent = entity.getComponent<MaterialComponent>();
 	auto& material = matComponent.materials->at(matID);
 	material.idx = buildState.materialIndex++;

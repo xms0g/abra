@@ -21,11 +21,10 @@ PostProcessPass::PostProcessPass() = default;
 
 PostProcessPass::~PostProcessPass() = default;
 
-void PostProcessPass::configure(
-	const RenderContext& ctx,
-	const FrameGraph& graph,
-	GraphicsEncoder& encoder,
-	EventBus& eventBus) {
+void PostProcessPass::configure(const RenderContext& ctx,
+                                const FrameGraph& graph,
+                                GraphicsEncoder& encoder,
+                                EventBus& eventBus) {
 	mEffects = {
 		std::make_shared<Bloom>("Bloom", false),
 		std::make_shared<ToneMapping>("Tone Mapping", false),

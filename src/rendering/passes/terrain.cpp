@@ -11,11 +11,10 @@ TerrainPass::TerrainPass() = default;
 
 TerrainPass::~TerrainPass() = default;
 
-void TerrainPass::configure(
-	const RenderContext& ctx,
-	const FrameGraph& graph,
-	GraphicsEncoder& encoder,
-	EventBus& eventBus) {
+void TerrainPass::configure(const RenderContext& ctx,
+                            const FrameGraph& graph,
+                            GraphicsEncoder& encoder,
+                            EventBus& eventBus) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Patches,
 	};

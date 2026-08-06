@@ -7,13 +7,12 @@
 #include "../../io/filesystem.hpp"
 #include "../../config/configManager.h"
 
-Model::Terrain::Terrain(
-	glm::vec3 color,
-	bool unlit,
-	const std::string& diffuseTexture,
-	const std::string& specularTexture,
-	const std::string& normalTexture,
-	const std::string& heightTexture) {
+Model::Terrain::Terrain(glm::vec3 color,
+                        bool unlit,
+                        const std::string& diffuseTexture,
+                        const std::string& specularTexture,
+                        const std::string& normalTexture,
+                        const std::string& heightTexture) {
 	std::filesystem::path assetRoot = CONFIG_MANAGER.get<std::string>("path.asset");
 	std::string path = fs::resolvePath(assetRoot / heightTexture);
 
@@ -67,7 +66,7 @@ Model::Terrain::Terrain(
 	std::vector<Texture> textures;
 	if (!heightTexture.empty()) {
 		flags |= HAS_HEIGHT_MAP;
-		textures.emplace_back(0, HEIGHT,TextureTarget::Texture2D, heightTexture);
+		textures.emplace_back(0, HEIGHT, TextureTarget::Texture2D, heightTexture);
 	}
 
 	Material material;

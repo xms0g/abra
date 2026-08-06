@@ -15,35 +15,31 @@ public:
 
 	void configure(const FrameGraph& graph) override;
 
-	TextureView render(
-		GraphicsEncoder& encoder,
-		Model::Quad& quad,
-		TextureView sceneTexture,
-		FrameBuffer* renderTarget) override;
+	TextureView render(GraphicsEncoder& encoder,
+	                   Model::Quad& quad,
+	                   TextureView sceneTexture,
+	                   FrameBuffer* renderTarget) override;
 
 protected:
 	void updateFromEventImpl(const GuiPostProcessEvent& event) override;
 
 private:
-	TextureView brightFilterPass(
-		GraphicsEncoder& encoder,
-		const Model::Quad& quad,
-		TextureView sceneTexture,
-		bool& toggle);
+	TextureView brightFilterPass(GraphicsEncoder& encoder,
+	                             const Model::Quad& quad,
+	                             TextureView sceneTexture,
+	                             bool& toggle);
 
-	TextureView blurPass(
-		GraphicsEncoder& encoder,
-		const Model::Quad& quad,
-		TextureView sceneTexture,
-		bool& toggle);
+	TextureView blurPass(GraphicsEncoder& encoder,
+	                     const Model::Quad& quad,
+	                     TextureView sceneTexture,
+	                     bool& toggle);
 
 	[[nodiscard]]
-	TextureView combinePass(
-		GraphicsEncoder& encoder,
-		const Model::Quad& quad,
-		TextureView sceneTexture,
-		TextureView blurTexture,
-		const bool& toggle);
+	TextureView combinePass(GraphicsEncoder& encoder,
+	                        const Model::Quad& quad,
+	                        TextureView sceneTexture,
+	                        TextureView blurTexture,
+	                        const bool& toggle);
 
 	std::array<FrameBuffer*, 2> mRenderTargets{};
 	std::array<GraphicsPipeline, 3> mPipelines;

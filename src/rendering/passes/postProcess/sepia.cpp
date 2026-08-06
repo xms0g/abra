@@ -18,11 +18,10 @@ void Sepia::configure(const FrameGraph& graph) {
 		{{.name = "screenTexture", .slot = 0}});
 }
 
-TextureView Sepia::render(
-	GraphicsEncoder& encoder,
-	Model::Quad& quad,
-	const TextureView sceneTexture,
-	FrameBuffer* renderTarget) {
+TextureView Sepia::render(GraphicsEncoder& encoder,
+                          Model::Quad& quad,
+                          const TextureView sceneTexture,
+                          FrameBuffer* renderTarget) {
 	encoder.bindFrameBuffer(*renderTarget);
 	encoder.clearFrameBuffer(ClearMask::Color);
 

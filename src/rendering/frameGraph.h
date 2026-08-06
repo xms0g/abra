@@ -14,12 +14,11 @@ public:
 	[[nodiscard]]
 	FrameBuffer& getResource(const std::string& key) const;
 
-	void addPass(
-		std::string name,
-		bool active,
-		std::unique_ptr<IPass> pass,
-		std::vector<std::string> inputs,
-		std::vector<std::string> outputs);
+	void addPass(std::string name,
+	             bool active,
+	             std::unique_ptr<IPass> pass,
+	             std::vector<std::string> inputs,
+	             std::vector<std::string> outputs);
 
 	void addResource(std::string key, std::unique_ptr<FrameBuffer> resource);
 

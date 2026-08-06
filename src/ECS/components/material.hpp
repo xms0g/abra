@@ -12,10 +12,9 @@ struct MaterialComponent {
 
 	MaterialComponent() = default;
 
-	explicit MaterialComponent(
-		MaterialMap* mat,
-		const float h = 1.0f,
-		const uint32_t f = 1 << 1)
+	explicit MaterialComponent(MaterialMap* mat,
+	                           const float h = 1.0f,
+	                           const uint32_t f = 1 << 1)
 		: materials(mat),
 		  heightScale(h),
 		  renderFlag(f) {

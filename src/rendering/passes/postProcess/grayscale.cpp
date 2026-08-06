@@ -19,11 +19,10 @@ void Grayscale::configure(const FrameGraph& graph) {
 		{{.name = "screenTexture", .slot = 0}});
 }
 
-TextureView Grayscale::render(
-	GraphicsEncoder& encoder,
-	Model::Quad& quad,
-	const TextureView sceneTexture,
-	FrameBuffer* renderTarget) {
+TextureView Grayscale::render(GraphicsEncoder& encoder,
+                              Model::Quad& quad,
+                              const TextureView sceneTexture,
+                              FrameBuffer* renderTarget) {
 	encoder.bindFrameBuffer(*renderTarget);
 	encoder.clearFrameBuffer(ClearMask::Color);
 

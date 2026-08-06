@@ -7,11 +7,10 @@ ResolvePass::ResolvePass() = default;
 
 ResolvePass::~ResolvePass() = default;
 
-void ResolvePass::configure(
-	const RenderContext& ctx,
-	const FrameGraph& graph,
-	GraphicsEncoder& encoder,
-	EventBus& eventBus) {
+void ResolvePass::configure(const RenderContext& ctx,
+                            const FrameGraph& graph,
+                            GraphicsEncoder& encoder,
+                            EventBus& eventBus) {
 }
 
 void ResolvePass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {

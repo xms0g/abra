@@ -26,12 +26,11 @@ OmnidirectionalShadow::OmnidirectionalShadow(const RenderContext& ctx) {
 
 OmnidirectionalShadow::~OmnidirectionalShadow() = default;
 
-void OmnidirectionalShadow::render(
-	const RenderContext& ctx,
-	GraphicsEncoder& encoder,
-	GraphicsPipeline& pipeline,
-	const glm::vec3& position,
-	const int32_t layer) {
+void OmnidirectionalShadow::render(const RenderContext& ctx,
+                                   GraphicsEncoder& encoder,
+                                   GraphicsPipeline& pipeline,
+                                   const glm::vec3& position,
+                                   const int32_t layer) {
 	mShadowTransforms.clear();
 
 	for (const auto& [dir, up]: mDirUps) {

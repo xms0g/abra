@@ -12,11 +12,10 @@ DebugPass::DebugPass() = default;
 
 DebugPass::~DebugPass() = default;
 
-void DebugPass::configure(
-	const RenderContext& ctx,
-	const FrameGraph& graph,
-	GraphicsEncoder& encoder,
-	EventBus& eventBus) {
+void DebugPass::configure(const RenderContext& ctx,
+                          const FrameGraph& graph,
+                          GraphicsEncoder& encoder,
+                          EventBus& eventBus) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};

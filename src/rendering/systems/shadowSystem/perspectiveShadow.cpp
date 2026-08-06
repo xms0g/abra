@@ -28,16 +28,15 @@ glm::mat4 PerspectiveShadow::lightSpaceMatrix(const int layer) const {
 	return mLightSpaceMatrix[layer];
 }
 
-void PerspectiveShadow::render(
-	const RenderContext& ctx,
-	GraphicsEncoder& encoder,
-	GraphicsPipeline& pipeline,
-	const FrameBuffer& frameBuffer,
-	const glm::vec3& direction,
-	const glm::vec3& position,
-	const float fovy,
-	const int32_t layer) {
-	frameBuffer.attachTexture(0,  Attachment::Depth, 0, layer);
+void PerspectiveShadow::render(const RenderContext& ctx,
+                               GraphicsEncoder& encoder,
+                               GraphicsPipeline& pipeline,
+                               const FrameBuffer& frameBuffer,
+                               const glm::vec3& direction,
+                               const glm::vec3& position,
+                               const float fovy,
+                               const int32_t layer) {
+	frameBuffer.attachTexture(0, Attachment::Depth, 0, layer);
 	encoder.clearFrameBuffer(ClearMask::Depth);
 
 	const glm::mat4 lightProjection = glm::perspective(fovy, mAspect, mNear, mFar);

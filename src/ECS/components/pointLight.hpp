@@ -15,17 +15,16 @@ struct PointLightComponent {
 
 	PointLightComponent() = default;
 
-	explicit PointLightComponent(
-		const uint32_t i,
-		const glm::vec3 pos,
-		const glm::vec3 a,
-		const glm::vec3 dif,
-		const glm::vec3 s,
-		const float kc,
-		const float kl,
-		const float kq,
-		const float intens,
-		const bool cs)
+	explicit PointLightComponent(const uint32_t i,
+	                             const glm::vec3 pos,
+	                             const glm::vec3 a,
+	                             const glm::vec3 dif,
+	                             const glm::vec3 s,
+	                             const float kc,
+	                             const float kl,
+	                             const float kq,
+	                             const float intens,
+	                             const bool cs)
 		: idx(i),
 		  position(pos),
 		  ambient(a),

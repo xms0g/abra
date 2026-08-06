@@ -12,11 +12,10 @@ DeferredLightingPass::DeferredLightingPass() = default;
 
 DeferredLightingPass::~DeferredLightingPass() = default;
 
-void DeferredLightingPass::configure(
-	const RenderContext& ctx,
-	const FrameGraph& graph,
-	GraphicsEncoder& encoder,
-	EventBus& eventBus) {
+void DeferredLightingPass::configure(const RenderContext& ctx,
+                                     const FrameGraph& graph,
+                                     GraphicsEncoder& encoder,
+                                     EventBus& eventBus) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};

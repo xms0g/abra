@@ -10,11 +10,10 @@ ForwardOpaquePass::ForwardOpaquePass() = default;
 
 ForwardOpaquePass::~ForwardOpaquePass() = default;
 
-void ForwardOpaquePass::configure(
-	const RenderContext& ctx,
-	const FrameGraph& graph,
-	GraphicsEncoder& encoder,
-	EventBus& eventBus) {
+void ForwardOpaquePass::configure(const RenderContext& ctx,
+                                  const FrameGraph& graph,
+                                  GraphicsEncoder& encoder,
+                                  EventBus& eventBus) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};

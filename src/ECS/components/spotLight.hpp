@@ -18,20 +18,19 @@ struct SpotLightComponent {
 
 	SpotLightComponent() = default;
 
-	explicit SpotLightComponent(
-		const uint32_t i,
-		const glm::vec3 pos,
-		const glm::vec3 dir,
-		const glm::vec3 a,
-		const glm::vec3 dif,
-		const glm::vec3 s,
-		const float kc,
-		const float kl,
-		const float kq,
-		const float co,
-		const float oc,
-		const float intens,
-		const bool cs)
+	explicit SpotLightComponent(const uint32_t i,
+	                            const glm::vec3 pos,
+	                            const glm::vec3 dir,
+	                            const glm::vec3 a,
+	                            const glm::vec3 dif,
+	                            const glm::vec3 s,
+	                            const float kc,
+	                            const float kl,
+	                            const float kq,
+	                            const float co,
+	                            const float oc,
+	                            const float intens,
+	                            const bool cs)
 		: idx(i),
 		  position(pos),
 		  direction(dir),

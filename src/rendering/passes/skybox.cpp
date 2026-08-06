@@ -9,11 +9,10 @@ SkyboxPass::SkyboxPass() = default;
 
 SkyboxPass::~SkyboxPass() = default;
 
-void SkyboxPass::configure(
-	const RenderContext& ctx,
-	const FrameGraph& graph,
-	GraphicsEncoder& encoder,
-	EventBus& eventBus) {
+void SkyboxPass::configure(const RenderContext& ctx,
+                           const FrameGraph& graph,
+                           GraphicsEncoder& encoder,
+                           EventBus& eventBus) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};

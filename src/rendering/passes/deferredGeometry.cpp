@@ -11,11 +11,10 @@ DeferredGeometryPass::DeferredGeometryPass() = default;
 
 DeferredGeometryPass::~DeferredGeometryPass() = default;
 
-void DeferredGeometryPass::configure(
-	const RenderContext& ctx,
-	const FrameGraph& graph,
-	GraphicsEncoder& encoder,
-	EventBus& eventBus) {
+void DeferredGeometryPass::configure(const RenderContext& ctx,
+                                     const FrameGraph& graph,
+                                     GraphicsEncoder& encoder,
+                                     EventBus& eventBus) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};

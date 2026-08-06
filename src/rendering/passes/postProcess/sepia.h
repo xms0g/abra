@@ -9,11 +9,10 @@ public:
 
 	void configure(const FrameGraph& graph) override;
 
-	TextureView render(
-		GraphicsEncoder& encoder,
-		Model::Quad& quad,
-		TextureView sceneTexture,
-		FrameBuffer* renderTarget) override;
+	TextureView render(GraphicsEncoder& encoder,
+	                   Model::Quad& quad,
+	                   TextureView sceneTexture,
+	                   FrameBuffer* renderTarget) override;
 
 protected:
 	void updateFromEventImpl(const GuiPostProcessEvent& event) override;

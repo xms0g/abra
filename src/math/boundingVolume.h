@@ -13,6 +13,7 @@ struct Frustum;
 class BoundingVolume {
 public:
 	BoundingVolume() = default;
+
 	BoundingVolume(const glm::vec3& min, const glm::vec3& max)
 		: mCenter{(max + min) * 0.5f}, mExtents{max.x - mCenter.x, max.y - mCenter.y, max.z - mCenter.z} {
 	}
@@ -42,9 +43,9 @@ protected:
 };
 
 // Dummy
-class DummyBV final: public BoundingVolume {
-	public:
-		~DummyBV() override = default;
+class DummyBV final : public BoundingVolume {
+public:
+	~DummyBV() override = default;
 
 protected:
 	[[nodiscard]]
@@ -66,11 +67,10 @@ public:
 	bool isOnFrustum(const Frustum& camFrustum, const glm::mat4& model) const;
 
 	[[nodiscard]]
-	static bool isMeshInFrustum(
-		const Frustum& camFrustum,
-		const glm::vec3& min,
-		const glm::vec3& max,
-		const glm::mat4& model);
+	static bool isMeshInFrustum(const Frustum& camFrustum,
+	                            const glm::vec3& min,
+	                            const glm::vec3& max,
+	                            const glm::mat4& model);
 
 protected:
 	[[nodiscard]]
@@ -93,18 +93,16 @@ public:
 	~AABB() override = default;
 
 	[[nodiscard]]
-	static bool isOnFrustum(
-		const Frustum& camFrustum,
-		const glm::mat4& model,
-		const glm::vec3& center,
-		const glm::vec3& extents);
+	static bool isOnFrustum(const Frustum& camFrustum,
+	                        const glm::mat4& model,
+	                        const glm::vec3& center,
+	                        const glm::vec3& extents);
 
 	[[nodiscard]]
-	static bool isMeshInFrustum(
-		const Frustum& camFrustum,
-		const glm::vec3& min,
-		const glm::vec3& max,
-		const glm::mat4& model);
+	static bool isMeshInFrustum(const Frustum& camFrustum,
+	                            const glm::vec3& min,
+	                            const glm::vec3& max,
+	                            const glm::mat4& model);
 
 protected:
 	[[nodiscard]]
