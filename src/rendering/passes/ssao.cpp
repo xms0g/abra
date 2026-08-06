@@ -108,7 +108,6 @@ void SSAOPass::ssao(const FrameGraph& graph, GraphicsEncoder& encoder) {
 	encoder.setViewport({.x = 0, .y = 0, .width = ssao.width(), .height = ssao.height()});
 
 	encoder.bindPipeline(mPipelines[0]);
-	encoder.setUniform("kernelSize", CONFIG_MANAGER.get<int32_t>("ssao.kernelSize"));
 	encoder.draw(3);
 }
 
@@ -132,7 +131,7 @@ void SSAOPass::createKernel() {
 
 	struct alignas(16) SSAOData {
 		glm::vec4 samples[16];
-		glm::vec4 rbi;
+		glm::vec4 settings;
 		glm::vec4 resolution;
 	};
 	SSAOData data{};
@@ -141,14 +140,16 @@ void SSAOPass::createKernel() {
 		data.samples[i] = kernel[i];
 	}
 
-	data.rbi = glm::vec4(
+	data.settings = glm::vec4(
 		CONFIG_MANAGER.get<float>("ssao.radius"),
 		CONFIG_MANAGER.get<float>("ssao.bias"),
 		CONFIG_MANAGER.get<float>("ssao.intensity"),
-		0.0f);
-	data.resolution = glm::vec4(
-		CONFIG_MANAGER.get<int32_t>("window.width")/2,
-		CONFIG_MANAGER.get<int32_t>("window.height")/2, 0.0f, 0.0f);
+		static_cast<float>(kernelSize));
+
+	const int32_t width = CONFIG_MANAGER.get<int32_t>("window.width")/2;
+	const int32_t height = CONFIG_MANAGER.get<int32_t>("window.height")/2;
+
+	data.resolution = glm::vec4(width, height, width/4, height/4);
 
 	mUBO = UniformBuffer{DYNAMIC, sizeof(SSAOData), CONFIG_MANAGER.get<uint32_t>("ssao.ubo_binding")};
 	mUBO.bind();
