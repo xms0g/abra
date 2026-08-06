@@ -4,10 +4,10 @@
 #include "../graphicsEncoder.h"
 #include "../texture/texture.h"
 #include "../models/quad.h"
+#include "../mesh/vertexArray.h"
 #include "../context/renderContext.hpp"
 #include "../../config/configManager.h"
 #include "../../math/random.h"
-#include "../mesh/vertexArray.h"
 
 SSAOPass::SSAOPass() = default;
 
@@ -107,8 +107,10 @@ void SSAOPass::execute(const RenderContext& ctx, const FrameGraph& graph, Graphi
 }
 
 void SSAOPass::ssao(const FrameGraph& graph, GraphicsEncoder& encoder) {
-	encoder.bindFrameBuffer(graph.getResource("ssao"));
+	const auto& ssao = graph.getResource("ssao");
+	encoder.bindFrameBuffer(ssao);
 	encoder.clearFrameBuffer(ClearMask::Color);
+	encoder.setViewport({.x = 0, .y = 0, .width = ssao.width(), .height = ssao.height()});
 
 	encoder.bindPipeline(mPipelines[0]);
 	encoder.bindVertexArray(mQuad->vao().id());
@@ -116,8 +118,10 @@ void SSAOPass::ssao(const FrameGraph& graph, GraphicsEncoder& encoder) {
 }
 
 void SSAOPass::blur(const FrameGraph& graph, GraphicsEncoder& encoder) {
-	encoder.bindFrameBuffer(graph.getResource("ssaoBlur"));
+	const auto& blur = graph.getResource("ssaoBlur");
+	encoder.bindFrameBuffer(blur);
 	encoder.clearFrameBuffer(ClearMask::Color);
+	encoder.setViewport({.x = 0, .y = 0, .width = blur.width(), .height = blur.height()});
 
 	encoder.bindPipeline(mPipelines[1]);
 	encoder.bindTexture(graph.getResource("ssao").texture(), 0);
@@ -149,8 +153,8 @@ void SSAOPass::createKernel() {
 		CONFIG_MANAGER.get<float>("ssao.intensity"),
 		0.0f);
 	data.resolution = glm::vec4(
-		CONFIG_MANAGER.get<int32_t>("window.width"),
-		CONFIG_MANAGER.get<int32_t>("window.height"), 0.0f, 0.0f);
+		CONFIG_MANAGER.get<int32_t>("window.width")/2,
+		CONFIG_MANAGER.get<int32_t>("window.height")/2, 0.0f, 0.0f);
 
 	mUBO = UniformBuffer{DYNAMIC, sizeof(SSAOData), CONFIG_MANAGER.get<uint32_t>("ssao.ubo_binding")};
 	mUBO.bind();

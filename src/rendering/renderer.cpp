@@ -255,22 +255,17 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 }
 
 void Renderer::createFrameBuffers() {
-	mGraph.addResource(
-		"sceneBuffer", std::make_unique<FrameBuffer>(
-			CONFIG_MANAGER.get<int32_t>("window.width"),
-			CONFIG_MANAGER.get<int32_t>("window.height")));
+	int32_t width = CONFIG_MANAGER.get<int32_t>("window.width");
+	int32_t height = CONFIG_MANAGER.get<int32_t>("window.height");
 
+	mGraph.addResource("sceneBuffer", std::make_unique<FrameBuffer>(width, height));
 	auto& sceneBuffer = mGraph.getResource("sceneBuffer");
 
 	if (CONFIG_MANAGER.get<bool>("msaa.enabled")) {
 		glEnable(GL_MULTISAMPLE);
 		const int32_t sampleCount = CONFIG_MANAGER.get<int32_t>("msaa.sample_count");
 
-		mGraph.addResource(
-			"intermediateBuffer", std::make_unique<FrameBuffer>(
-				CONFIG_MANAGER.get<int32_t>("window.width"),
-				CONFIG_MANAGER.get<int32_t>("window.height")));
-
+		mGraph.addResource("intermediateBuffer", std::make_unique<FrameBuffer>(width, height));
 		auto& intermediateBuffer = mGraph.getResource("intermediateBuffer");
 		intermediateBuffer.bind();
 
@@ -308,13 +303,10 @@ void Renderer::createFrameBuffers() {
 	sceneBuffer.unbind();
 
 	// GBuffer
-	mGraph.addResource(
-		"gBuffer", std::make_unique<FrameBuffer>(
-			CONFIG_MANAGER.get<int32_t>("window.width"),
-			CONFIG_MANAGER.get<int32_t>("window.height")));
-
+	mGraph.addResource("gBuffer", std::make_unique<FrameBuffer>(width, height));
 	auto& gBuffer = mGraph.getResource("gBuffer");
 	gBuffer.bind();
+
 	gBuffer.withTextureFP(BaseFormat::RGBA) // position
 			.withTextureFP(BaseFormat::RGBA); // normal
 	if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
@@ -331,20 +323,15 @@ void Renderer::createFrameBuffers() {
 			.checkStatus();
 
 	// SSAO
-	mGraph.addResource(
-		"ssao", std::make_unique<FrameBuffer>(
-			CONFIG_MANAGER.get<int32_t>("window.width"),
-			CONFIG_MANAGER.get<int32_t>("window.height"))
-	);
+	int32_t ssaoWidth = CONFIG_MANAGER.get<int32_t>("window.width")/2;
+	int32_t ssaoHeight = CONFIG_MANAGER.get<int32_t>("window.height")/2;
+
+	mGraph.addResource("ssao", std::make_unique<FrameBuffer>(ssaoWidth, ssaoHeight));
 	mGraph.getResource("ssao").bind();
 	mGraph.getResource("ssao").withTexture(BaseFormat::Red).checkStatus();
 	mGraph.getResource("ssao").unbind();
 
-	mGraph.addResource(
-		"ssaoBlur", std::make_unique<FrameBuffer>(
-			CONFIG_MANAGER.get<int32_t>("window.width"),
-			CONFIG_MANAGER.get<int32_t>("window.height"))
-	);
+	mGraph.addResource("ssaoBlur", std::make_unique<FrameBuffer>(ssaoWidth, ssaoHeight));
 	mGraph.getResource("ssaoBlur").bind();
 	mGraph.getResource("ssaoBlur").withTexture(BaseFormat::Red).checkStatus();
 	mGraph.getResource("ssaoBlur").unbind();
@@ -379,18 +366,17 @@ void Renderer::createFrameBuffers() {
 
 	// PostProcess Render Targets
 	auto addPPRenderTarget = [&](const std::string& name) {
-		mGraph.addResource(
-			name, std::make_unique<FrameBuffer>(
-				CONFIG_MANAGER.get<int32_t>("window.width"),
-				CONFIG_MANAGER.get<int32_t>("window.height")));
-
+		mGraph.addResource(name, std::make_unique<FrameBuffer>(width, height));
 		auto& target = mGraph.getResource(name);
+
+		target.bind();
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
 			target.withTextureFP(BaseFormat::RGBA);
 		} else {
 			target.withTexture(BaseFormat::RGBA);
 		}
 		target.checkStatus();
+		target.unbind();
 	};
 
 	addPPRenderTarget("ping");

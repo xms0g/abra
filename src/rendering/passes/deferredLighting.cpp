@@ -113,6 +113,8 @@ void DeferredLightingPass::execute(const RenderContext& ctx, const FrameGraph& g
 
 	encoder.blitFramebuffer(gBuffer, sceneBuffer, BlitMask::Depth);
 	encoder.bindFrameBuffer(sceneBuffer);
+	encoder.setViewport({.x = 0, .y = 0, .width = sceneBuffer.width(), .height = sceneBuffer.height()});
+
 	encoder.bindPipeline(mPipeline);
 	encoder.bindVertexArray(mQuad->vao().id());
 	encoder.draw(6);
