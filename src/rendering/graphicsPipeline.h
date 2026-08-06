@@ -112,6 +112,10 @@ struct PipelineRasterizationState {
 	PolygonFace polygonFace;
 };
 
+struct PipelineMultisampleState {
+	uint32_t rasterizationSamples;
+};
+
 struct PipelineDepthStencilState {
 	bool depthTestEnable{};
 	bool depthWriteEnable{};
@@ -142,6 +146,7 @@ struct PipelineShaderStage {
 struct PipelineRenderingInfo {
 	PipelinePrimitiveAssemblyState primitiveAssemblyState;
 	PipelineRasterizationState rasterizationState;
+	PipelineMultisampleState multisampleState;
 	PipelineDepthStencilState depthStencilState;
 	PipelineColorBlendState colorBlendState;
 	PipelineTessellationState tessellationState;
@@ -153,6 +158,7 @@ struct PipelineRenderingInfo {
 struct PipelineState {
 	PipelinePrimitiveAssemblyState primitiveAssemblyState;
 	PipelineRasterizationState rasterizationState;
+	PipelineMultisampleState multisampleState;
 	PipelineDepthStencilState depthStencilState;
 	PipelineColorBlendState colorBlendState;
 	PipelineTessellationState tessellationState;

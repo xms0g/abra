@@ -105,6 +105,16 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 		glFrontFace(toUnderlying(pipelineState.rasterizationState.frontFace));
 	}
 
+	if (mState.glStateCache.aa.samples != pipelineState.multisampleState.rasterizationSamples) {
+		mState.glStateCache.aa.samples = pipelineState.multisampleState.rasterizationSamples;
+
+		if (mState.glStateCache.aa.samples > 0) {
+			glEnable(GL_MULTISAMPLE);
+		} else {
+			glDisable(GL_MULTISAMPLE);
+		}
+	}
+
 	if (mState.glStateCache.blend.blendEnable != pipelineState.colorBlendState.blendEnable) {
 		mState.glStateCache.blend.blendEnable = pipelineState.colorBlendState.blendEnable;
 
@@ -130,8 +140,9 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 		}
 	}
 
-	if (pipelineState.tessellationState.patchControlPoints > 0) {
-		glPatchParameteri(GL_PATCH_VERTICES, pipelineState.tessellationState.patchControlPoints);
+	if (mState.glStateCache.tessellation.patchVertices != pipelineState.tessellationState.patchControlPoints) {
+		mState.glStateCache.tessellation.patchVertices = pipelineState.tessellationState.patchControlPoints;
+		glPatchParameteri(GL_PATCH_VERTICES, mState.glStateCache.tessellation.patchVertices);
 	}
 
 	if (mState.glStateCache.polygon.polygonMode != pipelineState.rasterizationState.polygonMode) {

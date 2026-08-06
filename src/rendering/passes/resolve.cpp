@@ -17,5 +17,4 @@ void ResolvePass::execute(const RenderContext& ctx, const FrameGraph& graph, Gra
 	const auto& sceneBuffer = graph.getResource("sceneBuffer");
 	const auto& intermediateBuffer = graph.getResource("intermediateBuffer");
 	encoder.blitFramebuffer(sceneBuffer, intermediateBuffer, BlitMask::Color);
-	//ctx.sceneBuffer = ctx.intermediateBuffer;
 }

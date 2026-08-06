@@ -3,6 +3,7 @@
 GraphicsPipeline::GraphicsPipeline(PipelineRenderingInfo& renderingInfo) {
 	mState.primitiveAssemblyState = renderingInfo.primitiveAssemblyState;
 	mState.rasterizationState = renderingInfo.rasterizationState;
+	mState.multisampleState = renderingInfo.multisampleState;
 	mState.depthStencilState = renderingInfo.depthStencilState;
 	mState.colorBlendState = renderingInfo.colorBlendState;
 	mState.tessellationState = renderingInfo.tessellationState;

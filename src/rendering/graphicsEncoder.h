@@ -108,12 +108,22 @@ private:
 		bool blendEnable{};
 	};
 
+	struct AntiAliasingCache {
+		uint32_t samples{};
+	};
+
+	struct TessellationCache {
+		int32_t patchVertices{};
+	};
+
 	struct GLStateCache {
 		HandleCache handles{};
 		DepthStencilCache depthStencil{};
 		CullCache cull{};
 		BlendCache blend{};
 		PolygonCache polygon{};
+		AntiAliasingCache aa{};
+		TessellationCache tessellation{};
 		Viewport viewport{};
 
 		void reset() {
@@ -122,6 +132,8 @@ private:
 			cull = {};
 			blend = {};
 			polygon = {};
+			aa = {};
+			tessellation = {};
 			viewport = {};
 		}
 	};
