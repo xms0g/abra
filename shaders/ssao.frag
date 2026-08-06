@@ -14,7 +14,7 @@ uniform int kernelSize;
 
 layout (std140) uniform SSAOBlock
 {
-    vec4 samples[32];
+    vec4 samples[16];
     vec4 rbi;
     vec4 resolution;
 };
@@ -27,10 +27,8 @@ void main() {
     float intensity = rbi.z;
     vec2 noiseScale = vec2(resolution.x/4.0, resolution.y/4.0);
     // get input for SSAO algorithm
-    vec3 normalWorld = texture(gNormal, fs_in.TexCoord).xyz;
     vec3 fragPosView = texture(gPosition, fs_in.TexCoord).xyz;
-    vec3 normalView = normalize(mat3(view) * normalWorld);
-
+    vec3 normalView = texture(gNormal, fs_in.TexCoord).xyz;
     vec3 randomVec = normalize(texture(texNoise, fs_in.TexCoord * noiseScale).rgb);
     // create TBN change-of-basis matrix: from tangent-space to view-space
     vec3 tangent = normalize(randomVec - normalView * dot(randomVec, normalView));

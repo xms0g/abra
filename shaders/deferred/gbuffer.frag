@@ -7,6 +7,7 @@ in VS_OUT
     vec3 TangentViewDir;
 } fs_in;
 
+#include "ub/camera.glsl"
 #include "pbr/material.glsl"
 #include "common/normalMap.glsl"
 #include "common/parallaxMap.glsl"
@@ -27,7 +28,7 @@ void main() {
     // store the fragment position vector in the first gbuffer texture
     gPosition.rgb = fs_in.ViewPos;
     // also store the per-fragment normals into the gbuffer
-    gNormal.rgb = normal(fs_in.TBN, texCoord, true);
+    gNormal.rgb = normalize(mat3(view) * normal(fs_in.TBN, texCoord, true));
     // and the diffuse per-fragment color
     gAlbedo.rgb = albedoSample.rgb;
     // Occulusion - Roughness - Metallic

@@ -13,11 +13,10 @@ SSAOPass::SSAOPass() = default;
 
 SSAOPass::~SSAOPass() = default;
 
-void SSAOPass::configure(
-	const RenderContext& ctx,
-	const FrameGraph& graph,
-	GraphicsEncoder& encoder,
-	EventBus& eventBus) {
+void SSAOPass::configure(const RenderContext& ctx,
+                         const FrameGraph& graph,
+                         GraphicsEncoder& encoder,
+                         EventBus& eventBus) {
 	createNoiseTexture(encoder);
 	createKernel();
 
@@ -134,7 +133,7 @@ void SSAOPass::createKernel() {
 	kernel = math::random::generateKernel(kernelSize);
 
 	struct alignas(16) SSAOData {
-		glm::vec4 samples[32];
+		glm::vec4 samples[16];
 		glm::vec4 rbi;
 		glm::vec4 resolution;
 	};
