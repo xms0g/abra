@@ -49,8 +49,8 @@ void TerrainPass::configure(const RenderContext& ctx,
 		.stages = {
 			{.code = ShaderLoader::load("models/terrain.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("models/terrain.frag"), .stage = ShaderStageType::Fragment},
-			{.code = ShaderLoader::load("models/terrain.tcs"), .stage = ShaderStageType::TessControl},
-			{.code = ShaderLoader::load("models/terrain.tes"), .stage = ShaderStageType::TessEvaluation},
+			{.code = ShaderLoader::load("models/terrain.tesc"), .stage = ShaderStageType::TessControl},
+			{.code = ShaderLoader::load("models/terrain.tese"), .stage = ShaderStageType::TessEvaluation},
 		},
 		.samplers = {
 			{.name = "material.texture_height", .slot = 0},
