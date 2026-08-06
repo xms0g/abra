@@ -51,8 +51,7 @@ void SSAOPass::configure(const RenderContext& ctx,
 		.samplers = {
 			{.name = "gPosition", .slot = CONFIG_MANAGER.get<int32_t>("gBuffer.position.textureSlot")},
 			{.name = "gNormal", .slot = CONFIG_MANAGER.get<int32_t>("gBuffer.normal.textureSlot")},
-			{.name = "texNoise", .slot = CONFIG_MANAGER.get<int32_t>("ssao.noise.textureSlot")},
-			{.name = "kernelSize", .slot = CONFIG_MANAGER.get<int32_t>("ssao.kernelSize")}
+			{.name = "texNoise", .slot = CONFIG_MANAGER.get<int32_t>("ssao.noise.textureSlot")}
 		},
 		.uniforms = {
 			{
@@ -109,6 +108,7 @@ void SSAOPass::ssao(const FrameGraph& graph, GraphicsEncoder& encoder) {
 	encoder.setViewport({.x = 0, .y = 0, .width = ssao.width(), .height = ssao.height()});
 
 	encoder.bindPipeline(mPipelines[0]);
+	encoder.setUniform("kernelSize", CONFIG_MANAGER.get<int32_t>("ssao.kernelSize"));
 	encoder.draw(3);
 }
 
