@@ -24,7 +24,7 @@ TextureView FXAA::render(GraphicsEncoder& encoder, const TextureView sceneTextur
 	encoder.clearFrameBuffer(ClearMask::Color);
 
 	encoder.bindPipeline(mPipeline);
-	encoder.setUniform("resolution", glm::vec2(renderTarget->width(), renderTarget->height()));
+	encoder.setUniform("inverseResolution", glm::vec2(1.0/renderTarget->width(), 1.0/renderTarget->height()));
 
 	const TextureView textures[] = {sceneTexture};
 	encoder.bindMaterial({.textures = std::span(textures)});

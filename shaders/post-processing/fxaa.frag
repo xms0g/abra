@@ -9,13 +9,11 @@ in VS_OUT
 #define FXAA_SPAN_MAX 8.0
 
 uniform sampler2D screenTexture;
-uniform vec2 resolution;
+uniform vec2 inverseResolution;
 
 out vec4 fragColor;
 
 void main() {
-    vec2 inverseResolution = vec2(1.0/resolution.x, 1.0/resolution.y);
-
     vec3 upperLeft = texture(screenTexture, fs_in.TexCoord + (vec2(-1.0, -1.0) * inverseResolution)).rgb;
     vec3 upperRight = texture(screenTexture, fs_in.TexCoord + (vec2(1.0, -1.0) * inverseResolution)).rgb;
     vec3 lowerLeft = texture(screenTexture, fs_in.TexCoord + (vec2(-1.0, 1.0) * inverseResolution)).rgb;
