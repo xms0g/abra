@@ -1,11 +1,6 @@
 #pragma once
-#include <memory>
 #include "IPass.hpp"
 #include "../graphicsPipeline.h"
-
-namespace Model {
-class Quad;
-}
 
 class CubemapBuffer;
 class FrameBuffer;
@@ -26,5 +21,4 @@ public:
 
 private:
 	GraphicsPipeline mPipeline{};
-	std::unique_ptr<Model::Quad> mQuad;
 };

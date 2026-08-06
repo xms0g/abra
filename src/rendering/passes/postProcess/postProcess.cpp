@@ -12,10 +12,8 @@
 #include "../../graphicsEncoder.h"
 #include "../../frameGraph.h"
 #include "../../buffers/frameBuffer.h"
-#include "../../models/quad.h"
 #include "../../../event/eventBus.hpp"
 #include "../../../event/events/guiPostProcessEvent.hpp"
-#include "../../mesh/vertexArray.h"
 
 PostProcessPass::PostProcessPass() = default;
 
@@ -43,14 +41,13 @@ void PostProcessPass::configure(const RenderContext& ctx,
 	}
 
 	std::vector<PipelineShaderStage> stages;
-	stages.emplace_back(ShaderLoader::load("models/quad.vert"), ShaderStageType::Vertex);
+	stages.emplace_back(ShaderLoader::load("models/quad2.vert"), ShaderStageType::Vertex);
 	stages.emplace_back(ShaderLoader::load("models/quad.frag"), ShaderStageType::Fragment);
 
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
 		stages,
 		{{.name = "screenTexture", .slot = 0}});
 
-	mQuad = std::make_unique<Model::Quad>();
 	mRenderTargets = {&graph.getResource("ping"), &graph.getResource("pong")};
 	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessEvent>(this, &PostProcessPass::onGuiUpdate);
 }
@@ -63,7 +60,7 @@ void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph,
 		if (!effect->enabled())
 			continue;
 
-		inputTex = effect->render(encoder, *mQuad, inputTex, mRenderTargets[toggle]);
+		inputTex = effect->render(encoder, inputTex, mRenderTargets[toggle]);
 		toggle = !toggle;
 	}
 
@@ -73,8 +70,7 @@ void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph,
 	const TextureView textures[] = {inputTex};
 	encoder.bindMaterial({.textures = std::span(textures)});
 
-	encoder.bindVertexArray(mQuad->vao().id());
-	encoder.draw(6);
+	encoder.draw(3);
 }
 
 void PostProcessPass::onGuiUpdate(const GuiPostProcessEvent& event) {

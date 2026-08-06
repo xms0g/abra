@@ -2,8 +2,6 @@
 #include "../../shader.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../context/renderContext.hpp"
-#include "../../mesh/vertexArray.h"
-#include "../../models/quad.h"
 
 Grayscale::Grayscale(const std::string& name, const bool enabled)
 	: BasePostEffect(name, enabled) {
@@ -11,7 +9,7 @@ Grayscale::Grayscale(const std::string& name, const bool enabled)
 
 void Grayscale::configure(const FrameGraph& graph) {
 	std::vector<PipelineShaderStage> stages;
-	stages.emplace_back(ShaderLoader::load("models/quad.vert"), ShaderStageType::Vertex);
+	stages.emplace_back(ShaderLoader::load("models/quad2.vert"), ShaderStageType::Vertex);
 	stages.emplace_back(ShaderLoader::load("post-processing/grayscale.frag"), ShaderStageType::Fragment);
 
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
@@ -19,10 +17,7 @@ void Grayscale::configure(const FrameGraph& graph) {
 		{{.name = "screenTexture", .slot = 0}});
 }
 
-TextureView Grayscale::render(GraphicsEncoder& encoder,
-                              Model::Quad& quad,
-                              const TextureView sceneTexture,
-                              FrameBuffer* renderTarget) {
+TextureView Grayscale::render(GraphicsEncoder& encoder, const TextureView sceneTexture, FrameBuffer* renderTarget) {
 	encoder.bindFrameBuffer(*renderTarget);
 	encoder.clearFrameBuffer(ClearMask::Color);
 
@@ -31,8 +26,7 @@ TextureView Grayscale::render(GraphicsEncoder& encoder,
 	const TextureView textures[] = {sceneTexture};
 	encoder.bindMaterial({.textures = std::span(textures)});
 
-	encoder.bindVertexArray(quad.vao().id());
-	encoder.draw(6);
+	encoder.draw(3);
 
 	return renderTarget->texture();
 }

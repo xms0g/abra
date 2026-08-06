@@ -3,8 +3,6 @@
 #include "../frameGraph.h"
 #include "../graphicsEncoder.h"
 #include "../texture/texture.h"
-#include "../models/quad.h"
-#include "../mesh/vertexArray.h"
 #include "../context/renderContext.hpp"
 #include "../../config/configManager.h"
 #include "../../math/random.h"
@@ -47,7 +45,7 @@ void SSAOPass::configure(const RenderContext& ctx,
 		.depthStencilState = depthStencilState,
 		.colorBlendState = colorBlendState,
 		.stages = {
-			{.code = ShaderLoader::load("models/quad.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("models/quad2.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("ssao.frag"), .stage = ShaderStageType::Fragment}
 		},
 		.samplers = {
@@ -74,7 +72,7 @@ void SSAOPass::configure(const RenderContext& ctx,
 		.depthStencilState = depthStencilState,
 		.colorBlendState = colorBlendState,
 		.stages = {
-			{.code = ShaderLoader::load("models/quad.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("models/quad2.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("ssaoBlur.frag"), .stage = ShaderStageType::Fragment},
 		},
 		.samplers = {
@@ -97,8 +95,6 @@ void SSAOPass::configure(const RenderContext& ctx,
 	encoder.bindTexture(
 		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.textureIdx")),
 		CONFIG_MANAGER.get<int32_t>("gBuffer.normal.textureSlot"));
-
-	mQuad = std::make_unique<Model::Quad>();
 }
 
 void SSAOPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
@@ -113,8 +109,7 @@ void SSAOPass::ssao(const FrameGraph& graph, GraphicsEncoder& encoder) {
 	encoder.setViewport({.x = 0, .y = 0, .width = ssao.width(), .height = ssao.height()});
 
 	encoder.bindPipeline(mPipelines[0]);
-	encoder.bindVertexArray(mQuad->vao().id());
-	encoder.draw(6);
+	encoder.draw(3);
 }
 
 void SSAOPass::blur(const FrameGraph& graph, GraphicsEncoder& encoder) {
@@ -125,8 +120,7 @@ void SSAOPass::blur(const FrameGraph& graph, GraphicsEncoder& encoder) {
 
 	encoder.bindPipeline(mPipelines[1]);
 	encoder.bindTexture(graph.getResource("ssao").texture(), 0);
-	encoder.bindVertexArray(mQuad->vao().id());
-	encoder.draw(6);
+	encoder.draw(3);
 }
 
 void SSAOPass::createKernel() {

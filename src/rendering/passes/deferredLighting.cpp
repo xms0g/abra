@@ -3,8 +3,6 @@
 #include "../renderer.h"
 #include "../shader.h"
 #include "../graphicsEncoder.h"
-#include "../models/quad.h"
-#include "../mesh/vertexArray.h"
 #include "../context/renderContext.hpp"
 #include "../../config/configManager.h"
 
@@ -43,7 +41,7 @@ void DeferredLightingPass::configure(const RenderContext& ctx,
 		.depthStencilState = depthStencilState,
 		.colorBlendState = colorBlendState,
 		.stages = {
-			{.code = ShaderLoader::load("models/quad.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("models/quad2.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("deferred/lighting.frag"), .stage = ShaderStageType::Fragment},
 		},
 		.samplers = {
@@ -103,7 +101,6 @@ void DeferredLightingPass::configure(const RenderContext& ctx,
 	encoder.bindTexture(
 		graph.getResource("ssaoBlur").texture(),
 		CONFIG_MANAGER.get<int32_t>("ssao.textureSlot"));
-	mQuad = std::make_unique<Model::Quad>();
 }
 
 void DeferredLightingPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
@@ -115,6 +112,5 @@ void DeferredLightingPass::execute(const RenderContext& ctx, const FrameGraph& g
 	encoder.setViewport({.x = 0, .y = 0, .width = sceneBuffer.width(), .height = sceneBuffer.height()});
 
 	encoder.bindPipeline(mPipeline);
-	encoder.bindVertexArray(mQuad->vao().id());
-	encoder.draw(6);
+	encoder.draw(3);
 }

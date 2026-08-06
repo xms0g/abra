@@ -1,8 +1,6 @@
 #include "sepia.h"
 #include "../../shader.h"
 #include "../../buffers/frameBuffer.h"
-#include "../../mesh/vertexArray.h"
-#include "../../models/quad.h"
 
 Sepia::Sepia(const std::string& name, const bool enabled)
 	: BasePostEffect(name, enabled) {
@@ -10,7 +8,7 @@ Sepia::Sepia(const std::string& name, const bool enabled)
 
 void Sepia::configure(const FrameGraph& graph) {
 	std::vector<PipelineShaderStage> stages;
-	stages.emplace_back(ShaderLoader::load("models/quad.vert"), ShaderStageType::Vertex);
+	stages.emplace_back(ShaderLoader::load("models/quad2.vert"), ShaderStageType::Vertex);
 	stages.emplace_back(ShaderLoader::load("post-processing/sepia.frag"), ShaderStageType::Fragment);
 
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
@@ -18,10 +16,7 @@ void Sepia::configure(const FrameGraph& graph) {
 		{{.name = "screenTexture", .slot = 0}});
 }
 
-TextureView Sepia::render(GraphicsEncoder& encoder,
-                          Model::Quad& quad,
-                          const TextureView sceneTexture,
-                          FrameBuffer* renderTarget) {
+TextureView Sepia::render(GraphicsEncoder& encoder, const TextureView sceneTexture, FrameBuffer* renderTarget) {
 	encoder.bindFrameBuffer(*renderTarget);
 	encoder.clearFrameBuffer(ClearMask::Color);
 
@@ -30,8 +25,7 @@ TextureView Sepia::render(GraphicsEncoder& encoder,
 	const TextureView textures[] = {sceneTexture};
 	encoder.bindMaterial({.textures = std::span(textures)});
 
-	encoder.bindVertexArray(quad.vao().id());
-	encoder.draw(6);
+	encoder.draw(3);
 
 	return renderTarget->texture();
 }

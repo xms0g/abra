@@ -9,10 +9,6 @@
 class FrameBuffer;
 class Shader;
 
-namespace Model {
-class Quad;
-}
-
 class SSAOPass final : public IPass {
 public:
 	SSAOPass();
@@ -38,5 +34,4 @@ private:
 	std::array<GraphicsPipeline, 2> mPipelines;
 	UniformBuffer mUBO{};
 	Texture mNoiseTexture{};
-	std::unique_ptr<Model::Quad> mQuad;
 };
