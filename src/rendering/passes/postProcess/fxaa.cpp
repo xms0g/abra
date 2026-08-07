@@ -15,8 +15,7 @@ void FXAA::configure(const FrameGraph& graph) {
 
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
 		stages,
-		{
-			{.name = "screenTexture", .slot = 0}});
+		{{.name = "screenTexture", .type = DescriptorType::Sampler2D, .binding = 0}});
 }
 
 TextureView FXAA::render(GraphicsEncoder& encoder, const TextureView sceneTexture, FrameBuffer* renderTarget) {
@@ -24,7 +23,7 @@ TextureView FXAA::render(GraphicsEncoder& encoder, const TextureView sceneTextur
 	encoder.clearFrameBuffer(ClearMask::Color);
 
 	encoder.bindPipeline(mPipeline);
-	encoder.setUniform("inverseResolution", glm::vec2(1.0/renderTarget->width(), 1.0/renderTarget->height()));
+	encoder.setUniform("inverseResolution", glm::vec2(1.0 / renderTarget->width(), 1.0 / renderTarget->height()));
 
 	const TextureView textures[] = {sceneTexture};
 	encoder.bindMaterial({.textures = std::span(textures)});

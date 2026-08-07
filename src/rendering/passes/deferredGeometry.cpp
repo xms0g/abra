@@ -45,37 +45,42 @@ void DeferredGeometryPass::configure(const RenderContext& ctx,
 			{.code = ShaderLoader::load("deferred/gbuffer.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("deferred/gbuffer.frag"), .stage = ShaderStageType::Fragment},
 		},
-		.samplers = {
+		.descriptors = {
 			{
 				.name = "material.texture_albedo",
-				.slot = CONFIG_MANAGER.get<int32_t>("PBR.albedo.textureSlot")
+				.type = DescriptorType::Sampler2D,
+				.binding = CONFIG_MANAGER.get<int32_t>("PBR.albedo.textureSlot")
 			},
 			{
 				.name = "material.texture_normal",
-				.slot = CONFIG_MANAGER.get<int32_t>("PBR.normal.textureSlot")
+				.type = DescriptorType::Sampler2D,
+				.binding = CONFIG_MANAGER.get<int32_t>("PBR.normal.textureSlot")
 			},
 			{
 				.name = "material.texture_roughnessMetallic",
-				.slot = CONFIG_MANAGER.get<int32_t>("PBR.roughnessMetallic.textureSlot")
+				.type = DescriptorType::Sampler2D,
+				.binding = CONFIG_MANAGER.get<int32_t>("PBR.roughnessMetallic.textureSlot")
 			},
 			{
 				.name = "material.texture_ao",
-				.slot = CONFIG_MANAGER.get<int32_t>("PBR.ao.textureSlot")
+				.type = DescriptorType::Sampler2D,
+				.binding = CONFIG_MANAGER.get<int32_t>("PBR.ao.textureSlot")
 			},
 			{
 				.name = "material.texture_emissive",
-				.slot = CONFIG_MANAGER.get<int32_t>("PBR.emissive.textureSlot")
+				.type = DescriptorType::Sampler2D,
+				.binding = CONFIG_MANAGER.get<int32_t>("PBR.emissive.textureSlot")
 			},
 			{
 				.name = "material.texture_height",
-				.slot = CONFIG_MANAGER.get<int32_t>("PBR.height.textureSlot")
+				.type = DescriptorType::Sampler2D,
+				.binding = CONFIG_MANAGER.get<int32_t>("PBR.height.textureSlot")
 			},
-		},
-		.uniforms = {
 			{
 				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
-				.binding = CONFIG_MANAGER.get<uint32_t>("camera.ubo_binding"),
-			},
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo_binding"),
+			}
 		}
 	};
 

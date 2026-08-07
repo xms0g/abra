@@ -44,31 +44,76 @@ void DeferredLightingPass::configure(const RenderContext& ctx,
 			{.code = ShaderLoader::load("models/quad2.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("deferred/lighting.frag"), .stage = ShaderStageType::Fragment},
 		},
-		.samplers = {
-			{.name = "gPosition", .slot = CONFIG_MANAGER.get<int32_t>("gBuffer.position.textureSlot")},
-			{.name = "gNormal", .slot = CONFIG_MANAGER.get<int32_t>("gBuffer.normal.textureSlot")},
-			{.name = "gAlbedo", .slot = CONFIG_MANAGER.get<int32_t>("gBuffer.albedo.textureSlot")},
-			{.name = "gORM", .slot = CONFIG_MANAGER.get<int32_t>("gBuffer.orm.textureSlot")},
-			{.name = "ssao", .slot = CONFIG_MANAGER.get<int32_t>("ssao.textureSlot")},
-			{.name = "irradianceMap", .slot = CONFIG_MANAGER.get<int32_t>("PBR.irradianceMap.textureSlot")},
-			{.name = "prefilterMap", .slot = CONFIG_MANAGER.get<int32_t>("PBR.prefilterMap.textureSlot")},
-			{.name = "brdfLUT", .slot = CONFIG_MANAGER.get<int32_t>("PBR.brdfLUT.textureSlot")},
-			{.name = "shadowMap", .slot = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot")},
-			{.name = "shadowCubemap", .slot = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot") + 1},
-			{.name = "persShadowMap", .slot = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot") + 2}
-		},
-		.uniforms = {
+		.descriptors = {
+			{
+				.name = "gPosition",
+				.type = DescriptorType::Sampler2D,
+				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.position.textureSlot")
+			},
+			{
+				.name = "gNormal",
+				.type = DescriptorType::Sampler2D,
+				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.normal.textureSlot")
+			},
+			{
+				.name = "gAlbedo",
+				.type = DescriptorType::Sampler2D,
+				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.albedo.textureSlot")
+			},
+			{
+				.name = "gORM",
+				.type = DescriptorType::Sampler2D,
+				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.orm.textureSlot")
+			},
+			{
+				.name = "ssao",
+				.type = DescriptorType::Sampler2D,
+				.binding = CONFIG_MANAGER.get<int32_t>("ssao.textureSlot")
+			},
+			{
+				.name = "irradianceMap",
+				.type = DescriptorType::SamplerCube,
+				.binding = CONFIG_MANAGER.get<int32_t>("PBR.irradianceMap.textureSlot")
+			},
+			{
+				.name = "prefilterMap",
+				.type = DescriptorType::SamplerCube,
+				.binding = CONFIG_MANAGER.get<int32_t>("PBR.prefilterMap.textureSlot")
+			},
+			{
+				.name = "brdfLUT",
+				.type = DescriptorType::Sampler2D,
+				.binding = CONFIG_MANAGER.get<int32_t>("PBR.brdfLUT.textureSlot")
+			},
+			{
+				.name = "shadowMap",
+				.type = DescriptorType::Sampler2D,
+				.binding = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot")
+			},
+			{
+				.name = "shadowCubemap",
+				.type = DescriptorType::SamplerCubeArray,
+				.binding = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot") + 1
+			},
+			{
+				.name = "persShadowMap",
+				.type = DescriptorType::Sampler2DArray,
+				.binding = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot") + 2
+			},
 			{
 				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
-				.binding = CONFIG_MANAGER.get<uint32_t>("camera.ubo_binding"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo_binding"),
 			},
 			{
 				.name = CONFIG_MANAGER.get<std::string>("light.block_name"),
-				.binding = CONFIG_MANAGER.get<uint32_t>("light.ubo_binding"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("light.ubo_binding"),
 			},
 			{
 				.name = CONFIG_MANAGER.get<std::string>("shadow.block_name"),
-				.binding = CONFIG_MANAGER.get<uint32_t>("shadow.ubo_binding"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("shadow.ubo_binding"),
 			}
 		}
 	};

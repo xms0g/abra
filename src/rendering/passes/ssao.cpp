@@ -48,19 +48,31 @@ void SSAOPass::configure(const RenderContext& ctx,
 			{.code = ShaderLoader::load("models/quad2.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("ssao.frag"), .stage = ShaderStageType::Fragment}
 		},
-		.samplers = {
-			{.name = "gPosition", .slot = CONFIG_MANAGER.get<int32_t>("gBuffer.position.textureSlot")},
-			{.name = "gNormal", .slot = CONFIG_MANAGER.get<int32_t>("gBuffer.normal.textureSlot")},
-			{.name = "texNoise", .slot = CONFIG_MANAGER.get<int32_t>("ssao.noise.textureSlot")}
-		},
-		.uniforms = {
+		.descriptors = {
+			{
+				.name = "gPosition", 
+				.type = DescriptorType::Sampler2D, 
+				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.position.textureSlot")
+			},
+			{
+				.name = "gNormal", 
+				.type = DescriptorType::Sampler2D, 
+				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.normal.textureSlot")
+			},
+			{
+				.name = "texNoise", 
+				.type = DescriptorType::Sampler2D, 
+				.binding = CONFIG_MANAGER.get<int32_t>("ssao.noise.textureSlot")
+			},
 			{
 				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
-				.binding = CONFIG_MANAGER.get<uint32_t>("camera.ubo_binding"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo_binding"),
 			},
 			{
 				.name = CONFIG_MANAGER.get<std::string>("ssao.block_name"),
-				.binding = CONFIG_MANAGER.get<uint32_t>("ssao.ubo_binding"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("ssao.ubo_binding"),
 			}
 		}
 	};
@@ -74,10 +86,9 @@ void SSAOPass::configure(const RenderContext& ctx,
 			{.code = ShaderLoader::load("models/quad2.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("ssaoBlur.frag"), .stage = ShaderStageType::Fragment},
 		},
-		.samplers = {
-			{.name = "ssaoTexture", .slot = 0}
+		.descriptors = {
+			{.name = "ssaoTexture", .type = DescriptorType::Sampler2D, .binding = 0}
 		},
-		.uniforms = {}
 	};
 
 	mPipelines[0] = GraphicsPipeline{ssaoInfo};
@@ -151,7 +162,7 @@ void SSAOPass::createKernel() {
 
 	data.resolution = glm::vec4(width, height, width/4, height/4);
 
-	mUBO = UniformBuffer{DYNAMIC, sizeof(SSAOData), CONFIG_MANAGER.get<uint32_t>("ssao.ubo_binding")};
+	mUBO = UniformBuffer{DYNAMIC, sizeof(SSAOData), CONFIG_MANAGER.get<int32_t>("ssao.ubo_binding")};
 	mUBO.bind();
 	mUBO.setData(&data, sizeof(SSAOData), 0);
 	mUBO.unbind();

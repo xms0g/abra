@@ -47,11 +47,11 @@ void DebugPass::configure(const RenderContext& ctx,
 			{.code = ShaderLoader::load("debug/normal.frag"), .stage = ShaderStageType::Fragment},
 			{.code = ShaderLoader::load("debug/normal.geom"), .stage = ShaderStageType::Geometry},
 		},
-		.samplers = {},
-		.uniforms = {
+		.descriptors = {
 			{
 				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
-				.binding = CONFIG_MANAGER.get<uint32_t>("camera.ubo_binding"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo_binding"),
 			},
 		}
 	};
@@ -66,11 +66,11 @@ void DebugPass::configure(const RenderContext& ctx,
 			{.code = ShaderLoader::load("debug/wireframe.frag"), .stage = ShaderStageType::Fragment},
 			{.code = ShaderLoader::load("debug/wireframe.geom"), .stage = ShaderStageType::Geometry},
 		},
-		.samplers = {},
-		.uniforms = {
+		.descriptors = {
 			{
 				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
-				.binding = CONFIG_MANAGER.get<uint32_t>("camera.ubo_binding"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo_binding"),
 			},
 		}
 	};

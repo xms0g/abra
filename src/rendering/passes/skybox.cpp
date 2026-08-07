@@ -43,10 +43,9 @@ void SkyboxPass::configure(const RenderContext& ctx,
 			{.code = ShaderLoader::load("skybox.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("skybox.frag"), .stage = ShaderStageType::Fragment},
 		},
-		.samplers = {
-			{.name = "skybox", .slot = 0},
+		.descriptors = {
+			{.name = "skybox", .type = DescriptorType::SamplerCube, .binding = 0},
 		},
-		.uniforms = {}
 	};
 
 	mPipeline = GraphicsPipeline{info};

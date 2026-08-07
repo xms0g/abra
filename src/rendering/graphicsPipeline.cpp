@@ -15,13 +15,20 @@ GraphicsPipeline::GraphicsPipeline(PipelineRenderingInfo& renderingInfo) {
 	mState.shader.link();
 
 	mState.shader.bind();
-	for (const auto& [name, slot]: renderingInfo.samplers) {
-		mState.shader.setValue(name, slot);
-	}
-
-	for (const auto& [name, binding]: renderingInfo.uniforms) {
-		const uint32_t ubidx = glGetUniformBlockIndex(mState.shader.id(), name.c_str());
-		glUniformBlockBinding(mState.shader.id(), ubidx, binding);
+	for (const auto& [name, type, binding]: renderingInfo.descriptors) {
+		switch (type) {
+			case DescriptorType::UniformBuffer: {
+				const uint32_t index = glGetUniformBlockIndex(mState.shader.id(), name.c_str());
+				glUniformBlockBinding(mState.shader.id(), index, binding);
+				break;
+			}
+			case DescriptorType::Sampler2D:
+			case DescriptorType::SamplerCube:
+			case DescriptorType::Sampler2DArray:
+			case DescriptorType::SamplerCubeArray:
+				mState.shader.setValue(name, binding);
+				break;
+		}
 	}
 }
 
@@ -42,7 +49,7 @@ PipelineState& GraphicsPipeline::state() {
 }
 
 GraphicsPipeline GraphicsPipeline::createFullscreenQuadPipeline(std::vector<PipelineShaderStage> stages,
-                                                                std::vector<SamplerInfo> samplers) {
+                                                                std::vector<DescriptorBinding> resources) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
@@ -70,8 +77,7 @@ GraphicsPipeline GraphicsPipeline::createFullscreenQuadPipeline(std::vector<Pipe
 		.depthStencilState = depthStencilState,
 		.colorBlendState = colorBlendState,
 		.stages = std::move(stages),
-		.samplers = std::move(samplers),
-		.uniforms = {}
+		.descriptors = std::move(resources),
 	};
 
 	return GraphicsPipeline{pipelineInfo};

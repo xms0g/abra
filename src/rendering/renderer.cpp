@@ -35,6 +35,7 @@
 #include "../config/configManager.h"
 #include "../core/camera.h"
 #include "../core/window.h"
+#include "../core/gui/ui.h"
 #include "../ECS/registry.h"
 #include "../ECS/components/transform.hpp"
 #include "../ECS/components/mesh.hpp"
@@ -113,13 +114,14 @@ void Renderer::createUniformBuffers(const Camera& camera) {
 	mCameraUBO = UniformBuffer{
 		DYNAMIC,
 		4 * sizeof(glm::mat4) + sizeof(glm::vec4),
-		CONFIG_MANAGER.get<uint32_t>("camera.ubo_binding")
+		CONFIG_MANAGER.get<int32_t>("camera.ubo_binding")
 	};
 
+	const float aspectRatio = static_cast<float>(CONFIG_MANAGER.get<int32_t>("window.width")) /
+	                          static_cast<float>(CONFIG_MANAGER.get<int32_t>("window.height"));
 	const glm::mat4 projectionMat = glm::perspective(
 		glm::radians(camera.zoom()),
-		static_cast<float>(CONFIG_MANAGER.get<int32_t>("window.width")) / static_cast<float>(
-			CONFIG_MANAGER.get<int32_t>("window.height")),
+		aspectRatio,
 		camera.znear(), camera.zfar());
 
 	mCameraUBO.bind();
@@ -323,8 +325,8 @@ void Renderer::createFrameBuffers() {
 			.checkStatus();
 
 	// SSAO
-	int32_t ssaoWidth = CONFIG_MANAGER.get<int32_t>("window.width")/2;
-	int32_t ssaoHeight = CONFIG_MANAGER.get<int32_t>("window.height")/2;
+	int32_t ssaoWidth = CONFIG_MANAGER.get<int32_t>("window.width") / 2;
+	int32_t ssaoHeight = CONFIG_MANAGER.get<int32_t>("window.height") / 2;
 
 	mGraph.addResource("ssao", std::make_unique<FrameBuffer>(ssaoWidth, ssaoHeight));
 	mGraph.getResource("ssao").bind();
@@ -485,10 +487,9 @@ TextureView Renderer::createEnvMap(const Texture& hdrTexture) {
 			{.code = ShaderLoader::load("pbr/cubemap.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("pbr/equirectangularToCube.frag"), .stage = ShaderStageType::Fragment}
 		},
-		.samplers = {
-			{.name = "equirectangularMap", .slot = 0}
+		.descriptors = {
+			{.name = "equirectangularMap", .type = DescriptorType::Sampler2D, .binding = 0}
 		},
-		.uniforms = {}
 	};
 
 	auto pipeline = GraphicsPipeline{info};
@@ -564,10 +565,9 @@ void Renderer::createIrradianceMap(const TextureView environment) {
 			{.code = ShaderLoader::load("pbr/cubemap.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("pbr/irradianceConv.frag"), .stage = ShaderStageType::Fragment}
 		},
-		.samplers = {
-			{.name = "environmentMap", .slot = 0}
+		.descriptors = {
+			{.name = "environmentMap", .type = DescriptorType::SamplerCube, .binding = 0}
 		},
-		.uniforms = {}
 	};
 
 	auto pipeline = GraphicsPipeline{info};
@@ -640,10 +640,9 @@ void Renderer::createPrefilterMap(const TextureView environment) {
 			{.code = ShaderLoader::load("pbr/cubemap.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("pbr/prefilter.frag"), .stage = ShaderStageType::Fragment}
 		},
-		.samplers = {
-			{.name = "environmentMap", .slot = 0}
-		},
-		.uniforms = {}
+		.descriptors = {
+			{.name = "environmentMap", .type = DescriptorType::SamplerCube, .binding = 0}
+		}
 	};
 
 	auto pipeline = GraphicsPipeline{info};
@@ -677,7 +676,7 @@ void Renderer::createPrefilterMap(const TextureView environment) {
 		.x = 0, .y = 0, .width = mPBRBuffers.prefilter->width(), .height = mPBRBuffers.prefilter->height()
 	});
 
-	constexpr uint32_t mipLevels = 5;
+	constexpr int32_t mipLevels = 5;
 	const int32_t prefilterMapSize = CONFIG_MANAGER.get<int32_t>("PBR.prefilterMap.size");
 
 	for (int32_t i = 0; i < mipLevels; ++i) {
@@ -732,10 +731,9 @@ void Renderer::createBrdfLUT() {
 			{.code = ShaderLoader::load("pbr/brdfLUT.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("pbr/brdfLUT.frag"), .stage = ShaderStageType::Fragment}
 		},
-		.samplers = {
-			{.name = "environmentMap", .slot = 0}
-		},
-		.uniforms = {}
+		.descriptors = {
+			{.name = "environmentMap", .type = DescriptorType::SamplerCube, .binding = 0}
+		}
 	};
 
 	auto pipeline = GraphicsPipeline{info};

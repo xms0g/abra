@@ -13,7 +13,7 @@ void Sepia::configure(const FrameGraph& graph) {
 
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
 		stages,
-		{{.name = "screenTexture", .slot = 0}});
+		{{.name = "screenTexture", .type = DescriptorType::Sampler2D, .binding = 0}});
 }
 
 TextureView Sepia::render(GraphicsEncoder& encoder, const TextureView sceneTexture, FrameBuffer* renderTarget) {

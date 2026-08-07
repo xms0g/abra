@@ -17,7 +17,7 @@ void Bloom::configure(const FrameGraph& graph) {
 
 	mPipelines[0] = GraphicsPipeline::createFullscreenQuadPipeline(
 		stages0,
-		{{.name = "screenTexture", .slot = 0}});
+		{{.name = "screenTexture", .type = DescriptorType::Sampler2D, .binding = 0}});
 
 	std::vector<PipelineShaderStage> stages1;
 	stages1.emplace_back(ShaderLoader::load("models/quad2.vert"), ShaderStageType::Vertex);
@@ -25,7 +25,7 @@ void Bloom::configure(const FrameGraph& graph) {
 
 	mPipelines[1] = GraphicsPipeline::createFullscreenQuadPipeline(
 		stages1,
-		{{.name = "screenTexture", .slot = 0}});
+		{{.name = "screenTexture", .type = DescriptorType::Sampler2D, .binding = 0}});
 
 	std::vector<PipelineShaderStage> stages2;
 	stages2.emplace_back(ShaderLoader::load("models/quad2.vert"), ShaderStageType::Vertex);
@@ -34,8 +34,8 @@ void Bloom::configure(const FrameGraph& graph) {
 	mPipelines[2] = GraphicsPipeline::createFullscreenQuadPipeline(
 		stages2,
 		{
-			{.name = "screenTexture", .slot = 0},
-			{.name = "bloomBlur", .slot = 1}
+			{.name = "screenTexture", .type = DescriptorType::Sampler2D, .binding = 0},
+			{.name = "bloomBlur", .type = DescriptorType::Sampler2D, .binding = 1}
 		});
 
 	mRenderTargets = {&graph.getResource("bloomPing"), &graph.getResource("bloomPong")};

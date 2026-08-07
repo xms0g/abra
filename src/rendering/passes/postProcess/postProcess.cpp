@@ -46,7 +46,7 @@ void PostProcessPass::configure(const RenderContext& ctx,
 
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
 		stages,
-		{{.name = "screenTexture", .slot = 0}});
+		{{.name = "screenTexture", .type = DescriptorType::Sampler2D, .binding = 0}});
 
 	mRenderTargets = {&graph.getResource("ping"), &graph.getResource("pong")};
 	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessEvent>(this, &PostProcessPass::onGuiUpdate);

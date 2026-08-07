@@ -55,11 +55,11 @@ void ShadowSystem::configure(const RenderContext& ctx,
 			{.code = ShaderLoader::load("depth/depth.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("depth/depth.frag"), .stage = ShaderStageType::Fragment},
 		},
-		.samplers = {},
-		.uniforms = {
+		.descriptors = {
 			{
 				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
-				.binding = CONFIG_MANAGER.get<uint32_t>("camera.ubo_binding"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo_binding"),
 			},
 		}
 	};
@@ -74,8 +74,6 @@ void ShadowSystem::configure(const RenderContext& ctx,
 			{.code = ShaderLoader::load("depth/depthCubemap.frag"), .stage = ShaderStageType::Fragment},
 			{.code = ShaderLoader::load("depth/depthCubemap.geom"), .stage = ShaderStageType::Geometry}
 		},
-		.samplers = {},
-		.uniforms = {}
 	};
 
 	mPipelines[0] = GraphicsPipeline{depthInfo};
@@ -88,7 +86,7 @@ void ShadowSystem::configure(const RenderContext& ctx,
 	mUBO = UniformBuffer(
 		DYNAMIC,
 		sizeof(ShadowData),
-		CONFIG_MANAGER.get<uint32_t>("shadow.ubo_binding"));
+		CONFIG_MANAGER.get<int32_t>("shadow.ubo_binding"));
 
 	eventBus.subscribeToEvent<ShadowSystem, UpdateShadowMapEvent>(this, &ShadowSystem::onGuiUpdate);
 

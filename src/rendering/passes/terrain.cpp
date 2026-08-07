@@ -52,13 +52,12 @@ void TerrainPass::configure(const RenderContext& ctx,
 			{.code = ShaderLoader::load("models/terrain.tesc"), .stage = ShaderStageType::TessControl},
 			{.code = ShaderLoader::load("models/terrain.tese"), .stage = ShaderStageType::TessEvaluation},
 		},
-		.samplers = {
-			{.name = "material.texture_height", .slot = 0},
-		},
-		.uniforms = {
+		.descriptors = {
+			{.name = "material.texture_height", .type = DescriptorType::Sampler2D, .binding = 0},
 			{
 				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
-				.binding = CONFIG_MANAGER.get<uint32_t>("camera.ubo_binding"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo_binding"),
 			},
 		}
 	};

@@ -44,11 +44,11 @@ void ForwardUnlitPass::configure(const RenderContext& ctx,
 			{.code = ShaderLoader::load("unlit.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("unlit.frag"), .stage = ShaderStageType::Fragment},
 		},
-		.samplers = {},
-		.uniforms = {
+		.descriptors = {
 			{
 				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
-				.binding = CONFIG_MANAGER.get<uint32_t>("camera.ubo_binding"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo_binding"),
 			}
 		}
 	};

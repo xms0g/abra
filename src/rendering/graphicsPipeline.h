@@ -73,14 +73,18 @@ enum class CompareOp: uint32_t {
 	Never = GL_NEVER
 };
 
-struct SamplerInfo {
-	std::string name;
-	int32_t slot;
+enum class DescriptorType : uint32_t {
+	UniformBuffer,
+	Sampler2D,
+	SamplerCube,
+	Sampler2DArray,
+	SamplerCubeArray,
 };
 
-struct UniformBindingInfo {
+struct DescriptorBinding {
 	std::string name;
-	uint32_t binding;
+	DescriptorType type;
+	int32_t binding{};
 };
 
 struct Viewport {
@@ -93,6 +97,7 @@ struct Viewport {
 };
 
 class FrameBuffer;
+
 struct RenderingInfo {
 	FrameBuffer& frameBuffer;
 	bool clearColor{};
@@ -151,8 +156,7 @@ struct PipelineRenderingInfo {
 	PipelineColorBlendState colorBlendState;
 	PipelineTessellationState tessellationState;
 	std::vector<PipelineShaderStage> stages;
-	std::vector<SamplerInfo> samplers;
-	std::vector<UniformBindingInfo> uniforms;
+	std::vector<DescriptorBinding> descriptors;
 };
 
 struct PipelineState {
@@ -192,7 +196,7 @@ public:
 
 	static GraphicsPipeline createFullscreenQuadPipeline(
 		std::vector<PipelineShaderStage> stages,
-		std::vector<SamplerInfo> samplers);
+		std::vector<DescriptorBinding> resources);
 
 private:
 	PipelineState mState{};

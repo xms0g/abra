@@ -57,26 +57,39 @@ void InstancedBlendPass::configure(const RenderContext& ctx,
 			{.code = ShaderLoader::load("instanced.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("blend.frag"), .stage = ShaderStageType::Fragment},
 		},
-		.samplers = {
-			{.name = "material.texture_albedo", .slot = 0},
-			{.name = "material.texture_specular", .slot = 1},
-			{.name = "material.texture_normal", .slot = 2},
-			{.name = "shadowMap", .slot = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot")},
-			{.name = "shadowCubemap", .slot = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot") + 1},
-			{.name = "persShadowMap", .slot = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot") + 2}
-		},
-		.uniforms = {
+		.descriptors = {
+			{.name = "material.texture_albedo", .type = DescriptorType::Sampler2D, .binding = 0},
+			{.name = "material.texture_specular", .type = DescriptorType::Sampler2D, .binding = 1},
+			{.name = "material.texture_normal", .type = DescriptorType::Sampler2D, .binding = 2},
+			{
+				.name = "shadowMap",
+				.type = DescriptorType::Sampler2D,
+				.binding = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot")
+			},
+			{
+				.name = "shadowCubemap",
+				.type = DescriptorType::SamplerCubeArray,
+				.binding = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot") + 1
+			},
+			{
+				.name = "persShadowMap",
+				.type = DescriptorType::Sampler2DArray,
+				.binding = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot") + 2
+			},
 			{
 				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
-				.binding = CONFIG_MANAGER.get<uint32_t>("camera.ubo_binding"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo_binding"),
 			},
 			{
 				.name = CONFIG_MANAGER.get<std::string>("light.block_name"),
-				.binding = CONFIG_MANAGER.get<uint32_t>("light.ubo_binding"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("light.ubo_binding"),
 			},
 			{
 				.name = CONFIG_MANAGER.get<std::string>("shadow.block_name"),
-				.binding = CONFIG_MANAGER.get<uint32_t>("shadow.ubo_binding"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("shadow.ubo_binding"),
 			}
 		}
 	};
@@ -132,17 +145,17 @@ void InstancedBlendPass::prepareInstanceBuffer(const std::vector<uint32_t>& vaos
 
 	// Allocate the full block of memory once
 	mVBO->bind();
-	mVBO->setData(nullptr, static_cast<uint32_t>(totalRequiredSize), 0);
+	mVBO->setData(nullptr, static_cast<int32_t>(totalRequiredSize), 0);
 
 	// Setup attributes now that the buffer is allocated
-	uint32_t currentOffset = 0;
+	int32_t currentOffset = 0;
 	for (const auto& group: mObjects) {
 		for (const auto meshIdx: group.matBatch.meshIndices) {
-			const uint32_t vao = vaos[meshIdx];
+			const int32_t vao = vaos[meshIdx];
 			Mesh::enableInstanceAttributes(vao, currentOffset);
 		}
 		const size_t instanceCount = group.transforms.size() / 9;
-		currentOffset += static_cast<uint32_t>(instanceCount * sizeof(InstanceData));
+		currentOffset += static_cast<int32_t>(instanceCount * sizeof(InstanceData));
 	}
 
 	mVBO->unbind();
@@ -151,7 +164,7 @@ void InstancedBlendPass::prepareInstanceBuffer(const std::vector<uint32_t>& vaos
 void InstancedBlendPass::uploadInstanceData() const {
 	mVBO->bind();
 
-	uint32_t currentOffset = 0;
+	int32_t currentOffset = 0;
 	for (const auto& group: mObjects) {
 		std::vector<InstanceData> gpuData;
 		const size_t instanceCount = group.transforms.size() / 9;
@@ -167,8 +180,8 @@ void InstancedBlendPass::uploadInstanceData() const {
 		}
 
 		const size_t uploadSize = gpuData.size() * sizeof(InstanceData);
-		mVBO->setData(gpuData.data(), static_cast<uint32_t>(uploadSize), currentOffset);
-		currentOffset += static_cast<uint32_t>(uploadSize);
+		mVBO->setData(gpuData.data(), static_cast<int32_t>(uploadSize), currentOffset);
+		currentOffset += static_cast<int32_t>(uploadSize);
 	}
 
 	mVBO->unbind();

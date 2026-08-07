@@ -5,6 +5,7 @@
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../../config/configManager.h"
+#include "../../core/gui/ui.h"
 
 ForwardOpaquePass::ForwardOpaquePass() = default;
 
@@ -44,27 +45,40 @@ void ForwardOpaquePass::configure(const RenderContext& ctx,
 			{.code = ShaderLoader::load("object.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("opaque.frag"), .stage = ShaderStageType::Fragment},
 		},
-		.samplers = {
-			{.name = "material.texture_albedo", .slot = 0},
-			{.name = "material.texture_specular", .slot = 1},
-			{.name = "material.texture_normal", .slot = 2},
-			{.name = "material.texture_height", .slot = 3},
-			{.name = "shadowMap", .slot = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot")},
-			{.name = "shadowCubemap", .slot = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot") + 1},
-			{.name = "persShadowMap", .slot = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot") + 2}
-		},
-		.uniforms = {
+		.descriptors = {
+			{.name = "material.texture_albedo", .type = DescriptorType::Sampler2D, .binding = 0},
+			{.name = "material.texture_specular", .type = DescriptorType::Sampler2D, .binding = 1},
+			{.name = "material.texture_normal", .type = DescriptorType::Sampler2D, .binding = 2},
+			{.name = "material.texture_height", .type = DescriptorType::Sampler2D, .binding = 3},
+			{
+				.name = "shadowMap",
+				.type = DescriptorType::Sampler2D,
+				.binding = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot")
+			},
+			{
+				.name = "shadowCubemap",
+				.type = DescriptorType::SamplerCubeArray,
+				.binding = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot") + 1
+			},
+			{
+				.name = "persShadowMap",
+				.type = DescriptorType::Sampler2DArray,
+				.binding = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot") + 2
+			},
 			{
 				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
-				.binding = CONFIG_MANAGER.get<uint32_t>("camera.ubo_binding"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo_binding"),
 			},
 			{
 				.name = CONFIG_MANAGER.get<std::string>("light.block_name"),
-				.binding = CONFIG_MANAGER.get<uint32_t>("light.ubo_binding"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("light.ubo_binding"),
 			},
 			{
 				.name = CONFIG_MANAGER.get<std::string>("shadow.block_name"),
-				.binding = CONFIG_MANAGER.get<uint32_t>("shadow.ubo_binding"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("shadow.ubo_binding"),
 			}
 		}
 	};

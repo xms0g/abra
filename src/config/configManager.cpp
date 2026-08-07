@@ -32,19 +32,19 @@ void ConfigManager::load(const std::string_view filepath) {
 		set("camera.zoom", config["camera"]["zoom"].value_or(45.0f));
 		set("camera.znear", config["camera"]["znear"].value_or(0.1f));
 		set("camera.zfar", config["camera"]["zfar"].value_or(1000.0f));
-		set("camera.ubo_binding", static_cast<uint32_t>(config["camera"]["ubo_binding"].value_or(0)));
+		set("camera.ubo_binding", config["camera"]["ubo_binding"].value_or(0));
 		set("camera.block_name", std::string(config["camera"]["block_name"].value_or("CameraBlock")));
 
 		set("light.max_directional", config["light"]["max_directional"].value_or(4));
 		set("light.max_point", config["light"]["max_point"].value_or(4));
 		set("light.max_spot", config["light"]["max_spot"].value_or(4));
-		set("light.ubo_binding", static_cast<uint32_t>(config["light"]["ubo_binding"].value_or(1)));
+		set("light.ubo_binding",config["light"]["ubo_binding"].value_or(1));
 		set("light.block_name", std::string(config["light"]["block_name"].value_or("LightBlock")));
 
 		set("shadow.map_width", config["shadow"]["map_width"].value_or(1024));
 		set("shadow.map_height", config["shadow"]["map_height"].value_or(1024));
 		set("shadow.texture_slot", config["shadow"]["texture_slot"].value_or(1));
-		set("shadow.ubo_binding", static_cast<uint32_t>(config["shadow"]["ubo_binding"].value_or(2)));
+		set("shadow.ubo_binding", config["shadow"]["ubo_binding"].value_or(2));
 		set("shadow.block_name", std::string(config["shadow"]["block_name"].value_or("ShadowBlock")));
 		set("shadow.directional.height", config["shadow"]["directional"]["height"].value_or(1.0f));
 		set("shadow.directional.nearPlane", config["shadow"]["directional"]["near"].value_or(0.1f));
@@ -64,7 +64,7 @@ void ConfigManager::load(const std::string_view filepath) {
 		set("ssao.radius", config["ssao"]["radius"].value_or(1.0f));
 		set("ssao.bias", config["ssao"]["bias"].value_or(0.005f));
 		set("ssao.intensity", config["ssao"]["intensity"].value_or(1.0f));
-		set("ssao.ubo_binding", static_cast<uint32_t>(config["ssao"]["ubo_binding"].value_or(3)));
+		set("ssao.ubo_binding", config["ssao"]["ubo_binding"].value_or(3));
 		set("ssao.block_name", std::string(config["ssao"]["block_name"].value_or("SSAOBlock")));
 		set("ssao.noise.textureSize", config["ssao"]["noise"]["texture_size"].value_or(128));
 		set("ssao.noise.textureSlot", config["ssao"]["noise"]["texture_slot"].value_or(18));
