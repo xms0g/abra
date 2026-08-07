@@ -42,6 +42,7 @@
 #include "../ECS/components/material.hpp"
 #include "../event/eventBus.hpp"
 #include "../resource/resourceManager.h"
+#include "passes/instancedBlend.h"
 
 Renderer::Renderer(Registry& registry, const Camera& camera, Window& window) {
 	RequireComponent<MeshComponent>();
@@ -114,7 +115,7 @@ void Renderer::createUniformBuffers(const Camera& camera) {
 	mCameraUBO = UniformBuffer{
 		DYNAMIC,
 		4 * sizeof(glm::mat4) + sizeof(glm::vec4),
-		CONFIG_MANAGER.get<int32_t>("camera.ubo_binding")
+		CONFIG_MANAGER.get<int32_t>("camera.ubo.binding")
 	};
 
 	const float aspectRatio = static_cast<float>(CONFIG_MANAGER.get<int32_t>("window.width")) /
@@ -206,9 +207,16 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 		{"ssao", "ssaoBlur"}
 	);
 	mGraph.addPass(
-		"InstancedPass",
-		!mQueueRegistry.empty("opaqueInstanced") || !mQueueRegistry.empty("blendInstanced"),
+		"InstancedOpaquePass",
+		!mQueueRegistry.empty("opaqueInstanced"),
 		std::make_unique<InstancedOpaquePass>(),
+		{"sceneBuffer"},
+		{"sceneBuffer"}
+	);
+	mGraph.addPass(
+		"InstancedBlendPass",
+		!mQueueRegistry.empty("blendInstanced"),
+		std::make_unique<InstancedBlendPass>(),
 		{"sceneBuffer"},
 		{"sceneBuffer"}
 	);
@@ -325,15 +333,12 @@ void Renderer::createFrameBuffers() {
 			.checkStatus();
 
 	// SSAO
-	int32_t ssaoWidth = CONFIG_MANAGER.get<int32_t>("window.width") / 2;
-	int32_t ssaoHeight = CONFIG_MANAGER.get<int32_t>("window.height") / 2;
-
-	mGraph.addResource("ssao", std::make_unique<FrameBuffer>(ssaoWidth, ssaoHeight));
+	mGraph.addResource("ssao", std::make_unique<FrameBuffer>(width / 2, height / 2));
 	mGraph.getResource("ssao").bind();
 	mGraph.getResource("ssao").withTexture(BaseFormat::Red).checkStatus();
 	mGraph.getResource("ssao").unbind();
 
-	mGraph.addResource("ssaoBlur", std::make_unique<FrameBuffer>(ssaoWidth, ssaoHeight));
+	mGraph.addResource("ssaoBlur", std::make_unique<FrameBuffer>(width / 2, height / 2));
 	mGraph.getResource("ssaoBlur").bind();
 	mGraph.getResource("ssaoBlur").withTexture(BaseFormat::Red).checkStatus();
 	mGraph.getResource("ssaoBlur").unbind();
@@ -341,16 +346,16 @@ void Renderer::createFrameBuffers() {
 	// Shadow Maps
 	mGraph.addResource(
 		"directional", std::make_unique<FrameBuffer>(
-			CONFIG_MANAGER.get<int32_t>("shadow.map_width"),
-			CONFIG_MANAGER.get<int32_t>("shadow.map_height")));
+			CONFIG_MANAGER.get<int32_t>("shadow.map.width"),
+			CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
 	mGraph.getResource("directional").bind();
 	mGraph.getResource("directional").withTextureDepth(InternalFormat::Depth24, true).checkStatus();
 	mGraph.getResource("directional").unbind();
 
 	mGraph.addResource(
 		"point", std::make_unique<FrameBuffer>(
-			CONFIG_MANAGER.get<int32_t>("shadow.map_width"),
-			CONFIG_MANAGER.get<int32_t>("shadow.map_height")));
+			CONFIG_MANAGER.get<int32_t>("shadow.map.width"),
+			CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
 	mGraph.getResource("point").bind();
 	mGraph.getResource("point").withTextureCubemapDepthArray(
 				CONFIG_MANAGER.get<int32_t>("light.max_point"), InternalFormat::Depth24, true)
@@ -359,8 +364,8 @@ void Renderer::createFrameBuffers() {
 
 	mGraph.addResource(
 		"spot", std::make_unique<FrameBuffer>(
-			CONFIG_MANAGER.get<int32_t>("shadow.map_width"),
-			CONFIG_MANAGER.get<int32_t>("shadow.map_height")));
+			CONFIG_MANAGER.get<int32_t>("shadow.map.width"),
+			CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
 	mGraph.getResource("spot").bind();
 	mGraph.getResource("spot").withTextureDepthArray(
 				CONFIG_MANAGER.get<int32_t>("light.max_spot"), InternalFormat::Depth24, true)

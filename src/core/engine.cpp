@@ -20,7 +20,7 @@ void Engine::init(Registry& registry) {
 
 	mWindow = std::make_unique<Window>(
 		CONFIG_MANAGER.get<std::string>("window.title"),
-		CONFIG_MANAGER.get<int32_t>("msaa.sample_count"),
+		CONFIG_MANAGER.get<int32_t>("msaa.samples"),
 		CONFIG_MANAGER.get<bool>("window.fullscreen"));
 
 	mGuiSystem = &registry.addSystem<GuiSystem>();
