@@ -64,32 +64,32 @@ void InstancedBlendPass::configure(const RenderContext& ctx,
 			{
 				.name = "shadowMap",
 				.type = DescriptorType::Sampler2D,
-				.binding = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot")
+				.binding = CONFIG_MANAGER.get<int32_t>("shadow.map.slot")
 			},
 			{
 				.name = "shadowCubemap",
 				.type = DescriptorType::SamplerCubeArray,
-				.binding = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot") + 1
+				.binding = CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 1
 			},
 			{
 				.name = "persShadowMap",
 				.type = DescriptorType::Sampler2DArray,
-				.binding = CONFIG_MANAGER.get<int32_t>("shadow.texture_slot") + 2
+				.binding = CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 2
 			},
 			{
-				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
+				.name = CONFIG_MANAGER.get<std::string>("camera.ubo.blockName"),
 				.type = DescriptorType::UniformBuffer,
-				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo_binding"),
+				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo.binding"),
 			},
 			{
-				.name = CONFIG_MANAGER.get<std::string>("light.block_name"),
+				.name = CONFIG_MANAGER.get<std::string>("light.ubo.blockName"),
 				.type = DescriptorType::UniformBuffer,
-				.binding = CONFIG_MANAGER.get<int32_t>("light.ubo_binding"),
+				.binding = CONFIG_MANAGER.get<int32_t>("light.ubo.binding"),
 			},
 			{
-				.name = CONFIG_MANAGER.get<std::string>("shadow.block_name"),
+				.name = CONFIG_MANAGER.get<std::string>("shadow.ubo.blockName"),
 				.type = DescriptorType::UniformBuffer,
-				.binding = CONFIG_MANAGER.get<int32_t>("shadow.ubo_binding"),
+				.binding = CONFIG_MANAGER.get<int32_t>("shadow.ubo.binding"),
 			}
 		}
 	};

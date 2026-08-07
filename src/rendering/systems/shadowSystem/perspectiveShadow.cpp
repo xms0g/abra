@@ -11,8 +11,8 @@
 #include "../../../rendering/graphicsPipeline.h"
 
 PerspectiveShadow::PerspectiveShadow(const RenderContext& ctx) {
-	mWidth = CONFIG_MANAGER.get<int32_t>("shadow.map_width");
-	mHeight = CONFIG_MANAGER.get<int32_t>("shadow.map_height");
+	mWidth = CONFIG_MANAGER.get<int32_t>("shadow.map.width");
+	mHeight = CONFIG_MANAGER.get<int32_t>("shadow.map.height");
 	mAspect = static_cast<float>(mWidth) / static_cast<float>(mHeight);
 	mNear = CONFIG_MANAGER.get<float>("shadow.perspective.nearPlane");
 	mFar = CONFIG_MANAGER.get<float>("shadow.perspective.farPlane");

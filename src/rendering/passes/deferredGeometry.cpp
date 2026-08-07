@@ -49,37 +49,37 @@ void DeferredGeometryPass::configure(const RenderContext& ctx,
 			{
 				.name = "material.texture_albedo",
 				.type = DescriptorType::Sampler2D,
-				.binding = CONFIG_MANAGER.get<int32_t>("PBR.albedo.textureSlot")
+				.binding = CONFIG_MANAGER.get<int32_t>("PBR.albedo.slot")
 			},
 			{
 				.name = "material.texture_normal",
 				.type = DescriptorType::Sampler2D,
-				.binding = CONFIG_MANAGER.get<int32_t>("PBR.normal.textureSlot")
+				.binding = CONFIG_MANAGER.get<int32_t>("PBR.normal.slot")
 			},
 			{
 				.name = "material.texture_roughnessMetallic",
 				.type = DescriptorType::Sampler2D,
-				.binding = CONFIG_MANAGER.get<int32_t>("PBR.roughnessMetallic.textureSlot")
+				.binding = CONFIG_MANAGER.get<int32_t>("PBR.roughnessMetallic.slot")
 			},
 			{
 				.name = "material.texture_ao",
 				.type = DescriptorType::Sampler2D,
-				.binding = CONFIG_MANAGER.get<int32_t>("PBR.ao.textureSlot")
+				.binding = CONFIG_MANAGER.get<int32_t>("PBR.ao.slot")
 			},
 			{
 				.name = "material.texture_emissive",
 				.type = DescriptorType::Sampler2D,
-				.binding = CONFIG_MANAGER.get<int32_t>("PBR.emissive.textureSlot")
+				.binding = CONFIG_MANAGER.get<int32_t>("PBR.emissive.slot")
 			},
 			{
 				.name = "material.texture_height",
 				.type = DescriptorType::Sampler2D,
-				.binding = CONFIG_MANAGER.get<int32_t>("PBR.height.textureSlot")
+				.binding = CONFIG_MANAGER.get<int32_t>("PBR.height.slot")
 			},
 			{
-				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
+				.name = CONFIG_MANAGER.get<std::string>("camera.ubo.blockName"),
 				.type = DescriptorType::UniformBuffer,
-				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo_binding"),
+				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo.binding"),
 			}
 		}
 	};

@@ -57,9 +57,9 @@ void ShadowSystem::configure(const RenderContext& ctx,
 		},
 		.descriptors = {
 			{
-				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
+				.name = CONFIG_MANAGER.get<std::string>("camera.ubo.blockName"),
 				.type = DescriptorType::UniformBuffer,
-				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo_binding"),
+				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo.binding"),
 			},
 		}
 	};
@@ -86,7 +86,7 @@ void ShadowSystem::configure(const RenderContext& ctx,
 	mUBO = UniformBuffer(
 		DYNAMIC,
 		sizeof(ShadowData),
-		CONFIG_MANAGER.get<int32_t>("shadow.ubo_binding"));
+		CONFIG_MANAGER.get<int32_t>("shadow.ubo.binding"));
 
 	eventBus.subscribeToEvent<ShadowSystem, UpdateShadowMapEvent>(this, &ShadowSystem::onGuiUpdate);
 

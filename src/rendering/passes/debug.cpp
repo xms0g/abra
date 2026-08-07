@@ -49,9 +49,9 @@ void DebugPass::configure(const RenderContext& ctx,
 		},
 		.descriptors = {
 			{
-				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
+				.name = CONFIG_MANAGER.get<std::string>("camera.ubo.blockName"),
 				.type = DescriptorType::UniformBuffer,
-				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo_binding"),
+				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo.binding"),
 			},
 		}
 	};
@@ -68,9 +68,9 @@ void DebugPass::configure(const RenderContext& ctx,
 		},
 		.descriptors = {
 			{
-				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
+				.name = CONFIG_MANAGER.get<std::string>("camera.ubo.blockName"),
 				.type = DescriptorType::UniformBuffer,
-				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo_binding"),
+				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo.binding"),
 			},
 		}
 	};

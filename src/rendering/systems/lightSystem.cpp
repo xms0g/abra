@@ -49,7 +49,7 @@ void LightSystem::configure(RenderContext& ctx, EventBus& eventBus) {
 	mUBO = UniformBuffer(
 		DYNAMIC,
 		sizeof(PackedLights),
-		CONFIG_MANAGER.get<int32_t>("light.ubo_binding"));
+		CONFIG_MANAGER.get<int32_t>("light.ubo.binding"));
 
 	updateLightUBO();
 }

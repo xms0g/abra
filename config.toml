@@ -28,22 +28,25 @@ sensitivity = 0.1
 zoom = 45.0
 znear = 0.1
 zfar = 100000.0
-ubo_binding = 0
-block_name = "CameraBlock"
+[camera.ubo]
+binding = 0
+blockName = "CameraBlock"
 
 [lights]
 max_directional = 1
 max_point = 4
 max_spot = 4
-ubo_binding = 1
-block_name = "LightBlock"
+[light.ubo]
+binding = 1
+blockName = "LightBlock"
 
-[shadow]
-map_width = 1024
-map_height = 1024
-texture_slot = 6
-ubo_binding = 2
-block_name = "ShadowBlock"
+[shadow.map]
+width = 1024
+height = 1024
+slot = 6
+[shadow.ubo]
+binding = 2
+blockName = "ShadowBlock"
 [shadow.directional]
 height = 5.0
 near = 1.0
@@ -65,12 +68,13 @@ kernel_size = 16
 radius = 0.5
 bias = 0.025
 intensity = 3.0
-texture_slot = 12
-ubo_binding = 3
-block_name = "SSAOBlock"
+slot = 12
+[ssao.ubo]
+binding = 3
+blockName = "SSAOBlock"
 [ssao.noise]
-texture_size = 4
-texture_slot = 18
+size = 4
+slot = 18
 
 [pbr]
 envmap_size = 512

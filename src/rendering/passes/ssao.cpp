@@ -52,27 +52,27 @@ void SSAOPass::configure(const RenderContext& ctx,
 			{
 				.name = "gPosition", 
 				.type = DescriptorType::Sampler2D, 
-				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.position.textureSlot")
+				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.position.slot")
 			},
 			{
 				.name = "gNormal", 
 				.type = DescriptorType::Sampler2D, 
-				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.normal.textureSlot")
+				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.normal.slot")
 			},
 			{
 				.name = "texNoise", 
 				.type = DescriptorType::Sampler2D, 
-				.binding = CONFIG_MANAGER.get<int32_t>("ssao.noise.textureSlot")
+				.binding = CONFIG_MANAGER.get<int32_t>("ssao.noise.slot")
 			},
 			{
-				.name = CONFIG_MANAGER.get<std::string>("camera.block_name"),
+				.name = CONFIG_MANAGER.get<std::string>("camera.ubo.blockName"),
 				.type = DescriptorType::UniformBuffer,
-				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo_binding"),
+				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo.binding"),
 			},
 			{
-				.name = CONFIG_MANAGER.get<std::string>("ssao.block_name"),
+				.name = CONFIG_MANAGER.get<std::string>("ssao.ubo.blockName"),
 				.type = DescriptorType::UniformBuffer,
-				.binding = CONFIG_MANAGER.get<int32_t>("ssao.ubo_binding"),
+				.binding = CONFIG_MANAGER.get<int32_t>("ssao.ubo.binding"),
 			}
 		}
 	};
@@ -99,12 +99,12 @@ void SSAOPass::configure(const RenderContext& ctx,
 	const auto& gBuffer = graph.getResource("gBuffer");
 
 	encoder.bindTexture(
-		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.textureIdx")),
-		CONFIG_MANAGER.get<int32_t>("gBuffer.position.textureSlot"));
+		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.index")),
+		CONFIG_MANAGER.get<int32_t>("gBuffer.position.slot"));
 
 	encoder.bindTexture(
-		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.textureIdx")),
-		CONFIG_MANAGER.get<int32_t>("gBuffer.normal.textureSlot"));
+		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")),
+		CONFIG_MANAGER.get<int32_t>("gBuffer.normal.slot"));
 }
 
 void SSAOPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
@@ -162,14 +162,14 @@ void SSAOPass::createKernel() {
 
 	data.resolution = glm::vec4(width, height, width/4, height/4);
 
-	mUBO = UniformBuffer{DYNAMIC, sizeof(SSAOData), CONFIG_MANAGER.get<int32_t>("ssao.ubo_binding")};
+	mUBO = UniformBuffer{DYNAMIC, sizeof(SSAOData), CONFIG_MANAGER.get<int32_t>("ssao.ubo.binding")};
 	mUBO.bind();
 	mUBO.setData(&data, sizeof(SSAOData), 0);
 	mUBO.unbind();
 }
 
 void SSAOPass::createNoiseTexture(GraphicsEncoder& encoder) {
-	const int32_t textureSize = CONFIG_MANAGER.get<int32_t>("ssao.noise.textureSize");
+	const int32_t textureSize = CONFIG_MANAGER.get<int32_t>("ssao.noise.size");
 
 	std::vector<float> noise;
 	noise.resize(textureSize * textureSize);
@@ -179,5 +179,5 @@ void SSAOPass::createNoiseTexture(GraphicsEncoder& encoder) {
 
 	encoder.bindTexture(
 		{.id = mNoiseTexture.id, .target = mNoiseTexture.target},
-		CONFIG_MANAGER.get<int32_t>("ssao.noise.textureSlot"));
+		CONFIG_MANAGER.get<int32_t>("ssao.noise.slot"));
 }
