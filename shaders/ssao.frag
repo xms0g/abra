@@ -24,7 +24,7 @@ void main() {
     float bias = settings.y;
     float intensity = settings.z;
     int kernelSize = int(settings.w);
-    vec2 noiseScale = vec2(resolution.z, resolution.w);
+    vec2 noiseScale = resolution.zw;
     // get input for SSAO algorithm
     vec3 fragPosView = texture(gPosition, fs_in.TexCoord).xyz;
     vec3 normalView = texture(gNormal, fs_in.TexCoord).xyz;
