@@ -150,11 +150,11 @@ private:
 template<typename T>
 void GraphicsEncoder::setUniform(const std::string& name, const T& value) {
 	assert(mState.pipeline);
-	mState.pipeline->state().shader.setValue(name, value);
+	mState.pipeline->setValue(name, value);
 }
 
 template<typename T>
 void GraphicsEncoder::setUniform(const std::string& name, const T* value, uint32_t count) const {
 	assert(mState.pipeline);
-	mState.pipeline->state().shader.setValue(name, value, count);
+	mState.pipeline->setValue(name, value, count);
 }

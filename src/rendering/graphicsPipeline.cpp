@@ -44,8 +44,36 @@ GraphicsPipeline& GraphicsPipeline::operator=(GraphicsPipeline&& other) noexcept
 	return *this;
 }
 
-PipelineState& GraphicsPipeline::state() {
-	return mState;
+PipelinePrimitiveAssemblyState& GraphicsPipeline::primitiveAssemblyState() {
+	return mState.primitiveAssemblyState;
+}
+
+PipelineRasterizationState& GraphicsPipeline::rasterizationState() {
+	return mState.rasterizationState;
+}
+
+PipelineMultisampleState& GraphicsPipeline::multisampleState() {
+	return mState.multisampleState;
+}
+
+PipelineDepthStencilState& GraphicsPipeline::depthStencilState() {
+	return mState.depthStencilState;
+}
+
+PipelineColorBlendState& GraphicsPipeline::colorBlendState() {
+	return mState.colorBlendState;
+}
+
+PipelineTessellationState& GraphicsPipeline::tessellationState() {
+	return mState.tessellationState;
+}
+
+uint32_t GraphicsPipeline::program() const {
+	return mState.shader.id();
+}
+
+void GraphicsPipeline::bind() const {
+	mState.shader.bind();
 }
 
 GraphicsPipeline GraphicsPipeline::createFullscreenQuadPipeline(std::vector<PipelineShaderStage> stages,

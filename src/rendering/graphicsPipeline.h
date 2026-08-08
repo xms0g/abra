@@ -191,13 +191,53 @@ public:
 
 	GraphicsPipeline& operator=(GraphicsPipeline&& other) noexcept;
 
+	PipelinePrimitiveAssemblyState& primitiveAssemblyState();
+
+	PipelineRasterizationState& rasterizationState();
+
+	PipelineMultisampleState& multisampleState();
+
+	PipelineDepthStencilState& depthStencilState();
+
+	PipelineColorBlendState& colorBlendState();
+
+	PipelineTessellationState& tessellationState();
+
 	[[nodiscard]]
-	PipelineState& state();
+	uint32_t program() const;
+
+	void bind() const;
+
+	template<typename T>
+	void setValue(const std::string& name, const T& value) const;
+
+	template<typename T>
+	void setValue(const std::string& name, const T* value, uint32_t count);
 
 	static GraphicsPipeline createFullscreenQuadPipeline(
 		std::vector<PipelineShaderStage> stages,
 		std::vector<DescriptorBinding> resources);
 
 private:
+	struct PipelineState {
+		PipelinePrimitiveAssemblyState primitiveAssemblyState;
+		PipelineRasterizationState rasterizationState;
+		PipelineMultisampleState multisampleState;
+		PipelineDepthStencilState depthStencilState;
+		PipelineColorBlendState colorBlendState;
+		PipelineTessellationState tessellationState;
+		Shader shader;
+	};
+
 	PipelineState mState{};
 };
+
+template<typename T>
+void GraphicsPipeline::setValue(const std::string& name, const T& value) const {
+	mState.shader.setValue(name, value);
+}
+
+template<typename T>
+void GraphicsPipeline::setValue(const std::string& name, const T* value, uint32_t count) {
+	mState.shader.setValue(name, value, count);
+}

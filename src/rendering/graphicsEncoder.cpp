@@ -56,57 +56,55 @@ void GraphicsEncoder::bindTextures(const std::span<const TextureView> handles, u
 void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 	mState.pipeline = &pipeline;
 
-	const auto& pipelineState = mState.pipeline->state();
+	if (mState.glStateCache.depthStencil.depthTestEnable != mState.pipeline->depthStencilState().depthTestEnable) {
+		mState.glStateCache.depthStencil.depthTestEnable = mState.pipeline->depthStencilState().depthTestEnable;
 
-	if (mState.glStateCache.depthStencil.depthTestEnable != pipelineState.depthStencilState.depthTestEnable) {
-		mState.glStateCache.depthStencil.depthTestEnable = pipelineState.depthStencilState.depthTestEnable;
-
-		if (pipelineState.depthStencilState.depthTestEnable) {
+		if (mState.pipeline->depthStencilState().depthTestEnable) {
 			glEnable(GL_DEPTH_TEST);
 		} else {
 			glDisable(GL_DEPTH_TEST);
 		}
 	}
 
-	if (mState.glStateCache.depthStencil.depthWriteEnable != pipelineState.depthStencilState.depthWriteEnable) {
-		mState.glStateCache.depthStencil.depthWriteEnable = pipelineState.depthStencilState.depthWriteEnable;
-		glDepthMask(pipelineState.depthStencilState.depthWriteEnable ? GL_TRUE : GL_FALSE);
+	if (mState.glStateCache.depthStencil.depthWriteEnable != mState.pipeline->depthStencilState().depthWriteEnable) {
+		mState.glStateCache.depthStencil.depthWriteEnable = mState.pipeline->depthStencilState().depthWriteEnable;
+		glDepthMask(mState.pipeline->depthStencilState().depthWriteEnable ? GL_TRUE : GL_FALSE);
 	}
 
-	if (mState.glStateCache.depthStencil.depthCompareOp != pipelineState.depthStencilState.depthCompareOp &&
-	    pipelineState.depthStencilState.depthCompareOp != CompareOp::Never) {
-		mState.glStateCache.depthStencil.depthCompareOp = pipelineState.depthStencilState.depthCompareOp;
-		glDepthFunc(toUnderlying(pipelineState.depthStencilState.depthCompareOp));
+	if (mState.glStateCache.depthStencil.depthCompareOp != mState.pipeline->depthStencilState().depthCompareOp &&
+	    mState.pipeline->depthStencilState().depthCompareOp != CompareOp::Never) {
+		mState.glStateCache.depthStencil.depthCompareOp = mState.pipeline->depthStencilState().depthCompareOp;
+		glDepthFunc(toUnderlying(mState.pipeline->depthStencilState().depthCompareOp));
 	}
 
-	if (mState.glStateCache.depthStencil.stencilTestEnable != pipelineState.depthStencilState.stencilTestEnable) {
-		mState.glStateCache.depthStencil.stencilTestEnable = pipelineState.depthStencilState.stencilTestEnable;
+	if (mState.glStateCache.depthStencil.stencilTestEnable != mState.pipeline->depthStencilState().stencilTestEnable) {
+		mState.glStateCache.depthStencil.stencilTestEnable = mState.pipeline->depthStencilState().stencilTestEnable;
 
-		if (pipelineState.depthStencilState.stencilTestEnable) {
+		if (mState.pipeline->depthStencilState().stencilTestEnable) {
 			glEnable(GL_STENCIL_TEST);
 		} else {
 			glDisable(GL_STENCIL_TEST);
 		}
 	}
 
-	if (mState.glStateCache.cull.cullMode != pipelineState.rasterizationState.cullMode) {
-		mState.glStateCache.cull.cullMode = pipelineState.rasterizationState.cullMode;
+	if (mState.glStateCache.cull.cullMode != mState.pipeline->rasterizationState().cullMode) {
+		mState.glStateCache.cull.cullMode = mState.pipeline->rasterizationState().cullMode;
 
-		if (pipelineState.rasterizationState.cullMode != CullMode::None) {
+		if (mState.pipeline->rasterizationState().cullMode != CullMode::None) {
 			setCullEnabled(true);
-			setCullFace(pipelineState.rasterizationState.cullMode);
+			setCullFace(mState.pipeline->rasterizationState().cullMode);
 		} else {
 			setCullEnabled(false);
 		}
 	}
 
-	if (mState.glStateCache.cull.frontFace != pipelineState.rasterizationState.frontFace) {
-		mState.glStateCache.cull.frontFace = pipelineState.rasterizationState.frontFace;
-		glFrontFace(toUnderlying(pipelineState.rasterizationState.frontFace));
+	if (mState.glStateCache.cull.frontFace != mState.pipeline->rasterizationState().frontFace) {
+		mState.glStateCache.cull.frontFace = mState.pipeline->rasterizationState().frontFace;
+		glFrontFace(toUnderlying(mState.pipeline->rasterizationState().frontFace));
 	}
 
-	if (mState.glStateCache.aa.samples != pipelineState.multisampleState.rasterizationSamples) {
-		mState.glStateCache.aa.samples = pipelineState.multisampleState.rasterizationSamples;
+	if (mState.glStateCache.aa.samples != mState.pipeline->multisampleState().rasterizationSamples) {
+		mState.glStateCache.aa.samples = mState.pipeline->multisampleState().rasterizationSamples;
 
 		if (mState.glStateCache.aa.samples > 0) {
 			glEnable(GL_MULTISAMPLE);
@@ -115,57 +113,55 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 		}
 	}
 
-	if (mState.glStateCache.blend.blendEnable != pipelineState.colorBlendState.blendEnable) {
-		mState.glStateCache.blend.blendEnable = pipelineState.colorBlendState.blendEnable;
+	if (mState.glStateCache.blend.blendEnable != mState.pipeline->colorBlendState().blendEnable) {
+		mState.glStateCache.blend.blendEnable = mState.pipeline->colorBlendState().blendEnable;
 
-		if (pipelineState.colorBlendState.blendEnable) {
+		if (mState.pipeline->colorBlendState().blendEnable) {
 			glEnable(GL_BLEND);
 			glBlendFuncSeparate(
-				toUnderlying(pipelineState.colorBlendState.srcColorBlendFactor),
-				toUnderlying(pipelineState.colorBlendState.dstColorBlendFactor),
-				toUnderlying(pipelineState.colorBlendState.srcAlphaBlendFactor),
-				toUnderlying(pipelineState.colorBlendState.dstAlphaBlendFactor));
+				toUnderlying(mState.pipeline->colorBlendState().srcColorBlendFactor),
+				toUnderlying(mState.pipeline->colorBlendState().dstColorBlendFactor),
+				toUnderlying(mState.pipeline->colorBlendState().srcAlphaBlendFactor),
+				toUnderlying(mState.pipeline->colorBlendState().dstAlphaBlendFactor));
 			glBlendEquationSeparate(
-				toUnderlying(pipelineState.colorBlendState.colorBlendOp),
-				toUnderlying(pipelineState.colorBlendState.alphaBlendOp));
+				toUnderlying(mState.pipeline->colorBlendState().colorBlendOp),
+				toUnderlying(mState.pipeline->colorBlendState().alphaBlendOp));
 
 			glColorMask(
-				static_cast<bool>(pipelineState.colorBlendState.colorWriteMask & ColorComponent::Red),
-				static_cast<bool>(pipelineState.colorBlendState.colorWriteMask & ColorComponent::Green),
-				static_cast<bool>(pipelineState.colorBlendState.colorWriteMask & ColorComponent::Blue),
-				static_cast<bool>(pipelineState.colorBlendState.colorWriteMask & ColorComponent::Alpha)
+				static_cast<bool>(mState.pipeline->colorBlendState().colorWriteMask & ColorComponent::Red),
+				static_cast<bool>(mState.pipeline->colorBlendState().colorWriteMask & ColorComponent::Green),
+				static_cast<bool>(mState.pipeline->colorBlendState().colorWriteMask & ColorComponent::Blue),
+				static_cast<bool>(mState.pipeline->colorBlendState().colorWriteMask & ColorComponent::Alpha)
 			);
 		} else {
 			glDisable(GL_BLEND);
 		}
 	}
 
-	if (mState.glStateCache.tessellation.patchVertices != pipelineState.tessellationState.patchControlPoints) {
-		mState.glStateCache.tessellation.patchVertices = pipelineState.tessellationState.patchControlPoints;
+	if (mState.glStateCache.tessellation.patchVertices != mState.pipeline->tessellationState().patchControlPoints) {
+		mState.glStateCache.tessellation.patchVertices = mState.pipeline->tessellationState().patchControlPoints;
 		glPatchParameteri(GL_PATCH_VERTICES, mState.glStateCache.tessellation.patchVertices);
 	}
 
-	if (mState.glStateCache.polygon.polygonMode != pipelineState.rasterizationState.polygonMode) {
-		mState.glStateCache.polygon.polygonMode = pipelineState.rasterizationState.polygonMode;
+	if (mState.glStateCache.polygon.polygonMode != mState.pipeline->rasterizationState().polygonMode) {
+		mState.glStateCache.polygon.polygonMode = mState.pipeline->rasterizationState().polygonMode;
 
 		glPolygonMode(
-			toUnderlying(pipelineState.rasterizationState.polygonFace),
-			toUnderlying(pipelineState.rasterizationState.polygonMode));
+			toUnderlying(mState.pipeline->rasterizationState().polygonFace),
+			toUnderlying(mState.pipeline->rasterizationState().polygonMode));
 	}
 
-	if (mState.glStateCache.handles.program != pipelineState.shader.id()) {
-		mState.glStateCache.handles.program = pipelineState.shader.id();
+	if (mState.glStateCache.handles.program != mState.pipeline->program()) {
+		mState.glStateCache.handles.program = mState.pipeline->program();
 
-		pipelineState.shader.bind();
+		mState.pipeline->bind();
 	}
 }
 
 void GraphicsEncoder::bindMaterial(const MaterialView& material) {
-	const auto& pipelineState = mState.pipeline->state();
-
-	if (mState.materialCache.lastMatFlags != material.flags || mState.materialCache.lastShader != pipelineState.shader.id()) {
+	if (mState.materialCache.lastMatFlags != material.flags || mState.materialCache.lastShader != mState.pipeline->program()) {
 		mState.materialCache.lastMatFlags = material.flags;
-		mState.materialCache.lastShader = pipelineState.shader.id();
+		mState.materialCache.lastShader = mState.pipeline->program();
 		setUniform("material.flags", material.flags);
 	}
 
@@ -186,15 +182,15 @@ void GraphicsEncoder::bindMaterial(const MaterialView& material) {
 
 	if (material.flags & TWOSIDED &&
 	    mState.glStateCache.cull.cullMode != CullMode::None &&
-	    pipelineState.rasterizationState.cullMode != CullMode::None) [[unlikely]] {
+	    mState.pipeline->rasterizationState().cullMode != CullMode::None) [[unlikely]] {
 		mState.glStateCache.cull.cullMode = CullMode::None;
 		setCullEnabled(false);
 	}
 
 	if (!(material.flags & TWOSIDED) &&
 	    mState.glStateCache.cull.cullMode == CullMode::None &&
-	    pipelineState.rasterizationState.cullMode != CullMode::None) [[unlikely]] {
-		mState.glStateCache.cull.cullMode = pipelineState.rasterizationState.cullMode;
+	    mState.pipeline->rasterizationState().cullMode != CullMode::None) [[unlikely]] {
+		mState.glStateCache.cull.cullMode = mState.pipeline->rasterizationState().cullMode;
 		setCullEnabled(true);
 	}
 }
@@ -218,18 +214,18 @@ void GraphicsEncoder::clearFrameBuffer(const ClearMask mask) const {
 }
 
 void GraphicsEncoder::draw(const size_t vertexCount) const {
-	glDrawArrays(toUnderlying(mState.pipeline->state().primitiveAssemblyState.topology), 0,
+	glDrawArrays(toUnderlying(mState.pipeline->primitiveAssemblyState().topology), 0,
 	             static_cast<int32_t>(vertexCount));
 }
 
 void GraphicsEncoder::drawIndexed(const size_t indexCount) const {
-	glDrawElements(toUnderlying(mState.pipeline->state().primitiveAssemblyState.topology),
+	glDrawElements(toUnderlying(mState.pipeline->primitiveAssemblyState().topology),
 	               static_cast<int32_t>(indexCount), GL_UNSIGNED_INT, nullptr);
 }
 
 void GraphicsEncoder::drawInstanced(const size_t indexCount, const uint32_t count) const {
 	glDrawElementsInstanced(
-		toUnderlying(mState.pipeline->state().primitiveAssemblyState.topology),
+		toUnderlying(mState.pipeline->primitiveAssemblyState().topology),
 		static_cast<int32_t>(indexCount),
 		GL_UNSIGNED_INT,
 		nullptr,
