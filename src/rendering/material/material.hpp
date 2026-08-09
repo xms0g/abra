@@ -67,7 +67,7 @@ struct MaterialBatch {
 	std::vector<uint32_t> meshIndices;
 };
 
-struct MaterialCache {
+struct TextureBindingCache {
 	uint32_t lastMatFlags{0};
 	uint32_t lastShader{0};
 	std::array<TextureView, 32> textures;

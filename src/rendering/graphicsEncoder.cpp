@@ -43,17 +43,6 @@ void GraphicsEncoder::bindTexture(const TextureView& handle, const uint32_t slot
 	glBindTexture(toUnderlying(handle.target), handle.id);
 }
 
-void GraphicsEncoder::bindTextures(const std::span<const TextureView> handles, uint32_t slot) {
-	for (const auto& handle: handles) {
-		if (mState.materialCache.textures[slot] != handle) {
-			mState.materialCache.textures[slot] = handle;
-			bindTexture(handle, slot);
-		}
-
-		++slot;
-	}
-}
-
 void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 	mState.pipeline = &pipeline;
 
@@ -91,12 +80,7 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 	if (mState.glStateCache.cull.cullMode != mState.pipeline->rasterizationState().cullMode) {
 		mState.glStateCache.cull.cullMode = mState.pipeline->rasterizationState().cullMode;
 
-		if (mState.pipeline->rasterizationState().cullMode != CullMode::None) {
-			setCullEnabled(true);
-			setCullFace(mState.pipeline->rasterizationState().cullMode);
-		} else {
-			setCullEnabled(false);
-		}
+		setCullMode(mState.pipeline->rasterizationState().cullMode);
 	}
 
 	if (mState.glStateCache.cull.frontFace != mState.pipeline->rasterizationState().frontFace) {
@@ -160,10 +144,9 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 }
 
 void GraphicsEncoder::pushConstants(const MaterialView& material) {
-	if (mState.materialCache.lastMatFlags != material.flags || mState.materialCache.lastShader != mState.pipeline->
-	    program()) {
-		mState.materialCache.lastMatFlags = material.flags;
-		mState.materialCache.lastShader = mState.pipeline->program();
+	if (mState.bindingCache.lastMatFlags != material.flags || mState.bindingCache.lastShader != mState.pipeline->program()) {
+		mState.bindingCache.lastMatFlags = material.flags;
+		mState.bindingCache.lastShader = mState.pipeline->program();
 		setUniform("material.flags", material.flags);
 	}
 
@@ -198,7 +181,12 @@ void GraphicsEncoder::bindDescriptorSet(const DescriptorSet& descriptorSet) {
 			case DescriptorType::Sampler2DArray:
 			case DescriptorType::SamplerCubeArray: {
 				const auto& texture = std::get<TextureView>(descriptor.resource);
-				bindTexture(texture, descriptor.binding);
+
+				if (mState.bindingCache.textures[descriptor.binding] != texture) {
+					mState.bindingCache.textures[descriptor.binding] = texture;
+					bindTexture(texture, descriptor.binding);
+				}
+
 				break;
 			}
 		}
@@ -245,13 +233,6 @@ void GraphicsEncoder::setViewport(const Viewport viewport) {
 	}
 }
 
-void GraphicsEncoder::setCullEnabled(const bool enabled) {
-	if (enabled)
-		glEnable(GL_CULL_FACE);
-	else
-		glDisable(GL_CULL_FACE);
-}
-
 void GraphicsEncoder::setCullFace(const CullMode mode) {
 	glCullFace(toUnderlying(mode));
 }
@@ -270,6 +251,6 @@ void GraphicsEncoder::setCullMode(const CullMode mode) {
 }
 
 void GraphicsEncoder::reset() {
-	mState.materialCache.reset();
+	mState.bindingCache.reset();
 	mState.glStateCache.reset();
 }

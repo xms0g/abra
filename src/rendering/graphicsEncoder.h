@@ -50,8 +50,6 @@ public:
 
 	void bindTexture(const TextureView& handle, uint32_t slot);
 
-	void bindTextures(std::span<const TextureView> handles, uint32_t slot);
-
 	void bindPipeline(GraphicsPipeline& pipeline);
 
 	void pushConstants(const MaterialView& material);
@@ -71,8 +69,6 @@ public:
 	void drawInstanced(size_t indexCount, uint32_t count) const;
 
 	void setViewport(Viewport viewport);
-
-	void setCullEnabled(bool enabled);
 
 	void setCullFace(CullMode mode);
 
@@ -145,7 +141,7 @@ private:
 	};
 
 	struct EncoderState {
-		MaterialCache materialCache{};
+		TextureBindingCache bindingCache{};
 		GLStateCache glStateCache{};
 		GraphicsPipeline* pipeline{nullptr};
 	};
