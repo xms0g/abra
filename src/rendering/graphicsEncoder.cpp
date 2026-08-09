@@ -1,6 +1,7 @@
 #include "graphicsEncoder.h"
 #include "graphicsPipeline.h"
 #include "shader.h"
+#include "descriptorSet.h"
 #include "buffers/frameBuffer.h"
 
 void GraphicsEncoder::beginRendering(const RenderingInfo& info) {
@@ -158,8 +159,9 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 	}
 }
 
-void GraphicsEncoder::bindMaterial(const MaterialView& material) {
-	if (mState.materialCache.lastMatFlags != material.flags || mState.materialCache.lastShader != mState.pipeline->program()) {
+void GraphicsEncoder::pushConstants(const MaterialView& material) {
+	if (mState.materialCache.lastMatFlags != material.flags || mState.materialCache.lastShader != mState.pipeline->
+	    program()) {
 		mState.materialCache.lastMatFlags = material.flags;
 		mState.materialCache.lastShader = mState.pipeline->program();
 		setUniform("material.flags", material.flags);
@@ -175,29 +177,32 @@ void GraphicsEncoder::bindMaterial(const MaterialView& material) {
 
 	if (material.flags & HAS_SOLID_COLOR) [[unlikely]] {
 		setUniform("material.color", material.color);
-	} else {
-		constexpr int slot{0};
-		bindTextures(material.textures, slot);
-	}
-
-	if (material.flags & TWOSIDED &&
-	    mState.glStateCache.cull.cullMode != CullMode::None &&
-	    mState.pipeline->rasterizationState().cullMode != CullMode::None) [[unlikely]] {
-		mState.glStateCache.cull.cullMode = CullMode::None;
-		setCullEnabled(false);
-	}
-
-	if (!(material.flags & TWOSIDED) &&
-	    mState.glStateCache.cull.cullMode == CullMode::None &&
-	    mState.pipeline->rasterizationState().cullMode != CullMode::None) [[unlikely]] {
-		mState.glStateCache.cull.cullMode = mState.pipeline->rasterizationState().cullMode;
-		setCullEnabled(true);
 	}
 }
 
 void GraphicsEncoder::bindTransform(const TransformView& transform) {
 	setUniform("model", transform.model);
 	setUniform("normalMatrix", transform.normal);
+}
+
+void GraphicsEncoder::bindDescriptorSet(const DescriptorSet& descriptorSet) {
+	for (const auto& descriptor: descriptorSet.descriptors()) {
+		switch (descriptor.type) {
+			// case DescriptorType::UniformBuffer: {
+			// 	const auto& buffer = descriptor.resource.as<UniformBufferView>();
+			// 	setUniformBlock(buffer.id, binding.binding);
+			// 	break;
+			// }
+			case DescriptorType::Sampler2D:
+			case DescriptorType::SamplerCube:
+			case DescriptorType::Sampler2DArray:
+			case DescriptorType::SamplerCubeArray: {
+				const auto& texture = std::get<TextureView>(descriptor.resource);
+				bindTexture(texture, descriptor.binding);
+				break;
+			}
+		}
+	}
 }
 
 void GraphicsEncoder::blitFramebuffer(const FrameBuffer& src, const FrameBuffer& dst, const BlitMask mask) const {
@@ -249,6 +254,19 @@ void GraphicsEncoder::setCullEnabled(const bool enabled) {
 
 void GraphicsEncoder::setCullFace(const CullMode mode) {
 	glCullFace(toUnderlying(mode));
+}
+
+void GraphicsEncoder::setCullMode(const CullMode mode) {
+	if (mState.glStateCache.cull.cullMode != mode) {
+		mState.glStateCache.cull.cullMode = mode;
+
+		if (mode == CullMode::None)
+			glDisable(GL_CULL_FACE);
+		else {
+			glEnable(GL_CULL_FACE);
+			glCullFace(toUnderlying(mode));
+		}
+	}
 }
 
 void GraphicsEncoder::reset() {

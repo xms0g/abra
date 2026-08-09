@@ -1,5 +1,6 @@
 #include "toneMapping.h"
 #include "../../shader.h"
+#include "../../descriptorSet.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../context/renderContext.hpp"
 
@@ -12,21 +13,21 @@ void ToneMapping::configure(const FrameGraph& graph) {
 	stages.emplace_back(ShaderLoader::load("models/quad2.vert"), ShaderStageType::Vertex);
 	stages.emplace_back(ShaderLoader::load("post-processing/toneMapping.frag"), ShaderStageType::Fragment);
 
-	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
-		stages,
-		{{.name = "screenTexture", .type = DescriptorType::Sampler2D, .binding = 0}});
+	DescriptorSetLayout passLayout = {
+		.bindings = {
+			{.name = "screenTexture", .type = DescriptorType::Sampler2D, .binding = 0}
+		}
+	};
+	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(stages, passLayout);
 }
 
-TextureView ToneMapping::render(GraphicsEncoder& encoder, const TextureView sceneTexture, FrameBuffer* renderTarget) {
+TextureView ToneMapping::render(GraphicsEncoder& encoder, DescriptorSet& dscSet, FrameBuffer* renderTarget) {
 	encoder.bindFrameBuffer(*renderTarget);
 	encoder.clearFrameBuffer(ClearMask::Color);
 
 	encoder.bindPipeline(mPipeline);
 	encoder.setUniform("exposure", mExposure);
-
-	const TextureView textures[] = {sceneTexture};
-	encoder.bindMaterial({.textures = std::span(textures)});
-
+	encoder.bindDescriptorSet(dscSet);
 	encoder.draw(3);
 
 	return renderTarget->texture();

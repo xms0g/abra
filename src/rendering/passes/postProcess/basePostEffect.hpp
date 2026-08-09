@@ -11,6 +11,7 @@ class Quad;
 
 class FrameGraph;
 class FrameBuffer;
+class DescriptorSet;
 
 class BasePostEffect {
 public:
@@ -32,7 +33,7 @@ public:
 
 	virtual void configure(const FrameGraph& graph) = 0;
 
-	virtual TextureView render(GraphicsEncoder& encoder, TextureView sceneTexture, FrameBuffer* renderTarget) = 0;
+	virtual TextureView render(GraphicsEncoder& encoder, DescriptorSet& dscSet, FrameBuffer* renderTarget) = 0;
 
 	void updateFromEvent(const GuiPostProcessEvent& event) {
 		this->enabled(event.enabled);

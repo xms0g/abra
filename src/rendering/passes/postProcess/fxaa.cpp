@@ -1,6 +1,7 @@
 #include "fxaa.h"
 #include "../../shader.h"
 #include "../../buffers/frameBuffer.h"
+#include "../../descriptorSet.h"
 #include "../../context/renderContext.hpp"
 #include "../../../event/events/guiPostProcessEvent.hpp"
 
@@ -13,21 +14,21 @@ void FXAA::configure(const FrameGraph& graph) {
 	stages.emplace_back(ShaderLoader::load("models/quad2.vert"), ShaderStageType::Vertex);
 	stages.emplace_back(ShaderLoader::load("post-processing/fxaa.frag"), ShaderStageType::Fragment);
 
-	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
-		stages,
-		{{.name = "screenTexture", .type = DescriptorType::Sampler2D, .binding = 0}});
+	DescriptorSetLayout passLayout = {
+		.bindings = {
+		{.name = "screenTexture", .type = DescriptorType::Sampler2D, .binding = 0}
+		}
+	};
+	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(stages, passLayout);
 }
 
-TextureView FXAA::render(GraphicsEncoder& encoder, const TextureView sceneTexture, FrameBuffer* renderTarget) {
+TextureView FXAA::render(GraphicsEncoder& encoder, DescriptorSet& dscSet, FrameBuffer* renderTarget) {
 	encoder.bindFrameBuffer(*renderTarget);
 	encoder.clearFrameBuffer(ClearMask::Color);
 
 	encoder.bindPipeline(mPipeline);
 	encoder.setUniform("inverseResolution", glm::vec2(1.0 / renderTarget->width(), 1.0 / renderTarget->height()));
-
-	const TextureView textures[] = {sceneTexture};
-	encoder.bindMaterial({.textures = std::span(textures)});
-
+	encoder.bindDescriptorSet(dscSet);
 	encoder.draw(3);
 
 	return renderTarget->texture();

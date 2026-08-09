@@ -1,6 +1,7 @@
 #include "forwardUnlit.h"
 #include "../shader.h"
 #include "../frameGraph.h"
+#include "../descriptorSet.h"
 #include "../graphicsEncoder.h"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
@@ -43,8 +44,11 @@ void ForwardUnlitPass::configure(const RenderContext& ctx,
 		.stages = {
 			{.code = ShaderLoader::load("unlit.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("unlit.frag"), .stage = ShaderStageType::Fragment},
-		},
-		.descriptors = {
+		}
+	};
+
+	DescriptorSetLayout bufferLayout = {
+		.bindings = {
 			{
 				.name = CONFIG_MANAGER.get<std::string>("camera.ubo.blockName"),
 				.type = DescriptorType::UniformBuffer,
@@ -53,7 +57,9 @@ void ForwardUnlitPass::configure(const RenderContext& ctx,
 		}
 	};
 
-	mPipeline = GraphicsPipeline{info};
+	PipelineLayout layout = {.descriptorSets = {bufferLayout}};
+	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
+	mPipeline = GraphicsPipeline{createInfo};
 
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("UnlitCommands");
 }
@@ -62,7 +68,7 @@ void ForwardUnlitPass::execute(const RenderContext& ctx, const FrameGraph& graph
 	for (const auto& cmd: *mCommands) {
 		encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
 		encoder.bindPipeline(mPipeline);
-		encoder.bindMaterial(cmd.material);
+		encoder.pushConstants(cmd.material);
 		encoder.bindTransform(cmd.transform);
 		encoder.bindVertexArray(cmd.mesh.vao);
 		encoder.drawIndexed(cmd.mesh.indexCount);

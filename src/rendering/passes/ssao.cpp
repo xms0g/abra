@@ -1,6 +1,7 @@
 #include "ssao.h"
 #include "../shader.h"
 #include "../frameGraph.h"
+#include "../descriptorSet.h"
 #include "../graphicsEncoder.h"
 #include "../texture/texture.h"
 #include "../context/renderContext.hpp"
@@ -47,23 +48,31 @@ void SSAOPass::configure(const RenderContext& ctx,
 		.stages = {
 			{.code = ShaderLoader::load("models/quad2.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("ssao.frag"), .stage = ShaderStageType::Fragment}
-		},
-		.descriptors = {
+		}
+	};
+
+	DescriptorSetLayout ssaoPassLayout = {
+		.bindings = {
 			{
-				.name = "gPosition", 
-				.type = DescriptorType::Sampler2D, 
+				.name = "gPosition",
+				.type = DescriptorType::Sampler2D,
 				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.position.slot")
 			},
 			{
-				.name = "gNormal", 
-				.type = DescriptorType::Sampler2D, 
+				.name = "gNormal",
+				.type = DescriptorType::Sampler2D,
 				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.normal.slot")
 			},
 			{
-				.name = "texNoise", 
-				.type = DescriptorType::Sampler2D, 
+				.name = "texNoise",
+				.type = DescriptorType::Sampler2D,
 				.binding = CONFIG_MANAGER.get<int32_t>("ssao.noise.slot")
-			},
+			}
+		}
+	};
+
+	DescriptorSetLayout bufferLayout = {
+		.bindings = {
 			{
 				.name = CONFIG_MANAGER.get<std::string>("camera.ubo.blockName"),
 				.type = DescriptorType::UniformBuffer,
@@ -77,6 +86,10 @@ void SSAOPass::configure(const RenderContext& ctx,
 		}
 	};
 
+	PipelineLayout ssaoLayout = {.descriptorSets = {ssaoPassLayout, bufferLayout}};
+	GraphicsPipelineCreateInfo ssaoCreateInfo = {.rendering = ssaoInfo, .layout = ssaoLayout};
+	mPipelines[0] = GraphicsPipeline{ssaoCreateInfo};
+
 	PipelineRenderingInfo blurInfo = {
 		.primitiveAssemblyState = primitiveAssemblyState,
 		.rasterizationState = rasterizationState,
@@ -85,26 +98,33 @@ void SSAOPass::configure(const RenderContext& ctx,
 		.stages = {
 			{.code = ShaderLoader::load("models/quad2.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("ssaoBlur.frag"), .stage = ShaderStageType::Fragment},
-		},
-		.descriptors = {
-			{.name = "ssaoTexture", .type = DescriptorType::Sampler2D, .binding = 0}
-		},
+		}
 	};
 
-	mPipelines[0] = GraphicsPipeline{ssaoInfo};
-	mPipelines[1] = GraphicsPipeline{blurInfo};
+	DescriptorSetLayout blurPassLayout = {
+		.bindings = {
+			{.name = "ssaoTexture", .type = DescriptorType::Sampler2D, .binding = 0}
+		}
+	};
 
-	encoder = GraphicsEncoder{};
+	PipelineLayout blurLayout = {.descriptorSets = {blurPassLayout}};
+	GraphicsPipelineCreateInfo blurCreateInfo = {.rendering = blurInfo, .layout = blurLayout};
+	mPipelines[1] = GraphicsPipeline{blurCreateInfo};
 
 	const auto& gBuffer = graph.getResource("gBuffer");
 
-	encoder.bindTexture(
-		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.index")),
-		CONFIG_MANAGER.get<int32_t>("gBuffer.position.slot"));
+	DescriptorSet frameSet{};
+	frameSet.write(
+		CONFIG_MANAGER.get<int32_t>("gBuffer.position.slot"),
+		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.index")))
+	.write(
+		CONFIG_MANAGER.get<int32_t>("gBuffer.normal.slot"),
+		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")))
+	.write(
+		CONFIG_MANAGER.get<int32_t>("ssao.noise.slot"),
+		{.id = mNoiseTexture.id, .target = mNoiseTexture.target});
 
-	encoder.bindTexture(
-		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")),
-		CONFIG_MANAGER.get<int32_t>("gBuffer.normal.slot"));
+	encoder.bindDescriptorSet(frameSet);
 }
 
 void SSAOPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
@@ -114,6 +134,7 @@ void SSAOPass::execute(const RenderContext& ctx, const FrameGraph& graph, Graphi
 
 void SSAOPass::ssao(const FrameGraph& graph, GraphicsEncoder& encoder) {
 	const auto& ssao = graph.getResource("ssao");
+
 	encoder.bindFrameBuffer(ssao);
 	encoder.clearFrameBuffer(ClearMask::Color);
 	encoder.setViewport({.x = 0, .y = 0, .width = ssao.width(), .height = ssao.height()});
@@ -124,6 +145,7 @@ void SSAOPass::ssao(const FrameGraph& graph, GraphicsEncoder& encoder) {
 
 void SSAOPass::blur(const FrameGraph& graph, GraphicsEncoder& encoder) {
 	const auto& blur = graph.getResource("ssaoBlur");
+
 	encoder.bindFrameBuffer(blur);
 	encoder.clearFrameBuffer(ClearMask::Color);
 	encoder.setViewport({.x = 0, .y = 0, .width = blur.width(), .height = blur.height()});
@@ -157,10 +179,10 @@ void SSAOPass::createKernel() {
 		CONFIG_MANAGER.get<float>("ssao.intensity"),
 		static_cast<float>(kernelSize));
 
-	const int32_t width = CONFIG_MANAGER.get<int32_t>("window.width")/2;
-	const int32_t height = CONFIG_MANAGER.get<int32_t>("window.height")/2;
+	const int32_t width = CONFIG_MANAGER.get<int32_t>("window.width") / 2;
+	const int32_t height = CONFIG_MANAGER.get<int32_t>("window.height") / 2;
 
-	data.resolution = glm::vec4(width, height, width/4, height/4);
+	data.resolution = glm::vec4(width, height, width / 4, height / 4);
 
 	mUBO = UniformBuffer{DYNAMIC, sizeof(SSAOData), CONFIG_MANAGER.get<int32_t>("ssao.ubo.binding")};
 	mUBO.bind();
@@ -176,8 +198,4 @@ void SSAOPass::createNoiseTexture(GraphicsEncoder& encoder) {
 
 	noise = math::random::generateNoise(textureSize * textureSize);
 	mNoiseTexture = Texture::generate(textureSize, textureSize, noise.data());
-
-	encoder.bindTexture(
-		{.id = mNoiseTexture.id, .target = mNoiseTexture.target},
-		CONFIG_MANAGER.get<int32_t>("ssao.noise.slot"));
 }

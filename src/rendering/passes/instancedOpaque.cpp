@@ -1,6 +1,7 @@
 #include "instancedOpaque.h"
 #include "../frameGraph.h"
 #include "../shader.h"
+#include "../descriptorSet.h"
 #include "../graphicsEncoder.h"
 #include "../context/renderContext.hpp"
 #include "../context/renderGroup.hpp"
@@ -49,27 +50,20 @@ void InstancedOpaquePass::configure(const RenderContext& ctx,
 		.stages = {
 			{.code = ShaderLoader::load("instanced.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("opaque.frag"), .stage = ShaderStageType::Fragment},
-		},
-		.descriptors = {
+		}
+	};
+
+	DescriptorSetLayout materialLayout = {
+		.bindings = {
 			{.name = "material.texture_albedo", .type = DescriptorType::Sampler2D, .binding = 0},
 			{.name = "material.texture_specular", .type = DescriptorType::Sampler2D, .binding = 1},
 			{.name = "material.texture_normal", .type = DescriptorType::Sampler2D, .binding = 2},
 			{.name = "material.texture_height", .type = DescriptorType::Sampler2D, .binding = 3},
-			{
-				.name = "shadowMap",
-				.type = DescriptorType::Sampler2D,
-				.binding = CONFIG_MANAGER.get<int32_t>("shadow.map.slot")
-			},
-			{
-				.name = "shadowCubemap",
-				.type = DescriptorType::SamplerCubeArray,
-				.binding = CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 1
-			},
-			{
-				.name = "persShadowMap",
-				.type = DescriptorType::Sampler2DArray,
-				.binding = CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 2
-			},
+		}
+	};
+
+	DescriptorSetLayout bufferLayout = {
+		.bindings = {
 			{
 				.name = CONFIG_MANAGER.get<std::string>("camera.ubo.blockName"),
 				.type = DescriptorType::UniformBuffer,
@@ -88,15 +82,42 @@ void InstancedOpaquePass::configure(const RenderContext& ctx,
 		}
 	};
 
-	mPipeline = GraphicsPipeline{info};
-
-	const auto shadowTextures = std::vector{
-		graph.getResource("directional").texture(),
-		graph.getResource("point").texture(),
-		graph.getResource("spot").texture()
+	DescriptorSetLayout passLayout = {
+		.bindings = {
+			{
+				.name = "shadowMap",
+				.type = DescriptorType::Sampler2D,
+				.binding = CONFIG_MANAGER.get<int32_t>("shadow.map.slot")
+			},
+			{
+				.name = "shadowCubemap",
+				.type = DescriptorType::SamplerCubeArray,
+				.binding = CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 1
+			},
+			{
+				.name = "persShadowMap",
+				.type = DescriptorType::Sampler2DArray,
+				.binding = CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 2
+			},
+		}
 	};
 
-	encoder.bindTextures(shadowTextures, CONFIG_MANAGER.get<int32_t>("shadow.texture_slot"));
+	PipelineLayout layout = {.descriptorSets = {materialLayout, bufferLayout, passLayout}};
+	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
+	mPipeline = GraphicsPipeline{createInfo};
+
+	DescriptorSet frameSet{};
+	frameSet.write(
+				CONFIG_MANAGER.get<int32_t>("shadow.map.slot"),
+				graph.getResource("directional").texture())
+			.write(
+				CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 1,
+				graph.getResource("point").texture())
+			.write(
+				CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 2,
+				graph.getResource("spot").texture());
+
+	encoder.bindDescriptorSet(frameSet);
 
 	mObjects = std::span(
 		ctx.queueRegistry->get<RenderInstanceGroup>("opaqueInstanced").data(),
@@ -107,19 +128,19 @@ void InstancedOpaquePass::configure(const RenderContext& ctx,
 }
 
 void InstancedOpaquePass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
-	for (const auto& object: mObjects) {
-		encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
-		encoder.bindPipeline(mPipeline);
+	const auto pipelineCullMode = mPipeline.rasterizationState().cullMode;
 
+	for (const auto& object: mObjects) {
 		const size_t count = object.transforms.size() / 9;
 
-		encoder.bindMaterial({
+		encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
+		encoder.bindPipeline(mPipeline);
+		encoder.bindDescriptorSet(ctx.renderData->material.descriptorSets[object.matBatch.materialIndex]);
+		encoder.pushConstants({
 			.idx = object.matBatch.materialIndex,
-			.flags = ctx.renderData->material.flags[object.matBatch.materialIndex],
-			.textures = std::span<const TextureView>(
-				ctx.renderData->material.textures.data() + object.matBatch.textureOffset,
-				object.matBatch.textureCount)
+			.flags = ctx.renderData->material.flags[object.matBatch.materialIndex]
 		});
+		encoder.setCullMode(object.matBatch.materialFlags & TWOSIDED ? CullMode::None : pipelineCullMode);
 
 		for (const auto& meshIdx: object.matBatch.meshIndices) {
 			encoder.bindVertexArray(ctx.renderData->mesh.vaos[meshIdx]);

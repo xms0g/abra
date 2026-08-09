@@ -1,8 +1,10 @@
 #pragma once
 #include <vector>
 #include "glm/glm.hpp"
+#include "../descriptorSet.h"
 #include "../texture/texture.h"
 #include "../../math/matrix.h"
+
 
 struct RenderData {
 	struct {
@@ -21,6 +23,7 @@ struct RenderData {
 		std::vector<float> alphaCutoffs;
 		std::vector<uint32_t> flags;
 		std::vector<TextureView> textures;
+		std::vector<DescriptorSet> descriptorSets;
 		std::vector<glm::vec3> colors;
 	} material;
 
@@ -62,6 +65,10 @@ struct RenderData {
 
 	void emplaceTexture(const uint32_t textureID, const TextureTarget textureTarget) {
 		material.textures.push_back({.id = textureID, .target = textureTarget});
+	}
+
+	void emplaceDescriptorSet(const DescriptorSet& descriptorSet) {
+		material.descriptorSets.push_back(descriptorSet);
 	}
 
 	void emplaceHeightScale(const float heightScale) {

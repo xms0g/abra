@@ -7,6 +7,8 @@
 #include "buffers/frameBuffer.h"
 #include "material/material.hpp"
 
+class DescriptorSet;
+
 enum class BlitMask : uint32_t {
 	Color = GL_COLOR_BUFFER_BIT,
 	Depth = GL_DEPTH_BUFFER_BIT,
@@ -52,9 +54,11 @@ public:
 
 	void bindPipeline(GraphicsPipeline& pipeline);
 
-	void bindMaterial(const MaterialView& material);
+	void pushConstants(const MaterialView& material);
 
 	void bindTransform(const TransformView& transform);
+
+	void bindDescriptorSet(const DescriptorSet& descriptorSet);
 
 	void blitFramebuffer(const FrameBuffer& src, const FrameBuffer& dst, BlitMask mask) const;
 
@@ -71,6 +75,8 @@ public:
 	void setCullEnabled(bool enabled);
 
 	void setCullFace(CullMode mode);
+
+	void setCullMode(CullMode mode);
 
 	template<typename T>
 	void setUniform(const std::string& name, const T& value);

@@ -4,6 +4,9 @@
 #include "shader.h"
 #include "glUtils.hpp"
 
+struct DescriptorBinding;
+struct DescriptorSetLayout;
+
 enum class CullMode: uint32_t {
 	None = GL_NONE,
 	Front = GL_FRONT,
@@ -73,20 +76,6 @@ enum class CompareOp: uint32_t {
 	Never = GL_NEVER
 };
 
-enum class DescriptorType : uint32_t {
-	UniformBuffer,
-	Sampler2D,
-	SamplerCube,
-	Sampler2DArray,
-	SamplerCubeArray,
-};
-
-struct DescriptorBinding {
-	std::string name;
-	DescriptorType type;
-	int32_t binding{};
-};
-
 struct Viewport {
 	int32_t x;
 	int32_t y;
@@ -148,6 +137,10 @@ struct PipelineShaderStage {
 	ShaderStageType stage;
 };
 
+struct PipelineLayout {
+	std::vector<DescriptorSetLayout> descriptorSets;
+};
+
 struct PipelineRenderingInfo {
 	PipelinePrimitiveAssemblyState primitiveAssemblyState;
 	PipelineRasterizationState rasterizationState;
@@ -156,7 +149,11 @@ struct PipelineRenderingInfo {
 	PipelineColorBlendState colorBlendState;
 	PipelineTessellationState tessellationState;
 	std::vector<PipelineShaderStage> stages;
-	std::vector<DescriptorBinding> descriptors;
+};
+
+struct GraphicsPipelineCreateInfo {
+	PipelineRenderingInfo rendering;
+	PipelineLayout layout;
 };
 
 constexpr ColorComponent operator|(const ColorComponent lhs, const ColorComponent rhs) {
@@ -171,7 +168,7 @@ class GraphicsPipeline {
 public:
 	GraphicsPipeline() = default;
 
-	explicit GraphicsPipeline(PipelineRenderingInfo& renderingInfo);
+	explicit GraphicsPipeline(const GraphicsPipelineCreateInfo& createInfo);
 
 	GraphicsPipeline(const GraphicsPipeline& other) = delete;
 
@@ -206,7 +203,7 @@ public:
 
 	static GraphicsPipeline createFullscreenQuadPipeline(
 		std::vector<PipelineShaderStage> stages,
-		std::vector<DescriptorBinding> resources);
+		const DescriptorSetLayout& layout);
 
 private:
 	struct PipelineState {

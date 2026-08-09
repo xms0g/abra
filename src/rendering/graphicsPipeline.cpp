@@ -1,33 +1,36 @@
 #include "graphicsPipeline.h"
+#include "descriptorSet.h"
 
-GraphicsPipeline::GraphicsPipeline(PipelineRenderingInfo& renderingInfo) {
-	mState.primitiveAssemblyState = renderingInfo.primitiveAssemblyState;
-	mState.rasterizationState = renderingInfo.rasterizationState;
-	mState.multisampleState = renderingInfo.multisampleState;
-	mState.depthStencilState = renderingInfo.depthStencilState;
-	mState.colorBlendState = renderingInfo.colorBlendState;
-	mState.tessellationState = renderingInfo.tessellationState;
+GraphicsPipeline::GraphicsPipeline(const GraphicsPipelineCreateInfo& createInfo) {
+	mState.primitiveAssemblyState = createInfo.rendering.primitiveAssemblyState;
+	mState.rasterizationState = createInfo.rendering.rasterizationState;
+	mState.multisampleState = createInfo.rendering.multisampleState;
+	mState.depthStencilState = createInfo.rendering.depthStencilState;
+	mState.colorBlendState = createInfo.rendering.colorBlendState;
+	mState.tessellationState = createInfo.rendering.tessellationState;
 
-	for (const auto& info: renderingInfo.stages) {
+	for (const auto& info: createInfo.rendering.stages) {
 		ShaderStage stage{info};
 		mState.shader.attachStage(stage);
 	}
 	mState.shader.link();
 
 	mState.shader.bind();
-	for (const auto& [name, type, binding]: renderingInfo.descriptors) {
-		switch (type) {
-			case DescriptorType::UniformBuffer: {
-				const uint32_t index = glGetUniformBlockIndex(mState.shader.id(), name.c_str());
-				glUniformBlockBinding(mState.shader.id(), index, binding);
-				break;
+	for (const auto& [bindings]: createInfo.layout.descriptorSets) {
+		for (const auto& [name, type, binding]: bindings) {
+			switch (type) {
+				case DescriptorType::UniformBuffer: {
+					const uint32_t index = glGetUniformBlockIndex(mState.shader.id(), name.c_str());
+					glUniformBlockBinding(mState.shader.id(), index, binding);
+					break;
+				}
+				case DescriptorType::Sampler2D:
+				case DescriptorType::SamplerCube:
+				case DescriptorType::Sampler2DArray:
+				case DescriptorType::SamplerCubeArray:
+					mState.shader.setValue(name, binding);
+					break;
 			}
-			case DescriptorType::Sampler2D:
-			case DescriptorType::SamplerCube:
-			case DescriptorType::Sampler2DArray:
-			case DescriptorType::SamplerCubeArray:
-				mState.shader.setValue(name, binding);
-				break;
 		}
 	}
 }
@@ -77,7 +80,7 @@ void GraphicsPipeline::bind() const {
 }
 
 GraphicsPipeline GraphicsPipeline::createFullscreenQuadPipeline(std::vector<PipelineShaderStage> stages,
-                                                                std::vector<DescriptorBinding> resources) {
+                                                                const DescriptorSetLayout& layout) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
@@ -104,9 +107,11 @@ GraphicsPipeline GraphicsPipeline::createFullscreenQuadPipeline(std::vector<Pipe
 		.rasterizationState = rasterizationState,
 		.depthStencilState = depthStencilState,
 		.colorBlendState = colorBlendState,
-		.stages = std::move(stages),
-		.descriptors = std::move(resources),
+		.stages = std::move(stages)
 	};
 
-	return GraphicsPipeline{pipelineInfo};
+	PipelineLayout layoutInfo = {.descriptorSets = {layout}};
+	GraphicsPipelineCreateInfo createInfo = {.rendering = pipelineInfo, .layout = layoutInfo};
+
+	return GraphicsPipeline{createInfo};
 }

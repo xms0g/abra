@@ -75,9 +75,13 @@ MaterialBatch Batcher::batchMaterial(const uint32_t matID,
 	renderData.emplaceHeightScale(matComponent.heightScale);
 	renderData.emplaceMaterial(material.flags, material.color, material.alphaCutoff);
 
+	DescriptorSet descriptorSet;
+	int slot{0};
 	for (const auto& texture: material.textures) {
 		renderData.emplaceTexture(texture.id, texture.target);
+		descriptorSet.write(slot++, {.id = texture.id, .target = texture.target});
 	}
+	renderData.emplaceDescriptorSet(descriptorSet);
 
 	const size_t textureCount = material.textures.size();
 	MaterialBatch matBatch{

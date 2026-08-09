@@ -1,10 +1,12 @@
 #include "terrain.h"
 #include "../frameGraph.h"
 #include "../shader.h"
+#include "../descriptorSet.h"
 #include "../graphicsEncoder.h"
 #include "../command.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
+#include "../context/renderData.hpp"
 #include "../../config/configManager.h"
 
 TerrainPass::TerrainPass() = default;
@@ -51,9 +53,17 @@ void TerrainPass::configure(const RenderContext& ctx,
 			{.code = ShaderLoader::load("models/terrain.frag"), .stage = ShaderStageType::Fragment},
 			{.code = ShaderLoader::load("models/terrain.tesc"), .stage = ShaderStageType::TessControl},
 			{.code = ShaderLoader::load("models/terrain.tese"), .stage = ShaderStageType::TessEvaluation},
-		},
-		.descriptors = {
+		}
+	};
+
+	DescriptorSetLayout materialLayout = {
+		.bindings = {
 			{.name = "material.texture_height", .type = DescriptorType::Sampler2D, .binding = 0},
+		}
+	};
+
+	DescriptorSetLayout bufferLayout = {
+		.bindings = {
 			{
 				.name = CONFIG_MANAGER.get<std::string>("camera.ubo.blockName"),
 				.type = DescriptorType::UniformBuffer,
@@ -62,7 +72,10 @@ void TerrainPass::configure(const RenderContext& ctx,
 		}
 	};
 
-	mPipeline = GraphicsPipeline{info};
+	PipelineLayout layout = {.descriptorSets = {materialLayout, bufferLayout}};
+	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
+	mPipeline = GraphicsPipeline{createInfo};
+
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("TerrainCommands");
 }
 
@@ -71,7 +84,8 @@ void TerrainPass::execute(const RenderContext& ctx, const FrameGraph& graph, Gra
 
 	encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
 	encoder.bindPipeline(mPipeline);
-	encoder.bindMaterial(cmd.material);
+	encoder.bindDescriptorSet(ctx.renderData->material.descriptorSets[cmd.material.idx]);
+	encoder.pushConstants(cmd.material);
 	encoder.bindTransform(cmd.transform);
 	encoder.bindVertexArray(cmd.mesh.vao);
 	encoder.draw(cmd.mesh.vertexCount);

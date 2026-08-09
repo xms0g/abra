@@ -9,6 +9,7 @@
 #include "fxaa.h"
 #include "kernels.hpp"
 #include "../../shader.h"
+#include "../../descriptorSet.h"
 #include "../../graphicsEncoder.h"
 #include "../../frameGraph.h"
 #include "../../buffers/frameBuffer.h"
@@ -44,9 +45,13 @@ void PostProcessPass::configure(const RenderContext& ctx,
 	stages.emplace_back(ShaderLoader::load("models/quad2.vert"), ShaderStageType::Vertex);
 	stages.emplace_back(ShaderLoader::load("models/quad.frag"), ShaderStageType::Fragment);
 
-	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
-		stages,
-		{{.name = "screenTexture", .type = DescriptorType::Sampler2D, .binding = 0}});
+	const DescriptorSetLayout passLayout = {
+		.bindings = {
+				{.name = "screenTexture", .type = DescriptorType::Sampler2D, .binding = 0}
+		}
+	};
+
+	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(stages, passLayout);
 
 	mRenderTargets = {&graph.getResource("ping"), &graph.getResource("pong")};
 	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessEvent>(this, &PostProcessPass::onGuiUpdate);
@@ -56,20 +61,24 @@ void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph,
 	bool toggle = false;
 
 	TextureView inputTex = graph.getResource("sceneBuffer").texture();
+
 	for (const auto& effect: mEffects) {
 		if (!effect->enabled())
 			continue;
 
-		inputTex = effect->render(encoder, inputTex, mRenderTargets[toggle]);
+		DescriptorSet set;
+		set.write(0, inputTex);
+
+		inputTex = effect->render(encoder, set, mRenderTargets[toggle]);
 		toggle = !toggle;
 	}
 
+	DescriptorSet finalSet;
+	finalSet.write(0, inputTex);
+
 	encoder.bindFrameBuffer();
 	encoder.bindPipeline(mPipeline);
-
-	const TextureView textures[] = {inputTex};
-	encoder.bindMaterial({.textures = std::span(textures)});
-
+	encoder.bindDescriptorSet(finalSet);
 	encoder.draw(3);
 }
 

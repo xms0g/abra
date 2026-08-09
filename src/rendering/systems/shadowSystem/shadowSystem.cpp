@@ -3,6 +3,7 @@
 #include "omnidirectionalShadow.h"
 #include "perspectiveShadow.h"
 #include "../../frameGraph.h"
+#include "../../descriptorSet.h"
 #include "../../graphicsEncoder.h"
 #include "../../context/renderContext.hpp"
 #include "../../buffers/uniformBuffer.h"
@@ -54,8 +55,11 @@ void ShadowSystem::configure(const RenderContext& ctx,
 		.stages = {
 			{.code = ShaderLoader::load("depth/depth.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("depth/depth.frag"), .stage = ShaderStageType::Fragment},
-		},
-		.descriptors = {
+		}
+	};
+
+	DescriptorSetLayout bufferLayout = {
+		.bindings = {
 			{
 				.name = CONFIG_MANAGER.get<std::string>("camera.ubo.blockName"),
 				.type = DescriptorType::UniformBuffer,
@@ -76,8 +80,12 @@ void ShadowSystem::configure(const RenderContext& ctx,
 		},
 	};
 
-	mPipelines[0] = GraphicsPipeline{depthInfo};
-	mPipelines[1] = GraphicsPipeline{cubeDepthInfo};
+	PipelineLayout layout = {.descriptorSets = {bufferLayout}};
+	GraphicsPipelineCreateInfo depthCreateInfo = {.rendering = depthInfo, .layout = layout};
+	GraphicsPipelineCreateInfo cubeDepthCreateInfo = {.rendering = cubeDepthInfo, .layout = layout};
+
+	mPipelines[0] = GraphicsPipeline{depthCreateInfo};
+	mPipelines[1] = GraphicsPipeline{cubeDepthCreateInfo};
 
 	mDirShadow = std::make_unique<DirectionalShadow>(ctx);
 	mOmnidirShadow = std::make_unique<OmnidirectionalShadow>(ctx);

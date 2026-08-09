@@ -3,6 +3,7 @@
 #include "../renderer.h"
 #include "../shader.h"
 #include "../graphicsEncoder.h"
+#include "../descriptorSet.h"
 #include "../context/renderContext.hpp"
 #include "../../config/configManager.h"
 
@@ -43,8 +44,12 @@ void DeferredLightingPass::configure(const RenderContext& ctx,
 		.stages = {
 			{.code = ShaderLoader::load("models/quad2.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("deferred/lighting.frag"), .stage = ShaderStageType::Fragment},
-		},
-		.descriptors = {
+		}
+	};
+
+	DescriptorSetLayout passLayout = {
+		.bindings = {
+			// GBuffer
 			{
 				.name = "gPosition",
 				.type = DescriptorType::Sampler2D,
@@ -65,11 +70,13 @@ void DeferredLightingPass::configure(const RenderContext& ctx,
 				.type = DescriptorType::Sampler2D,
 				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.orm.slot")
 			},
+			// SSAO
 			{
 				.name = "ssao",
 				.type = DescriptorType::Sampler2D,
 				.binding = CONFIG_MANAGER.get<int32_t>("ssao.slot")
 			},
+			// IBL
 			{
 				.name = "irradianceMap",
 				.type = DescriptorType::SamplerCube,
@@ -85,6 +92,7 @@ void DeferredLightingPass::configure(const RenderContext& ctx,
 				.type = DescriptorType::Sampler2D,
 				.binding = CONFIG_MANAGER.get<int32_t>("PBR.brdfLUT.slot")
 			},
+			// Shadows
 			{
 				.name = "shadowMap",
 				.type = DescriptorType::Sampler2D,
@@ -99,7 +107,12 @@ void DeferredLightingPass::configure(const RenderContext& ctx,
 				.name = "persShadowMap",
 				.type = DescriptorType::Sampler2DArray,
 				.binding = CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 2
-			},
+			}
+		}
+	};
+
+	DescriptorSetLayout bufferLayout = {
+		.bindings = {
 			{
 				.name = CONFIG_MANAGER.get<std::string>("camera.ubo.blockName"),
 				.type = DescriptorType::UniformBuffer,
@@ -118,34 +131,48 @@ void DeferredLightingPass::configure(const RenderContext& ctx,
 		}
 	};
 
-	mPipeline = GraphicsPipeline{info};
+	PipelineLayout layout = {.descriptorSets = {passLayout, bufferLayout}};
+	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
+	mPipeline = GraphicsPipeline{createInfo};
 
 	const auto& gBuffer = graph.getResource("gBuffer");
-	const auto gbufferTextures = std::vector{
-		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.index")),
-		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")),
-		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.albedo.index")),
-		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.orm.index"))
-	};
 
-	const auto pbrTextures = std::vector{
-		ctx.pbrBuffers->irradiance->texture(),
-		ctx.pbrBuffers->prefilter->texture(),
-		ctx.pbrBuffers->brdfLUT->texture()
-	};
+	DescriptorSet frameSet{};
+	frameSet.write(
+				CONFIG_MANAGER.get<int32_t>("gBuffer.position.slot"),
+				gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.index")))
+			.write(
+				CONFIG_MANAGER.get<int32_t>("gBuffer.normal.slot"),
+				gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")))
+			.write(
+				CONFIG_MANAGER.get<int32_t>("gBuffer.albedo.slot"),
+				gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.albedo.index")))
+			.write(
+				CONFIG_MANAGER.get<int32_t>("gBuffer.orm.slot"),
+				gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.orm.index")))
+			.write(
+				CONFIG_MANAGER.get<int32_t>("ssao.slot"),
+				graph.getResource("ssaoBlur").texture())
+			.write(
+				CONFIG_MANAGER.get<int32_t>("PBR.irradianceMap.slot"),
+				ctx.pbrBuffers->irradiance->texture())
+			.write(
+				CONFIG_MANAGER.get<int32_t>("PBR.prefilterMap.slot"),
+				ctx.pbrBuffers->prefilter->texture())
+			.write(
+				CONFIG_MANAGER.get<int32_t>("PBR.brdfLUT.slot"),
+				ctx.pbrBuffers->brdfLUT->texture())
+			.write(
+				CONFIG_MANAGER.get<int32_t>("shadow.map.slot"),
+				graph.getResource("directional").texture())
+			.write(
+				CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 1,
+				graph.getResource("point").texture())
+			.write(
+				CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 2,
+				graph.getResource("spot").texture());
 
-	const auto shadowTextures = std::vector{
-		graph.getResource("directional").texture(),
-		graph.getResource("point").texture(),
-		graph.getResource("spot").texture()
-	};
-
-	encoder.bindTextures(gbufferTextures, CONFIG_MANAGER.get<int32_t>("gBuffer.position.slot"));
-	encoder.bindTextures(pbrTextures, CONFIG_MANAGER.get<int32_t>("PBR.irradianceMap.slot"));
-	encoder.bindTextures(shadowTextures, CONFIG_MANAGER.get<int32_t>("shadow.map.slot"));
-	encoder.bindTexture(
-		graph.getResource("ssaoBlur").texture(),
-		CONFIG_MANAGER.get<int32_t>("ssao.slot"));
+	encoder.bindDescriptorSet(frameSet);
 }
 
 void DeferredLightingPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {

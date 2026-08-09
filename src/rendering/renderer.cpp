@@ -491,13 +491,19 @@ TextureView Renderer::createEnvMap(const Texture& hdrTexture) {
 		.stages = {
 			{.code = ShaderLoader::load("pbr/cubemap.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("pbr/equirectangularToCube.frag"), .stage = ShaderStageType::Fragment}
-		},
-		.descriptors = {
-			{.name = "equirectangularMap", .type = DescriptorType::Sampler2D, .binding = 0}
-		},
+		}
 	};
 
-	auto pipeline = GraphicsPipeline{info};
+	DescriptorSetLayout materialLayout = {
+		.bindings = {
+			{.name = "equirectangularMap", .type = DescriptorType::Sampler2D, .binding = 0}
+		}
+	};
+
+	PipelineLayout pipelineLayout = {.descriptorSets = {materialLayout}};
+	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = pipelineLayout};
+	auto pipeline = GraphicsPipeline{createInfo};
+
 	auto encoder = GraphicsEncoder{};
 
 	auto envMap = std::make_unique<FrameBuffer>(
@@ -513,10 +519,13 @@ TextureView Renderer::createEnvMap(const Texture& hdrTexture) {
 	cube.meshes().at(0).front().uploadToGPU();
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
+	DescriptorSet descriptorSet{};
+	descriptorSet.write(0, {.id = hdrTexture.id, .target = hdrTexture.target});
+
 	// convert HDR equirectangular environment map to cubemap equivalent
 	encoder.bindPipeline(pipeline);
 	encoder.setUniform("projection", mCaptureProjection);
-	encoder.bindTexture({.id = hdrTexture.id, .target = hdrTexture.target}, 0);
+	encoder.bindDescriptorSet(descriptorSet);
 
 	encoder.bindFrameBuffer(*mPBRBuffers.environment);
 	encoder.setViewport({
@@ -569,13 +578,19 @@ void Renderer::createIrradianceMap(const TextureView environment) {
 		.stages = {
 			{.code = ShaderLoader::load("pbr/cubemap.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("pbr/irradianceConv.frag"), .stage = ShaderStageType::Fragment}
-		},
-		.descriptors = {
-			{.name = "environmentMap", .type = DescriptorType::SamplerCube, .binding = 0}
-		},
+		}
 	};
 
-	auto pipeline = GraphicsPipeline{info};
+	DescriptorSetLayout passLayout = {
+		.bindings = {
+			{.name = "environmentMap", .type = DescriptorType::SamplerCube, .binding = 0}
+		}
+	};
+
+	PipelineLayout pipelineLayout = {.descriptorSets = {passLayout}};
+	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = pipelineLayout};
+	auto pipeline = GraphicsPipeline{createInfo};
+
 	auto encoder = GraphicsEncoder{};
 
 	auto irradianceMap = std::make_unique<FrameBuffer>(
@@ -591,10 +606,13 @@ void Renderer::createIrradianceMap(const TextureView environment) {
 	cube.meshes().at(0).front().uploadToGPU();
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
+	DescriptorSet descriptorSet{};
+	descriptorSet.write(0, environment);
+
 	// solve diffuse integral by convolution to create an irradiance (cube)map.
 	encoder.bindPipeline(pipeline);
 	encoder.setUniform("projection", mCaptureProjection);
-	encoder.bindTexture(environment, 0);
+	encoder.bindDescriptorSet(descriptorSet);
 
 	encoder.bindFrameBuffer(*mPBRBuffers.irradiance);
 	encoder.setViewport({
@@ -644,13 +662,19 @@ void Renderer::createPrefilterMap(const TextureView environment) {
 		.stages = {
 			{.code = ShaderLoader::load("pbr/cubemap.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("pbr/prefilter.frag"), .stage = ShaderStageType::Fragment}
-		},
-		.descriptors = {
+		}
+	};
+
+	DescriptorSetLayout passLayout = {
+		.bindings = {
 			{.name = "environmentMap", .type = DescriptorType::SamplerCube, .binding = 0}
 		}
 	};
 
-	auto pipeline = GraphicsPipeline{info};
+	PipelineLayout pipelineLayout = {.descriptorSets = {passLayout}};
+	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = pipelineLayout};
+	auto pipeline = GraphicsPipeline{createInfo};
+
 	auto encoder = GraphicsEncoder{};
 
 	auto prefilterMap = std::make_unique<FrameBuffer>(
@@ -668,13 +692,16 @@ void Renderer::createPrefilterMap(const TextureView environment) {
 	cube.meshes().at(0).front().uploadToGPU();
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
+	DescriptorSet descriptorSet{};
+	descriptorSet.write(0, environment);
+
 	// run a quasi monte-carlo simulation on the environment lighting to create a prefilter (cube)map.
 	encoder.bindPipeline(pipeline);
 	encoder.setUniform("projection", mCaptureProjection);
 	encoder.setUniform("resolution",
 	                   static_cast<float>(CONFIG_MANAGER.get<int32_t>("PBR.envMap.size")));
 
-	encoder.bindTexture(environment, 0);
+	encoder.bindDescriptorSet(descriptorSet);
 
 	encoder.bindFrameBuffer(*mPBRBuffers.prefilter);
 	encoder.setViewport({
@@ -735,13 +762,14 @@ void Renderer::createBrdfLUT() {
 		.stages = {
 			{.code = ShaderLoader::load("pbr/brdfLUT.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("pbr/brdfLUT.frag"), .stage = ShaderStageType::Fragment}
-		},
-		.descriptors = {
-			{.name = "environmentMap", .type = DescriptorType::SamplerCube, .binding = 0}
 		}
 	};
 
-	auto pipeline = GraphicsPipeline{info};
+	DescriptorSetLayout passLayout = {};
+	PipelineLayout pipelineLayout = {.descriptorSets = {passLayout}};
+	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = pipelineLayout};
+	auto pipeline = GraphicsPipeline{createInfo};
+
 	auto encoder = GraphicsEncoder{};
 
 	auto brdfLUT = std::make_unique<FrameBuffer>(

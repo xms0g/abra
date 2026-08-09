@@ -1,5 +1,6 @@
 #include "debug.h"
 #include "../shader.h"
+#include "../descriptorSet.h"
 #include "../frameGraph.h"
 #include "../graphicsEncoder.h"
 #include "../command.hpp"
@@ -7,6 +8,7 @@
 #include "../context/renderQueue.hpp"
 #include "../../ECS/components/debug.hpp"
 #include "../../config/configManager.h"
+
 
 DebugPass::DebugPass() = default;
 
@@ -46,8 +48,11 @@ void DebugPass::configure(const RenderContext& ctx,
 			{.code = ShaderLoader::load("debug/normal.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("debug/normal.frag"), .stage = ShaderStageType::Fragment},
 			{.code = ShaderLoader::load("debug/normal.geom"), .stage = ShaderStageType::Geometry},
-		},
-		.descriptors = {
+		}
+	};
+
+	DescriptorSetLayout bufferLayout = {
+		.bindings = {
 			{
 				.name = CONFIG_MANAGER.get<std::string>("camera.ubo.blockName"),
 				.type = DescriptorType::UniformBuffer,
@@ -65,20 +70,17 @@ void DebugPass::configure(const RenderContext& ctx,
 			{.code = ShaderLoader::load("debug/wireframe.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("debug/wireframe.frag"), .stage = ShaderStageType::Fragment},
 			{.code = ShaderLoader::load("debug/wireframe.geom"), .stage = ShaderStageType::Geometry},
-		},
-		.descriptors = {
-			{
-				.name = CONFIG_MANAGER.get<std::string>("camera.ubo.blockName"),
-				.type = DescriptorType::UniformBuffer,
-				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo.binding"),
-			},
 		}
 	};
 
+	PipelineLayout layout = {.descriptorSets = {bufferLayout}};
+	GraphicsPipelineCreateInfo normalCreateInfo = {.rendering = normalInfo, .layout = layout};
+	GraphicsPipelineCreateInfo wireframeCreateInfo = {.rendering = wireframeInfo, .layout = layout};
+
 	mPipelines = {
 		GraphicsPipeline{},
-		GraphicsPipeline{normalInfo},
-		GraphicsPipeline{wireframeInfo},
+		GraphicsPipeline{normalCreateInfo},
+		GraphicsPipeline{wireframeCreateInfo},
 	};
 
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("DebugCommands");

@@ -2,8 +2,10 @@
 #include "../shader.h"
 #include "../command.hpp"
 #include "../frameGraph.h"
+#include "../descriptorSet.h"
 #include "../graphicsEncoder.h"
 #include "../context/renderContext.hpp"
+#include "../context/renderData.hpp"
 #include "../context/renderQueue.hpp"
 #include "../../config/configManager.h"
 
@@ -45,7 +47,10 @@ void DeferredGeometryPass::configure(const RenderContext& ctx,
 			{.code = ShaderLoader::load("deferred/gbuffer.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("deferred/gbuffer.frag"), .stage = ShaderStageType::Fragment},
 		},
-		.descriptors = {
+	};
+
+	DescriptorSetLayout materialLayout = {
+		.bindings = {
 			{
 				.name = "material.texture_albedo",
 				.type = DescriptorType::Sampler2D,
@@ -75,7 +80,12 @@ void DeferredGeometryPass::configure(const RenderContext& ctx,
 				.name = "material.texture_height",
 				.type = DescriptorType::Sampler2D,
 				.binding = CONFIG_MANAGER.get<int32_t>("PBR.height.slot")
-			},
+			}
+		}
+	};
+
+	DescriptorSetLayout bufferLayout = {
+		.bindings = {
 			{
 				.name = CONFIG_MANAGER.get<std::string>("camera.ubo.blockName"),
 				.type = DescriptorType::UniformBuffer,
@@ -84,7 +94,9 @@ void DeferredGeometryPass::configure(const RenderContext& ctx,
 		}
 	};
 
-	mPipeline = GraphicsPipeline{info};
+	PipelineLayout layout = {.descriptorSets = {materialLayout, bufferLayout}};
+	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
+	mPipeline = GraphicsPipeline{createInfo};
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("DeferredCommands");
 }
 
@@ -94,8 +106,12 @@ void DeferredGeometryPass::execute(const RenderContext& ctx, const FrameGraph& g
 
 	encoder.bindPipeline(mPipeline);
 
+	const auto pipelineCullMode = mPipeline.rasterizationState().cullMode;
+
 	for (const auto& cmd: *mCommands) {
-		encoder.bindMaterial(cmd.material);
+		encoder.bindDescriptorSet(ctx.renderData->material.descriptorSets[cmd.material.idx]);
+		encoder.pushConstants(cmd.material);
+		encoder.setCullMode(cmd.material.flags & TWOSIDED ? CullMode::None : pipelineCullMode);
 		encoder.bindTransform(cmd.transform);
 		encoder.bindVertexArray(cmd.mesh.vao);
 		encoder.drawIndexed(cmd.mesh.indexCount);

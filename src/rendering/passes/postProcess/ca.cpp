@@ -1,6 +1,7 @@
 #include "ca.h"
 #include "../../buffers/frameBuffer.h"
 #include "../../context/renderContext.hpp"
+#include "../../descriptorSet.h"
 #include "../../../event/events/guiPostProcessEvent.hpp"
 
 CA::CA(const std::string& name, const bool enabled)
@@ -12,21 +13,22 @@ void CA::configure(const FrameGraph& graph) {
 	stages.emplace_back(ShaderLoader::load("models/quad2.vert"), ShaderStageType::Vertex);
 	stages.emplace_back(ShaderLoader::load("post-processing/ca.frag"), ShaderStageType::Fragment);
 
-	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(
-		stages,
-		{{.name = "screenTexture", .type = DescriptorType::Sampler2D, .binding = 0}});
+	const DescriptorSetLayout passLayout = {
+		.bindings = {
+			{.name = "screenTexture", .type = DescriptorType::Sampler2D, .binding = 0}
+		}
+	};
+
+	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(stages, passLayout);
 }
 
-TextureView CA::render(GraphicsEncoder& encoder, const TextureView sceneTexture, FrameBuffer* renderTarget) {
+TextureView CA::render(GraphicsEncoder& encoder, DescriptorSet& dscSet, FrameBuffer* renderTarget) {
 	encoder.bindFrameBuffer(*renderTarget);
 	encoder.clearFrameBuffer(ClearMask::Color);
 
 	encoder.bindPipeline(mPipeline);
 	encoder.setUniform("intensity", mIntensity);
-
-	const TextureView textures[] = {sceneTexture};
-	encoder.bindMaterial({.textures = std::span(textures)});
-
+	encoder.bindDescriptorSet(dscSet);
 	encoder.draw(3);
 
 	return renderTarget->texture();
