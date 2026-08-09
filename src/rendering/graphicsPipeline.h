@@ -159,16 +159,6 @@ struct PipelineRenderingInfo {
 	std::vector<DescriptorBinding> descriptors;
 };
 
-struct PipelineState {
-	PipelinePrimitiveAssemblyState primitiveAssemblyState;
-	PipelineRasterizationState rasterizationState;
-	PipelineMultisampleState multisampleState;
-	PipelineDepthStencilState depthStencilState;
-	PipelineColorBlendState colorBlendState;
-	PipelineTessellationState tessellationState;
-	Shader shader;
-};
-
 constexpr ColorComponent operator|(const ColorComponent lhs, const ColorComponent rhs) {
 	return static_cast<ColorComponent>(toUnderlying(lhs) | toUnderlying(rhs));
 }
