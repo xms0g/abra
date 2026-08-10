@@ -75,10 +75,10 @@ public:
 	void setCullMode(CullMode mode);
 
 	template<typename T>
-	void setUniform(const std::string& name, const T& value);
+	void setUniform(std::string_view name, const T& value);
 
 	template<typename T>
-	void setUniform(const std::string& name, const T* value, uint32_t count) const;
+	void setUniform(std::string_view name, const T* value, uint32_t count) const;
 
 	void reset();
 
@@ -150,13 +150,13 @@ private:
 };
 
 template<typename T>
-void GraphicsEncoder::setUniform(const std::string& name, const T& value) {
+void GraphicsEncoder::setUniform(std::string_view name, const T& value) {
 	assert(mState.pipeline);
 	mState.pipeline->setValue(name, value);
 }
 
 template<typename T>
-void GraphicsEncoder::setUniform(const std::string& name, const T* value, uint32_t count) const {
+void GraphicsEncoder::setUniform(std::string_view name, const T* value, uint32_t count) const {
 	assert(mState.pipeline);
 	mState.pipeline->setValue(name, value, count);
 }

@@ -65,10 +65,10 @@ public:
 	void link() const;
 
 	template<typename T>
-	void setValue(const std::string& name, const T& value) const;
+	void setValue(std::string_view name, const T& value) const;
 
 	template<typename T>
-	void setValue(const std::string& name, const T* value, uint32_t count);
+	void setValue(std::string_view name, const T* value, uint32_t count);
 
 private:
 	void checkLinkErrors() const;
@@ -77,39 +77,39 @@ private:
 };
 
 namespace Uniform {
-void setBool(uint32_t id, const std::string& name, bool value);
+void setBool(uint32_t id, std::string_view name, bool value);
 
-void setInt(uint32_t id, const std::string& name, int32_t value);
+void setInt(uint32_t id, std::string_view name, int32_t value);
 
-void setUint(uint32_t id, const std::string& name, uint32_t value);
+void setUint(uint32_t id, std::string_view name, uint32_t value);
 
-void setFloat(uint32_t id, const std::string& name, float value);
+void setFloat(uint32_t id, std::string_view name, float value);
 
-void setFloatArray(uint32_t id, const std::string& name, const float* values, uint32_t count);
+void setFloatArray(uint32_t id, std::string_view name, const float* values, uint32_t count);
 
-void setVec2(uint32_t id, const std::string& name, const glm::vec2& value);
+void setVec2(uint32_t id, std::string_view name, const glm::vec2& value);
 
-void setVec2(uint32_t id, const std::string& name, float x, float y);
+void setVec2(uint32_t id, std::string_view name, float x, float y);
 
-void setVec3(uint32_t id, const std::string& name, const glm::vec3& value);
+void setVec3(uint32_t id, std::string_view name, const glm::vec3& value);
 
-void setVec3(uint32_t id, const std::string& name, float x, float y, float z);
+void setVec3(uint32_t id, std::string_view name, float x, float y, float z);
 
-void setVec4(uint32_t id, const std::string& name, const glm::vec4& value);
+void setVec4(uint32_t id, std::string_view name, const glm::vec4& value);
 
-void setVec4(uint32_t id, const std::string& name, float x, float y, float z, float w);
+void setVec4(uint32_t id, std::string_view name, float x, float y, float z, float w);
 
-void setMat2(uint32_t id, const std::string& name, const glm::mat2& mat);
+void setMat2(uint32_t id, std::string_view name, const glm::mat2& mat);
 
-void setMat3(uint32_t id, const std::string& name, const glm::mat3& mat);
+void setMat3(uint32_t id, std::string_view name, const glm::mat3& mat);
 
-void setMat4(uint32_t id, const std::string& name, const glm::mat4& mat);
+void setMat4(uint32_t id, std::string_view name, const glm::mat4& mat);
 
-void setMat4Array(uint32_t id, const std::string& name, const glm::mat4* matrices, size_t count);
+void setMat4Array(uint32_t id, std::string_view name, const glm::mat4* matrices, size_t count);
 }
 
 template<typename T>
-void Shader::setValue(const std::string& name, const T& value) const {
+void Shader::setValue(std::string_view name, const T& value) const {
 	if constexpr (std::is_same_v<T, bool>)
 		Uniform::setBool(mID, name, value);
 	else if constexpr (std::is_same_v<T, int32_t>)
@@ -135,7 +135,7 @@ void Shader::setValue(const std::string& name, const T& value) const {
 }
 
 template<typename T>
-void Shader::setValue(const std::string& name, const T* value, uint32_t count) {
+void Shader::setValue(std::string_view name, const T* value, uint32_t count) {
 	if constexpr (std::is_same_v<T, float>)
 		Uniform::setFloatArray(mID, name, value, count);
 	else if constexpr (std::is_same_v<T, glm::mat4>)

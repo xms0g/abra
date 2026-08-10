@@ -196,10 +196,10 @@ public:
 	void bind() const;
 
 	template<typename T>
-	void setValue(const std::string& name, const T& value) const;
+	void setValue(std::string_view name, const T& value) const;
 
 	template<typename T>
-	void setValue(const std::string& name, const T* value, uint32_t count);
+	void setValue(std::string_view name, const T* value, uint32_t count);
 
 	static GraphicsPipeline createFullscreenQuadPipeline(
 		std::vector<PipelineShaderStage> stages,
@@ -220,11 +220,11 @@ private:
 };
 
 template<typename T>
-void GraphicsPipeline::setValue(const std::string& name, const T& value) const {
+void GraphicsPipeline::setValue(std::string_view name, const T& value) const {
 	mState.shader.setValue(name, value);
 }
 
 template<typename T>
-void GraphicsPipeline::setValue(const std::string& name, const T* value, uint32_t count) {
+void GraphicsPipeline::setValue(std::string_view name, const T* value, uint32_t count) {
 	mState.shader.setValue(name, value, count);
 }
