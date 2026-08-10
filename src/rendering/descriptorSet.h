@@ -7,10 +7,7 @@
 
 enum class DescriptorType : uint32_t {
 	UniformBuffer,
-	Sampler2D,
-	SamplerCube,
-	Sampler2DArray,
-	SamplerCubeArray,
+	SampledImage,
 };
 
 struct Descriptor {
@@ -38,8 +35,6 @@ public:
 
 	[[nodiscard]]
 	const std::vector<Descriptor>& descriptors() const;
-
-	static DescriptorType fromTextureTarget(TextureTarget target);
 
 private:
 	std::vector<Descriptor> mDescriptors;

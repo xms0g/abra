@@ -24,10 +24,7 @@ GraphicsPipeline::GraphicsPipeline(const GraphicsPipelineCreateInfo& createInfo)
 					glUniformBlockBinding(mState.shader.id(), index, binding);
 					break;
 				}
-				case DescriptorType::Sampler2D:
-				case DescriptorType::SamplerCube:
-				case DescriptorType::Sampler2DArray:
-				case DescriptorType::SamplerCubeArray:
+				case DescriptorType::SampledImage:
 					mState.shader.setValue(name, binding);
 					break;
 			}

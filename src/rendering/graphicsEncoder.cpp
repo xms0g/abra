@@ -171,15 +171,10 @@ void GraphicsEncoder::bindTransform(const TransformView& transform) {
 void GraphicsEncoder::bindDescriptorSet(const DescriptorSet& descriptorSet) {
 	for (const auto& descriptor: descriptorSet.descriptors()) {
 		switch (descriptor.type) {
-			// case DescriptorType::UniformBuffer: {
-			// 	const auto& buffer = descriptor.resource.as<UniformBufferView>();
-			// 	setUniformBlock(buffer.id, binding.binding);
-			// 	break;
-			// }
-			case DescriptorType::Sampler2D:
-			case DescriptorType::SamplerCube:
-			case DescriptorType::Sampler2DArray:
-			case DescriptorType::SamplerCubeArray: {
+			case DescriptorType::UniformBuffer: {
+				break;
+			}
+			case DescriptorType::SampledImage: {
 				const auto& texture = std::get<TextureView>(descriptor.resource);
 
 				if (mState.bindingCache.textures[descriptor.binding] != texture) {
