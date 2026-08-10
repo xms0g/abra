@@ -9,6 +9,11 @@ DescriptorSet& DescriptorSet::write(const uint32_t binding, const TextureView te
 	return *this;
 }
 
+DescriptorSet& DescriptorSet::write(const uint32_t binding, BufferView buffer) {
+	mDescriptors[binding] =  {.type = DescriptorType::UniformBuffer, .binding = binding, .resource = buffer};
+	return *this;
+}
+
 const std::array<Descriptor, 32>& DescriptorSet::descriptors() const {
 	return mDescriptors;
 }

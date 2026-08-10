@@ -6,14 +6,21 @@
 #include "texture/texture.h"
 
 enum class DescriptorType : uint32_t {
+	None,
 	UniformBuffer,
 	SampledImage
+};
+
+struct BufferView {
+	uint32_t id{0};
+	uint32_t target{0};
+	int32_t size{0};
 };
 
 struct Descriptor {
 	DescriptorType type{};
 	uint32_t binding{};
-	std::variant<TextureView> resource{};
+	std::variant<TextureView, BufferView> resource{};
 
 	template<typename T>
 	T rs() {
@@ -38,7 +45,8 @@ public:
 	TextureView texture(uint32_t binding);
 
 	DescriptorSet& write(uint32_t binding, TextureView texture);
-	//void write(uint32_t binding, BufferView buffer);
+
+	DescriptorSet& write(uint32_t binding, BufferView buffer);
 
 	[[nodiscard]]
 	const std::array<Descriptor, 32>& descriptors() const;

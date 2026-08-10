@@ -71,20 +71,20 @@ Renderer::~Renderer() {
 	GuiBackend::shutdown();
 }
 
-void Renderer::configure(const Camera& camera, EventBus& eventBus) {
+void Renderer::configure(EventBus& eventBus) {
 	createPBRBuffers();
 
 	Batcher batcher;
 	batcher.build(mRenderData, mQueueRegistry, getSystemEntities());
 
 	createRenderPasses(eventBus);
-	createUniformBuffers(camera);
+	createUniformBuffers();
 	configureSystems(eventBus);
 }
 
 void Renderer::render() {
 	GuiBackend::newFrame();
-	refreshCameraData();
+	updateUniformBuffers();
 	sortEntities();
 
 	mEncoder.reset();
@@ -110,24 +110,20 @@ void Renderer::createSystems(Registry& registry) {
 	mSyncStateSystem = std::make_unique<SyncStateSystem>();
 }
 
-void Renderer::createUniformBuffers(const Camera& camera) {
+void Renderer::createUniformBuffers() {
 	// Create camera buffer
 	mCameraUBO = UniformBuffer{
 		DYNAMIC,
-		4 * sizeof(glm::mat4) + sizeof(glm::vec4),
-		CONFIG_MANAGER.get<int32_t>("camera.ubo.binding")
+		4 * sizeof(glm::mat4) + sizeof(glm::vec4)
 	};
 
-	const float aspectRatio = static_cast<float>(CONFIG_MANAGER.get<int32_t>("window.width")) /
-	                          static_cast<float>(CONFIG_MANAGER.get<int32_t>("window.height"));
-	const glm::mat4 projectionMat = glm::perspective(
-		glm::radians(camera.zoom()),
-		aspectRatio,
-		camera.znear(), camera.zfar());
+	DescriptorSet cameraSet{};
+	cameraSet.write(
+		CONFIG_MANAGER.get<int32_t>("camera.ubo.binding"),
+		{.id = mCameraUBO.id(), .target = mCameraUBO.target(), .size = mCameraUBO.size()}
+		);
 
-	mCameraUBO.bind();
-	mCameraUBO.setData(glm::value_ptr(projectionMat), sizeof(glm::mat4), 3 * sizeof(glm::mat4) + sizeof(glm::vec4));
-	mCameraUBO.unbind();
+	mEncoder.bindDescriptorSet(cameraSet);
 }
 
 void Renderer::createPBRBuffers() {
@@ -393,28 +389,30 @@ void Renderer::createFrameBuffers() {
 }
 
 void Renderer::configureSystems(EventBus& eventBus) {
-	mLightSystem->configure(mRenderCtx, eventBus);
+	mLightSystem->configure(mRenderCtx, mEncoder, eventBus);
 	mSyncStateSystem->configure(mRenderCtx, eventBus);
 	mShadowSystem->configure(mRenderCtx, mGraph, mEncoder, eventBus);
 }
 
-void Renderer::refreshCameraData() const {
-	struct alignas(16) PackedView {
-		glm::mat4 view;
-		glm::mat4 inverseView;
-		glm::mat4 skyView;
-		glm::vec4 cameraPos;
-	};
+void Renderer::updateUniformBuffers() const {
+	const float aspectRatio = static_cast<float>(CONFIG_MANAGER.get<int32_t>("window.width")) /
+	                          static_cast<float>(CONFIG_MANAGER.get<int32_t>("window.height"));
 
-	const PackedView packed = {
+	const glm::mat4 projection = glm::perspective(
+		glm::radians(mRenderCtx.camera->zoom()),
+		aspectRatio,
+		mRenderCtx.camera->znear(), mRenderCtx.camera->zfar());
+
+	const UniformBufferObject ubo = {
 		.view = mRenderCtx.camera->viewMatrix(),
 		.inverseView = glm::inverse(mRenderCtx.camera->viewMatrix()),
 		.skyView = glm::mat4(glm::mat3(mRenderCtx.camera->viewMatrix())),
-		.cameraPos = glm::vec4(mRenderCtx.camera->position(), 1.0)
+		.cameraPos = glm::vec4(mRenderCtx.camera->position(), 1.0),
+		.projection = projection
 	};
 
 	mCameraUBO.bind();
-	mCameraUBO.setData(&packed, sizeof(PackedView), 0);
+	mCameraUBO.setData(&ubo, 0);
 }
 
 void Renderer::sortEntities() {

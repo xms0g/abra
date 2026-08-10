@@ -93,26 +93,30 @@ void ShadowSystem::configure(const RenderContext& ctx,
 
 	mUBO = UniformBuffer(
 		DYNAMIC,
-		sizeof(ShadowData),
-		CONFIG_MANAGER.get<int32_t>("shadow.ubo.binding"));
+		sizeof(UniformBufferObject));
+
+	DescriptorSet shadowSet{};
+	shadowSet.write(
+		CONFIG_MANAGER.get<int32_t>("shadow.ubo.binding"),
+		{.id = mUBO.id(), .target = mUBO.target(), .size = mUBO.size()}
+		);
+
+	encoder.bindDescriptorSet(shadowSet);
 
 	eventBus.subscribeToEvent<ShadowSystem, UpdateShadowMapEvent>(this, &ShadowSystem::onGuiUpdate);
-
-	mGPUData.omniFarPlane = glm::vec4(CONFIG_MANAGER.get<float>("shadow.omnidirectional.farPlane"), 0.0f, 0.0f,
-	                                  0.0f);
 
 	constexpr UpdateShadowMapEvent event;
 	onGuiUpdate(event);
 }
 
-void ShadowSystem::directionalShadowPass() {
+void ShadowSystem::directionalShadowPass(UniformBufferObject& ubo) {
 	const auto lights = mCtx->light.dirLights;
 
 	if (lights.empty())
 		return;
 
 	mDirShadow->render(*mCtx, *mGraph, *mEncoder, mPipelines[0], lights[0]->direction);
-	mGPUData.lightSpaceMatrix = mDirShadow->lightSpaceMatrix();
+	ubo.lightSpaceMatrix = mDirShadow->lightSpaceMatrix();
 }
 
 void ShadowSystem::omnidirectionalShadowPass() {
@@ -137,7 +141,7 @@ void ShadowSystem::omnidirectionalShadowPass() {
 	mEncoder->unbindFrameBuffer();
 }
 
-void ShadowSystem::perspectiveShadowPass() {
+void ShadowSystem::perspectiveShadowPass(UniformBufferObject& ubo) {
 	const auto lights = mCtx->light.spotLights;
 	if (lights.empty())
 		return;
@@ -162,19 +166,22 @@ void ShadowSystem::perspectiveShadowPass() {
 			light->outerCutOff,
 			i);
 
-		mGPUData.persLightSpaceMatrix[i] = mPersShadow->lightSpaceMatrix(i);
+		ubo.persLightSpaceMatrix[i] = mPersShadow->lightSpaceMatrix(i);
 	}
 
 	mEncoder->unbindFrameBuffer();
 }
 
 void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
-	directionalShadowPass();
+	UniformBufferObject ubo{};
+	ubo.omniFarPlane = glm::vec4(CONFIG_MANAGER.get<float>("shadow.omnidirectional.farPlane"), 0.0f, 0.0f,0.0f);
+
+	directionalShadowPass(ubo);
 	omnidirectionalShadowPass();
-	perspectiveShadowPass();
+	perspectiveShadowPass(ubo);
 
 	mEncoder->setCullFace(CullMode::Back);
 
 	mUBO.bind();
-	mUBO.setData(&mGPUData, sizeof(ShadowData), 0);
+	mUBO.setData(&ubo, 0);
 }

@@ -16,8 +16,8 @@ void SSAOPass::configure(const RenderContext& ctx,
                          const FrameGraph& graph,
                          GraphicsEncoder& encoder,
                          EventBus& eventBus) {
-	createNoiseTexture(encoder);
-	createKernel();
+	createNoiseTexture();
+	createKernel(encoder);
 
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
@@ -115,14 +115,14 @@ void SSAOPass::configure(const RenderContext& ctx,
 
 	DescriptorSet frameSet{};
 	frameSet.write(
-		CONFIG_MANAGER.get<int32_t>("gBuffer.position.slot"),
-		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.index")))
-	.write(
-		CONFIG_MANAGER.get<int32_t>("gBuffer.normal.slot"),
-		gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")))
-	.write(
-		CONFIG_MANAGER.get<int32_t>("ssao.noise.slot"),
-		{.id = mNoiseTexture.id, .target = mNoiseTexture.target});
+				CONFIG_MANAGER.get<int32_t>("gBuffer.position.slot"),
+				gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.index")))
+			.write(
+				CONFIG_MANAGER.get<int32_t>("gBuffer.normal.slot"),
+				gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")))
+			.write(
+				CONFIG_MANAGER.get<int32_t>("ssao.noise.slot"),
+				{.id = mNoiseTexture.id, .target = mNoiseTexture.target});
 
 	encoder.bindDescriptorSet(frameSet);
 }
@@ -155,25 +155,25 @@ void SSAOPass::blur(const FrameGraph& graph, GraphicsEncoder& encoder) {
 	encoder.draw(3);
 }
 
-void SSAOPass::createKernel() {
+void SSAOPass::createKernel(GraphicsEncoder& encoder) {
 	const int32_t kernelSize = CONFIG_MANAGER.get<int32_t>("ssao.kernelSize");
 
 	std::vector<glm::vec4> kernel;
 	kernel.resize(kernelSize);
 	kernel = math::random::generateKernel(kernelSize);
 
-	struct alignas(16) SSAOData {
+	struct alignas(16) UniformBufferObject {
 		glm::vec4 samples[16];
 		glm::vec4 settings;
 		glm::vec4 resolution;
 	};
-	SSAOData data{};
+	UniformBufferObject ubo{};
 
 	for (size_t i = 0; i < kernel.size(); ++i) {
-		data.samples[i] = kernel[i];
+		ubo.samples[i] = kernel[i];
 	}
 
-	data.settings = glm::vec4(
+	ubo.settings = glm::vec4(
 		CONFIG_MANAGER.get<float>("ssao.radius"),
 		CONFIG_MANAGER.get<float>("ssao.bias"),
 		CONFIG_MANAGER.get<float>("ssao.intensity"),
@@ -182,15 +182,24 @@ void SSAOPass::createKernel() {
 	const int32_t width = CONFIG_MANAGER.get<int32_t>("window.width") / 2;
 	const int32_t height = CONFIG_MANAGER.get<int32_t>("window.height") / 2;
 
-	data.resolution = glm::vec4(width, height, width / 4, height / 4);
+	ubo.resolution = glm::vec4(width, height, width / 4, height / 4);
 
-	mUBO = UniformBuffer{DYNAMIC, sizeof(SSAOData), CONFIG_MANAGER.get<int32_t>("ssao.ubo.binding")};
+	mUBO = UniformBuffer{DYNAMIC, sizeof(UniformBufferObject)};
+
+	DescriptorSet ssaoSet{};
+	ssaoSet.write(
+		CONFIG_MANAGER.get<int32_t>("ssao.ubo.binding"),
+		{.id = mUBO.id(), .target = mUBO.target(), .size = mUBO.size()}
+	);
+
+	encoder.bindDescriptorSet(ssaoSet);
+
 	mUBO.bind();
-	mUBO.setData(&data, sizeof(SSAOData), 0);
+	mUBO.setData(&ubo, 0);
 	mUBO.unbind();
 }
 
-void SSAOPass::createNoiseTexture(GraphicsEncoder& encoder) {
+void SSAOPass::createNoiseTexture() {
 	const int32_t textureSize = CONFIG_MANAGER.get<int32_t>("ssao.noise.size");
 
 	std::vector<float> noise;

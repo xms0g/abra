@@ -22,21 +22,19 @@ public:
 	void configure(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder, EventBus& eventBus);
 
 private:
-	void directionalShadowPass();
-
-	void omnidirectionalShadowPass();
-
-	void perspectiveShadowPass();
-
-	void onGuiUpdate(const UpdateShadowMapEvent& event);
-
-	struct alignas(16) ShadowData {
+	struct alignas(16) UniformBufferObject {
 		glm::mat4 lightSpaceMatrix{};
 		glm::mat4 persLightSpaceMatrix[4]{};
 		glm::vec4 omniFarPlane{};
 	};
 
-	ShadowData mGPUData;
+	void directionalShadowPass(UniformBufferObject& ubo);
+
+	void omnidirectionalShadowPass();
+
+	void perspectiveShadowPass(UniformBufferObject& ubo);
+
+	void onGuiUpdate(const UpdateShadowMapEvent& event);
 
 	const RenderContext* mCtx{nullptr};
 	const FrameGraph* mGraph{nullptr};

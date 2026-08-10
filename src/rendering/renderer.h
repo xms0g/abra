@@ -31,7 +31,7 @@ public:
 
 	~Renderer() override;
 
-	void configure(const Camera& camera, EventBus& eventBus);
+	void configure(EventBus& eventBus);
 
 	void render();
 
@@ -40,7 +40,7 @@ public:
 private:
 	void createSystems(Registry& registry);
 
-	void createUniformBuffers(const Camera& camera);
+	void createUniformBuffers();
 
 	void createPBRBuffers();
 
@@ -52,7 +52,7 @@ private:
 
 	void configureSystems(EventBus& eventBus);
 
-	void refreshCameraData() const;
+	void updateUniformBuffers() const;
 
 	void sortEntities();
 
@@ -63,6 +63,14 @@ private:
 	void createPrefilterMap(TextureView environment);
 
 	void createBrdfLUT();
+
+	struct alignas(16) UniformBufferObject {
+		glm::mat4 view;
+		glm::mat4 inverseView;
+		glm::mat4 skyView;
+		glm::vec4 cameraPos;
+		glm::mat4 projection;
+	};
 
 	FrameGraph mGraph{};
 	// Systems

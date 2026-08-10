@@ -3,6 +3,7 @@
 #include "../../ECS/system.hpp"
 #include "../buffers/uniformBuffer.h"
 
+class GraphicsEncoder;
 struct RenderContext;
 struct GuiLightEvent;
 class EventBus;
@@ -14,10 +15,10 @@ class LightSystem final : public System {
 public:
 	LightSystem();
 
-	void configure(RenderContext& ctx, EventBus& eventBus);
+	void configure(RenderContext& ctx, GraphicsEncoder& encoder, EventBus& eventBus);
 
 private:
-	void updateLightUBO();
+	void updateLightUBO() const;
 
 	void onGuiUpdate(const GuiLightEvent& event);
 
@@ -56,12 +57,10 @@ private:
 		glm::vec4 cutOff;
 	};
 
-	struct alignas(16) PackedLights {
+	struct alignas(16) UniformBufferObject {
 		DirectionalLight dirLights[1]{};
 		PointLight pointLights[4]{};
 		SpotLight spotLights[4]{};
 		glm::ivec4 lightCount{};
 	};
-
-	PackedLights mGPUData;
 };

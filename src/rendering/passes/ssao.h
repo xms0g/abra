@@ -27,9 +27,9 @@ private:
 
 	void blur(const FrameGraph& graph, GraphicsEncoder& encoder);
 
-	void createKernel();
+	void createKernel(GraphicsEncoder& encoder);
 
-	void createNoiseTexture(GraphicsEncoder& encoder);
+	void createNoiseTexture();
 
 	std::array<GraphicsPipeline, 2> mPipelines;
 	UniformBuffer mUBO{};

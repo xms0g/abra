@@ -47,6 +47,16 @@ public:
 			glDeleteBuffers(1, &mID);
 	}
 
+	[[nodiscard]]
+	uint32_t id() const {
+		return mID;
+	}
+
+	[[nodiscard]]
+	uint32_t target() const {
+		return mTarget;
+	}
+
 	void bind() const {
 		glBindBuffer(mTarget, mID);
 	}

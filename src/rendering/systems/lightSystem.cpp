@@ -1,6 +1,7 @@
 #include "lightSystem.h"
 #include <span>
 #include "glm/gtc/type_ptr.hpp"
+#include "../graphicsEncoder.h"
 #include "../buffers/uniformBuffer.h"
 #include "../context/renderContext.hpp"
 #include "../context/renderData.hpp"
@@ -20,7 +21,7 @@ LightSystem::LightSystem() {
 	RequireComponent<SpotLightComponent>(true);
 }
 
-void LightSystem::configure(RenderContext& ctx, EventBus& eventBus) {
+void LightSystem::configure(RenderContext& ctx, GraphicsEncoder& encoder, EventBus& eventBus) {
 	mDirLights.reserve(CONFIG_MANAGER.get<int32_t>("light.max_directional"));
 	mPointLights.reserve(CONFIG_MANAGER.get<int32_t>("light.max_point"));
 	mSpotLights.reserve(CONFIG_MANAGER.get<int32_t>("light.max_spot"));
@@ -48,13 +49,20 @@ void LightSystem::configure(RenderContext& ctx, EventBus& eventBus) {
 
 	mUBO = UniformBuffer(
 		DYNAMIC,
-		sizeof(PackedLights),
-		CONFIG_MANAGER.get<int32_t>("light.ubo.binding"));
+		sizeof(UniformBufferObject));
+
+	DescriptorSet lightSet{};
+	lightSet.write(
+	CONFIG_MANAGER.get<int32_t>("light.ubo.binding"),
+	{.id = mUBO.id(), .target = mUBO.target(), .size = mUBO.size()}
+	);
+
+	encoder.bindDescriptorSet(lightSet);
 
 	updateLightUBO();
 }
 
-void LightSystem::updateLightUBO() {
+void LightSystem::updateLightUBO() const {
 	auto updateLightData = [](const auto& sourceLights, auto& destGPUData) -> uint32_t {
 		uint32_t activeCount = 0;
 
@@ -89,14 +97,15 @@ void LightSystem::updateLightUBO() {
 		return activeCount;
 	};
 
-	const uint32_t dirLightCount = updateLightData(mDirLights, mGPUData.dirLights);
-	const uint32_t pointLightCount = updateLightData(mPointLights, mGPUData.pointLights);
-	const uint32_t spotLightCount = updateLightData(mSpotLights, mGPUData.spotLights);
+	UniformBufferObject ubo{};
+	const uint32_t dirLightCount = updateLightData(mDirLights, ubo.dirLights);
+	const uint32_t pointLightCount = updateLightData(mPointLights, ubo.pointLights);
+	const uint32_t spotLightCount = updateLightData(mSpotLights, ubo.spotLights);
 
-	mGPUData.lightCount = glm::ivec4(dirLightCount, pointLightCount, spotLightCount, 0);
+	ubo.lightCount = glm::ivec4(dirLightCount, pointLightCount, spotLightCount, 0);
 
 	mUBO.bind();
-	mUBO.setData(&mGPUData, sizeof(PackedLights), 0);
+	mUBO.setData(&ubo, 0);
 }
 
 void LightSystem::onGuiUpdate(const GuiLightEvent& event) {

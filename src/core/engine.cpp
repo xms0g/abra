@@ -29,7 +29,7 @@ void Engine::init(Registry& registry) {
 
 void Engine::configure() const {
 	mCamera->configure(*mEventBus);
-	mRenderer->configure(*mCamera, *mEventBus);
+	mRenderer->configure(*mEventBus);
 }
 
 void Engine::run() {

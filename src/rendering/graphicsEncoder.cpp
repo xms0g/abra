@@ -169,21 +169,26 @@ void GraphicsEncoder::bindTransform(const TransformView& transform) {
 }
 
 void GraphicsEncoder::bindDescriptorSet(const DescriptorSet& descriptorSet) {
-	for (const auto& descriptor: descriptorSet.descriptors()) {
-		switch (descriptor.type) {
+	for (const auto& [type, binding, resource]: descriptorSet.descriptors()) {
+		switch (type) {
 			case DescriptorType::UniformBuffer: {
+				const auto& [id, target, size] = std::get<BufferView>(resource);
+
+				glBindBufferRange(target, binding, id, 0, size);
 				break;
 			}
 			case DescriptorType::SampledImage: {
-				const auto& texture = std::get<TextureView>(descriptor.resource);
+				const auto& texture = std::get<TextureView>(resource);
 
-				if (mState.bindingCache.textures[descriptor.binding] != texture) {
-					mState.bindingCache.textures[descriptor.binding] = texture;
-					bindTexture(texture, descriptor.binding);
+				if (mState.bindingCache.textures[binding] != texture) {
+					mState.bindingCache.textures[binding] = texture;
+					bindTexture(texture, binding);
 				}
 
 				break;
 			}
+			case DescriptorType::None:
+				break;
 		}
 	}
 }
