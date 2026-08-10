@@ -11,7 +11,10 @@ public:
 
 	void configure(const FrameGraph& graph) override;
 
-	TextureView render(GraphicsEncoder& encoder, DescriptorSet& dscSet, FrameBuffer* renderTarget) override;
+	DescriptorSet* render(GraphicsEncoder& encoder,
+	                      DescriptorSet& dscSet,
+	                      DescriptorSet& renderTargetDscSet,
+	                      FrameBuffer* renderTarget) override;
 
 protected:
 	void updateFromEventImpl(const GuiPostProcessEvent& event) override;

@@ -14,6 +14,11 @@ struct Descriptor {
 	DescriptorType type{};
 	uint32_t binding{};
 	std::variant<TextureView> resource{};
+
+	template<typename T>
+	T rs() {
+		return std::get<T>(resource);
+	}
 };
 
 struct DescriptorBinding {
@@ -30,12 +35,14 @@ class DescriptorSet {
 public:
 	DescriptorSet() = default;
 
+	TextureView texture(uint32_t binding);
+
 	DescriptorSet& write(uint32_t binding, TextureView texture);
 	//void write(uint32_t binding, BufferView buffer);
 
 	[[nodiscard]]
-	const std::vector<Descriptor>& descriptors() const;
+	const std::array<Descriptor, 32>& descriptors() const;
 
 private:
-	std::vector<Descriptor> mDescriptors;
+	std::array<Descriptor, 32> mDescriptors;
 };

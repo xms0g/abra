@@ -43,30 +43,35 @@ void Bloom::configure(const FrameGraph& graph) {
 
 	mPipelines[2] = GraphicsPipeline::createFullscreenQuadPipeline(stages2, combineLayout);
 	mRenderTargets = {&graph.getResource("bloomPing"), &graph.getResource("bloomPong")};
+
+	DescriptorSet pingDescSet{};
+	pingDescSet.write(0, mRenderTargets[0]->texture());
+
+	DescriptorSet pongDescSet{};
+	pongDescSet.write(0, mRenderTargets[1]->texture());
+
+	mRenderTargetsDescSets = {pingDescSet, pongDescSet};
 }
 
-TextureView Bloom::render(GraphicsEncoder& encoder, DescriptorSet& dscSet, FrameBuffer* renderTarget) {
+DescriptorSet* Bloom::render(GraphicsEncoder& encoder,
+                             DescriptorSet& dscSet,
+                             DescriptorSet& renderTargetDscSet,
+                             FrameBuffer* renderTarget) {
 	(void) renderTarget;
+	(void) renderTargetDscSet;
 	bool toggle = false;
 
-	TextureView inputTex = brightFilterPass(encoder, dscSet, toggle);
+	DescriptorSet* inputDescSet = brightFilterPass(encoder, dscSet, toggle);
+	inputDescSet = blurPass(encoder, *inputDescSet, toggle);
+	inputDescSet = combinePass(encoder, dscSet, *inputDescSet, toggle);
 
-	DescriptorSet set;
-	set.write(0, inputTex);
-
-	inputTex = blurPass(encoder, set, toggle);
-
-	dscSet.write(1, inputTex);
-
-	inputTex = combinePass(encoder, dscSet, toggle);
-
-	return inputTex;
+	return inputDescSet;
 }
 
 void Bloom::updateFromEventImpl(const GuiPostProcessEvent& event) {
 }
 
-TextureView Bloom::brightFilterPass(GraphicsEncoder& encoder, const DescriptorSet& dscSet, bool& toggle) {
+DescriptorSet* Bloom::brightFilterPass(GraphicsEncoder& encoder, const DescriptorSet& dscSet, bool& toggle) {
 	encoder.bindFrameBuffer(*mRenderTargets[toggle]);
 	encoder.clearFrameBuffer(ClearMask::Color);
 
@@ -74,44 +79,43 @@ TextureView Bloom::brightFilterPass(GraphicsEncoder& encoder, const DescriptorSe
 	encoder.bindDescriptorSet(dscSet);
 	encoder.draw(3);
 
-	const FrameBuffer* renderTarget = mRenderTargets[toggle];
+	DescriptorSet* renderTargetDescSet = &mRenderTargetsDescSets[toggle];
 	toggle = !toggle;
 
-	return renderTarget->texture();
+	return renderTargetDescSet;
 }
 
-TextureView Bloom::blurPass(GraphicsEncoder& encoder, const DescriptorSet& dscSet, bool& toggle) {
-	TextureView outTex;
+DescriptorSet* Bloom::blurPass(GraphicsEncoder& encoder, DescriptorSet& dscSet, bool& toggle) {
+	DescriptorSet* renderTargetDescSet = &dscSet;
 
 	encoder.bindPipeline(mPipelines[1]);
 	for (int i = 0; i < 10; ++i) {
 		encoder.bindFrameBuffer(*mRenderTargets[toggle]);
 		encoder.setUniform("horizontal", (i & 1) == 0);
-
-		DescriptorSet set;
-		set.write(0, outTex);
-
-		if (i == 0)
-			encoder.bindDescriptorSet(dscSet);
-		else
-			encoder.bindDescriptorSet(set);
-
+		encoder.bindDescriptorSet(*renderTargetDescSet);
 		encoder.draw(3);
 
-		outTex = mRenderTargets[toggle]->texture();
+		renderTargetDescSet = &mRenderTargetsDescSets[toggle];
 		toggle = !toggle;
 	}
 
-	return outTex;
+	return renderTargetDescSet;
 }
 
-TextureView Bloom::combinePass(GraphicsEncoder& encoder, const DescriptorSet& dscSet, const bool& toggle) {
+DescriptorSet* Bloom::combinePass(GraphicsEncoder& encoder,
+                                  DescriptorSet& dscSet,
+                                  DescriptorSet& blurDscSet,
+                                  const bool& toggle) {
+	DescriptorSet combineDescSet{};
+	combineDescSet.write(0, dscSet.texture(0));
+	combineDescSet.write(1, blurDscSet.texture(0));
+
 	encoder.bindFrameBuffer(*mRenderTargets[toggle]);
 	//encoder.clearFrameBuffer(ClearMask::Color);
 
 	encoder.bindPipeline(mPipelines[2]);
-	encoder.bindDescriptorSet(dscSet);
+	encoder.bindDescriptorSet(combineDescSet);
 	encoder.draw(3);
 
-	return mRenderTargets[toggle]->texture();
+	return &mRenderTargetsDescSets[toggle];
 }

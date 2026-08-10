@@ -47,38 +47,42 @@ void PostProcessPass::configure(const RenderContext& ctx,
 
 	const DescriptorSetLayout passLayout = {
 		.bindings = {
-				{.name = "screenTexture", .type = DescriptorType::SampledImage, .binding = 0}
+			{.name = "screenTexture", .type = DescriptorType::SampledImage, .binding = 0}
 		}
 	};
 
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(stages, passLayout);
 
 	mRenderTargets = {&graph.getResource("ping"), &graph.getResource("pong")};
+
+	DescriptorSet pingDescSet{};
+	pingDescSet.write(0, mRenderTargets[0]->texture());
+
+	DescriptorSet pongDescSet{};
+	pongDescSet.write(0, mRenderTargets[1]->texture());
+
+	mRenderTargetsDescSets = {pingDescSet, pongDescSet};
 	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessEvent>(this, &PostProcessPass::onGuiUpdate);
 }
 
 void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
 	bool toggle = false;
 
-	TextureView inputTex = graph.getResource("sceneBuffer").texture();
+	DescriptorSet sceneDescSet{};
+	sceneDescSet.write(0, graph.getResource("sceneBuffer").texture());
 
+	DescriptorSet* dscSet = &sceneDescSet;
 	for (const auto& effect: mEffects) {
 		if (!effect->enabled())
 			continue;
 
-		DescriptorSet set;
-		set.write(0, inputTex);
-
-		inputTex = effect->render(encoder, set, mRenderTargets[toggle]);
+		dscSet = effect->render(encoder, *dscSet, mRenderTargetsDescSets[toggle], mRenderTargets[toggle]);
 		toggle = !toggle;
 	}
 
-	DescriptorSet finalSet;
-	finalSet.write(0, inputTex);
-
 	encoder.bindFrameBuffer();
 	encoder.bindPipeline(mPipeline);
-	encoder.bindDescriptorSet(finalSet);
+	encoder.bindDescriptorSet(*dscSet);
 	encoder.draw(3);
 }
 

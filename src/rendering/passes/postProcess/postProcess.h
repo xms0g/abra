@@ -4,6 +4,7 @@
 #include "basePostEffect.hpp"
 #include "../IPass.hpp"
 #include "../../graphicsPipeline.h"
+#include "../../descriptorSet.h"
 
 struct GuiPostProcessEvent;
 class EventBus;
@@ -29,5 +30,6 @@ private:
 
 	GraphicsPipeline mPipeline{};
 	std::array<FrameBuffer*, 2> mRenderTargets{};
+	std::array<DescriptorSet, 2> mRenderTargetsDescSets{};
 	std::vector<std::shared_ptr<BasePostEffect> > mEffects;
 };

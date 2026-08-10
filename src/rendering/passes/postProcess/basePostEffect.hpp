@@ -33,7 +33,10 @@ public:
 
 	virtual void configure(const FrameGraph& graph) = 0;
 
-	virtual TextureView render(GraphicsEncoder& encoder, DescriptorSet& dscSet, FrameBuffer* renderTarget) = 0;
+	virtual DescriptorSet* render(GraphicsEncoder& encoder,
+	                              DescriptorSet& dscSet,
+	                              DescriptorSet& renderTargetDscSet,
+	                              FrameBuffer* renderTarget) = 0;
 
 	void updateFromEvent(const GuiPostProcessEvent& event) {
 		this->enabled(event.enabled);
@@ -42,6 +45,7 @@ public:
 
 protected:
 	virtual void updateFromEventImpl(const GuiPostProcessEvent& event) = 0;
+
 	GraphicsPipeline mPipeline;
 
 private:

@@ -22,7 +22,10 @@ void Kernel::configure(const FrameGraph& graph) {
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(stages, passLayout);
 }
 
-TextureView Kernel::render(GraphicsEncoder& encoder, DescriptorSet& dscSet, FrameBuffer* renderTarget) {
+DescriptorSet* Kernel::render(GraphicsEncoder& encoder,
+                              DescriptorSet& dscSet,
+                              DescriptorSet& renderTargetDscSet,
+                              FrameBuffer* renderTarget) {
 	encoder.bindFrameBuffer(*renderTarget);
 	encoder.clearFrameBuffer(ClearMask::Color);
 
@@ -31,7 +34,7 @@ TextureView Kernel::render(GraphicsEncoder& encoder, DescriptorSet& dscSet, Fram
 	encoder.bindDescriptorSet(dscSet);
 	encoder.draw(3);
 
-	return renderTarget->texture();
+	return &renderTargetDscSet;
 }
 
 void Kernel::updateFromEventImpl(const GuiPostProcessEvent& event) {

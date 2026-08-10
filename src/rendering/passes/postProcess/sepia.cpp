@@ -20,7 +20,10 @@ void Sepia::configure(const FrameGraph& graph) {
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(stages, passLayout);
 }
 
-TextureView Sepia::render(GraphicsEncoder& encoder, DescriptorSet& dscSet, FrameBuffer* renderTarget) {
+DescriptorSet* Sepia::render(GraphicsEncoder& encoder,
+                             DescriptorSet& dscSet,
+                             DescriptorSet& renderTargetDscSet,
+                             FrameBuffer* renderTarget) {
 	encoder.bindFrameBuffer(*renderTarget);
 	encoder.clearFrameBuffer(ClearMask::Color);
 
@@ -28,7 +31,7 @@ TextureView Sepia::render(GraphicsEncoder& encoder, DescriptorSet& dscSet, Frame
 	encoder.bindDescriptorSet(dscSet);
 	encoder.draw(3);
 
-	return renderTarget->texture();
+	return &renderTargetDscSet;
 }
 
 void Sepia::updateFromEventImpl(const GuiPostProcessEvent& event) {

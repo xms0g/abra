@@ -21,7 +21,10 @@ void Grayscale::configure(const FrameGraph& graph) {
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(stages, passLayout);
 }
 
-TextureView Grayscale::render(GraphicsEncoder& encoder, DescriptorSet& dscSet, FrameBuffer* renderTarget) {
+DescriptorSet* Grayscale::render(GraphicsEncoder& encoder,
+                                 DescriptorSet& dscSet,
+                                 DescriptorSet& renderTargetDscSet,
+                                 FrameBuffer* renderTarget) {
 	encoder.bindFrameBuffer(*renderTarget);
 	encoder.clearFrameBuffer(ClearMask::Color);
 
@@ -29,7 +32,7 @@ TextureView Grayscale::render(GraphicsEncoder& encoder, DescriptorSet& dscSet, F
 	encoder.bindDescriptorSet(dscSet);
 	encoder.draw(3);
 
-	return renderTarget->texture();
+	return &renderTargetDscSet;
 }
 
 void Grayscale::updateFromEventImpl(const GuiPostProcessEvent& event) {

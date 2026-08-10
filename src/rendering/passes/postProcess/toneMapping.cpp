@@ -13,7 +13,7 @@ void ToneMapping::configure(const FrameGraph& graph) {
 	stages.emplace_back(ShaderLoader::load("models/quad2.vert"), ShaderStageType::Vertex);
 	stages.emplace_back(ShaderLoader::load("post-processing/toneMapping.frag"), ShaderStageType::Fragment);
 
-	DescriptorSetLayout passLayout = {
+	const DescriptorSetLayout passLayout = {
 		.bindings = {
 			{.name = "screenTexture", .type = DescriptorType::SampledImage, .binding = 0}
 		}
@@ -21,7 +21,10 @@ void ToneMapping::configure(const FrameGraph& graph) {
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(stages, passLayout);
 }
 
-TextureView ToneMapping::render(GraphicsEncoder& encoder, DescriptorSet& dscSet, FrameBuffer* renderTarget) {
+DescriptorSet* ToneMapping::render(GraphicsEncoder& encoder,
+                                   DescriptorSet& dscSet,
+                                   DescriptorSet& renderTargetDscSet,
+                                   FrameBuffer* renderTarget) {
 	encoder.bindFrameBuffer(*renderTarget);
 	encoder.clearFrameBuffer(ClearMask::Color);
 
@@ -30,7 +33,7 @@ TextureView ToneMapping::render(GraphicsEncoder& encoder, DescriptorSet& dscSet,
 	encoder.bindDescriptorSet(dscSet);
 	encoder.draw(3);
 
-	return renderTarget->texture();
+	return &renderTargetDscSet;
 }
 
 void ToneMapping::updateFromEventImpl(const GuiPostProcessEvent& event) {

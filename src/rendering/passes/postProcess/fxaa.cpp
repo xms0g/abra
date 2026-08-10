@@ -16,13 +16,16 @@ void FXAA::configure(const FrameGraph& graph) {
 
 	DescriptorSetLayout passLayout = {
 		.bindings = {
-		{.name = "screenTexture", .type = DescriptorType::SampledImage, .binding = 0}
+			{.name = "screenTexture", .type = DescriptorType::SampledImage, .binding = 0}
 		}
 	};
 	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(stages, passLayout);
 }
 
-TextureView FXAA::render(GraphicsEncoder& encoder, DescriptorSet& dscSet, FrameBuffer* renderTarget) {
+DescriptorSet* FXAA::render(GraphicsEncoder& encoder,
+                            DescriptorSet& dscSet,
+                            DescriptorSet& renderTargetDscSet,
+                            FrameBuffer* renderTarget) {
 	encoder.bindFrameBuffer(*renderTarget);
 	encoder.clearFrameBuffer(ClearMask::Color);
 
@@ -31,7 +34,7 @@ TextureView FXAA::render(GraphicsEncoder& encoder, DescriptorSet& dscSet, FrameB
 	encoder.bindDescriptorSet(dscSet);
 	encoder.draw(3);
 
-	return renderTarget->texture();
+	return &renderTargetDscSet;
 }
 
 void FXAA::updateFromEventImpl(const GuiPostProcessEvent& event) {

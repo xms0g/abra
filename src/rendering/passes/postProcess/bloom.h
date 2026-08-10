@@ -1,5 +1,6 @@
 #pragma once
 #include "basePostEffect.hpp"
+#include "../../descriptorSet.h"
 #include "../../texture/texture.h"
 
 class FrameGraph;
@@ -15,19 +16,26 @@ public:
 
 	void configure(const FrameGraph& graph) override;
 
-	TextureView render(GraphicsEncoder& encoder, DescriptorSet& dscSet, FrameBuffer* renderTarget) override;
+	DescriptorSet* render(GraphicsEncoder& encoder,
+	                      DescriptorSet& dscSet,
+	                      DescriptorSet& renderTargetDscSet,
+	                      FrameBuffer* renderTarget) override;
 
 protected:
 	void updateFromEventImpl(const GuiPostProcessEvent& event) override;
 
 private:
-	TextureView brightFilterPass(GraphicsEncoder& encoder, const DescriptorSet& dscSet, bool& toggle);
+	DescriptorSet* brightFilterPass(GraphicsEncoder& encoder, const DescriptorSet& dscSet, bool& toggle);
 
-	TextureView blurPass(GraphicsEncoder& encoder, const DescriptorSet& dscSet, bool& toggle);
+	DescriptorSet* blurPass(GraphicsEncoder& encoder, DescriptorSet& dscSet, bool& toggle);
 
 	[[nodiscard]]
-	TextureView combinePass(GraphicsEncoder& encoder, const DescriptorSet& dscSet, const bool& toggle);
+	DescriptorSet* combinePass(GraphicsEncoder& encoder,
+	                           DescriptorSet& dscSet,
+	                           DescriptorSet& blurDscSet,
+	                           const bool& toggle);
 
 	std::array<FrameBuffer*, 2> mRenderTargets{};
+	std::array<DescriptorSet, 2> mRenderTargetsDescSets{};
 	std::array<GraphicsPipeline, 3> mPipelines;
 };
