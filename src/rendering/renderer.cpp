@@ -395,12 +395,9 @@ void Renderer::configureSystems(EventBus& eventBus) {
 }
 
 void Renderer::updateUniformBuffers() const {
-	const float aspectRatio = static_cast<float>(CONFIG_MANAGER.get<int32_t>("window.width")) /
-	                          static_cast<float>(CONFIG_MANAGER.get<int32_t>("window.height"));
-
 	const glm::mat4 projection = glm::perspective(
 		glm::radians(mRenderCtx.camera->zoom()),
-		aspectRatio,
+		CONFIG_MANAGER.get<float>("window.aspectRatio"),
 		mRenderCtx.camera->znear(), mRenderCtx.camera->zfar());
 
 	const UniformBufferObject ubo = {

@@ -32,6 +32,7 @@ Window::Window(const std::string& title, const int multisamples, const bool full
 
 	CONFIG_MANAGER.set<int32_t>("window.width", std::move(displayMode.w));
 	CONFIG_MANAGER.set<int32_t>("window.height", std::move(displayMode.h));
+	CONFIG_MANAGER.set<float>("window.aspectRatio", static_cast<float>(displayMode.w) / static_cast<float>(displayMode.h));
 
 	mWindow = SDL_CreateWindow(
 		mTitle.c_str(),
