@@ -104,8 +104,7 @@ void LightSystem::updateLightUBO() const {
 
 	ubo.lightCount = glm::ivec4(dirLightCount, pointLightCount, spotLightCount, 0);
 
-	mUBO.bind();
-	mUBO.setData(&ubo, 0);
+	mUBO.copyToMemory(&ubo, 0);
 }
 
 void LightSystem::onGuiUpdate(const GuiLightEvent& event) {

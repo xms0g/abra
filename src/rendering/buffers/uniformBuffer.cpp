@@ -12,6 +12,7 @@ int32_t UniformBuffer::size() const {
 	return mSize;
 }
 
-void UniformBuffer::setData(const void* data, const size_t offset) const {
+void UniformBuffer::copyToMemory(const void* data, const size_t offset) const {
+	bind();
 	glBufferSubData(mTarget, static_cast<long>(offset), static_cast<long>(mSize), data);
 }

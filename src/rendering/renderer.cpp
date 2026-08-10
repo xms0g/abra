@@ -408,8 +408,7 @@ void Renderer::updateUniformBuffers() const {
 		.projection = projection
 	};
 
-	mCameraUBO.bind();
-	mCameraUBO.setData(&ubo, 0);
+	mCameraUBO.copyToMemory(&ubo, 0);
 }
 
 void Renderer::sortEntities() {

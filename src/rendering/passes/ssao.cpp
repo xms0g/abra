@@ -193,10 +193,7 @@ void SSAOPass::createKernel(GraphicsEncoder& encoder) {
 	);
 
 	encoder.bindDescriptorSet(ssaoSet);
-
-	mUBO.bind();
-	mUBO.setData(&ubo, 0);
-	mUBO.unbind();
+	mUBO.copyToMemory(&ubo, 0);
 }
 
 void SSAOPass::createNoiseTexture() {

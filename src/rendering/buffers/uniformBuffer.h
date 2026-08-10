@@ -10,7 +10,7 @@ public:
 	[[nodiscard]]
 	int32_t size() const;
 
-	void setData(const void* data, size_t offset = 0) const;
+	void copyToMemory(const void* data, size_t offset = 0) const;
 
 private:
 	int32_t mSize{0};

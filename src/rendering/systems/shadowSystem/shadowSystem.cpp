@@ -182,6 +182,5 @@ void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
 
 	mEncoder->setCullFace(CullMode::Back);
 
-	mUBO.bind();
-	mUBO.setData(&ubo, 0);
+	mUBO.copyToMemory(&ubo, 0);
 }
