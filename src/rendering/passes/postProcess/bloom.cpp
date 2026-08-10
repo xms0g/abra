@@ -18,7 +18,7 @@ void Bloom::configure(const FrameGraph& graph) {
 
 	const DescriptorSetLayout passLayout = {
 		.bindings = {
-			{.name = "screenTexture", .type = DescriptorType::Sampler2D, .binding = 0}
+			{.name = "screenTexture", .type = DescriptorType::SampledImage, .binding = 0}
 		}
 	};
 
@@ -36,8 +36,8 @@ void Bloom::configure(const FrameGraph& graph) {
 
 	const DescriptorSetLayout combineLayout = {
 		.bindings = {
-			{.name = "screenTexture", .type = DescriptorType::Sampler2D, .binding = 0},
-			{.name = "bloomBlur", .type = DescriptorType::Sampler2D, .binding = 1}
+			{.name = "screenTexture", .type = DescriptorType::SampledImage, .binding = 0},
+			{.name = "bloomBlur", .type = DescriptorType::SampledImage, .binding = 1}
 		}
 	};
 

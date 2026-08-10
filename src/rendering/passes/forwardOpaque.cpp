@@ -50,10 +50,10 @@ void ForwardOpaquePass::configure(const RenderContext& ctx,
 
 	DescriptorSetLayout materialLayout = {
 		.bindings = {
-			{.name = "material.texture_albedo", .type = DescriptorType::Sampler2D, .binding = 0},
-			{.name = "material.texture_specular", .type = DescriptorType::Sampler2D, .binding = 1},
-			{.name = "material.texture_normal", .type = DescriptorType::Sampler2D, .binding = 2},
-			{.name = "material.texture_height", .type = DescriptorType::Sampler2D, .binding = 3},
+			{.name = "material.texture_albedo", .type = DescriptorType::SampledImage, .binding = 0},
+			{.name = "material.texture_specular", .type = DescriptorType::SampledImage, .binding = 1},
+			{.name = "material.texture_normal", .type = DescriptorType::SampledImage, .binding = 2},
+			{.name = "material.texture_height", .type = DescriptorType::SampledImage, .binding = 3},
 		}
 	};
 	DescriptorSetLayout bufferLayout = {
@@ -80,17 +80,17 @@ void ForwardOpaquePass::configure(const RenderContext& ctx,
 		.bindings = {
 			{
 				.name = "shadowMap",
-				.type = DescriptorType::Sampler2D,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("shadow.map.slot")
 			},
 			{
 				.name = "shadowCubemap",
-				.type = DescriptorType::SamplerCubeArray,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 1
 			},
 			{
 				.name = "persShadowMap",
-				.type = DescriptorType::Sampler2DArray,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 2
 			},
 		}

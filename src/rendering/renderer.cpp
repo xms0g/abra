@@ -496,7 +496,7 @@ TextureView Renderer::createEnvMap(const Texture& hdrTexture) {
 
 	DescriptorSetLayout materialLayout = {
 		.bindings = {
-			{.name = "equirectangularMap", .type = DescriptorType::Sampler2D, .binding = 0}
+			{.name = "equirectangularMap", .type = DescriptorType::SampledImage, .binding = 0}
 		}
 	};
 
@@ -583,7 +583,7 @@ void Renderer::createIrradianceMap(const TextureView environment) {
 
 	DescriptorSetLayout passLayout = {
 		.bindings = {
-			{.name = "environmentMap", .type = DescriptorType::SamplerCube, .binding = 0}
+			{.name = "environmentMap", .type = DescriptorType::SampledImage, .binding = 0}
 		}
 	};
 
@@ -667,7 +667,7 @@ void Renderer::createPrefilterMap(const TextureView environment) {
 
 	DescriptorSetLayout passLayout = {
 		.bindings = {
-			{.name = "environmentMap", .type = DescriptorType::SamplerCube, .binding = 0}
+			{.name = "environmentMap", .type = DescriptorType::SampledImage, .binding = 0}
 		}
 	};
 

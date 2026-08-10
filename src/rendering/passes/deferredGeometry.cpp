@@ -53,32 +53,32 @@ void DeferredGeometryPass::configure(const RenderContext& ctx,
 		.bindings = {
 			{
 				.name = "material.texture_albedo",
-				.type = DescriptorType::Sampler2D,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("PBR.albedo.slot")
 			},
 			{
 				.name = "material.texture_normal",
-				.type = DescriptorType::Sampler2D,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("PBR.normal.slot")
 			},
 			{
 				.name = "material.texture_roughnessMetallic",
-				.type = DescriptorType::Sampler2D,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("PBR.roughnessMetallic.slot")
 			},
 			{
 				.name = "material.texture_ao",
-				.type = DescriptorType::Sampler2D,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("PBR.ao.slot")
 			},
 			{
 				.name = "material.texture_emissive",
-				.type = DescriptorType::Sampler2D,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("PBR.emissive.slot")
 			},
 			{
 				.name = "material.texture_height",
-				.type = DescriptorType::Sampler2D,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("PBR.height.slot")
 			}
 		}

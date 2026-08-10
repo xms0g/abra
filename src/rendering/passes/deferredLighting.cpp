@@ -52,60 +52,60 @@ void DeferredLightingPass::configure(const RenderContext& ctx,
 			// GBuffer
 			{
 				.name = "gPosition",
-				.type = DescriptorType::Sampler2D,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.position.slot")
 			},
 			{
 				.name = "gNormal",
-				.type = DescriptorType::Sampler2D,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.normal.slot")
 			},
 			{
 				.name = "gAlbedo",
-				.type = DescriptorType::Sampler2D,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.albedo.slot")
 			},
 			{
 				.name = "gORM",
-				.type = DescriptorType::Sampler2D,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.orm.slot")
 			},
 			// SSAO
 			{
 				.name = "ssao",
-				.type = DescriptorType::Sampler2D,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("ssao.slot")
 			},
 			// IBL
 			{
 				.name = "irradianceMap",
-				.type = DescriptorType::SamplerCube,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("PBR.irradianceMap.slot")
 			},
 			{
 				.name = "prefilterMap",
-				.type = DescriptorType::SamplerCube,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("PBR.prefilterMap.slot")
 			},
 			{
 				.name = "brdfLUT",
-				.type = DescriptorType::Sampler2D,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("PBR.brdfLUT.slot")
 			},
 			// Shadows
 			{
 				.name = "shadowMap",
-				.type = DescriptorType::Sampler2D,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("shadow.map.slot")
 			},
 			{
 				.name = "shadowCubemap",
-				.type = DescriptorType::SamplerCubeArray,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 1
 			},
 			{
 				.name = "persShadowMap",
-				.type = DescriptorType::Sampler2DArray,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 2
 			}
 		}

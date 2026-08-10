@@ -15,7 +15,7 @@ void Gamma::configure(const FrameGraph& graph) {
 
 	const DescriptorSetLayout passLayout = {
 		.bindings = {
-			{.name = "screenTexture", .type = DescriptorType::Sampler2D, .binding = 0}
+			{.name = "screenTexture", .type = DescriptorType::SampledImage, .binding = 0}
 		}
 	};
 

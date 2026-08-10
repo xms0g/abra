@@ -7,7 +7,7 @@
 
 enum class DescriptorType : uint32_t {
 	UniformBuffer,
-	SampledImage,
+	SampledImage
 };
 
 struct Descriptor {

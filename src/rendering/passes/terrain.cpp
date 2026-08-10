@@ -58,7 +58,7 @@ void TerrainPass::configure(const RenderContext& ctx,
 
 	DescriptorSetLayout materialLayout = {
 		.bindings = {
-			{.name = "material.texture_height", .type = DescriptorType::Sampler2D, .binding = 0},
+			{.name = "material.texture_height", .type = DescriptorType::SampledImage, .binding = 0},
 		}
 	};
 

@@ -55,17 +55,17 @@ void SSAOPass::configure(const RenderContext& ctx,
 		.bindings = {
 			{
 				.name = "gPosition",
-				.type = DescriptorType::Sampler2D,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.position.slot")
 			},
 			{
 				.name = "gNormal",
-				.type = DescriptorType::Sampler2D,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.normal.slot")
 			},
 			{
 				.name = "texNoise",
-				.type = DescriptorType::Sampler2D,
+				.type = DescriptorType::SampledImage,
 				.binding = CONFIG_MANAGER.get<int32_t>("ssao.noise.slot")
 			}
 		}
@@ -103,7 +103,7 @@ void SSAOPass::configure(const RenderContext& ctx,
 
 	DescriptorSetLayout blurPassLayout = {
 		.bindings = {
-			{.name = "ssaoTexture", .type = DescriptorType::Sampler2D, .binding = 0}
+			{.name = "ssaoTexture", .type = DescriptorType::SampledImage, .binding = 0}
 		}
 	};
 

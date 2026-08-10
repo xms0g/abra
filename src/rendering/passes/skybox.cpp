@@ -49,7 +49,7 @@ void SkyboxPass::configure(const RenderContext& ctx,
 
 	DescriptorSetLayout passLayout = {
 		.bindings = {
-			{.name = "skybox", .type = DescriptorType::SamplerCube, .binding = 0},
+			{.name = "skybox", .type = DescriptorType::SampledImage, .binding = 0},
 		}
 	};
 
