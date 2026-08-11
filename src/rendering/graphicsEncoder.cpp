@@ -145,7 +145,7 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 
 void GraphicsEncoder::pushConstants(const void* data) const {
 	for (int i = 0; i < mState.pipeline->layout().pushConstants.count; ++i) {
-		auto [name, offset, type] = mState.pipeline->layout().pushConstants.constants[i];
+		auto& [name, offset, type] = mState.pipeline->layout().pushConstants.constants[i];
 		pushConstant(name, static_cast<const std::byte*>(data) + offset, type);
 	}
 }
