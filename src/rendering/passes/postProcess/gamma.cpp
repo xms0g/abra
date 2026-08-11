@@ -13,13 +13,11 @@ void Gamma::configure(const FrameGraph& graph) {
 	stages.emplace_back(ShaderLoader::load("models/quad2.vert"), ShaderStageType::Vertex);
 	stages.emplace_back(ShaderLoader::load("post-processing/gamma.frag"), ShaderStageType::Fragment);
 
-	const DescriptorSetLayout passLayout = {
+	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(stages, {
 		.bindings = {
 			{.name = "screenTexture", .type = DescriptorType::SampledImage, .binding = 0}
 		}
-	};
-
-	mPipeline = GraphicsPipeline::createFullscreenQuadPipeline(stages, passLayout);
+	});
 }
 
 DescriptorSet* Gamma::render(GraphicsEncoder& encoder,

@@ -16,32 +16,34 @@ void Bloom::configure(const FrameGraph& graph) {
 	stages0.emplace_back(ShaderLoader::load("models/quad2.vert"), ShaderStageType::Vertex);
 	stages0.emplace_back(ShaderLoader::load("post-processing/bloom/brightFilter.frag"), ShaderStageType::Fragment);
 
-	const DescriptorSetLayout passLayout = {
+
+	mPipelines[0] = GraphicsPipeline::createFullscreenQuadPipeline(stages0, {
 		.bindings = {
 			{.name = "screenTexture", .type = DescriptorType::SampledImage, .binding = 0}
 		}
-	};
-
-	mPipelines[0] = GraphicsPipeline::createFullscreenQuadPipeline(stages0, passLayout);
+	});
 
 	std::vector<PipelineShaderStage> stages1;
 	stages1.emplace_back(ShaderLoader::load("models/quad2.vert"), ShaderStageType::Vertex);
 	stages1.emplace_back(ShaderLoader::load("post-processing/bloom/blur.frag"), ShaderStageType::Fragment);
 
-	mPipelines[1] = GraphicsPipeline::createFullscreenQuadPipeline(stages1, passLayout);
+	mPipelines[1] = GraphicsPipeline::createFullscreenQuadPipeline(stages1, {
+		.bindings = {
+			{.name = "screenTexture", .type = DescriptorType::SampledImage, .binding = 0}
+		}
+	});
 
 	std::vector<PipelineShaderStage> stages2;
 	stages2.emplace_back(ShaderLoader::load("models/quad2.vert"), ShaderStageType::Vertex);
 	stages2.emplace_back(ShaderLoader::load("post-processing/bloom/combine.frag"), ShaderStageType::Fragment);
 
-	const DescriptorSetLayout combineLayout = {
+
+	mPipelines[2] = GraphicsPipeline::createFullscreenQuadPipeline(stages2, {
 		.bindings = {
 			{.name = "screenTexture", .type = DescriptorType::SampledImage, .binding = 0},
 			{.name = "bloomBlur", .type = DescriptorType::SampledImage, .binding = 1}
 		}
-	};
-
-	mPipelines[2] = GraphicsPipeline::createFullscreenQuadPipeline(stages2, combineLayout);
+	});
 	mRenderTargets = {&graph.getResource("bloomPing"), &graph.getResource("bloomPong")};
 
 	DescriptorSet pingDescSet{};
