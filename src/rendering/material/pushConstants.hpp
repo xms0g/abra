@@ -1,6 +1,6 @@
 #pragma once
 
-struct MaterialPushConstant {
+struct MaterialPushConstants {
 	uint32_t flags;
 	float heightScale;
 	float alphaCutoff;

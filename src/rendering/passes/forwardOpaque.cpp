@@ -3,7 +3,7 @@
 #include "../shader.h"
 #include "../graphicsEncoder.h"
 #include "../descriptorSet.h"
-#include "../material/pushConstant.hpp"
+#include "../material/pushConstants.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../context/renderData.hpp"
@@ -99,10 +99,10 @@ void ForwardOpaquePass::configure(const RenderContext& ctx,
 
 	PushConstantLayout pushConstantLayout = {
 		.constants = {{
-			{.name = "material.flags", .offset = offsetof(MaterialPushConstant, flags), .type = PushConstantType::UInt},
-			{.name = "material.heightScale", .offset = offsetof(MaterialPushConstant, heightScale), .type = PushConstantType::Float},
-			{.name = "material.alphaCutoff", .offset = offsetof(MaterialPushConstant, alphaCutoff), .type = PushConstantType::Float},
-			{.name = "material.color", .offset = offsetof(MaterialPushConstant, color), .type = PushConstantType::Vec3}
+			{.name = "material.flags", .offset = offsetof(MaterialPushConstants, flags), .type = PushConstantType::UInt},
+			{.name = "material.heightScale", .offset = offsetof(MaterialPushConstants, heightScale), .type = PushConstantType::Float},
+			{.name = "material.alphaCutoff", .offset = offsetof(MaterialPushConstants, alphaCutoff), .type = PushConstantType::Float},
+			{.name = "material.color", .offset = offsetof(MaterialPushConstants, color), .type = PushConstantType::Vec3}
 		}},
 		.count = 4
 	};
@@ -137,7 +137,7 @@ void ForwardOpaquePass::execute(const RenderContext& ctx, const FrameGraph& grap
 		encoder.bindPipeline(mPipeline);
 		encoder.bindDescriptorSet(ctx.renderData->material.descriptorSets[cmd.material.idx]);
 
-		const MaterialPushConstant pushConstants = {
+		const MaterialPushConstants pushConstants = {
 			.flags = cmd.material.flags,
 			.heightScale = cmd.material.heightScale,
 			.alphaCutoff = cmd.material.alphaCutoff,
