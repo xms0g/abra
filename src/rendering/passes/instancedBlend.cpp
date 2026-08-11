@@ -8,6 +8,7 @@
 #include "../context/renderData.hpp"
 #include "../context/renderQueue.hpp"
 #include "../material/material.hpp"
+#include "../material/pushConstants.hpp"
 #include "../buffers/vertexBuffer.h"
 #include "../mesh/mesh.h"
 #include "../../math/matrix.h"
@@ -109,6 +110,16 @@ void InstancedBlendPass::configure(const RenderContext& ctx,
 		}
 	};
 
+	PushConstantLayout pushConstantLayout = {
+		.constants = {{
+			{.name = "material.flags", .offset = offsetof(MaterialPushConstants, flags), .type = PushConstantType::UInt},
+			{.name = "material.heightScale", .offset = offsetof(MaterialPushConstants, heightScale), .type = PushConstantType::Float},
+			{.name = "material.alphaCutoff", .offset = offsetof(MaterialPushConstants, alphaCutoff), .type = PushConstantType::Float},
+			{.name = "material.color", .offset = offsetof(MaterialPushConstants, color), .type = PushConstantType::Vec3}
+		}},
+		.count = 4
+	};
+
 	PipelineLayout layout = {.descriptorSets = {materialLayout, bufferLayout, passLayout}};
 	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
 	mPipeline = GraphicsPipeline{createInfo};
@@ -143,10 +154,14 @@ void InstancedBlendPass::execute(const RenderContext& ctx, const FrameGraph& gra
 		encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
 		encoder.bindPipeline(mPipeline);
 		encoder.bindDescriptorSet(ctx.renderData->material.descriptorSets[object.matBatch.materialIndex]);
-		encoder.pushConstants({
-			.idx = object.matBatch.materialIndex,
-			.flags = ctx.renderData->material.flags[object.matBatch.materialIndex]
-		});
+
+		const MaterialPushConstants pushConstants = {
+			.flags = object.matBatch.materialFlags,
+			.heightScale = ctx.renderData->entity.heightScales[object.entityID],
+			.alphaCutoff = ctx.renderData->material.alphaCutoffs[object.matBatch.materialIndex],
+			.color = ctx.renderData->material.colors[object.matBatch.materialIndex]
+		};
+		encoder.pushConstants(&pushConstants);
 		encoder.setCullMode(object.matBatch.materialFlags & TWOSIDED ? CullMode::None : pipelineCullMode);
 
 		for (const auto& meshIdx: object.matBatch.meshIndices) {

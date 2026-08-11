@@ -52,7 +52,7 @@ public:
 
 	void bindPipeline(GraphicsPipeline& pipeline);
 
-	void pushConstants(const MaterialView& material);
+	void pushConstants(const void* data) const;
 
 	void bindTransform(const TransformView& transform);
 
@@ -83,6 +83,8 @@ public:
 	void reset();
 
 private:
+	void pushConstant(std::string_view name, const void* data, PushConstantType type) const;
+
 	struct HandleCache {
 		uint32_t program{0};
 		uint32_t vao{0};

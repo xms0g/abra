@@ -2,6 +2,7 @@
 #include "../frameGraph.h"
 #include "../graphicsEncoder.h"
 #include "../descriptorSet.h"
+#include "../material/pushConstants.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../context/renderData.hpp"
@@ -102,7 +103,20 @@ void ForwardBlendPass::configure(const RenderContext& ctx,
 		}
 	};
 
-	PipelineLayout layout = {.descriptorSets = {materialLayout, bufferLayout, passLayout}};
+	PushConstantLayout pushConstantLayout = {
+		.constants = {{
+			{.name = "material.flags", .offset = offsetof(MaterialPushConstants, flags), .type = PushConstantType::UInt},
+			{.name = "material.heightScale", .offset = offsetof(MaterialPushConstants, heightScale), .type = PushConstantType::Float},
+			{.name = "material.alphaCutoff", .offset = offsetof(MaterialPushConstants, alphaCutoff), .type = PushConstantType::Float},
+			{.name = "material.color", .offset = offsetof(MaterialPushConstants, color), .type = PushConstantType::Vec3}
+		}},
+		.count = 4
+	};
+
+	PipelineLayout layout = {
+		.descriptorSets = {materialLayout, bufferLayout, passLayout},
+		.pushConstants = pushConstantLayout
+	};
 	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
 	mPipeline = GraphicsPipeline{createInfo};
 
@@ -128,7 +142,14 @@ void ForwardBlendPass::execute(const RenderContext& ctx, const FrameGraph& graph
 		encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
 		encoder.bindPipeline(mPipeline);
 		encoder.bindDescriptorSet(ctx.renderData->material.descriptorSets[cmd.material.idx]);
-		encoder.pushConstants(cmd.material);
+
+		const MaterialPushConstants pushConstants = {
+			.flags = cmd.material.flags,
+			.heightScale = cmd.material.heightScale,
+			.alphaCutoff = cmd.material.alphaCutoff,
+			.color = cmd.material.color
+		};
+		encoder.pushConstants(&pushConstants);
 		encoder.setCullMode(cmd.material.flags & TWOSIDED ? CullMode::None : pipelineCullMode);
 		encoder.bindTransform(cmd.transform);
 		encoder.bindVertexArray(cmd.mesh.vao);

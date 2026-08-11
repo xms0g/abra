@@ -8,6 +8,7 @@ GraphicsPipeline::GraphicsPipeline(const GraphicsPipelineCreateInfo& createInfo)
 	mState.depthStencilState = createInfo.rendering.depthStencilState;
 	mState.colorBlendState = createInfo.rendering.colorBlendState;
 	mState.tessellationState = createInfo.rendering.tessellationState;
+	mState.layout = createInfo.layout;
 
 	for (const auto& info: createInfo.rendering.stages) {
 		ShaderStage stage{info};
@@ -66,6 +67,10 @@ PipelineColorBlendState& GraphicsPipeline::colorBlendState() {
 
 PipelineTessellationState& GraphicsPipeline::tessellationState() {
 	return mState.tessellationState;
+}
+
+PipelineLayout& GraphicsPipeline::layout() {
+	return mState.layout;
 }
 
 uint32_t GraphicsPipeline::program() const {

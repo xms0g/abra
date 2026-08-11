@@ -3,6 +3,7 @@
 #include "../frameGraph.h"
 #include "../descriptorSet.h"
 #include "../graphicsEncoder.h"
+#include "../material/pushConstants.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../../config/configManager.h"
@@ -57,7 +58,20 @@ void ForwardUnlitPass::configure(const RenderContext& ctx,
 		}
 	};
 
-	PipelineLayout layout = {.descriptorSets = {bufferLayout}};
+	PushConstantLayout pushConstantLayout = {
+		.constants = {{
+			{.name = "material.flags", .offset = offsetof(MaterialPushConstants, flags), .type = PushConstantType::UInt},
+			{.name = "material.heightScale", .offset = offsetof(MaterialPushConstants, heightScale), .type = PushConstantType::Float},
+			{.name = "material.alphaCutoff", .offset = offsetof(MaterialPushConstants, alphaCutoff), .type = PushConstantType::Float},
+			{.name = "material.color", .offset = offsetof(MaterialPushConstants, color), .type = PushConstantType::Vec3}
+		}},
+		.count = 4
+	};
+
+	PipelineLayout layout = {
+		.descriptorSets = {bufferLayout},
+		.pushConstants = pushConstantLayout
+	};
 	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
 	mPipeline = GraphicsPipeline{createInfo};
 
@@ -68,7 +82,14 @@ void ForwardUnlitPass::execute(const RenderContext& ctx, const FrameGraph& graph
 	for (const auto& cmd: *mCommands) {
 		encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
 		encoder.bindPipeline(mPipeline);
-		encoder.pushConstants(cmd.material);
+
+		const MaterialPushConstants pushConstants = {
+			.flags = cmd.material.flags,
+			.heightScale = cmd.material.heightScale,
+			.alphaCutoff = cmd.material.alphaCutoff,
+			.color = cmd.material.color
+		};
+		encoder.pushConstants(&pushConstants);
 		encoder.bindTransform(cmd.transform);
 		encoder.bindVertexArray(cmd.mesh.vao);
 		encoder.drawIndexed(cmd.mesh.indexCount);
