@@ -8,6 +8,7 @@
 #include "../context/renderData.hpp"
 #include "../context/renderQueue.hpp"
 #include "../material/material.hpp"
+#include "../material/pushConstant.hpp"
 #include "../buffers/vertexBuffer.h"
 #include "../mesh/mesh.h"
 #include "../../math/matrix.h"
@@ -102,7 +103,20 @@ void InstancedOpaquePass::configure(const RenderContext& ctx,
 		}
 	};
 
-	PipelineLayout layout = {.descriptorSets = {materialLayout, bufferLayout, passLayout}};
+	PushConstantLayout pushConstantLayout = {
+		.constants = {{
+			{.name = "material.flags", .offset = offsetof(MaterialPushConstant, flags), .type = PushConstantType::UInt},
+			{.name = "material.heightScale", .offset = offsetof(MaterialPushConstant, heightScale), .type = PushConstantType::Float},
+			{.name = "material.alphaCutoff", .offset = offsetof(MaterialPushConstant, alphaCutoff), .type = PushConstantType::Float},
+			{.name = "material.color", .offset = offsetof(MaterialPushConstant, color), .type = PushConstantType::Vec3}
+		}},
+		.count = 4
+	};
+
+	PipelineLayout layout = {
+		.descriptorSets = {materialLayout, bufferLayout, passLayout},
+		.pushConstants = pushConstantLayout
+	};
 	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
 	mPipeline = GraphicsPipeline{createInfo};
 
@@ -136,10 +150,14 @@ void InstancedOpaquePass::execute(const RenderContext& ctx, const FrameGraph& gr
 		encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
 		encoder.bindPipeline(mPipeline);
 		encoder.bindDescriptorSet(ctx.renderData->material.descriptorSets[object.matBatch.materialIndex]);
-		encoder.pushConstants({
-			.idx = object.matBatch.materialIndex,
-			.flags = ctx.renderData->material.flags[object.matBatch.materialIndex]
-		});
+
+		const MaterialPushConstant pushConstants = {
+			.flags = object.matBatch.materialFlags,
+			.heightScale = ctx.renderData->entity.heightScales[object.entityID],
+			.alphaCutoff = ctx.renderData->material.alphaCutoffs[object.matBatch.materialIndex],
+			.color = ctx.renderData->material.colors[object.matBatch.materialIndex]
+		};
+		encoder.pushConstants(&pushConstants);
 		encoder.setCullMode(object.matBatch.materialFlags & TWOSIDED ? CullMode::None : pipelineCullMode);
 
 		for (const auto& meshIdx: object.matBatch.meshIndices) {

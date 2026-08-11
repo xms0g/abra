@@ -67,7 +67,6 @@ void SkyboxPass::execute(const RenderContext& ctx, const FrameGraph& graph, Grap
 	encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
 	encoder.bindPipeline(mPipeline);
 	encoder.bindDescriptorSet(ctx.renderData->material.descriptorSets[cmd.material.idx]);
-	encoder.pushConstants(cmd.material);
 	encoder.setCullMode(cmd.material.flags & TWOSIDED ? CullMode::None : pipelineCullMode);
 	encoder.bindTransform(cmd.transform);
 	encoder.bindVertexArray(cmd.mesh.vao);

@@ -143,23 +143,10 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 	}
 }
 
-void GraphicsEncoder::pushConstants(const MaterialView& material) {
-	if (mState.bindingCache.lastMatFlags != material.flags || mState.bindingCache.lastShader != mState.pipeline->program()) {
-		mState.bindingCache.lastMatFlags = material.flags;
-		mState.bindingCache.lastShader = mState.pipeline->program();
-		setUniform("material.flags", material.flags);
-	}
-
-	if (material.flags & HAS_HEIGHT_MAP) [[unlikely]] {
-		setUniform("material.heightScale", material.heightScale);
-	}
-
-	if (material.flags & ALPHACUTOFF) [[unlikely]] {
-		setUniform("material.alphaCutoff", material.alphaCutoff);
-	}
-
-	if (material.flags & HAS_SOLID_COLOR) [[unlikely]] {
-		setUniform("material.color", material.color);
+void GraphicsEncoder::pushConstants(const void* data) const {
+	for (int i = 0; i < mState.pipeline->layout().pushConstants.count; ++i) {
+		auto [name, offset, type] = mState.pipeline->layout().pushConstants.constants[i];
+		pushConstant(name, static_cast<const std::byte*>(data) + offset, type);
 	}
 }
 
@@ -253,4 +240,22 @@ void GraphicsEncoder::setCullMode(const CullMode mode) {
 void GraphicsEncoder::reset() {
 	mState.bindingCache.reset();
 	mState.glStateCache.reset();
+}
+
+void GraphicsEncoder::pushConstant(const std::string_view name, const void* data, const PushConstantType type) const {
+	assert(mState.pipeline);
+	switch (type) {
+		case PushConstantType::Int:
+			mState.pipeline->setValue(name, *static_cast<const int*>(data));
+			break;
+		case PushConstantType::UInt:
+			mState.pipeline->setValue(name, *static_cast<const uint32_t*>(data));
+			break;
+		case PushConstantType::Float:
+			mState.pipeline->setValue(name, *static_cast<const float*>(data));
+			break;
+		case PushConstantType::Vec3:
+			mState.pipeline->setValue(name, *static_cast<const glm::vec3*>(data));
+			break;
+	}
 }

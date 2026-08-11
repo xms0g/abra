@@ -4,6 +4,7 @@
 #include "../descriptorSet.h"
 #include "../graphicsEncoder.h"
 #include "../command.hpp"
+#include "../material/pushConstant.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../context/renderData.hpp"
@@ -72,7 +73,20 @@ void TerrainPass::configure(const RenderContext& ctx,
 		}
 	};
 
-	PipelineLayout layout = {.descriptorSets = {materialLayout, bufferLayout}};
+	PushConstantLayout pushConstantLayout = {
+		.constants = {{
+			{.name = "material.flags", .offset = offsetof(MaterialPushConstant, flags), .type = PushConstantType::UInt},
+			{.name = "material.heightScale", .offset = offsetof(MaterialPushConstant, heightScale), .type = PushConstantType::Float},
+			{.name = "material.alphaCutoff", .offset = offsetof(MaterialPushConstant, alphaCutoff), .type = PushConstantType::Float},
+			{.name = "material.color", .offset = offsetof(MaterialPushConstant, color), .type = PushConstantType::Vec3}
+		}},
+		.count = 4
+	};
+
+	PipelineLayout layout = {.
+		descriptorSets = {materialLayout, bufferLayout},
+		.pushConstants = pushConstantLayout
+	};
 	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
 	mPipeline = GraphicsPipeline{createInfo};
 
@@ -85,7 +99,14 @@ void TerrainPass::execute(const RenderContext& ctx, const FrameGraph& graph, Gra
 	encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
 	encoder.bindPipeline(mPipeline);
 	encoder.bindDescriptorSet(ctx.renderData->material.descriptorSets[cmd.material.idx]);
-	encoder.pushConstants(cmd.material);
+
+	const MaterialPushConstant pushConstants = {
+		.flags = cmd.material.flags,
+		.heightScale = cmd.material.heightScale,
+		.alphaCutoff = cmd.material.alphaCutoff,
+		.color = cmd.material.color
+	};
+	encoder.pushConstants(&pushConstants);
 	encoder.bindTransform(cmd.transform);
 	encoder.bindVertexArray(cmd.mesh.vao);
 	encoder.draw(cmd.mesh.vertexCount);

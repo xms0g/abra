@@ -3,9 +3,8 @@
 #include "glad/glad.h"
 #include "shader.h"
 #include "glUtils.hpp"
-
-struct DescriptorBinding;
-struct DescriptorSetLayout;
+#include "pushConstants.hpp"
+#include "descriptorSet.h"
 
 enum class CullMode: uint32_t {
 	None = GL_NONE,
@@ -139,6 +138,7 @@ struct PipelineShaderStage {
 
 struct PipelineLayout {
 	std::vector<DescriptorSetLayout> descriptorSets;
+	PushConstantLayout pushConstants;
 };
 
 struct PipelineRenderingInfo {
@@ -190,6 +190,8 @@ public:
 
 	PipelineTessellationState& tessellationState();
 
+	PipelineLayout& layout();
+
 	[[nodiscard]]
 	uint32_t program() const;
 
@@ -213,6 +215,7 @@ private:
 		PipelineDepthStencilState depthStencilState;
 		PipelineColorBlendState colorBlendState;
 		PipelineTessellationState tessellationState;
+		PipelineLayout layout;
 		Shader shader;
 	};
 
