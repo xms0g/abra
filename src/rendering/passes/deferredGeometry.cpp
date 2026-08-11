@@ -101,10 +101,8 @@ void DeferredGeometryPass::configure(const RenderContext& ctx,
 			{.name = "material.heightScale", .offset = offsetof(MaterialPushConstants, heightScale), .type = PushConstantType::Float},
 			{.name = "material.alphaCutoff", .offset = offsetof(MaterialPushConstants, alphaCutoff), .type = PushConstantType::Float},
 			{.name = "material.color", .offset = offsetof(MaterialPushConstants, color), .type = PushConstantType::Vec3},
-			{.name = "model", .offset = offsetof(TransformView, model), .type = PushConstantType::Mat4},
-			{.name = "normal", .offset = offsetof(TransformView, normal), .type = PushConstantType::Mat3}
 		}},
-		.count = 6
+		.count = 4
 	};
 
 	PipelineLayout layout = {
