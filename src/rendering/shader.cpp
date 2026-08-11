@@ -13,27 +13,27 @@ ShaderStage::ShaderStage(const PipelineShaderStage& info) : type(info.stage) {
 	std::string processedSource;
 	preprocess(info.code, processedSource);
 
-	handle = glCreateShader(toUnderlying(info.stage));
+	mHandle = glCreateShader(toUnderlying(info.stage));
 
 	const char* ptr = processedSource.data();
 
-	glShaderSource(handle, 1, &ptr, nullptr);
-	glCompileShader(handle);
+	glShaderSource(mHandle, 1, &ptr, nullptr);
+	glCompileShader(mHandle);
 
 	checkCompileErrors(info.code);
 }
 
 ShaderStage::ShaderStage(ShaderStage&& other) noexcept
-	: handle(std::exchange(other.handle, 0)),
+	: mHandle(std::exchange(other.mHandle, 0)),
 	  type(std::exchange(other.type, {})) {
 }
 
 ShaderStage& ShaderStage::operator=(ShaderStage&& other) noexcept {
 	if (this != &other) {
-		if (handle)
-			glDeleteShader(handle);
+		if (mHandle)
+			glDeleteShader(mHandle);
 
-		handle = std::exchange(other.handle, 0);
+		mHandle = std::exchange(other.mHandle, 0);
 		type = std::exchange(other.type, {});
 	}
 
@@ -41,25 +41,29 @@ ShaderStage& ShaderStage::operator=(ShaderStage&& other) noexcept {
 }
 
 ShaderStage::~ShaderStage() {
-	if (handle)
-		glDeleteShader(handle);
+	if (mHandle)
+		glDeleteShader(mHandle);
+}
+
+uint32_t ShaderStage::id() const {
+	return mHandle;
 }
 
 void ShaderStage::checkCompileErrors(const std::string_view code) const {
 	int32_t success;
-	glGetShaderiv(handle, GL_COMPILE_STATUS, &success);
+	glGetShaderiv(mHandle, GL_COMPILE_STATUS, &success);
 
 	if (!success) {
 		std::string infoLog;
 		int32_t maxLength = 0;
 
-		glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &maxLength);
+		glGetShaderiv(mHandle, GL_INFO_LOG_LENGTH, &maxLength);
 		infoLog.resize(maxLength);
 
-		glGetShaderInfoLog(handle, maxLength, nullptr, infoLog.data());
+		glGetShaderInfoLog(mHandle, maxLength, nullptr, infoLog.data());
 
 		// The program is useless now. So delete it.
-		glDeleteShader(handle);
+		glDeleteShader(mHandle);
 
 		throw std::runtime_error(std::format("Compilation Error in: {} \n {}", code, infoLog));
 	}
@@ -132,7 +136,7 @@ void Shader::bind() const {
 }
 
 void Shader::attachStage(const ShaderStage& stage) const {
-	glAttachShader(mID, stage.handle);
+	glAttachShader(mID, stage.id());
 }
 
 void Shader::link() const {
@@ -160,65 +164,75 @@ void Shader::checkLinkErrors() const {
 	}
 }
 
-void Uniform::setBool(const uint32_t id, const std::string_view name, const bool value) {
-	glUniform1i(glGetUniformLocation(id, name.data()), static_cast<int>(value));
+int32_t Shader::getUniformLocation(const std::string_view name) {
+	if (const auto it = mUniformLocations.find(name.data()); it != mUniformLocations.end())
+		return it->second;
+
+	const int32_t location = glGetUniformLocation(mID, name.data());
+	mUniformLocations.emplace(std::string(name), location);
+
+	return location;
 }
 
-void Uniform::setInt(const uint32_t id, const std::string_view name, const int32_t value) {
-	glUniform1i(glGetUniformLocation(id, name.data()), value);
+void Uniform::setBool(const int32_t location, const bool value) {
+	glUniform1i(location, static_cast<int>(value));
 }
 
-void Uniform::setUint(const uint32_t id, const std::string_view name, const uint32_t value) {
-	glUniform1ui(glGetUniformLocation(id, name.data()), value);
+void Uniform::setInt(const int32_t location, const int32_t value) {
+	glUniform1i(location, value);
 }
 
-void Uniform::setFloat(const uint32_t id, const std::string_view name, const float value) {
-	glUniform1f(glGetUniformLocation(id, name.data()), value);
+void Uniform::setUint(const int32_t location, const uint32_t value) {
+	glUniform1ui(location, value);
 }
 
-void Uniform::setFloatArray(const uint32_t id, const std::string_view name, const float* values, const uint32_t count) {
-	glUniform1fv(glGetUniformLocation(id, name.data()), static_cast<int32_t>(count), values);
+void Uniform::setFloat(const int32_t location, const float value) {
+	glUniform1f(location, value);
 }
 
-void Uniform::setVec2(const uint32_t id, const std::string_view name, const glm::vec2& value) {
-	glUniform2fv(glGetUniformLocation(id, name.data()), 1, &value[0]);
+void Uniform::setFloatArray(const int32_t location, const float* values, const uint32_t count) {
+	glUniform1fv(location, static_cast<int32_t>(count), values);
 }
 
-void Uniform::setVec2(const uint32_t id, const std::string_view name, const float x, const float y) {
-	glUniform2f(glGetUniformLocation(id, name.data()), x, y);
+void Uniform::setVec2(const int32_t location, const glm::vec2& value) {
+	glUniform2fv(location, 1, &value[0]);
 }
 
-void Uniform::setVec3(const uint32_t id, const std::string_view name, const glm::vec3& value) {
-	glUniform3fv(glGetUniformLocation(id, name.data()), 1, &value[0]);
+void Uniform::setVec2(const int32_t location, const float x, const float y) {
+	glUniform2f(location, x, y);
 }
 
-void Uniform::setVec3(const uint32_t id, const std::string_view name, const float x, const float y, const float z) {
-	glUniform3f(glGetUniformLocation(id, name.data()), x, y, z);
+void Uniform::setVec3(const int32_t location, const glm::vec3& value) {
+	glUniform3fv(location, 1, &value[0]);
 }
 
-void Uniform::setVec4(const uint32_t id, const std::string_view name, const glm::vec4& value) {
-	glUniform4fv(glGetUniformLocation(id, name.data()), 1, &value[0]);
+void Uniform::setVec3(const int32_t location, const float x, const float y, const float z) {
+	glUniform3f(location, x, y, z);
 }
 
-void Uniform::setVec4(const uint32_t id, const std::string_view name, const float x, const float y, const float z,
+void Uniform::setVec4(const int32_t location, const glm::vec4& value) {
+	glUniform4fv(location, 1, &value[0]);
+}
+
+void Uniform::setVec4(const int32_t location, const float x, const float y, const float z,
                       const float w) {
-	glUniform4f(glGetUniformLocation(id, name.data()), x, y, z, w);
+	glUniform4f(location, x, y, z, w);
 }
 
-void Uniform::setMat2(const uint32_t id, const std::string_view name, const glm::mat2& mat) {
-	glUniformMatrix2fv(glGetUniformLocation(id, name.data()), 1, GL_FALSE, &mat[0][0]);
+void Uniform::setMat2(const int32_t location, const glm::mat2& mat) {
+	glUniformMatrix2fv(location, 1, GL_FALSE, &mat[0][0]);
 }
 
-void Uniform::setMat3(const uint32_t id, const std::string_view name, const glm::mat3& mat) {
-	glUniformMatrix3fv(glGetUniformLocation(id, name.data()), 1, GL_FALSE, &mat[0][0]);
+void Uniform::setMat3(const int32_t location, const glm::mat3& mat) {
+	glUniformMatrix3fv(location, 1, GL_FALSE, &mat[0][0]);
 }
 
-void Uniform::setMat4(const uint32_t id, const std::string_view name, const glm::mat4& mat) {
-	glUniformMatrix4fv(glGetUniformLocation(id, name.data()), 1, GL_FALSE, &mat[0][0]);
+void Uniform::setMat4(const int32_t location, const glm::mat4& mat) {
+	glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0][0]);
 }
 
-void Uniform::setMat4Array(const uint32_t id, const std::string_view name, const glm::mat4* matrices, const size_t count) {
-	glUniformMatrix4fv(glGetUniformLocation(id, name.data()), static_cast<int32_t>(count), GL_FALSE, glm::value_ptr(matrices[0]));
+void Uniform::setMat4Array(const int32_t location, const glm::mat4* matrices, const size_t count) {
+	glUniformMatrix4fv(location, static_cast<int32_t>(count), GL_FALSE, glm::value_ptr(matrices[0]));
 }
 
 std::string ShaderLoader::load(const std::string_view file) {

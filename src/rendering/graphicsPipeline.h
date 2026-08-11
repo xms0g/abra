@@ -198,7 +198,7 @@ public:
 	void bind() const;
 
 	template<typename T>
-	void setValue(std::string_view name, const T& value) const;
+	void setValue(std::string_view name, const T& value);
 
 	template<typename T>
 	void setValue(std::string_view name, const T* value, uint32_t count);
@@ -223,7 +223,7 @@ private:
 };
 
 template<typename T>
-void GraphicsPipeline::setValue(std::string_view name, const T& value) const {
+void GraphicsPipeline::setValue(std::string_view name, const T& value) {
 	mState.shader.setValue(name, value);
 }
 

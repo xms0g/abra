@@ -78,7 +78,7 @@ public:
 	void setUniform(std::string_view name, const T& value);
 
 	template<typename T>
-	void setUniform(std::string_view name, const T* value, uint32_t count) const;
+	void setUniform(std::string_view name, const T* value, uint32_t count);
 
 	void reset();
 
@@ -158,7 +158,7 @@ void GraphicsEncoder::setUniform(std::string_view name, const T& value) {
 }
 
 template<typename T>
-void GraphicsEncoder::setUniform(std::string_view name, const T* value, uint32_t count) const {
+void GraphicsEncoder::setUniform(std::string_view name, const T* value, uint32_t count) {
 	assert(mState.pipeline);
 	mState.pipeline->setValue(name, value, count);
 }
