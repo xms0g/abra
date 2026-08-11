@@ -19,9 +19,6 @@ enum MaterialFlag: uint32_t {
 	HAS_SOLID_COLOR = 1 << 11,
 };
 
-class Shader;
-class Mesh;
-
 struct Material {
 	uint32_t idx{0};
 	uint32_t flags{0};
@@ -68,13 +65,9 @@ struct MaterialBatch {
 };
 
 struct TextureBindingCache {
-	uint32_t lastMatFlags{0};
-	uint32_t lastShader{0};
 	std::array<TextureView, 32> textures;
 
 	void reset() {
-		lastMatFlags = 0;
-		lastShader = 0;
 		textures.fill({});
 	}
 };

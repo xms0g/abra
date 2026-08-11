@@ -2,6 +2,7 @@
 #include <vector>
 #include "material/material.hpp"
 
+class Mesh;
 class Entity;
 class QueueRegistry;
 struct RenderData;
