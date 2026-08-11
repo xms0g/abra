@@ -15,10 +15,10 @@ public:
 	FrameBuffer& getResource(std::string_view key) const;
 
 	void addPass(std::string name,
-	             bool active,
 	             std::unique_ptr<IPass> pass,
 	             std::vector<std::string> inputs,
-	             std::vector<std::string> outputs);
+	             std::vector<std::string> outputs,
+	             bool active);
 
 	void addResource(std::string key, std::unique_ptr<FrameBuffer> resource);
 
@@ -31,10 +31,10 @@ public:
 private:
 	struct PassNode {
 		std::string name;
-		bool isActive{true};
 		std::unique_ptr<IPass> pass;
 		std::vector<std::string> inputs;
 		std::vector<std::string> outputs;
+		bool isActive{true};
 	};
 
 	std::unordered_map<std::string, std::unique_ptr<FrameBuffer> > mResources;

@@ -12,16 +12,16 @@ FrameBuffer& FrameGraph::getResource(const std::string_view key) const {
 }
 
 void FrameGraph::addPass(std::string name,
-                         const bool active,
                          std::unique_ptr<IPass> pass,
                          std::vector<std::string> inputs,
-                         std::vector<std::string> outputs) {
+                         std::vector<std::string> outputs,
+                         const bool active) {
 	mPasses.emplace_back(
 		std::move(name),
-		active,
 		std::move(pass),
 		std::move(inputs),
-		std::move(outputs));
+		std::move(outputs),
+		active);
 }
 
 void FrameGraph::addResource(std::string key, std::unique_ptr<FrameBuffer> resource) {
