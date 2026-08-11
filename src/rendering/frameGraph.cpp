@@ -7,8 +7,8 @@
 #include "passes/IPass.hpp"
 #include "../event/eventBus.hpp"
 
-FrameBuffer& FrameGraph::getResource(const std::string& key) const {
-	return *mResources.at(key);
+FrameBuffer& FrameGraph::getResource(const std::string_view key) const {
+	return *mResources.at(key.data());
 }
 
 void FrameGraph::addPass(std::string name,

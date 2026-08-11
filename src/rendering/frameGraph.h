@@ -12,7 +12,7 @@ class IPass;
 class FrameGraph {
 public:
 	[[nodiscard]]
-	FrameBuffer& getResource(const std::string& key) const;
+	FrameBuffer& getResource(std::string_view key) const;
 
 	void addPass(std::string name,
 	             bool active,
