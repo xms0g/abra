@@ -91,14 +91,12 @@ void ShadowSystem::configure(const RenderContext& ctx,
 	mOmnidirShadow = std::make_unique<OmnidirectionalShadow>(ctx);
 	mPersShadow = std::make_unique<PerspectiveShadow>(ctx);
 
-	mUBO = UniformBuffer(
-		DYNAMIC,
-		sizeof(UniformBufferObject));
+	mUBO = UniformBuffer{DYNAMIC, sizeof(UniformBufferObject)};
 
 	DescriptorSet shadowSet{};
 	shadowSet.write(
 		CONFIG_MANAGER.get<int32_t>("shadow.ubo.binding"),
-		{.id = mUBO.id(), .target = mUBO.target(), .size = mUBO.size()}
+		{.id = mUBO.id(), .target = mUBO.target(), .size = sizeof(UniformBufferObject)}
 		);
 
 	encoder.bindDescriptorSet(shadowSet);
@@ -182,5 +180,5 @@ void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
 
 	mEncoder->setCullFace(CullMode::Back);
 
-	mUBO.copyToMemory(&ubo, 0);
+	mUBO.copyToMemory(&ubo, 0, sizeof(UniformBufferObject));
 }

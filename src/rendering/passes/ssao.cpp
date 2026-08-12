@@ -189,11 +189,11 @@ void SSAOPass::createKernel(GraphicsEncoder& encoder) {
 	DescriptorSet ssaoSet{};
 	ssaoSet.write(
 		CONFIG_MANAGER.get<int32_t>("ssao.ubo.binding"),
-		{.id = mUBO.id(), .target = mUBO.target(), .size = mUBO.size()}
+		{.id = mUBO.id(), .target = mUBO.target(), .size = sizeof(UniformBufferObject)}
 	);
 
 	encoder.bindDescriptorSet(ssaoSet);
-	mUBO.copyToMemory(&ubo, 0);
+	mUBO.copyToMemory(&ubo, 0, sizeof(UniformBufferObject));
 }
 
 void SSAOPass::createNoiseTexture() {

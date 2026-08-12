@@ -112,15 +112,12 @@ void Renderer::createSystems(Registry& registry) {
 
 void Renderer::createUniformBuffers() {
 	// Create camera buffer
-	mCameraUBO = UniformBuffer{
-		DYNAMIC,
-		4 * sizeof(glm::mat4) + sizeof(glm::vec4)
-	};
+	mCameraUBO = UniformBuffer{DYNAMIC, sizeof(UniformBufferObject)};
 
 	DescriptorSet cameraSet{};
 	cameraSet.write(
 		CONFIG_MANAGER.get<int32_t>("camera.ubo.binding"),
-		{.id = mCameraUBO.id(), .target = mCameraUBO.target(), .size = mCameraUBO.size()}
+		{.id = mCameraUBO.id(), .target = mCameraUBO.target(), .size = sizeof(UniformBufferObject)}
 		);
 
 	mEncoder.bindDescriptorSet(cameraSet);
@@ -407,7 +404,7 @@ void Renderer::updateUniformBuffers() const {
 		.projection = projection
 	};
 
-	mCameraUBO.copyToMemory(&ubo, 0);
+	mCameraUBO.copyToMemory(&ubo, 0, sizeof(UniformBufferObject));
 }
 
 void Renderer::sortEntities() {

@@ -47,14 +47,12 @@ void LightSystem::configure(RenderContext& ctx, GraphicsEncoder& encoder, EventB
 	mCtx->light.pointLights = std::span(mPointLights.data(), mPointLights.size());
 	mCtx->light.spotLights = std::span(mSpotLights.data(), mSpotLights.size());
 
-	mUBO = UniformBuffer(
-		DYNAMIC,
-		sizeof(UniformBufferObject));
+	mUBO = UniformBuffer{DYNAMIC, sizeof(UniformBufferObject)};
 
 	DescriptorSet lightSet{};
 	lightSet.write(
 	CONFIG_MANAGER.get<int32_t>("light.ubo.binding"),
-	{.id = mUBO.id(), .target = mUBO.target(), .size = mUBO.size()}
+	{.id = mUBO.id(), .target = mUBO.target(), .size = sizeof(UniformBufferObject)}
 	);
 
 	encoder.bindDescriptorSet(lightSet);
@@ -104,7 +102,7 @@ void LightSystem::updateLightUBO() const {
 
 	ubo.lightCount = glm::ivec4(dirLightCount, pointLightCount, spotLightCount, 0);
 
-	mUBO.copyToMemory(&ubo, 0);
+	mUBO.copyToMemory(&ubo, 0, sizeof(UniformBufferObject));
 }
 
 void LightSystem::onGuiUpdate(const GuiLightEvent& event) {
