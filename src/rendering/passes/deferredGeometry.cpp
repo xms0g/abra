@@ -111,11 +111,13 @@ void DeferredGeometryPass::configure(const RenderContext& ctx,
 	};
 	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
 	mPipeline = GraphicsPipeline{createInfo};
+
+	mIndexes.gBuffer = graph.getResourceID("gBuffer");
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("DeferredCommands");
 }
 
 void DeferredGeometryPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
-	encoder.bindFrameBuffer(graph.getResource("gBuffer"));
+	encoder.bindFrameBuffer(graph.getResource(mIndexes.gBuffer));
 	encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
 
 	encoder.bindPipeline(mPipeline);

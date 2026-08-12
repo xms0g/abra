@@ -33,7 +33,6 @@ glm::mat4 DirectionalShadow::lightSpaceMatrix() const {
 }
 
 void DirectionalShadow::render(const RenderContext& ctx,
-                               const FrameGraph& graph,
                                GraphicsEncoder& encoder,
                                GraphicsPipeline& pipeline,
                                const glm::vec3& direction) {
@@ -45,12 +44,6 @@ void DirectionalShadow::render(const RenderContext& ctx,
 
 	encoder.bindPipeline(pipeline);
 	encoder.setUniform("lightSpaceMatrix", mLightSpaceMatrix);
-
-	// render scene from light's point of view
-	const auto& frameBuffer = graph.getResource("directional");
-	encoder.bindFrameBuffer(frameBuffer);
-	encoder.setViewport({.x = 0, .y = 0, .width = frameBuffer.width(), .height = frameBuffer.height()});
-	encoder.clearFrameBuffer(ClearMask::Depth);
 
 	for (const auto& [entityID, matBatch]: mObjects) {
 		encoder.bindTransform({

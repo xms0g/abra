@@ -28,6 +28,11 @@ public:
 private:
 	void onGuiUpdate(const GuiPostProcessEvent& event);
 
+	struct ResourceIndexes {
+		uint32_t sceneBuffer;
+	};
+
+	ResourceIndexes mIndexes{};
 	GraphicsPipeline mPipeline{};
 	std::array<FrameBuffer*, 2> mRenderTargets{};
 	std::array<DescriptorSet, 2> mRenderTargetsDescSets{};

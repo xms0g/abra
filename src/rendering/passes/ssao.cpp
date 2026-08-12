@@ -111,7 +111,11 @@ void SSAOPass::configure(const RenderContext& ctx,
 	GraphicsPipelineCreateInfo blurCreateInfo = {.rendering = blurInfo, .layout = blurLayout};
 	mPipelines[1] = GraphicsPipeline{blurCreateInfo};
 
-	const auto& gBuffer = graph.getResource("gBuffer");
+	mIndexes.gBuffer = graph.getResourceID("gBuffer");
+	mIndexes.ssao = graph.getResourceID("ssao");
+	mIndexes.blur = graph.getResourceID("ssaoBlur");
+
+	const auto& gBuffer = graph.getResource(mIndexes.gBuffer);
 
 	DescriptorSet frameSet{};
 	frameSet.write(
@@ -133,7 +137,7 @@ void SSAOPass::execute(const RenderContext& ctx, const FrameGraph& graph, Graphi
 }
 
 void SSAOPass::ssao(const FrameGraph& graph, GraphicsEncoder& encoder) {
-	const auto& ssao = graph.getResource("ssao");
+	const auto& ssao = graph.getResource(mIndexes.ssao);
 
 	encoder.bindFrameBuffer(ssao);
 	encoder.clearFrameBuffer(ClearMask::Color);
@@ -144,14 +148,14 @@ void SSAOPass::ssao(const FrameGraph& graph, GraphicsEncoder& encoder) {
 }
 
 void SSAOPass::blur(const FrameGraph& graph, GraphicsEncoder& encoder) {
-	const auto& blur = graph.getResource("ssaoBlur");
+	const auto& blur = graph.getResource(mIndexes.blur);
 
 	encoder.bindFrameBuffer(blur);
 	encoder.clearFrameBuffer(ClearMask::Color);
 	encoder.setViewport({.x = 0, .y = 0, .width = blur.width(), .height = blur.height()});
 
 	encoder.bindPipeline(mPipelines[1]);
-	encoder.bindTexture(graph.getResource("ssao").texture(), 0);
+	encoder.bindTexture(graph.getResource(mIndexes.ssao).texture(), 0);
 	encoder.draw(3);
 }
 

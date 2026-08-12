@@ -75,12 +75,13 @@ void ForwardUnlitPass::configure(const RenderContext& ctx,
 	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
 	mPipeline = GraphicsPipeline{createInfo};
 
+	mIndexes.sceneBuffer = graph.getResourceID("sceneBuffer");
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("UnlitCommands");
 }
 
 void ForwardUnlitPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
 	for (const auto& cmd: *mCommands) {
-		encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
+		encoder.bindFrameBuffer(graph.getResource(mIndexes.sceneBuffer));
 		encoder.bindPipeline(mPipeline);
 
 		const MaterialPushConstants pushConstants = {

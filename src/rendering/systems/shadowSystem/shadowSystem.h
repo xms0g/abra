@@ -36,6 +36,13 @@ private:
 
 	void onGuiUpdate(const UpdateShadowMapEvent& event);
 
+	struct ResourceIndexes {
+		uint32_t directional;
+		uint32_t omnidirectional;
+		uint32_t perspective;
+	};
+
+	ResourceIndexes mIndexes{};
 	const RenderContext* mCtx{nullptr};
 	const FrameGraph* mGraph{nullptr};
 	GraphicsEncoder* mEncoder{nullptr};

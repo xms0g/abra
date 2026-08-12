@@ -104,12 +104,26 @@ void ForwardBlendPass::configure(const RenderContext& ctx,
 	};
 
 	PushConstantLayout pushConstantLayout = {
-		.constants = {{
-			{.name = "material.flags", .offset = offsetof(MaterialPushConstants, flags), .type = PushConstantType::UInt},
-			{.name = "material.heightScale", .offset = offsetof(MaterialPushConstants, heightScale), .type = PushConstantType::Float},
-			{.name = "material.alphaCutoff", .offset = offsetof(MaterialPushConstants, alphaCutoff), .type = PushConstantType::Float},
-			{.name = "material.color", .offset = offsetof(MaterialPushConstants, color), .type = PushConstantType::Vec3}
-		}},
+		.constants = {
+			{
+				{
+					.name = "material.flags", .offset = offsetof(MaterialPushConstants, flags),
+					.type = PushConstantType::UInt
+				},
+				{
+					.name = "material.heightScale", .offset = offsetof(MaterialPushConstants, heightScale),
+					.type = PushConstantType::Float
+				},
+				{
+					.name = "material.alphaCutoff", .offset = offsetof(MaterialPushConstants, alphaCutoff),
+					.type = PushConstantType::Float
+				},
+				{
+					.name = "material.color", .offset = offsetof(MaterialPushConstants, color),
+					.type = PushConstantType::Vec3
+				}
+			}
+		},
 		.count = 4
 	};
 
@@ -123,15 +137,20 @@ void ForwardBlendPass::configure(const RenderContext& ctx,
 	DescriptorSet frameSet{};
 	frameSet.write(
 				CONFIG_MANAGER.get<int32_t>("shadow.map.slot"),
-				graph.getResource("directional").texture())
+				graph.getResource(mIndexes.directional).texture())
 			.write(
 				CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 1,
-				graph.getResource("point").texture())
+				graph.getResource(mIndexes.point).texture())
 			.write(
 				CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 2,
-				graph.getResource("spot").texture());
+				graph.getResource(mIndexes.spot).texture());
 
 	encoder.bindDescriptorSet(frameSet);
+
+	mIndexes.sceneBuffer = graph.getResourceID("sceneBuffer");
+	mIndexes.directional = graph.getResourceID("directional");
+	mIndexes.point = graph.getResourceID("point");
+	mIndexes.spot = graph.getResourceID("spot");
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("BlendCommands");
 }
 
@@ -139,7 +158,7 @@ void ForwardBlendPass::execute(const RenderContext& ctx, const FrameGraph& graph
 	const auto pipelineCullMode = mPipeline.rasterizationState().cullMode;
 
 	for (const auto& cmd: *mCommands) {
-		encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
+		encoder.bindFrameBuffer(graph.getResource(mIndexes.sceneBuffer));
 		encoder.bindPipeline(mPipeline);
 		encoder.bindDescriptorSet(ctx.renderData->material.descriptorSets[cmd.material.idx]);
 

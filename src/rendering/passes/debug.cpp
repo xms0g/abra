@@ -9,7 +9,6 @@
 #include "../../ECS/components/debug.hpp"
 #include "../../config/configManager.h"
 
-
 DebugPass::DebugPass() = default;
 
 DebugPass::~DebugPass() = default;
@@ -83,11 +82,12 @@ void DebugPass::configure(const RenderContext& ctx,
 		GraphicsPipeline{wireframeCreateInfo},
 	};
 
+	mIndexes.sceneBuffer = graph.getResourceID("sceneBuffer");
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("DebugCommands");
 }
 
 void DebugPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
-	encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
+	encoder.bindFrameBuffer(graph.getResource(mIndexes.sceneBuffer));
 
 	for (const auto& cmd: *mCommands) {
 		if (cmd.debugMode == None)

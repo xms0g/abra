@@ -57,6 +57,7 @@ void SkyboxPass::configure(const RenderContext& ctx,
 	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
 	mPipeline = GraphicsPipeline{createInfo};
 
+	mIndexes.sceneBuffer = graph.getResourceID("sceneBuffer");
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("SkyboxCommands");
 }
 
@@ -64,7 +65,7 @@ void SkyboxPass::execute(const RenderContext& ctx, const FrameGraph& graph, Grap
 	const auto& cmd = mCommands->front();
 	const auto pipelineCullMode = mPipeline.rasterizationState().cullMode;
 
-	encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
+	encoder.bindFrameBuffer(graph.getResource(mIndexes.sceneBuffer));
 	encoder.bindPipeline(mPipeline);
 	encoder.bindDescriptorSet(ctx.renderData->material.descriptorSets[cmd.material.idx]);
 	encoder.setCullMode(cmd.material.flags & TWOSIDED ? CullMode::None : pipelineCullMode);

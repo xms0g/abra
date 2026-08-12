@@ -30,10 +30,18 @@ private:
 		float padding[3];
 	};
 
+	struct ResourceIndexes {
+		uint32_t sceneBuffer;
+		uint32_t directional;
+		uint32_t point;
+		uint32_t spot;
+	};
+
 	void prepareInstanceBuffer(const std::vector<uint32_t>& vaos);
 
 	void uploadInstanceData() const;
 
+	ResourceIndexes mIndexes{};
 	GraphicsPipeline mPipeline{};
 	std::unique_ptr<VertexBuffer> mVBO;
 	std::span<RenderInstanceGroup> mObjects;

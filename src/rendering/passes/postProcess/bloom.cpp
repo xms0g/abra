@@ -44,7 +44,7 @@ void Bloom::configure(const FrameGraph& graph) {
 			{.name = "bloomBlur", .type = DescriptorType::SampledImage, .binding = 1}
 		}
 	});
-	mRenderTargets = {&graph.getResource("bloomPing"), &graph.getResource("bloomPong")};
+	mRenderTargets = {&graph.getResource(graph.getResourceID("bloomPing")), &graph.getResource(graph.getResourceID("bloomPong"))};
 
 	DescriptorSet pingDescSet{};
 	pingDescSet.write(0, mRenderTargets[0]->texture());

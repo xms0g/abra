@@ -31,6 +31,13 @@ private:
 
 	void createNoiseTexture();
 
+	struct ResourceIndexes {
+		uint32_t gBuffer;
+		uint32_t ssao;
+		uint32_t blur;
+	};
+
+	ResourceIndexes mIndexes{};
 	std::array<GraphicsPipeline, 2> mPipelines;
 	UniformBuffer mUBO{};
 	Texture mNoiseTexture{};

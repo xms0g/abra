@@ -51,7 +51,8 @@ void PostProcessPass::configure(const RenderContext& ctx,
 		}
 	});
 
-	mRenderTargets = {&graph.getResource("ping"), &graph.getResource("pong")};
+	mIndexes.sceneBuffer = graph.getResourceID("sceneBuffer");
+	mRenderTargets = {&graph.getResource(graph.getResourceID("ping")), &graph.getResource(graph.getResourceID("pong"))};
 
 	DescriptorSet pingDescSet{};
 	pingDescSet.write(0, mRenderTargets[0]->texture());
@@ -67,7 +68,7 @@ void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph,
 	bool toggle = false;
 
 	DescriptorSet sceneDescSet{};
-	sceneDescSet.write(0, graph.getResource("sceneBuffer").texture());
+	sceneDescSet.write(0, graph.getResource(mIndexes.sceneBuffer).texture());
 
 	DescriptorSet* dscSet = &sceneDescSet;
 	for (const auto& effect: mEffects) {

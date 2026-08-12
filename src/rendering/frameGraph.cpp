@@ -7,8 +7,12 @@
 #include "passes/IPass.hpp"
 #include "../event/eventBus.hpp"
 
-FrameBuffer& FrameGraph::getResource(const std::string_view key) const {
-	return *mResources.at(key.data());
+FrameBuffer& FrameGraph::getResource(const uint32_t id) const {
+	return *mResources[id];
+}
+
+uint32_t FrameGraph::getResourceID(const std::string_view key) const {
+	return mResourcesIDs.at(key.data());
 }
 
 void FrameGraph::addPass(std::string name,
@@ -25,7 +29,8 @@ void FrameGraph::addPass(std::string name,
 }
 
 void FrameGraph::addResource(std::string key, std::unique_ptr<FrameBuffer> resource) {
-	mResources.emplace(std::move(key), std::move(resource));
+	mResources.emplace_back(std::move(resource));
+	mResourcesIDs.emplace(std::move(key), mResources.size() - 1);
 }
 
 void FrameGraph::compile() {

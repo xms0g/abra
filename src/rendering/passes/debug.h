@@ -22,6 +22,11 @@ public:
 	void execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) override;
 
 private:
+	struct ResourceIndexes {
+		uint32_t sceneBuffer;
+	};
+
+	ResourceIndexes mIndexes{};
 	std::array<GraphicsPipeline, 3> mPipelines{};
 	RenderQueue<DrawCommand>* mCommands{nullptr};
 };

@@ -90,13 +90,14 @@ void TerrainPass::configure(const RenderContext& ctx,
 	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
 	mPipeline = GraphicsPipeline{createInfo};
 
+	mIndexes.sceneBuffer = graph.getResourceID("sceneBuffer");
 	mCommands = &ctx.queueRegistry->get<DrawCommand>("TerrainCommands");
 }
 
 void TerrainPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
 	const auto& cmd = mCommands->front();
 
-	encoder.bindFrameBuffer(graph.getResource("sceneBuffer"));
+	encoder.bindFrameBuffer(graph.getResource(mIndexes.sceneBuffer));
 	encoder.bindPipeline(mPipeline);
 	encoder.bindDescriptorSet(ctx.renderData->material.descriptorSets[cmd.material.idx]);
 

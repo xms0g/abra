@@ -12,7 +12,10 @@ class IPass;
 class FrameGraph {
 public:
 	[[nodiscard]]
-	FrameBuffer& getResource(std::string_view key) const;
+	FrameBuffer& getResource(uint32_t id) const;
+
+	[[nodiscard]]
+	uint32_t getResourceID(std::string_view key) const;
 
 	void addPass(std::string name,
 	             std::unique_ptr<IPass> pass,
@@ -37,7 +40,8 @@ private:
 		bool isActive{true};
 	};
 
-	std::unordered_map<std::string, std::unique_ptr<FrameBuffer> > mResources;
+	std::unordered_map<std::string, uint32_t> mResourcesIDs;
+	std::vector<std::unique_ptr<FrameBuffer>> mResources;
 	std::vector<PassNode> mPasses;
 	std::vector<size_t> mExecutionOrder;
 };

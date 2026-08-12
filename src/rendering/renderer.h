@@ -72,6 +72,11 @@ private:
 		glm::mat4 projection;
 	};
 
+	struct ResourceIndexes {
+		uint32_t sceneBuffer;
+	};
+
+	ResourceIndexes mIndexes{};
 	FrameGraph mGraph{};
 	// Systems
 	LightSystem* mLightSystem{};

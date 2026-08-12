@@ -135,7 +135,14 @@ void DeferredLightingPass::configure(const RenderContext& ctx,
 	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
 	mPipeline = GraphicsPipeline{createInfo};
 
-	const auto& gBuffer = graph.getResource("gBuffer");
+	mIndexes.gBuffer = graph.getResourceID("gBuffer");
+	mIndexes.sceneBuffer = graph.getResourceID("sceneBuffer");
+	mIndexes.ssao = graph.getResourceID("ssaoBlur");
+	mIndexes.directional = graph.getResourceID("directional");
+	mIndexes.point = graph.getResourceID("point");
+	mIndexes.spot = graph.getResourceID("spot");
+
+	const auto& gBuffer = graph.getResource(mIndexes.gBuffer);
 
 	DescriptorSet frameSet{};
 	frameSet.write(
@@ -152,7 +159,7 @@ void DeferredLightingPass::configure(const RenderContext& ctx,
 				gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.orm.index")))
 			.write(
 				CONFIG_MANAGER.get<int32_t>("ssao.slot"),
-				graph.getResource("ssaoBlur").texture())
+				graph.getResource(mIndexes.ssao).texture())
 			.write(
 				CONFIG_MANAGER.get<int32_t>("PBR.irradianceMap.slot"),
 				ctx.pbrBuffers->irradiance->texture())
@@ -164,20 +171,20 @@ void DeferredLightingPass::configure(const RenderContext& ctx,
 				ctx.pbrBuffers->brdfLUT->texture())
 			.write(
 				CONFIG_MANAGER.get<int32_t>("shadow.map.slot"),
-				graph.getResource("directional").texture())
+				graph.getResource(mIndexes.directional).texture())
 			.write(
 				CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 1,
-				graph.getResource("point").texture())
+				graph.getResource(mIndexes.point).texture())
 			.write(
 				CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 2,
-				graph.getResource("spot").texture());
+				graph.getResource(mIndexes.spot).texture());
 
 	encoder.bindDescriptorSet(frameSet);
 }
 
 void DeferredLightingPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
-	const auto& gBuffer = graph.getResource("gBuffer");
-	const auto& sceneBuffer = graph.getResource("sceneBuffer");
+	const auto& gBuffer = graph.getResource(mIndexes.gBuffer);
+	const auto& sceneBuffer = graph.getResource(mIndexes.sceneBuffer);
 
 	encoder.blitFramebuffer(gBuffer, sceneBuffer, BlitMask::Depth);
 	encoder.bindFrameBuffer(sceneBuffer);

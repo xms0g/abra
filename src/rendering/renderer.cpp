@@ -42,6 +42,7 @@
 #include "../ECS/components/material.hpp"
 #include "../event/eventBus.hpp"
 #include "../resource/resourceManager.h"
+#include "passes/forwardBlend.h"
 #include "passes/instancedBlend.h"
 
 Renderer::Renderer(Registry& registry, const Camera& camera, Window& window) {
@@ -89,7 +90,7 @@ void Renderer::render() {
 
 	mEncoder.reset();
 
-	auto& frameBuffer = mGraph.getResource("sceneBuffer");
+	auto& frameBuffer = mGraph.getResource(mIndexes.sceneBuffer);
 	mEncoder.beginRendering({
 		.frameBuffer = frameBuffer,
 		.clearColor = true,
@@ -118,7 +119,7 @@ void Renderer::createUniformBuffers() {
 	cameraSet.write(
 		CONFIG_MANAGER.get<int32_t>("camera.ubo.binding"),
 		{.id = mCameraUBO.id(), .target = mCameraUBO.target(), .size = sizeof(UniformBufferObject)}
-		);
+	);
 
 	mEncoder.bindDescriptorSet(cameraSet);
 }
@@ -171,6 +172,7 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 		{"sceneBuffer"},
 		!mQueueRegistry.empty("deferred")
 	);
+
 	mGraph.addPass(
 		"DeferredGeometryPass",
 		std::make_unique<DeferredGeometryPass>(),
@@ -261,14 +263,17 @@ void Renderer::createFrameBuffers() {
 	int32_t height = CONFIG_MANAGER.get<int32_t>("window.height");
 
 	mGraph.addResource("sceneBuffer", std::make_unique<FrameBuffer>(width, height));
-	auto& sceneBuffer = mGraph.getResource("sceneBuffer");
+	const uint32_t sceneBufferID = mGraph.getResourceID("sceneBuffer");
+	mIndexes.sceneBuffer = sceneBufferID;
+	auto& sceneBuffer = mGraph.getResource(sceneBufferID);
 
 	if (CONFIG_MANAGER.get<bool>("msaa.enabled")) {
 		glEnable(GL_MULTISAMPLE);
 		const int32_t sampleCount = CONFIG_MANAGER.get<int32_t>("msaa.sample_count");
 
 		mGraph.addResource("intermediateBuffer", std::make_unique<FrameBuffer>(width, height));
-		auto& intermediateBuffer = mGraph.getResource("intermediateBuffer");
+		const uint32_t intermediateBufferID = mGraph.getResourceID("intermediateBuffer");
+		auto& intermediateBuffer = mGraph.getResource(intermediateBufferID);
 		intermediateBuffer.bind();
 
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
@@ -306,7 +311,8 @@ void Renderer::createFrameBuffers() {
 
 	// GBuffer
 	mGraph.addResource("gBuffer", std::make_unique<FrameBuffer>(width, height));
-	auto& gBuffer = mGraph.getResource("gBuffer");
+	const uint32_t gBufferID = mGraph.getResourceID("gBuffer");
+	auto& gBuffer = mGraph.getResource(gBufferID);
 	gBuffer.bind();
 
 	gBuffer.withTextureFP(BaseFormat::RGBA) // position
@@ -326,47 +332,58 @@ void Renderer::createFrameBuffers() {
 
 	// SSAO
 	mGraph.addResource("ssao", std::make_unique<FrameBuffer>(width / 2, height / 2));
-	mGraph.getResource("ssao").bind();
-	mGraph.getResource("ssao").withTexture(BaseFormat::Red).checkStatus();
-	mGraph.getResource("ssao").unbind();
+	const uint32_t ssaoID = mGraph.getResourceID("ssao");
+	auto& ssao = mGraph.getResource(ssaoID);
+	ssao.bind();
+	ssao.withTexture(BaseFormat::Red).checkStatus();
+	ssao.unbind();
 
 	mGraph.addResource("ssaoBlur", std::make_unique<FrameBuffer>(width / 2, height / 2));
-	mGraph.getResource("ssaoBlur").bind();
-	mGraph.getResource("ssaoBlur").withTexture(BaseFormat::Red).checkStatus();
-	mGraph.getResource("ssaoBlur").unbind();
+	const uint32_t ssaoBlurID = mGraph.getResourceID("ssaoBlur");
+	auto& ssaoBlur = mGraph.getResource(ssaoBlurID);
+	ssaoBlur.bind();
+	ssaoBlur.withTexture(BaseFormat::Red).checkStatus();
+	ssaoBlur.unbind();
 
 	// Shadow Maps
 	mGraph.addResource(
 		"directional", std::make_unique<FrameBuffer>(
 			CONFIG_MANAGER.get<int32_t>("shadow.map.width"),
 			CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
-	mGraph.getResource("directional").bind();
-	mGraph.getResource("directional").withTextureDepth(InternalFormat::Depth24, true).checkStatus();
-	mGraph.getResource("directional").unbind();
+	const uint32_t directionalID = mGraph.getResourceID("directional");
+	auto& directional = mGraph.getResource(directionalID);
+	directional.bind();
+	directional.withTextureDepth(InternalFormat::Depth24, true).checkStatus();
+	directional.unbind();
 
 	mGraph.addResource(
 		"point", std::make_unique<FrameBuffer>(
 			CONFIG_MANAGER.get<int32_t>("shadow.map.width"),
 			CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
-	mGraph.getResource("point").bind();
-	mGraph.getResource("point").withTextureCubemapDepthArray(
+	const uint32_t pointID = mGraph.getResourceID("point");
+	auto& point = mGraph.getResource(pointID);
+	point.bind();
+	point.withTextureCubemapDepthArray(
 				CONFIG_MANAGER.get<int32_t>("light.max_point"), InternalFormat::Depth24, true)
 			.checkStatus();
-	mGraph.getResource("point").unbind();
+	point.unbind();
 
 	mGraph.addResource(
 		"spot", std::make_unique<FrameBuffer>(
 			CONFIG_MANAGER.get<int32_t>("shadow.map.width"),
 			CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
-	mGraph.getResource("spot").bind();
-	mGraph.getResource("spot").withTextureDepthArray(
+	const uint32_t spotID = mGraph.getResourceID("spot");
+	auto& spot = mGraph.getResource(spotID);
+	spot.bind();
+	spot.withTextureDepthArray(
 				CONFIG_MANAGER.get<int32_t>("light.max_spot"), InternalFormat::Depth24, true)
 			.checkStatus();
 
 	// PostProcess Render Targets
 	auto addPPRenderTarget = [&](const std::string& name) {
 		mGraph.addResource(name, std::make_unique<FrameBuffer>(width, height));
-		auto& target = mGraph.getResource(name);
+		const uint32_t id = mGraph.getResourceID(name);
+		auto& target = mGraph.getResource(id);
 
 		target.bind();
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {

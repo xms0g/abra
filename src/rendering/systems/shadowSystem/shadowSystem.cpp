@@ -25,6 +25,9 @@ void ShadowSystem::configure(const RenderContext& ctx,
 	mCtx = &ctx;
 	mGraph = &graph;
 	mEncoder = &encoder;
+	mIndexes.directional = graph.getResourceID("directional");
+	mIndexes.omnidirectional = graph.getResourceID("point");
+	mIndexes.perspective = graph.getResourceID("spot");
 
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
@@ -113,7 +116,12 @@ void ShadowSystem::directionalShadowPass(UniformBufferObject& ubo) {
 	if (lights.empty())
 		return;
 
-	mDirShadow->render(*mCtx, *mGraph, *mEncoder, mPipelines[0], lights[0]->direction);
+	const auto& frameBuffer = mGraph->getResource(mIndexes.directional);
+	mEncoder->bindFrameBuffer(frameBuffer);
+	mEncoder->setViewport({.x = 0, .y = 0, .width = frameBuffer.width(), .height = frameBuffer.height()});
+	mEncoder->clearFrameBuffer(ClearMask::Depth);
+
+	mDirShadow->render(*mCtx, *mEncoder, mPipelines[0], lights[0]->direction);
 	ubo.lightSpaceMatrix = mDirShadow->lightSpaceMatrix();
 }
 
@@ -123,7 +131,7 @@ void ShadowSystem::omnidirectionalShadowPass() {
 	if (lights.empty())
 		return;
 
-	const auto& frameBuffer = mGraph->getResource("point");
+	const auto& frameBuffer = mGraph->getResource(mIndexes.omnidirectional);
 	mEncoder->bindFrameBuffer(frameBuffer);
 	mEncoder->setViewport({.x = 0, .y = 0, .width = frameBuffer.width(), .height = frameBuffer.height()});
 	mEncoder->clearFrameBuffer(ClearMask::Depth);
@@ -144,7 +152,7 @@ void ShadowSystem::perspectiveShadowPass(UniformBufferObject& ubo) {
 	if (lights.empty())
 		return;
 
-	const auto& frameBuffer = mGraph->getResource("spot");
+	const auto& frameBuffer = mGraph->getResource(mIndexes.perspective);
 	mEncoder->bindFrameBuffer(frameBuffer);
 	mEncoder->setViewport({.x = 0, .y = 0, .width = frameBuffer.width(), .height = frameBuffer.height()});
 

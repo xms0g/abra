@@ -19,6 +19,14 @@ public:
 	void execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) override;
 
 private:
+	struct ResourceIndexes {
+		uint32_t sceneBuffer;
+		uint32_t directional;
+		uint32_t point;
+		uint32_t spot;
+	};
+
+	ResourceIndexes mIndexes{};
 	GraphicsPipeline mPipeline{};
 	RenderQueue<DrawCommand>* mCommands{nullptr};
 };
