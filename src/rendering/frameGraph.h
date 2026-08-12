@@ -15,7 +15,7 @@ public:
 	FrameBuffer& getResource(uint32_t id) const;
 
 	[[nodiscard]]
-	uint32_t getResourceID(std::string_view key) const;
+	uint32_t getResourceID(std::string_view name) const;
 
 	void addPass(std::string name,
 	             std::unique_ptr<IPass> pass,
@@ -40,7 +40,27 @@ private:
 		bool isActive{true};
 	};
 
-	std::unordered_map<std::string, uint32_t> mResourcesIDs;
+	struct StringHash {
+		using is_transparent = void;
+
+		size_t operator()(const std::string_view value) const noexcept {
+			return std::hash<std::string_view>{}(value);
+		}
+
+		size_t operator()(const std::string& value) const noexcept {
+			return std::hash<std::string_view>{}(value);
+		}
+	};
+
+	struct StringEqual {
+		using is_transparent = void;
+
+		bool operator()(const std::string_view lhs, const std::string_view rhs) const noexcept {
+			return lhs == rhs;
+		}
+	};
+
+	std::unordered_map<std::string, uint32_t, StringHash, StringEqual> mResourcesIDs;
 	std::vector<std::unique_ptr<FrameBuffer>> mResources;
 	std::vector<PassNode> mPasses;
 	std::vector<size_t> mExecutionOrder;

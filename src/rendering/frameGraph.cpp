@@ -11,8 +11,11 @@ FrameBuffer& FrameGraph::getResource(const uint32_t id) const {
 	return *mResources[id];
 }
 
-uint32_t FrameGraph::getResourceID(const std::string_view key) const {
-	return mResourcesIDs.at(key.data());
+uint32_t FrameGraph::getResourceID(const std::string_view name) const {
+	const auto it = mResourcesIDs.find(name);
+	assert(it != mResourcesIDs.end());
+
+	return it->second;
 }
 
 void FrameGraph::addPass(std::string name,
