@@ -23,7 +23,7 @@ public:
 	             std::vector<std::string> outputs,
 	             bool active);
 
-	void addResource(std::string key, std::unique_ptr<FrameBuffer> resource);
+	FrameBuffer& addResource(std::string key, std::unique_ptr<FrameBuffer> resource);
 
 	void compile();
 

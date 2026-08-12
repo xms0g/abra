@@ -31,9 +31,11 @@ void FrameGraph::addPass(std::string name,
 		active);
 }
 
-void FrameGraph::addResource(std::string key, std::unique_ptr<FrameBuffer> resource) {
+FrameBuffer& FrameGraph::addResource(std::string key, std::unique_ptr<FrameBuffer> resource) {
 	mResources.emplace_back(std::move(resource));
 	mResourcesIDs.emplace(std::move(key), mResources.size() - 1);
+
+	return *mResources.back();
 }
 
 void FrameGraph::compile() {

@@ -262,18 +262,16 @@ void Renderer::createFrameBuffers() {
 	int32_t width = CONFIG_MANAGER.get<int32_t>("window.width");
 	int32_t height = CONFIG_MANAGER.get<int32_t>("window.height");
 
-	mGraph.addResource("sceneBuffer", std::make_unique<FrameBuffer>(width, height));
+	auto& sceneBuffer = mGraph.addResource("sceneBuffer", std::make_unique<FrameBuffer>(width, height));
 	const uint32_t sceneBufferID = mGraph.getResourceID("sceneBuffer");
 	mIndexes.sceneBuffer = sceneBufferID;
-	auto& sceneBuffer = mGraph.getResource(sceneBufferID);
 
 	if (CONFIG_MANAGER.get<bool>("msaa.enabled")) {
 		glEnable(GL_MULTISAMPLE);
 		const int32_t sampleCount = CONFIG_MANAGER.get<int32_t>("msaa.sample_count");
 
-		mGraph.addResource("intermediateBuffer", std::make_unique<FrameBuffer>(width, height));
-		const uint32_t intermediateBufferID = mGraph.getResourceID("intermediateBuffer");
-		auto& intermediateBuffer = mGraph.getResource(intermediateBufferID);
+		auto& intermediateBuffer = mGraph.addResource("intermediateBuffer", std::make_unique<FrameBuffer>(width, height));
+
 		intermediateBuffer.bind();
 
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
@@ -310,9 +308,8 @@ void Renderer::createFrameBuffers() {
 	sceneBuffer.unbind();
 
 	// GBuffer
-	mGraph.addResource("gBuffer", std::make_unique<FrameBuffer>(width, height));
-	const uint32_t gBufferID = mGraph.getResourceID("gBuffer");
-	auto& gBuffer = mGraph.getResource(gBufferID);
+	auto& gBuffer = mGraph.addResource("gBuffer", std::make_unique<FrameBuffer>(width, height));
+
 	gBuffer.bind();
 
 	gBuffer.withTextureFP(BaseFormat::RGBA) // position
@@ -331,49 +328,41 @@ void Renderer::createFrameBuffers() {
 			.checkStatus();
 
 	// SSAO
-	mGraph.addResource("ssao", std::make_unique<FrameBuffer>(width / 2, height / 2));
-	const uint32_t ssaoID = mGraph.getResourceID("ssao");
-	auto& ssao = mGraph.getResource(ssaoID);
+	auto& ssao = mGraph.addResource("ssao", std::make_unique<FrameBuffer>(width / 2, height / 2));
+
 	ssao.bind();
 	ssao.withTexture(BaseFormat::Red).checkStatus();
 	ssao.unbind();
 
-	mGraph.addResource("ssaoBlur", std::make_unique<FrameBuffer>(width / 2, height / 2));
-	const uint32_t ssaoBlurID = mGraph.getResourceID("ssaoBlur");
-	auto& ssaoBlur = mGraph.getResource(ssaoBlurID);
+	auto& ssaoBlur = mGraph.addResource("ssaoBlur", std::make_unique<FrameBuffer>(width / 2, height / 2));
+
 	ssaoBlur.bind();
 	ssaoBlur.withTexture(BaseFormat::Red).checkStatus();
 	ssaoBlur.unbind();
 
 	// Shadow Maps
-	mGraph.addResource(
-		"directional", std::make_unique<FrameBuffer>(
+	auto& directional = mGraph.addResource("directional", std::make_unique<FrameBuffer>(
 			CONFIG_MANAGER.get<int32_t>("shadow.map.width"),
 			CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
-	const uint32_t directionalID = mGraph.getResourceID("directional");
-	auto& directional = mGraph.getResource(directionalID);
+
 	directional.bind();
 	directional.withTextureDepth(InternalFormat::Depth24, true).checkStatus();
 	directional.unbind();
 
-	mGraph.addResource(
-		"point", std::make_unique<FrameBuffer>(
+	auto& point = mGraph.addResource("point", std::make_unique<FrameBuffer>(
 			CONFIG_MANAGER.get<int32_t>("shadow.map.width"),
 			CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
-	const uint32_t pointID = mGraph.getResourceID("point");
-	auto& point = mGraph.getResource(pointID);
+
 	point.bind();
 	point.withTextureCubemapDepthArray(
 				CONFIG_MANAGER.get<int32_t>("light.max_point"), InternalFormat::Depth24, true)
 			.checkStatus();
 	point.unbind();
 
-	mGraph.addResource(
-		"spot", std::make_unique<FrameBuffer>(
+	auto& spot = mGraph.addResource("spot", std::make_unique<FrameBuffer>(
 			CONFIG_MANAGER.get<int32_t>("shadow.map.width"),
 			CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
-	const uint32_t spotID = mGraph.getResourceID("spot");
-	auto& spot = mGraph.getResource(spotID);
+
 	spot.bind();
 	spot.withTextureDepthArray(
 				CONFIG_MANAGER.get<int32_t>("light.max_spot"), InternalFormat::Depth24, true)
@@ -381,9 +370,7 @@ void Renderer::createFrameBuffers() {
 
 	// PostProcess Render Targets
 	auto addPPRenderTarget = [&](const std::string& name) {
-		mGraph.addResource(name, std::make_unique<FrameBuffer>(width, height));
-		const uint32_t id = mGraph.getResourceID(name);
-		auto& target = mGraph.getResource(id);
+		auto& target = mGraph.addResource(name, std::make_unique<FrameBuffer>(width, height));
 
 		target.bind();
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
