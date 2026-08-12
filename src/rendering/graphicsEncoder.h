@@ -85,66 +85,65 @@ public:
 private:
 	void pushConstant(std::string_view name, const void* data, PushConstantType type) const;
 
-	struct HandleCache {
-		uint32_t program{0};
-		uint32_t vao{0};
-		uint32_t framebuffer{0};
-	};
-
-	struct DepthStencilCache {
-		bool depthTestEnable{};
-		CompareOp depthCompareOp{};
-		bool depthWriteEnable{};
-		bool stencilTestEnable{};
-	};
-
-	struct CullCache {
-		CullMode cullMode{};
-		FrontFace frontFace{};
-	};
-
-	struct PolygonCache {
-		PolygonMode polygonMode{};
-		PolygonFace polygonFace{};
-	};
-
-	struct BlendCache {
-		bool blendEnable{};
-	};
-
-	struct AntiAliasingCache {
-		uint32_t samples{};
-	};
-
-	struct TessellationCache {
-		int32_t patchVertices{};
-	};
-
-	struct GLStateCache {
-		HandleCache handles{};
-		DepthStencilCache depthStencil{};
-		CullCache cull{};
-		BlendCache blend{};
-		PolygonCache polygon{};
-		AntiAliasingCache aa{};
-		TessellationCache tessellation{};
-		Viewport viewport{};
-
-		void reset() {
-			handles = {};
-			depthStencil = {};
-			cull = {};
-			blend = {};
-			polygon = {};
-			aa = {};
-			tessellation = {};
-			viewport = {};
-		}
-	};
-
 	struct EncoderState {
-		TextureBindingCache bindingCache{};
-		GLStateCache glStateCache{};
+		struct TextureBindingCache {
+			std::array<TextureView, 32> textures;
+
+			void reset() {
+				textures.fill({});
+			}
+		} bindingCache{};
+
+		struct GLStateCache {
+			struct HandleCache {
+				uint32_t program{0};
+				uint32_t vao{0};
+				uint32_t framebuffer{0};
+			} handles{};
+
+			struct DepthStencilCache {
+				bool depthTestEnable{};
+				CompareOp depthCompareOp{};
+				bool depthWriteEnable{};
+				bool stencilTestEnable{};
+			} depthStencil{};
+
+			struct CullCache {
+				CullMode cullMode{};
+				FrontFace frontFace{};
+			} cull{};
+
+			struct PolygonCache {
+				PolygonMode polygonMode{};
+				PolygonFace polygonFace{};
+			} polygon{};
+
+			struct BlendCache {
+				bool blendEnable{};
+			} blend{};
+
+			struct AntiAliasingCache {
+				uint32_t samples{};
+			} aa{};
+
+			struct TessellationCache {
+				int32_t patchVertices{};
+			} tessellation{};
+
+			Viewport viewport{};
+
+			void reset() {
+				handles = {};
+				depthStencil = {};
+				cull = {};
+				blend = {};
+				polygon = {};
+				aa = {};
+				tessellation = {};
+				viewport = {};
+			}
+		} glStateCache{};
+
 		GraphicsPipeline* pipeline{nullptr};
 	};
 

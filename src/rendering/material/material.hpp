@@ -63,11 +63,3 @@ struct MaterialBatch {
 	size_t textureCount{};
 	std::vector<uint32_t> meshIndices;
 };
-
-struct TextureBindingCache {
-	std::array<TextureView, 32> textures;
-
-	void reset() {
-		textures.fill({});
-	}
-};

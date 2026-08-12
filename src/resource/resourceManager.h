@@ -53,13 +53,12 @@ private:
 		uint32_t materialID;
 	};
 
-	void loadModel(size_t entityID,  std::string_view modelPath, std::string_view texturePath);
+	void loadModel(size_t entityID, std::string_view modelPath, std::string_view texturePath);
 
-	static void processMeshes(
-		const aiNode* node,
-		const aiScene* scene,
-		MeshMap& meshesByMatID,
-		MaterialLoadContext& materialLoadCtx);
+	static void processMeshes(const aiNode* node,
+	                          const aiScene* scene,
+	                          MeshMap& meshesByMatID,
+	                          MaterialLoadContext& materialLoadCtx);
 
 	static Mesh processMesh(aiMesh* mesh);
 
@@ -105,9 +104,7 @@ void ResourceManager::upload(size_t entityID, T& map) {
 		mMeshesByEntity.emplace(entityID, std::move(map));
 	} else if constexpr (std::is_same_v<T, MaterialMap>) {
 		mMaterialsByEntity.emplace(entityID, std::move(map));
-	} else if constexpr (std::is_same_v<T, std::vector<float>>) {
+	} else if constexpr (std::is_same_v<T, std::vector<float> >) {
 		mTransformsByEntity.emplace(entityID, std::move(map));
 	}
 }
-
-
