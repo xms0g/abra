@@ -6,13 +6,13 @@
 FrameBuffer::FrameBuffer(const int32_t width, const int32_t height)
 	: mWidth(width),
 	  mHeight(height) {
-	glGenFramebuffers(1, &mFBO);
+	glGenFramebuffers(1, &mFBHandle);
 	bind();
 }
 
 FrameBuffer::FrameBuffer(FrameBuffer&& other) noexcept
-	: mFBO(other.mFBO),
-	  mRBO(other.mRBO),
+	: mFBHandle(other.mFBHandle),
+	  mRBHandle(other.mRBHandle),
 	  mWidth(other.mWidth),
 	  mHeight(other.mHeight),
 	  mTextures(std::move(other.mTextures)),
@@ -21,15 +21,15 @@ FrameBuffer::FrameBuffer(FrameBuffer&& other) noexcept
 
 FrameBuffer& FrameBuffer::operator=(FrameBuffer&& other) noexcept {
 	if (this != &other) {
-		if (mFBO) {
-			glDeleteFramebuffers(1, &mFBO);
+		if (mFBHandle) {
+			glDeleteFramebuffers(1, &mFBHandle);
 		}
-		if (mRBO) {
-			glDeleteRenderbuffers(1, &mRBO);
+		if (mRBHandle) {
+			glDeleteRenderbuffers(1, &mRBHandle);
 		}
 
-		mFBO = std::exchange(other.mFBO, 0);
-		mRBO = std::exchange(other.mRBO, 0);
+		mFBHandle = std::exchange(other.mFBHandle, 0);
+		mRBHandle = std::exchange(other.mRBHandle, 0);
 		mWidth = std::exchange(other.mWidth, 0);
 		mHeight = std::exchange(other.mHeight, 0);
 		mTextures = std::move(other.mTextures);
@@ -45,14 +45,14 @@ FrameBuffer::~FrameBuffer() {
 		}
 	}
 
-	glDeleteFramebuffers(1, &mFBO);
+	glDeleteFramebuffers(1, &mFBHandle);
 
-	if (mRBO)
-		glDeleteRenderbuffers(1, &mRBO);
+	if (mRBHandle)
+		glDeleteRenderbuffers(1, &mRBHandle);
 }
 
-uint32_t FrameBuffer::id() const {
-	return mFBO;
+uint32_t FrameBuffer::handle() const {
+	return mFBHandle;
 }
 
 int32_t FrameBuffer::width() const {
@@ -68,7 +68,7 @@ TextureView FrameBuffer::texture(const uint32_t index) const {
 }
 
 void FrameBuffer::bind() const {
-	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, mFBHandle);
 }
 
 void FrameBuffer::unbind() const {
@@ -76,7 +76,7 @@ void FrameBuffer::unbind() const {
 }
 
 void FrameBuffer::resizeRenderBuffer(const int32_t width, const int32_t height) const {
-	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
+	glBindRenderbuffer(GL_RENDERBUFFER, mRBHandle);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
 	glViewport(0, 0, width, height);
 }
@@ -125,11 +125,11 @@ void FrameBuffer::checkStatus() {
 }
 
 void FrameBuffer::bindForRead() const {
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, mFBO);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, mFBHandle);
 }
 
 void FrameBuffer::bindForDraw() const {
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFBO);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFBHandle);
 }
 
 FrameBuffer& FrameBuffer::withTexture(const BaseFormat format) {
@@ -398,11 +398,11 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(const int32_t layerCount,
 }
 
 FrameBuffer& FrameBuffer::withRenderBufferDepth(const InternalFormat format) {
-	glGenRenderbuffers(1, &mRBO);
-	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
+	glGenRenderbuffers(1, &mRBHandle);
+	glBindRenderbuffer(GL_RENDERBUFFER, mRBHandle);
 
 	glRenderbufferStorage(GL_RENDERBUFFER, toUnderlying(format), mWidth, mHeight);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRBO);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRBHandle);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 	return *this;
@@ -410,22 +410,22 @@ FrameBuffer& FrameBuffer::withRenderBufferDepth(const InternalFormat format) {
 
 FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(const int32_t multisampledCount,
                                                             const InternalFormat format) {
-	glGenRenderbuffers(1, &mRBO);
-	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
+	glGenRenderbuffers(1, &mRBHandle);
+	glBindRenderbuffer(GL_RENDERBUFFER, mRBHandle);
 
 	glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisampledCount, toUnderlying(format), mWidth, mHeight);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRBO);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRBHandle);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 	return *this;
 }
 
 FrameBuffer& FrameBuffer::withRenderBufferDepthStencil(const InternalFormat format) {
-	glGenRenderbuffers(1, &mRBO);
-	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
+	glGenRenderbuffers(1, &mRBHandle);
+	glBindRenderbuffer(GL_RENDERBUFFER, mRBHandle);
 
 	glRenderbufferStorage(GL_RENDERBUFFER, toUnderlying(format), mWidth, mHeight);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mRBO);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mRBHandle);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 	return *this;
@@ -433,11 +433,11 @@ FrameBuffer& FrameBuffer::withRenderBufferDepthStencil(const InternalFormat form
 
 FrameBuffer& FrameBuffer::withRenderBufferDepthStencilMultisampled(const int32_t multisampledCount,
                                                                    const InternalFormat format) {
-	glGenRenderbuffers(1, &mRBO);
-	glBindRenderbuffer(GL_RENDERBUFFER, mRBO);
+	glGenRenderbuffers(1, &mRBHandle);
+	glBindRenderbuffer(GL_RENDERBUFFER, mRBHandle);
 
 	glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisampledCount, toUnderlying(format), mWidth, mHeight);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mRBO);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mRBHandle);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 	return *this;

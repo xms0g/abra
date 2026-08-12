@@ -21,8 +21,8 @@ GraphicsPipeline::GraphicsPipeline(const GraphicsPipelineCreateInfo& createInfo)
 		for (const auto& [name, type, binding]: bindings) {
 			switch (type) {
 				case DescriptorType::UniformBuffer: {
-					const uint32_t index = glGetUniformBlockIndex(mState.shader.id(), name.c_str());
-					glUniformBlockBinding(mState.shader.id(), index, binding);
+					const uint32_t index = glGetUniformBlockIndex(mState.shader.handle(), name.c_str());
+					glUniformBlockBinding(mState.shader.handle(), index, binding);
 					break;
 				}
 				case DescriptorType::SampledImage:
@@ -76,7 +76,7 @@ PipelineLayout& GraphicsPipeline::layout() {
 }
 
 uint32_t GraphicsPipeline::program() const {
-	return mState.shader.id();
+	return mState.shader.handle();
 }
 
 void GraphicsPipeline::bind() const {

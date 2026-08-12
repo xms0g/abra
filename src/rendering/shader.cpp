@@ -45,7 +45,7 @@ ShaderStage::~ShaderStage() {
 		glDeleteShader(mHandle);
 }
 
-uint32_t ShaderStage::id() const {
+uint32_t ShaderStage::handle() const {
 	return mHandle;
 }
 
@@ -108,57 +108,57 @@ void ShaderStage::preprocess(const std::string_view source, std::string& output,
 }
 
 Shader::Shader() {
-	mID = glCreateProgram();
+	mHandle = glCreateProgram();
 }
 
 Shader::~Shader() {
-	if (mID)
-		glDeleteProgram(mID);
+	if (mHandle)
+		glDeleteProgram(mHandle);
 }
 
 Shader::Shader(Shader&& other) noexcept
-	: mID(std::exchange(other.mID, 0)) {
+	: mHandle(std::exchange(other.mHandle, 0)) {
 }
 
 Shader& Shader::operator=(Shader&& other) noexcept {
 	if (this == &other)
 		return *this;
 
-	if (mID)
-		glDeleteProgram(mID);
+	if (mHandle)
+		glDeleteProgram(mHandle);
 
-	mID = std::exchange(other.mID, 0);
+	mHandle = std::exchange(other.mHandle, 0);
 	return *this;
 }
 
 void Shader::bind() const {
-	glUseProgram(mID);
+	glUseProgram(mHandle);
 }
 
 void Shader::attachStage(const ShaderStage& stage) const {
-	glAttachShader(mID, stage.id());
+	glAttachShader(mHandle, stage.handle());
 }
 
 void Shader::link() const {
-	glLinkProgram(mID);
+	glLinkProgram(mHandle);
 	checkLinkErrors();
 }
 
 void Shader::checkLinkErrors() const {
 	int32_t success;
-	glGetProgramiv(mID, GL_LINK_STATUS, &success);
+	glGetProgramiv(mHandle, GL_LINK_STATUS, &success);
 
 	if (!success) {
 		std::string infoLog;
 		int32_t maxLength = 0;
 
-		glGetProgramiv(mID, GL_INFO_LOG_LENGTH, &maxLength);
+		glGetProgramiv(mHandle, GL_INFO_LOG_LENGTH, &maxLength);
 		infoLog.resize(maxLength);
 
-		glGetProgramInfoLog(mID, maxLength, nullptr, infoLog.data());
+		glGetProgramInfoLog(mHandle, maxLength, nullptr, infoLog.data());
 
 		// The program is useless now. So delete it.
-		glDeleteProgram(mID);
+		glDeleteProgram(mHandle);
 
 		throw std::runtime_error(std::string("Linking error:\n") + infoLog);
 	}
@@ -168,7 +168,7 @@ int32_t Shader::getUniformLocation(const std::string_view name) {
 	if (const auto it = mUniformLocations.find(name.data()); it != mUniformLocations.end())
 		return it->second;
 
-	const int32_t location = glGetUniformLocation(mID, name.data());
+	const int32_t location = glGetUniformLocation(mHandle, name.data());
 	mUniformLocations.emplace(std::string(name), location);
 
 	return location;

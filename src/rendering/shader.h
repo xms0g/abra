@@ -31,7 +31,7 @@ public:
 	~ShaderStage();
 
 	[[nodiscard]]
-	uint32_t id() const;
+	uint32_t handle() const;
 
 private:
 	void checkCompileErrors(std::string_view code) const;
@@ -61,7 +61,7 @@ public:
 	Shader& operator=(Shader&& other) noexcept;
 
 	[[nodiscard]]
-	uint32_t id() const { return mID; }
+	uint32_t handle() const { return mHandle; }
 
 	// use/activate the shader
 	void bind() const;
@@ -82,7 +82,7 @@ private:
 	[[nodiscard]]
 	int32_t getUniformLocation(std::string_view name);
 
-	uint32_t mID{};
+	uint32_t mHandle{};
 	std::unordered_map<std::string, int32_t> mUniformLocations;
 };
 

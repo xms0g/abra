@@ -25,8 +25,8 @@ void GraphicsEncoder::unbindFrameBuffer() const {
 }
 
 void GraphicsEncoder::bindFrameBuffer(const FrameBuffer& frameBuffer) {
-	if (mState.glStateCache.handles.framebuffer != frameBuffer.id()) {
-		mState.glStateCache.handles.framebuffer = frameBuffer.id();
+	if (mState.glStateCache.handles.framebuffer != frameBuffer.handle()) {
+		mState.glStateCache.handles.framebuffer = frameBuffer.handle();
 		frameBuffer.bind();
 	}
 }

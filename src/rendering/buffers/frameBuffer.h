@@ -42,7 +42,7 @@ public:
 	~FrameBuffer();
 
 	[[nodiscard]]
-	uint32_t id() const;
+	uint32_t handle() const;
 
 	[[nodiscard]]
 	int32_t width() const;
@@ -102,8 +102,10 @@ private:
 
 	static InternalFormat getInternalFormat(BaseFormat format, bool isFloat = false);
 
-	uint32_t mFBO{0}, mRBO{0};
-	int32_t mWidth{0}, mHeight{0};
+	uint32_t mFBHandle{0};
+	uint32_t mRBHandle{0};
+	int32_t mWidth{0};
+	int32_t mHeight{0};
 
 	struct TextureDescription {
 		uint32_t id{0};

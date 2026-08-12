@@ -15,7 +15,7 @@ public:
 	Buffer(const uint32_t target, const BufferUsage usage)
 		: mTarget(target),
 		  mUsage(usage) {
-		glGenBuffers(1, &mID);
+		glGenBuffers(1, &mHandle);
 	}
 
 
@@ -24,17 +24,17 @@ public:
 	Buffer& operator=(const Buffer& other) = delete;
 
 	Buffer(Buffer&& other) noexcept
-		: mID(std::exchange(other.mID, 0)),
+		: mHandle(std::exchange(other.mHandle, 0)),
 		  mTarget(std::exchange(other.mTarget, 0)),
 		  mUsage(other.mUsage) {
 	}
 
 	Buffer& operator=(Buffer&& other) noexcept {
 		if (this != &other) {
-			if (mID != 0)
-				glDeleteBuffers(1, &mID);
+			if (mHandle != 0)
+				glDeleteBuffers(1, &mHandle);
 
-			mID = std::exchange(other.mID, 0);
+			mHandle = std::exchange(other.mHandle, 0);
 			mTarget = std::exchange(other.mTarget, 0);
 			mUsage = other.mUsage;
 		}
@@ -43,13 +43,13 @@ public:
 	}
 
 	virtual ~Buffer() {
-		if (mID != 0)
-			glDeleteBuffers(1, &mID);
+		if (mHandle != 0)
+			glDeleteBuffers(1, &mHandle);
 	}
 
 	[[nodiscard]]
 	uint32_t id() const {
-		return mID;
+		return mHandle;
 	}
 
 	[[nodiscard]]
@@ -58,7 +58,7 @@ public:
 	}
 
 	void bind() const {
-		glBindBuffer(mTarget, mID);
+		glBindBuffer(mTarget, mHandle);
 	}
 
 	void unbind() const {
@@ -66,7 +66,7 @@ public:
 	}
 
 protected:
-	uint32_t mID{0};
+	uint32_t mHandle{0};
 	uint32_t mTarget{0};
 	BufferUsage mUsage{};
 };
