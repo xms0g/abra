@@ -14,10 +14,10 @@ public:
 	static ConfigManager& instance();
 
 	template<typename T>
-	T& get(const std::string& key);
+	T& get(std::string_view key);
 
 	template<typename T>
-	void set(const std::string& key, T&& value);
+	void set(std::string_view key, T&& value);
 
 	void load(std::string_view filepath);
 
@@ -26,15 +26,37 @@ private:
 
 	~ConfigManager() = default;
 
-	std::unordered_map<std::string, std::any> mConfig;
+	struct StringHash {
+		using is_transparent = void;
+
+		size_t operator()(const std::string_view value) const noexcept {
+			return std::hash<std::string_view>{}(value);
+		}
+
+	};
+
+	struct StringEqual {
+		using is_transparent = void;
+
+		bool operator()(const std::string_view lhs, const std::string_view rhs) const noexcept {
+			return lhs == rhs;
+		}
+	};
+
+	std::unordered_map<std::string, std::any, StringHash, StringEqual> mConfig;
 };
 
 template<typename T>
-T& ConfigManager::get(const std::string& key) {
-	return std::any_cast<T&>(mConfig[key]);
+T& ConfigManager::get(const std::string_view key) {
+	const auto it = mConfig.find(key);
+
+	if (it == mConfig.end())
+		throw std::runtime_error("Config key not found: " + std::string(key));
+
+	return std::any_cast<T&>(it->second);
 }
 
 template<typename T>
-void ConfigManager::set(const std::string& key, T&& value) {
-	mConfig[key] = std::forward<T>(value);
+void ConfigManager::set(const std::string_view key, T&& value) {
+	mConfig[std::string(key)] = std::forward<T>(value);
 }

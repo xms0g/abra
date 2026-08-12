@@ -1,5 +1,6 @@
 #include "frameBuffer.h"
 #include <cassert>
+#include <iostream>
 #include <vector>
 #include "glad/glad.h"
 
@@ -119,8 +120,29 @@ void FrameBuffer::attachTexture(const uint32_t index,
 }
 
 void FrameBuffer::checkStatus() {
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		throw std::runtime_error("ERROR::FRAMEBUFFER::NOT_COMPLETE!\n");
+	const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+	if (status != GL_FRAMEBUFFER_COMPLETE) {
+		switch (status) {
+			case GL_FRAMEBUFFER_UNDEFINED:
+				throw std::runtime_error("FRAMEBUFFER_UNDEFINED\n");
+			case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+				throw std::runtime_error("FRAMEBUFFER_INCOMPLETE_ATTACHMENT\n");
+			case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+				throw std::runtime_error("FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT\n");
+			case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+				throw std::runtime_error("FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER\n");
+			case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+				throw std::runtime_error("FRAMEBUFFER_INCOMPLETE_READ_BUFFER\n");
+			case GL_FRAMEBUFFER_UNSUPPORTED:
+				throw std::runtime_error("FRAMEBUFFER_UNSUPPORTED\n");
+			case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+				throw std::runtime_error("FRAMEBUFFER_INCOMPLETE_MULTISAMPLE\n");
+			case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
+				throw std::runtime_error("FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS\n");
+			default:
+				break;
+		}
 	}
 }
 
