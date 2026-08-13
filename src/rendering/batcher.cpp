@@ -7,7 +7,6 @@
 #include "mesh/vertex.hpp"
 #include "mesh/vertexArray.h"
 #include "../math/boundingVolume.h"
-#include "../math/matrix.h"
 #include "../ECS/registry.h"
 #include "../ECS/components/bv.hpp"
 #include "../ECS/components/debug.hpp"

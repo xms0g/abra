@@ -1,8 +1,6 @@
 #include "gamma.h"
 #include "../../shader.h"
 #include "../../descriptorSet.h"
-#include "../../buffers/frameBuffer.h"
-#include "../../context/renderContext.hpp"
 
 Gamma::Gamma(const std::string& name, const bool enabled)
 	: BasePostEffect(name, enabled) {

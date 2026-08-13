@@ -15,7 +15,7 @@ ResourceManager& ResourceManager::instance() {
 	return instance;
 }
 
-void ResourceManager::asyncLoadModel(size_t entityID,  std::string modelPath, std::string texturePath) {
+void ResourceManager::asyncLoadModel(size_t entityID, std::string modelPath, std::string texturePath) {
 	mThreadPool.enqueue([this, entityID, modelPath = std::move(modelPath), texturePath = std::move(texturePath)]() {
 		loadModel(entityID, modelPath, texturePath);
 	});
@@ -73,7 +73,8 @@ void ResourceManager::uploadMaterialsToGPU() {
 
 				auto p = fs::resolvePath(assetRoot / texture.path);
 				texture.id = Texture::load(p, material.flags,
-					texture.type == aiTextureType_DIFFUSE || texture.type == aiTextureType_EMISSIVE);
+				                           texture.type == aiTextureType_DIFFUSE || texture.type ==
+				                           aiTextureType_EMISSIVE);
 
 				Texture::generateMipmaps({.id = texture.id, .target = texture.target});
 
@@ -87,7 +88,7 @@ void ResourceManager::waitForAll() const {
 	mThreadPool.wait();
 }
 
-void ResourceManager::loadModel(const size_t entityID, std::string_view modelPath, std::string_view texturePath) {
+void ResourceManager::loadModel(const size_t entityID, const std::string_view modelPath, std::string_view texturePath) {
 	// read file via ASSIMP
 	Assimp::Importer importer;
 	const std::filesystem::path assetRoot = CONFIG_MANAGER.get<std::string>("path.asset");
@@ -116,11 +117,10 @@ void ResourceManager::loadModel(const size_t entityID, std::string_view modelPat
 	}
 }
 
-void ResourceManager::processMeshes(
-	const aiNode* node,
-	const aiScene* scene,
-	MeshMap& meshesByMatID,
-	MaterialLoadContext& materialLoadCtx) {
+void ResourceManager::processMeshes(const aiNode* node,
+                                    const aiScene* scene,
+                                    MeshMap& meshesByMatID,
+                                    MaterialLoadContext& materialLoadCtx) {
 	// process each mesh located at the current node
 	for (uint32_t i = 0; i < node->mNumMeshes; ++i) {
 		// the node object only contains mIndices to index the actual objects in the scene.

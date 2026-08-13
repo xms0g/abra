@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include "glad/glad.h"
+#include "../glUtils.hpp"
 
 FrameBuffer::FrameBuffer(const int32_t width, const int32_t height)
 	: mWidth(width),

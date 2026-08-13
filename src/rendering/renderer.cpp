@@ -29,21 +29,19 @@
 #include "passes/resolve.h"
 #include "passes/terrain.h"
 #include "passes/forwardUnlit.h"
+#include "passes/forwardBlend.h"
+#include "passes/instancedBlend.h"
 #include "passes/postProcess/postProcess.h"
 #include "gui/backend.h"
 #include "material/material.hpp"
 #include "../config/configManager.h"
 #include "../core/camera.h"
 #include "../core/window.h"
-#include "../core/gui/ui.h"
 #include "../ECS/registry.h"
 #include "../ECS/components/transform.hpp"
 #include "../ECS/components/mesh.hpp"
 #include "../ECS/components/material.hpp"
 #include "../event/eventBus.hpp"
-#include "../resource/resourceManager.h"
-#include "passes/forwardBlend.h"
-#include "passes/instancedBlend.h"
 
 Renderer::Renderer(Registry& registry, const Camera& camera, Window& window) {
 	RequireComponent<MeshComponent>();
@@ -188,6 +186,13 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 		!mQueueRegistry.empty("opaque")
 	);
 	mGraph.addPass(
+		"ForwardBlendPass",
+		std::make_unique<ForwardBlendPass>(),
+		{"sceneBuffer", "BlendCommands"},
+		{"sceneBuffer"},
+		!mQueueRegistry.empty("blend")
+	);
+	mGraph.addPass(
 		"ForwardUnlitPass",
 		std::make_unique<ForwardUnlitPass>(),
 		{"sceneBuffer", "UnlitCommands"},
@@ -270,7 +275,8 @@ void Renderer::createFrameBuffers() {
 		glEnable(GL_MULTISAMPLE);
 		const int32_t sampleCount = CONFIG_MANAGER.get<int32_t>("msaa.sample_count");
 
-		auto& intermediateBuffer = mGraph.addResource("intermediateBuffer", std::make_unique<FrameBuffer>(width, height));
+		auto& intermediateBuffer = mGraph.addResource("intermediateBuffer",
+		                                              std::make_unique<FrameBuffer>(width, height));
 
 		intermediateBuffer.bind();
 
@@ -311,7 +317,6 @@ void Renderer::createFrameBuffers() {
 	auto& gBuffer = mGraph.addResource("gBuffer", std::make_unique<FrameBuffer>(width, height));
 
 	gBuffer.bind();
-
 	gBuffer.withTextureFP(BaseFormat::RGBA) // position
 			.withTextureFP(BaseFormat::RGBA); // normal
 	if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
@@ -342,16 +347,16 @@ void Renderer::createFrameBuffers() {
 
 	// Shadow Maps
 	auto& directional = mGraph.addResource("directional", std::make_unique<FrameBuffer>(
-			CONFIG_MANAGER.get<int32_t>("shadow.map.width"),
-			CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
+		                                       CONFIG_MANAGER.get<int32_t>("shadow.map.width"),
+		                                       CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
 
 	directional.bind();
 	directional.withTextureDepth(InternalFormat::Depth24, true).checkStatus();
 	directional.unbind();
 
 	auto& point = mGraph.addResource("point", std::make_unique<FrameBuffer>(
-			CONFIG_MANAGER.get<int32_t>("shadow.map.width"),
-			CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
+		                                 CONFIG_MANAGER.get<int32_t>("shadow.map.width"),
+		                                 CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
 
 	point.bind();
 	point.withTextureCubemapDepthArray(
@@ -360,8 +365,8 @@ void Renderer::createFrameBuffers() {
 	point.unbind();
 
 	auto& spot = mGraph.addResource("spot", std::make_unique<FrameBuffer>(
-			CONFIG_MANAGER.get<int32_t>("shadow.map.width"),
-			CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
+		                                CONFIG_MANAGER.get<int32_t>("shadow.map.width"),
+		                                CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
 
 	spot.bind();
 	spot.withTextureDepthArray(

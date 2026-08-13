@@ -5,7 +5,6 @@
 #include "glm/glm.hpp"
 #include "IPass.hpp"
 #include "../graphicsPipeline.h"
-#include "../context/renderQueue.hpp"
 
 class VertexBuffer;
 struct RenderInstanceGroup;

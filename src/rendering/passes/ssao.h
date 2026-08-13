@@ -1,6 +1,4 @@
 #pragma once
-#include <cstdint>
-#include <memory>
 #include "IPass.hpp"
 #include "../graphicsPipeline.h"
 #include "../buffers/uniformBuffer.h"

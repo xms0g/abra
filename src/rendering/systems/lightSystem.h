@@ -1,7 +1,7 @@
 #pragma once
 #include "glm/glm.hpp"
-#include "../../ECS/system.hpp"
 #include "../buffers/uniformBuffer.h"
+#include "../../ECS/system.hpp"
 
 class GraphicsEncoder;
 struct RenderContext;

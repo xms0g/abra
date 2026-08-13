@@ -1,8 +1,6 @@
 #include "kernel.h"
 #include "../../shader.h"
 #include "../../descriptorSet.h"
-#include "../../buffers/frameBuffer.h"
-#include "../../context/renderContext.hpp"
 
 Kernel::Kernel(const std::string& name, const float* kernel, const bool enabled)
 	: BasePostEffect(name, enabled),

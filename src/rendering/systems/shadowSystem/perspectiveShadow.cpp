@@ -8,7 +8,6 @@
 #include "../../context/renderQueue.hpp"
 #include "../../../config/configManager.h"
 #include "../../../rendering/graphicsEncoder.h"
-#include "../../../rendering/graphicsPipeline.h"
 
 PerspectiveShadow::PerspectiveShadow(const RenderContext& ctx) {
 	mWidth = CONFIG_MANAGER.get<int32_t>("shadow.map.width");

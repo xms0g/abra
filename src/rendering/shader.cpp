@@ -165,7 +165,7 @@ void Shader::checkLinkErrors() const {
 }
 
 int32_t Shader::getUniformLocation(const std::string_view name) {
-	if (const auto it = mUniformLocations.find(name.data()); it != mUniformLocations.end())
+	if (const auto it = mUniformLocations.find(name); it != mUniformLocations.end())
 		return it->second;
 
 	const int32_t location = glGetUniformLocation(mHandle, name.data());

@@ -82,8 +82,24 @@ private:
 	[[nodiscard]]
 	int32_t getUniformLocation(std::string_view name);
 
+	struct StringHash {
+		using is_transparent = void;
+
+		size_t operator()(const std::string_view value) const noexcept {
+			return std::hash<std::string_view>{}(value);
+		}
+	};
+
+	struct StringEqual {
+		using is_transparent = void;
+
+		bool operator()(const std::string_view lhs, const std::string_view rhs) const noexcept {
+			return lhs == rhs;
+		}
+	};
+
 	uint32_t mHandle{};
-	std::unordered_map<std::string, int32_t> mUniformLocations;
+	std::unordered_map<std::string, int32_t, StringHash, StringEqual> mUniformLocations;
 };
 
 namespace Uniform {

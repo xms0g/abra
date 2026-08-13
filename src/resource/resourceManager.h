@@ -9,9 +9,6 @@
 
 #define RESOURCE_MANAGER ResourceManager::instance()
 
-class Shader;
-class FrameBuffer;
-
 class ResourceManager {
 public:
 	ResourceManager(const ResourceManager&) = delete;

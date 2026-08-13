@@ -1,16 +1,12 @@
 #include "directionalShadow.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "../../mesh/mesh.h"
-#include "../../shader.h"
-#include "../../frameGraph.h"
 #include "../../context/renderContext.hpp"
 #include "../../context/renderGroup.hpp"
 #include "../../context/renderData.hpp"
 #include "../../context/renderQueue.hpp"
-#include "../../buffers/frameBuffer.h"
 #include "../../../config/configManager.h"
 #include "../../../rendering/graphicsEncoder.h"
-#include "../../../rendering/graphicsPipeline.h"
 
 DirectionalShadow::DirectionalShadow(const RenderContext& ctx) {
 	mHeight = CONFIG_MANAGER.get<float>("shadow.directional.height");

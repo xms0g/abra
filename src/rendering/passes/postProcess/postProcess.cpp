@@ -9,7 +9,6 @@
 #include "fxaa.h"
 #include "kernels.hpp"
 #include "../../shader.h"
-#include "../../descriptorSet.h"
 #include "../../graphicsEncoder.h"
 #include "../../frameGraph.h"
 #include "../../buffers/frameBuffer.h"

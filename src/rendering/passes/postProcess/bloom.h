@@ -1,7 +1,6 @@
 #pragma once
 #include "basePostEffect.hpp"
 #include "../../descriptorSet.h"
-#include "../../texture/texture.h"
 
 class FrameGraph;
 struct RenderContext;

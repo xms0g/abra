@@ -4,6 +4,7 @@
 #include "glad/glad.h"
 #include "image/stb_image.h"
 #include "../material/material.hpp"
+#include "../glUtils.hpp"
 
 Texture::Texture(const uint32_t id, const uint32_t type, const TextureTarget target, std::string path)
 	: id(id),

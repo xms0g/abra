@@ -1,7 +1,6 @@
 #include "resolve.h"
 #include "../frameGraph.h"
 #include "../graphicsEncoder.h"
-#include "../context/renderContext.hpp"
 
 ResolvePass::ResolvePass() = default;
 

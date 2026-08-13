@@ -3,7 +3,6 @@
 #include "../../frameGraph.h"
 #include "../../descriptorSet.h"
 #include "../../buffers/frameBuffer.h"
-#include "../../context/renderContext.hpp"
 
 Bloom::Bloom(const std::string& name, const bool enabled)
 	: BasePostEffect(name, enabled) {

@@ -2,7 +2,6 @@
 #include <vector>
 #include <string>
 #include "glad/glad.h"
-#include "../glUtils.hpp"
 
 enum TextureType {
 	ALBEDO = 1,
