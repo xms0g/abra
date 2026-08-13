@@ -52,8 +52,12 @@ FrameBuffer::~FrameBuffer() {
 		glDeleteRenderbuffers(1, &mRBHandle);
 }
 
-uint32_t FrameBuffer::handle() const {
+uint32_t FrameBuffer::fbHandle() const {
 	return mFBHandle;
+}
+
+uint32_t FrameBuffer::rbHandle() const {
+	return mRBHandle;
 }
 
 int32_t FrameBuffer::width() const {
@@ -66,49 +70,6 @@ int32_t FrameBuffer::height() const {
 
 TextureView FrameBuffer::texture(const uint32_t index) const {
 	return {.id = mTextures[index].id, .target = mTextures[index].target};
-}
-
-void FrameBuffer::resizeRenderBuffer(const int32_t width, const int32_t height) const {
-	glBindRenderbuffer(GL_RENDERBUFFER, mRBHandle);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
-	glViewport(0, 0, width, height);
-}
-
-void FrameBuffer::attachTexture(const uint32_t index,
-                                const Attachment attachment,
-                                const int32_t mip,
-                                const int32_t layer) const {
-	switch (auto [id, target] = texture(index); target) {
-		case TextureTarget::Texture2D:
-			glFramebufferTexture2D(
-				GL_FRAMEBUFFER,
-				toUnderlying(attachment),
-				GL_TEXTURE_2D,
-				id,
-				mip);
-			break;
-		case TextureTarget::TextureCubeMap:
-			assert(layer >= 0 && layer < 6);
-
-			glFramebufferTexture2D(
-				GL_FRAMEBUFFER,
-				toUnderlying(attachment),
-				GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer,
-				id,
-				mip);
-			break;
-		case TextureTarget::Texture2DArray:
-		case TextureTarget::TextureCubeMapArray:
-			glFramebufferTextureLayer(
-				GL_FRAMEBUFFER,
-				toUnderlying(attachment),
-				id,
-				mip,
-				layer);
-			break;
-		case TextureTarget::Texture2DMultisample:
-			break;
-	}
 }
 
 void FrameBuffer::checkStatus() {

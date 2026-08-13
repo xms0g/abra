@@ -35,7 +35,7 @@ void PerspectiveShadow::render(const RenderContext& ctx,
                                const glm::vec3& position,
                                const float fovy,
                                const int32_t layer) {
-	frameBuffer.attachTexture(0, Attachment::Depth, 0, layer);
+	encoder.attachTexture(frameBuffer, 0, Attachment::Depth, 0, layer);
 	encoder.clearFrameBuffer(ClearMask::Depth);
 
 	const glm::mat4 lightProjection = glm::perspective(fovy, mAspect, mNear, mFar);

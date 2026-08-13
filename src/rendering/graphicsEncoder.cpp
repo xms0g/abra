@@ -4,7 +4,7 @@
 #include "buffers/frameBuffer.h"
 
 void GraphicsEncoder::beginRendering(const RenderingInfo& info) {
-	glBindFramebuffer(GL_FRAMEBUFFER, info.frameBuffer.handle());
+	glBindFramebuffer(GL_FRAMEBUFFER, info.frameBuffer.fbHandle());
 
 	auto mask{ClearMask::None};
 	mask |= info.clearColor ? ClearMask::Color : ClearMask::None;
@@ -24,9 +24,9 @@ void GraphicsEncoder::unbindFrameBuffer() const {
 }
 
 void GraphicsEncoder::bindFrameBuffer(const FrameBuffer& frameBuffer) {
-	if (mState.glStateCache.handles.framebuffer != frameBuffer.handle()) {
-		mState.glStateCache.handles.framebuffer = frameBuffer.handle();
-		glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer.handle());
+	if (mState.glStateCache.handles.framebuffer != frameBuffer.fbHandle()) {
+		mState.glStateCache.handles.framebuffer = frameBuffer.fbHandle();
+		glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer.fbHandle());
 	}
 }
 
@@ -175,12 +175,56 @@ void GraphicsEncoder::bindDescriptorSet(const DescriptorSet& descriptorSet) {
 }
 
 void GraphicsEncoder::blitFramebuffer(const FrameBuffer& src, const FrameBuffer& dst, const BlitMask mask) const {
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, src.handle());
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.handle());
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, src.fbHandle());
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.fbHandle());
 
 	glBlitFramebuffer(0, 0, src.width(), src.height(),
 	                  0, 0, dst.width(), dst.height(),
 	                  toUnderlying(mask), GL_NEAREST);
+}
+
+void GraphicsEncoder::resizeRenderBuffer(const FrameBuffer& fb, const int32_t width, const int32_t height) {
+	glBindRenderbuffer(GL_RENDERBUFFER, fb.rbHandle());
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
+	setViewport({.x = 0, .y = 0, .width = width, .height = height});
+}
+
+void GraphicsEncoder::attachTexture(const FrameBuffer& fb,
+                                    const uint32_t index,
+                                    const Attachment attachment,
+                                    const int32_t mip,
+                                    const int32_t layer) const {
+	switch (auto [id, target] = fb.texture(index); target) {
+		case TextureTarget::Texture2D:
+			glFramebufferTexture2D(
+				GL_FRAMEBUFFER,
+				toUnderlying(attachment),
+				GL_TEXTURE_2D,
+				id,
+				mip);
+			break;
+		case TextureTarget::TextureCubeMap:
+			assert(layer >= 0 && layer < 6);
+
+			glFramebufferTexture2D(
+				GL_FRAMEBUFFER,
+				toUnderlying(attachment),
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer,
+				id,
+				mip);
+			break;
+		case TextureTarget::Texture2DArray:
+		case TextureTarget::TextureCubeMapArray:
+			glFramebufferTextureLayer(
+				GL_FRAMEBUFFER,
+				toUnderlying(attachment),
+				id,
+				mip,
+				layer);
+			break;
+		case TextureTarget::Texture2DMultisample:
+			break;
+	}
 }
 
 void GraphicsEncoder::clearFrameBuffer(const ClearMask mask) const {

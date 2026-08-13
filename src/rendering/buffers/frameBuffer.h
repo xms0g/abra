@@ -42,7 +42,10 @@ public:
 	~FrameBuffer();
 
 	[[nodiscard]]
-	uint32_t handle() const;
+	uint32_t fbHandle() const;
+
+	[[nodiscard]]
+	uint32_t rbHandle() const;
 
 	[[nodiscard]]
 	int32_t width() const;
@@ -52,10 +55,6 @@ public:
 
 	[[nodiscard]]
 	TextureView texture(uint32_t index = 0) const;
-
-	void resizeRenderBuffer(int32_t width, int32_t height) const;
-
-	void attachTexture(uint32_t index, Attachment attachment, int32_t mip, int32_t layer) const;
 
 	void checkStatus();
 
