@@ -3,7 +3,7 @@
 #include <string>
 
 #define MAX_PUSH_CONSTANTS 16
-#define PUSH_CONSTANT_FIELD(Name, Type, Field, PCType)\
+#define PUSH_CONSTANT(Name, Type, Field, PCType)\
 	{.name = Name, .offset = offsetof(Type, Field), .type = PCType}
 
 enum class PushConstantType: uint32_t {
