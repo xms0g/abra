@@ -28,8 +28,11 @@ public:
 	            int32_t layer);
 
 private:
-	int32_t mWidth{0}, mHeight{0};
-	float mAspect{0.0f}, mFar{0.0f}, mNear{0.0f};
+	int32_t mWidth{0};
+	int32_t mHeight{0};
+	float mAspect{0.0f};
+	float mFar{0.0f};
+	float mNear{0.0f};
 	glm::mat4 mLightSpaceMatrix[4]{};
 	std::span<RenderGroup> mObjects;
 };

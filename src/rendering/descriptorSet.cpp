@@ -14,6 +14,6 @@ DescriptorSet& DescriptorSet::write(const uint32_t binding, BufferView buffer) {
 	return *this;
 }
 
-const std::array<Descriptor, 32>& DescriptorSet::descriptors() const {
+const std::array<Descriptor, MAX_DESCRIPTOR_SETS>& DescriptorSet::descriptors() const {
 	return mDescriptors;
 }

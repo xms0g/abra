@@ -37,6 +37,22 @@ private:
 
 	~ResourceManager() = default;
 
+	void loadModel(size_t entityID, std::string_view modelPath, std::string_view texturePath);
+
+	struct MaterialLoadContext;
+	struct TextureLoadRequest;
+
+	static void processMeshes(const aiNode* node,
+	                          const aiScene* scene,
+	                          MeshMap& meshesByMatID,
+	                          MaterialLoadContext& materialLoadCtx);
+
+	static Mesh processMesh(aiMesh* mesh);
+
+	static void processMaterials(const aiScene* scene, MaterialLoadContext& materialLoadCtx);
+
+	static void loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& materialLoadCtx);
+
 	struct MaterialLoadContext {
 		MaterialMap materials;
 		std::string textureDir;
@@ -49,19 +65,6 @@ private:
 		aiTextureType type;
 		uint32_t materialID;
 	};
-
-	void loadModel(size_t entityID, std::string_view modelPath, std::string_view texturePath);
-
-	static void processMeshes(const aiNode* node,
-	                          const aiScene* scene,
-	                          MeshMap& meshesByMatID,
-	                          MaterialLoadContext& materialLoadCtx);
-
-	static Mesh processMesh(aiMesh* mesh);
-
-	static void processMaterials(const aiScene* scene, MaterialLoadContext& materialLoadCtx);
-
-	static void loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& materialLoadCtx);
 
 	std::unordered_map<size_t, MaterialMap> mMaterialsByEntity;
 	std::unordered_map<size_t, MeshMap> mMeshesByEntity;

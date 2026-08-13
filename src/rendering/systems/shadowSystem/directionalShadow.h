@@ -25,7 +25,13 @@ public:
 	            const glm::vec3& direction);
 
 private:
-	float mHeight, mLeft, mRight, mBottom, mTop, mNear, mFar;
+	float mHeight;
+	float mLeft;
+	float mRight;
+	float mBottom;
+	float mTop;
+	float mNear;
+	float mFar;
 	glm::mat4 mLightSpaceMatrix{};
 	std::span<RenderGroup> mObjects;
 };
