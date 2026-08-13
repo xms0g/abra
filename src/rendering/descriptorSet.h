@@ -5,6 +5,8 @@
 #include <span>
 #include "texture/texture.h"
 
+#define MAX_DESCRIPTOR_SETS 32
+
 enum class DescriptorType : uint32_t {
 	None,
 	UniformBuffer,
@@ -49,8 +51,8 @@ public:
 	DescriptorSet& write(uint32_t binding, BufferView buffer);
 
 	[[nodiscard]]
-	const std::array<Descriptor, 32>& descriptors() const;
+	const std::array<Descriptor, MAX_DESCRIPTOR_SETS>& descriptors() const;
 
 private:
-	std::array<Descriptor, 32> mDescriptors;
+	std::array<Descriptor, MAX_DESCRIPTOR_SETS> mDescriptors;
 };

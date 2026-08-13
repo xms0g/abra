@@ -73,19 +73,9 @@ void TerrainPass::configure(const RenderContext& ctx,
 		}
 	};
 
-	PushConstantLayout pushConstantLayout = {
-		.constants = {{
-			{.name = "material.flags", .offset = offsetof(MaterialPushConstants, flags), .type = PushConstantType::UInt},
-			{.name = "material.heightScale", .offset = offsetof(MaterialPushConstants, heightScale), .type = PushConstantType::Float},
-			{.name = "material.alphaCutoff", .offset = offsetof(MaterialPushConstants, alphaCutoff), .type = PushConstantType::Float},
-			{.name = "material.color", .offset = offsetof(MaterialPushConstants, color), .type = PushConstantType::Vec3}
-		}},
-		.count = 4
-	};
-
 	PipelineLayout layout = {.
 		descriptorSets = {materialLayout, bufferLayout},
-		.pushConstants = pushConstantLayout
+		.pushConstants = MaterialPushConstants::layout
 	};
 	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
 	mPipeline = GraphicsPipeline{createInfo};
