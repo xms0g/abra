@@ -9,7 +9,6 @@ FrameBuffer::FrameBuffer(const int32_t width, const int32_t height)
 	: mWidth(width),
 	  mHeight(height) {
 	glGenFramebuffers(1, &mFBHandle);
-	bind();
 }
 
 FrameBuffer::FrameBuffer(FrameBuffer&& other) noexcept
@@ -67,14 +66,6 @@ int32_t FrameBuffer::height() const {
 
 TextureView FrameBuffer::texture(const uint32_t index) const {
 	return {.id = mTextures[index].id, .target = mTextures[index].target};
-}
-
-void FrameBuffer::bind() const {
-	glBindFramebuffer(GL_FRAMEBUFFER, mFBHandle);
-}
-
-void FrameBuffer::unbind() const {
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void FrameBuffer::resizeRenderBuffer(const int32_t width, const int32_t height) const {
@@ -145,14 +136,6 @@ void FrameBuffer::checkStatus() {
 				break;
 		}
 	}
-}
-
-void FrameBuffer::bindForRead() const {
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, mFBHandle);
-}
-
-void FrameBuffer::bindForDraw() const {
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFBHandle);
 }
 
 FrameBuffer& FrameBuffer::withTexture(const BaseFormat format) {

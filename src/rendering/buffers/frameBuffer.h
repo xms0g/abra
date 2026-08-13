@@ -53,19 +53,11 @@ public:
 	[[nodiscard]]
 	TextureView texture(uint32_t index = 0) const;
 
-	void bind() const;
-
-	void unbind() const;
-
 	void resizeRenderBuffer(int32_t width, int32_t height) const;
 
 	void attachTexture(uint32_t index, Attachment attachment, int32_t mip, int32_t layer) const;
 
 	void checkStatus();
-
-	void bindForRead() const;
-
-	void bindForDraw() const;
 
 	FrameBuffer& withTexture(BaseFormat format);
 

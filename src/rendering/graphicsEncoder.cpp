@@ -4,7 +4,7 @@
 #include "buffers/frameBuffer.h"
 
 void GraphicsEncoder::beginRendering(const RenderingInfo& info) {
-	info.frameBuffer.bind();
+	glBindFramebuffer(GL_FRAMEBUFFER, info.frameBuffer.handle());
 
 	auto mask{ClearMask::None};
 	mask |= info.clearColor ? ClearMask::Color : ClearMask::None;
@@ -26,7 +26,7 @@ void GraphicsEncoder::unbindFrameBuffer() const {
 void GraphicsEncoder::bindFrameBuffer(const FrameBuffer& frameBuffer) {
 	if (mState.glStateCache.handles.framebuffer != frameBuffer.handle()) {
 		mState.glStateCache.handles.framebuffer = frameBuffer.handle();
-		frameBuffer.bind();
+		glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer.handle());
 	}
 }
 
@@ -175,8 +175,8 @@ void GraphicsEncoder::bindDescriptorSet(const DescriptorSet& descriptorSet) {
 }
 
 void GraphicsEncoder::blitFramebuffer(const FrameBuffer& src, const FrameBuffer& dst, const BlitMask mask) const {
-	src.bindForRead();
-	dst.bindForDraw();
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, src.handle());
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.handle());
 
 	glBlitFramebuffer(0, 0, src.width(), src.height(),
 	                  0, 0, dst.width(), dst.height(),

@@ -278,14 +278,14 @@ void Renderer::createFrameBuffers() {
 		auto& intermediateBuffer = mGraph.addResource("intermediateBuffer",
 		                                              std::make_unique<FrameBuffer>(width, height));
 
-		intermediateBuffer.bind();
+		mEncoder.bindFrameBuffer(intermediateBuffer);
 
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
 			intermediateBuffer.withTextureFP(BaseFormat::RGBA)
 					.withRenderBufferDepth(InternalFormat::Depth24)
 					.checkStatus();
 
-			sceneBuffer.bind();
+			mEncoder.bindFrameBuffer(sceneBuffer);
 			sceneBuffer.withTextureFPMultisampled(sampleCount, BaseFormat::RGBA)
 					.withRenderBufferDepthMultisampled(sampleCount, InternalFormat::Depth24)
 					.checkStatus();
@@ -294,13 +294,13 @@ void Renderer::createFrameBuffers() {
 					.withRenderBufferDepth(InternalFormat::Depth24)
 					.checkStatus();
 
-			sceneBuffer.bind();
+			mEncoder.bindFrameBuffer(sceneBuffer);
 			sceneBuffer.withTextureMultisampled(sampleCount, BaseFormat::RGBA)
 					.withRenderBufferDepthMultisampled(sampleCount, InternalFormat::Depth24)
 					.checkStatus();
 		}
 	} else {
-		sceneBuffer.bind();
+		mEncoder.bindFrameBuffer(sceneBuffer);
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
 			sceneBuffer.withTextureFP(BaseFormat::RGBA)
 					.withTextureDepth(InternalFormat::Depth24, false)
@@ -311,12 +311,11 @@ void Renderer::createFrameBuffers() {
 					.checkStatus();
 		}
 	}
-	sceneBuffer.unbind();
 
 	// GBuffer
 	auto& gBuffer = mGraph.addResource("gBuffer", std::make_unique<FrameBuffer>(width, height));
 
-	gBuffer.bind();
+	mEncoder.bindFrameBuffer(gBuffer);
 	gBuffer.withTextureFP(BaseFormat::RGBA) // position
 			.withTextureFP(BaseFormat::RGBA); // normal
 	if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
@@ -335,40 +334,36 @@ void Renderer::createFrameBuffers() {
 	// SSAO
 	auto& ssao = mGraph.addResource("ssao", std::make_unique<FrameBuffer>(width / 2, height / 2));
 
-	ssao.bind();
+	mEncoder.bindFrameBuffer(ssao);
 	ssao.withTexture(BaseFormat::Red).checkStatus();
-	ssao.unbind();
 
 	auto& ssaoBlur = mGraph.addResource("ssaoBlur", std::make_unique<FrameBuffer>(width / 2, height / 2));
 
-	ssaoBlur.bind();
+	mEncoder.bindFrameBuffer(ssaoBlur);
 	ssaoBlur.withTexture(BaseFormat::Red).checkStatus();
-	ssaoBlur.unbind();
 
 	// Shadow Maps
 	auto& directional = mGraph.addResource("directional", std::make_unique<FrameBuffer>(
 		                                       CONFIG_MANAGER.get<int32_t>("shadow.map.width"),
 		                                       CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
 
-	directional.bind();
+	mEncoder.bindFrameBuffer(directional);
 	directional.withTextureDepth(InternalFormat::Depth24, true).checkStatus();
-	directional.unbind();
 
 	auto& point = mGraph.addResource("point", std::make_unique<FrameBuffer>(
 		                                 CONFIG_MANAGER.get<int32_t>("shadow.map.width"),
 		                                 CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
 
-	point.bind();
+	mEncoder.bindFrameBuffer(point);
 	point.withTextureCubemapDepthArray(
 				CONFIG_MANAGER.get<int32_t>("light.max_point"), InternalFormat::Depth24, true)
 			.checkStatus();
-	point.unbind();
 
 	auto& spot = mGraph.addResource("spot", std::make_unique<FrameBuffer>(
 		                                CONFIG_MANAGER.get<int32_t>("shadow.map.width"),
 		                                CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
 
-	spot.bind();
+	mEncoder.bindFrameBuffer(spot);
 	spot.withTextureDepthArray(
 				CONFIG_MANAGER.get<int32_t>("light.max_spot"), InternalFormat::Depth24, true)
 			.checkStatus();
@@ -377,14 +372,13 @@ void Renderer::createFrameBuffers() {
 	auto addPPRenderTarget = [&](const std::string& name) {
 		auto& target = mGraph.addResource(name, std::make_unique<FrameBuffer>(width, height));
 
-		target.bind();
+		mEncoder.bindFrameBuffer(target);
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
 			target.withTextureFP(BaseFormat::RGBA);
 		} else {
 			target.withTexture(BaseFormat::RGBA);
 		}
 		target.checkStatus();
-		target.unbind();
 	};
 
 	addPPRenderTarget("ping");
