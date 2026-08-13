@@ -150,11 +150,6 @@ void GraphicsEncoder::pushConstants(const void* data) const {
 	}
 }
 
-void GraphicsEncoder::bindTransform(const TransformView& transform) {
-	setUniform("model", transform.model);
-	setUniform("normalMatrix", transform.normal);
-}
-
 void GraphicsEncoder::bindDescriptorSet(const DescriptorSet& descriptorSet) {
 	for (const auto& [type, binding, resource]: descriptorSet.descriptors()) {
 		switch (type) {

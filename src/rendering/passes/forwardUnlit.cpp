@@ -81,7 +81,8 @@ void ForwardUnlitPass::execute(const RenderContext& ctx, const FrameGraph& graph
 			.color = cmd.material.color
 		};
 		encoder.pushConstants(&pushConstants);
-		encoder.bindTransform(cmd.transform);
+		encoder.setUniform("model", cmd.transform.model);
+		encoder.setUniform("normalMatrix", cmd.transform.normal);
 		encoder.bindVertexArray(cmd.mesh.vao);
 		encoder.drawIndexed(cmd.mesh.indexCount);
 	}

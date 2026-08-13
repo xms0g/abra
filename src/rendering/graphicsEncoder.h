@@ -53,8 +53,6 @@ public:
 
 	void pushConstants(const void* data) const;
 
-	void bindTransform(const TransformView& transform);
-
 	void bindDescriptorSet(const DescriptorSet& descriptorSet);
 
 	void blitFramebuffer(const FrameBuffer& src, const FrameBuffer& dst, BlitMask mask) const;

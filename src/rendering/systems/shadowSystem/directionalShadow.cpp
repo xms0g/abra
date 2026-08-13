@@ -42,10 +42,8 @@ void DirectionalShadow::render(const RenderContext& ctx,
 	encoder.setUniform("lightSpaceMatrix", mLightSpaceMatrix);
 
 	for (const auto& [entityID, matBatch]: mObjects) {
-		encoder.bindTransform({
-			.model = ctx.renderData->entity.models[entityID],
-			.normal = ctx.renderData->entity.normals[entityID],
-		});
+		encoder.setUniform("model", ctx.renderData->entity.models[entityID]);
+		encoder.setUniform("normalMatrix", ctx.renderData->entity.normals[entityID]);
 
 		for (const auto& meshIdx: matBatch.meshIndices) {
 			encoder.bindVertexArray(ctx.renderData->mesh.vaos[meshIdx]);

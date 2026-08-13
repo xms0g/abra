@@ -126,7 +126,8 @@ void DeferredGeometryPass::execute(const RenderContext& ctx, const FrameGraph& g
 		};
 		encoder.pushConstants(&pushConstants);
 		encoder.setCullMode(cmd.material.flags & TWOSIDED ? CullMode::None : pipelineCullMode);
-		encoder.bindTransform(cmd.transform);
+		encoder.setUniform("model", cmd.transform.model);
+		encoder.setUniform("normalMatrix", cmd.transform.normal);
 		encoder.bindVertexArray(cmd.mesh.vao);
 		encoder.drawIndexed(cmd.mesh.indexCount);
 	}
