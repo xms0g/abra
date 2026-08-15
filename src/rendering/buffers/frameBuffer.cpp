@@ -72,33 +72,6 @@ TextureView FrameBuffer::texture(const uint32_t index) const {
 	return {.id = mTextures[index].id, .target = mTextures[index].target};
 }
 
-void FrameBuffer::checkStatus() {
-	const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
-	if (status != GL_FRAMEBUFFER_COMPLETE) {
-		switch (status) {
-			case GL_FRAMEBUFFER_UNDEFINED:
-				throw std::runtime_error("FRAMEBUFFER_UNDEFINED\n");
-			case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-				throw std::runtime_error("FRAMEBUFFER_INCOMPLETE_ATTACHMENT\n");
-			case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-				throw std::runtime_error("FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT\n");
-			case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-				throw std::runtime_error("FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER\n");
-			case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-				throw std::runtime_error("FRAMEBUFFER_INCOMPLETE_READ_BUFFER\n");
-			case GL_FRAMEBUFFER_UNSUPPORTED:
-				throw std::runtime_error("FRAMEBUFFER_UNSUPPORTED\n");
-			case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
-				throw std::runtime_error("FRAMEBUFFER_INCOMPLETE_MULTISAMPLE\n");
-			case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
-				throw std::runtime_error("FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS\n");
-			default:
-				break;
-		}
-	}
-}
-
 FrameBuffer& FrameBuffer::withTexture(const BaseFormat format) {
 	const InternalFormat internalFormat = getInternalFormat(format);
 
@@ -205,7 +178,7 @@ FrameBuffer& FrameBuffer::withTextureFPMultisampled(const int32_t multisampledCo
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTextureDepth(const InternalFormat format, const bool onlyForShadowMap) {
+FrameBuffer& FrameBuffer::withTextureDepth(const InternalFormat format) {
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextures.emplace_back(textureID, TextureTarget::Texture2D);
@@ -226,17 +199,10 @@ FrameBuffer& FrameBuffer::withTextureDepth(const InternalFormat format, const bo
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, textureID, 0);
 
-	if (onlyForShadowMap) {
-		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
-	}
-
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTextureDepthArray(const int32_t layerCount,
-                                                const InternalFormat format,
-                                                const bool onlyForShadowMap) {
+FrameBuffer& FrameBuffer::withTextureDepthArray(const int32_t layerCount, const InternalFormat format) {
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextures.emplace_back(textureID, TextureTarget::Texture2DArray);
@@ -257,11 +223,6 @@ FrameBuffer& FrameBuffer::withTextureDepthArray(const int32_t layerCount,
 	setDepthTextureParameters(GL_TEXTURE_2D_ARRAY, 2);
 
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, textureID, 0);
-
-	if (onlyForShadowMap) {
-		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
-	}
 
 	return *this;
 }
@@ -297,7 +258,7 @@ FrameBuffer& FrameBuffer::withTextureCubeMap() {
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTextureCubemapDepth(const InternalFormat format, const bool onlyForShadowMap) {
+FrameBuffer& FrameBuffer::withTextureCubemapDepth(const InternalFormat format) {
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextures.emplace_back(textureID, TextureTarget::TextureCubeMap);
@@ -318,17 +279,10 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepth(const InternalFormat format, c
 	// attach depth texture as FBO's depth buffer
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, textureID, 0);
 
-	if (onlyForShadowMap) {
-		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
-	}
-
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(const int32_t layerCount,
-                                                       const InternalFormat format,
-                                                       const bool onlyForShadowMap) {
+FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(const int32_t layerCount, const InternalFormat format) {
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	mTextures.emplace_back(textureID, TextureTarget::TextureCubeMapArray);
@@ -349,11 +303,6 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(const int32_t layerCount,
 	setDepthTextureParameters(GL_TEXTURE_CUBE_MAP_ARRAY, 3);
 	// attach depth texture as FBO's depth buffer
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, textureID, 0);
-
-	if (onlyForShadowMap) {
-		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
-	}
 
 	return *this;
 }
@@ -404,6 +353,12 @@ FrameBuffer& FrameBuffer::withRenderBufferDepthStencilMultisampled(const int32_t
 	return *this;
 }
 
+FrameBuffer& FrameBuffer::withNoColorAttachment() {
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	return *this;
+}
+
 FrameBuffer& FrameBuffer::configureAttachments() {
 	if (mTextures.empty()) {
 		throw std::runtime_error("ERROR::FRAMEBUFFER::NO_TEXTURES_ATTACHED!\n");
@@ -412,6 +367,33 @@ FrameBuffer& FrameBuffer::configureAttachments() {
 	glDrawBuffers(static_cast<int32_t>(mAttachments.size()), mAttachments.data());
 
 	return *this;
+}
+
+void FrameBuffer::checkStatus() {
+	const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+	if (status != GL_FRAMEBUFFER_COMPLETE) {
+		switch (status) {
+			case GL_FRAMEBUFFER_UNDEFINED:
+				throw std::runtime_error("FRAMEBUFFER_UNDEFINED\n");
+			case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+				throw std::runtime_error("FRAMEBUFFER_INCOMPLETE_ATTACHMENT\n");
+			case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+				throw std::runtime_error("FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT\n");
+			case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+				throw std::runtime_error("FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER\n");
+			case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+				throw std::runtime_error("FRAMEBUFFER_INCOMPLETE_READ_BUFFER\n");
+			case GL_FRAMEBUFFER_UNSUPPORTED:
+				throw std::runtime_error("FRAMEBUFFER_UNSUPPORTED\n");
+			case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+				throw std::runtime_error("FRAMEBUFFER_INCOMPLETE_MULTISAMPLE\n");
+			case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
+				throw std::runtime_error("FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS\n");
+			default:
+				break;
+		}
+	}
 }
 
 void FrameBuffer::setAttachment(const uint32_t textureID, const uint32_t target) {

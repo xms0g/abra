@@ -309,11 +309,11 @@ void Renderer::createFrameBuffers() {
 		mEncoder.bindFrameBuffer(sceneBuffer);
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
 			sceneBuffer.withTextureFP(BaseFormat::RGBA)
-					.withTextureDepth(InternalFormat::Depth24, false)
+					.withTextureDepth(InternalFormat::Depth24)
 					.checkStatus();
 		} else {
 			sceneBuffer.withTexture(BaseFormat::RGBA)
-					.withTextureDepth(InternalFormat::Depth24, false)
+					.withTextureDepth(InternalFormat::Depth24)
 					.checkStatus();
 		}
 	}
@@ -334,7 +334,7 @@ void Renderer::createFrameBuffers() {
 
 	gBuffer.withTexture(BaseFormat::RGBA) // orm
 			.configureAttachments()
-			.withTextureDepth(InternalFormat::Depth24, false)
+			.withTextureDepth(InternalFormat::Depth24)
 			.checkStatus();
 
 	// SSAO
@@ -354,15 +354,17 @@ void Renderer::createFrameBuffers() {
 		                                       CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
 
 	mEncoder.bindFrameBuffer(directional);
-	directional.withTextureDepth(InternalFormat::Depth24, true).checkStatus();
+	directional.withTextureDepth(InternalFormat::Depth24)
+			.withNoColorAttachment()
+			.checkStatus();
 
 	auto& point = mGraph.addResource("point", std::make_unique<FrameBuffer>(
 		                                 CONFIG_MANAGER.get<int32_t>("shadow.map.width"),
 		                                 CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
 
 	mEncoder.bindFrameBuffer(point);
-	point.withTextureCubemapDepthArray(
-				CONFIG_MANAGER.get<int32_t>("light.max_point"), InternalFormat::Depth24, true)
+	point.withTextureCubemapDepthArray(CONFIG_MANAGER.get<int32_t>("light.max_point"), InternalFormat::Depth24)
+			.withNoColorAttachment()
 			.checkStatus();
 
 	auto& spot = mGraph.addResource("spot", std::make_unique<FrameBuffer>(
@@ -370,8 +372,8 @@ void Renderer::createFrameBuffers() {
 		                                CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
 
 	mEncoder.bindFrameBuffer(spot);
-	spot.withTextureDepthArray(
-				CONFIG_MANAGER.get<int32_t>("light.max_spot"), InternalFormat::Depth24, true)
+	spot.withTextureDepthArray(CONFIG_MANAGER.get<int32_t>("light.max_spot"), InternalFormat::Depth24)
+			.withNoColorAttachment()
 			.checkStatus();
 
 	// PostProcess Render Targets

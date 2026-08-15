@@ -56,8 +56,6 @@ public:
 	[[nodiscard]]
 	TextureView texture(uint32_t index = 0) const;
 
-	void checkStatus();
-
 	FrameBuffer& withTexture(BaseFormat format);
 
 	FrameBuffer& withTextureMultisampled(int32_t multisampledCount, BaseFormat format);
@@ -66,15 +64,15 @@ public:
 
 	FrameBuffer& withTextureFPMultisampled(int32_t multisampledCount, BaseFormat format);
 
-	FrameBuffer& withTextureDepth(InternalFormat format, bool onlyForShadowMap);
+	FrameBuffer& withTextureDepth(InternalFormat format);
 
-	FrameBuffer& withTextureDepthArray(int32_t layerCount, InternalFormat format, bool onlyForShadowMap);
+	FrameBuffer& withTextureDepthArray(int32_t layerCount, InternalFormat format);
 
 	FrameBuffer& withTextureCubeMap();
 
-	FrameBuffer& withTextureCubemapDepth(InternalFormat format, bool onlyForShadowMap);
+	FrameBuffer& withTextureCubemapDepth(InternalFormat format);
 
-	FrameBuffer& withTextureCubemapDepthArray(int32_t layerCount, InternalFormat format, bool onlyForShadowMap);
+	FrameBuffer& withTextureCubemapDepthArray(int32_t layerCount, InternalFormat format);
 
 	FrameBuffer& withRenderBufferDepth(InternalFormat format);
 
@@ -84,7 +82,11 @@ public:
 
 	FrameBuffer& withRenderBufferDepthStencilMultisampled(int32_t multisampledCount, InternalFormat format);
 
+	FrameBuffer& withNoColorAttachment();
+
 	FrameBuffer& configureAttachments();
+
+	void checkStatus();
 
 private:
 	void setAttachment(uint32_t textureID, uint32_t target);
