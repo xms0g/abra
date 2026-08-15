@@ -502,6 +502,8 @@ TextureView Renderer::createEnvMap(const Texture& hdrTexture) {
 	auto envMap = std::make_unique<FrameBuffer>(
 		CONFIG_MANAGER.get<int32_t>("PBR.envMap.size"),
 		CONFIG_MANAGER.get<int32_t>("PBR.envMap.size"));
+
+	encoder.bindFrameBuffer(*envMap);
 	envMap->withTextureCubeMap()
 			.withRenderBufferDepth(InternalFormat::Depth24)
 			.checkStatus();
@@ -589,6 +591,8 @@ void Renderer::createIrradianceMap(const TextureView environment) {
 	auto irradianceMap = std::make_unique<FrameBuffer>(
 		CONFIG_MANAGER.get<int32_t>("PBR.irradianceMap.size"),
 		CONFIG_MANAGER.get<int32_t>("PBR.irradianceMap.size"));
+
+	encoder.bindFrameBuffer(*irradianceMap);
 	irradianceMap->withTextureCubeMap()
 			.withRenderBufferDepth(InternalFormat::Depth24)
 			.checkStatus();
@@ -673,6 +677,8 @@ void Renderer::createPrefilterMap(const TextureView environment) {
 	auto prefilterMap = std::make_unique<FrameBuffer>(
 		CONFIG_MANAGER.get<int32_t>("PBR.prefilterMap.size"),
 		CONFIG_MANAGER.get<int32_t>("PBR.prefilterMap.size"));
+
+	encoder.bindFrameBuffer(*prefilterMap);
 	prefilterMap->withTextureCubeMap()
 			.withRenderBufferDepth(InternalFormat::Depth24)
 			.checkStatus();
@@ -768,6 +774,8 @@ void Renderer::createBrdfLUT() {
 	auto brdfLUT = std::make_unique<FrameBuffer>(
 		CONFIG_MANAGER.get<int32_t>("PBR.brdfLUT.size"),
 		CONFIG_MANAGER.get<int32_t>("PBR.brdfLUT.size"));
+
+	encoder.bindFrameBuffer(*brdfLUT);
 	brdfLUT->withTextureFP(BaseFormat::RG)
 			.checkStatus();
 

@@ -230,7 +230,6 @@ FrameBuffer& FrameBuffer::withTextureDepth(const InternalFormat format, const bo
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
 	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	return *this;
 }
@@ -294,7 +293,6 @@ FrameBuffer& FrameBuffer::withTextureCubeMap() {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	return *this;
 }
@@ -324,8 +322,6 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepth(const InternalFormat format, c
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
 	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	return *this;
 }
@@ -358,8 +354,6 @@ FrameBuffer& FrameBuffer::withTextureCubemapDepthArray(const int32_t layerCount,
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
 	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	return *this;
 }
