@@ -37,10 +37,6 @@ public:
 	[[nodiscard]]
 	const glm::vec3& max() const;
 
-	void bind() const;
-
-	static void unbind();
-
 	static void enableInstanceAttributes(uint32_t vao, size_t offset);
 
 	void uploadToGPU();

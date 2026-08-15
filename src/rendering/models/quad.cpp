@@ -22,7 +22,7 @@ Model::Quad::Quad() {
 	mVBO = std::make_unique<VertexBuffer>(STATIC);
 	mVBO->bind();
 
-	mVBO->setData(&vertices[0], sizeof(vertices), 0);
+	mVBO->copyToMemory(&vertices[0], sizeof(vertices), 0);
 
 	VertexLayout layout;
 	layout.pushVector<glm::vec2>(0);	// Position

@@ -5,5 +5,5 @@ class IndexBuffer final : public Buffer {
 public:
 	explicit IndexBuffer(BufferUsage usage);
 
-	void setData(const void* data, uint32_t size) const;
+	void copyToMemory(const void* data, uint32_t size) const;
 };

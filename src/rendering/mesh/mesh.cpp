@@ -63,14 +63,6 @@ const glm::vec3& Mesh::max() const {
 	return mMax;
 }
 
-void Mesh::bind() const {
-	mVAO->bind();
-}
-
-void Mesh::unbind() {
-	VertexArray::unbind();
-}
-
 void Mesh::enableInstanceAttributes(const uint32_t vao, const size_t offset) {
 	glBindVertexArray(vao);
 
@@ -97,10 +89,9 @@ void Mesh::uploadToGPU() {
 	mIBO = std::make_unique<IndexBuffer>(STATIC);
 	// bind the buffer to be used
 	mVBO->bind();
-	mVBO->setData(mVertices.data(), static_cast<uint32_t>(mVertices.size() * sizeof(Vertex)), 0);
+	mVBO->copyToMemory(mVertices.data(), static_cast<uint32_t>(mVertices.size() * sizeof(Vertex)), 0);
 
-	mIBO->bind();
-	mIBO->setData(mIndices.data(), static_cast<uint32_t>(mIndices.size() * sizeof(uint32_t)));
+	mIBO->copyToMemory(mIndices.data(), static_cast<uint32_t>(mIndices.size() * sizeof(uint32_t)));
 
 	// set the vertex attribute pointers
 	VertexLayout layout;

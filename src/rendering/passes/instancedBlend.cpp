@@ -168,8 +168,6 @@ void InstancedBlendPass::execute(const RenderContext& ctx, const FrameGraph& gra
 }
 
 void InstancedBlendPass::prepareInstanceBuffer(const std::vector<uint32_t>& vaos) {
-	mVBO = std::make_unique<VertexBuffer>(DYNAMIC);
-
 	size_t totalRequiredSize = 0;
 	for (const auto& group: mObjects) {
 		const size_t instanceCount = group.transforms.size() / 9;
@@ -177,14 +175,14 @@ void InstancedBlendPass::prepareInstanceBuffer(const std::vector<uint32_t>& vaos
 	}
 
 	// Allocate the full block of memory once
-	mVBO->bind();
-	mVBO->setData(nullptr, static_cast<int32_t>(totalRequiredSize), 0);
+	mVBO = std::make_unique<VertexBuffer>(STATIC, totalRequiredSize);
 
 	// Setup attributes now that the buffer is allocated
 	int32_t currentOffset = 0;
+	mVBO->bind();
 	for (const auto& group: mObjects) {
 		for (const auto meshIdx: group.matBatch.meshIndices) {
-			const int32_t vao = vaos[meshIdx];
+			const uint32_t vao = vaos[meshIdx];
 			Mesh::enableInstanceAttributes(vao, currentOffset);
 		}
 		const size_t instanceCount = group.transforms.size() / 9;
@@ -213,7 +211,7 @@ void InstancedBlendPass::uploadInstanceData() const {
 		}
 
 		const size_t uploadSize = gpuData.size() * sizeof(InstanceData);
-		mVBO->setData(gpuData.data(), static_cast<int32_t>(uploadSize), currentOffset);
+		mVBO->copyToMemory(gpuData.data(), static_cast<int32_t>(uploadSize), currentOffset);
 		currentOffset += static_cast<int32_t>(uploadSize);
 	}
 
