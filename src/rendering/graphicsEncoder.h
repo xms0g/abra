@@ -47,8 +47,6 @@ public:
 
 	void bindVertexArray(uint32_t vao);
 
-	void bindTexture(const TextureView& handle, uint32_t slot);
-
 	void bindPipeline(GraphicsPipeline& pipeline);
 
 	void pushConstants(const void* data) const;

@@ -149,7 +149,11 @@ void SSAOPass::blur(const FrameGraph& graph, GraphicsEncoder& encoder) {
 	encoder.setViewport({.x = 0, .y = 0, .width = blur.width(), .height = blur.height()});
 
 	encoder.bindPipeline(mPipelines[1]);
-	encoder.bindTexture(graph.getResource(mIndexes.ssao).texture(), 0);
+
+	DescriptorSet ssaoSet{};
+	ssaoSet.write(graph.getResource(mIndexes.ssao).texture());
+	encoder.bindDescriptorSet(mPipelines[1].layout().descriptorSets[0], ssaoSet);
+
 	encoder.draw(3);
 }
 

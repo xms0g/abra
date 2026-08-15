@@ -36,7 +36,7 @@ private:
 	};
 
 	ResourceIndexes mIndexes{};
-	std::array<GraphicsPipeline, 2> mPipelines;
 	UniformBuffer mUBO{};
 	Texture mNoiseTexture{};
+	std::array<GraphicsPipeline, 2> mPipelines;
 };

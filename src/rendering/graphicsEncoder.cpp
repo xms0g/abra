@@ -37,11 +37,6 @@ void GraphicsEncoder::bindVertexArray(const uint32_t vao) {
 	}
 }
 
-void GraphicsEncoder::bindTexture(const TextureView& handle, const uint32_t slot) {
-	glActiveTexture(GL_TEXTURE0 + slot);
-	glBindTexture(toUnderlying(handle.target), handle.id);
-}
-
 void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 	mState.pipeline = &pipeline;
 
@@ -169,7 +164,8 @@ void GraphicsEncoder::bindDescriptorSet(const DescriptorSetLayout& layout, const
 
 				if (mState.bindingCache.textures[descBinding.binding] != texture) {
 					mState.bindingCache.textures[descBinding.binding] = texture;
-					bindTexture(texture, descBinding.binding);
+					glActiveTexture(GL_TEXTURE0 + descBinding.binding);
+					glBindTexture(toUnderlying(texture.target), texture.id);
 				}
 
 				break;
