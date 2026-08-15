@@ -145,41 +145,19 @@ void DeferredLightingPass::configure(const RenderContext& ctx,
 	const auto& gBuffer = graph.getResource(mIndexes.gBuffer);
 
 	DescriptorSet frameSet{};
-	frameSet.write(
-				CONFIG_MANAGER.get<int32_t>("gBuffer.position.slot"),
-				gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.index")))
-			.write(
-				CONFIG_MANAGER.get<int32_t>("gBuffer.normal.slot"),
-				gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")))
-			.write(
-				CONFIG_MANAGER.get<int32_t>("gBuffer.albedo.slot"),
-				gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.albedo.index")))
-			.write(
-				CONFIG_MANAGER.get<int32_t>("gBuffer.orm.slot"),
-				gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.orm.index")))
-			.write(
-				CONFIG_MANAGER.get<int32_t>("ssao.slot"),
-				graph.getResource(mIndexes.ssao).texture())
-			.write(
-				CONFIG_MANAGER.get<int32_t>("PBR.irradianceMap.slot"),
-				ctx.pbrBuffers->irradiance->texture())
-			.write(
-				CONFIG_MANAGER.get<int32_t>("PBR.prefilterMap.slot"),
-				ctx.pbrBuffers->prefilter->texture())
-			.write(
-				CONFIG_MANAGER.get<int32_t>("PBR.brdfLUT.slot"),
-				ctx.pbrBuffers->brdfLUT->texture())
-			.write(
-				CONFIG_MANAGER.get<int32_t>("shadow.map.slot"),
-				graph.getResource(mIndexes.directional).texture())
-			.write(
-				CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 1,
-				graph.getResource(mIndexes.point).texture())
-			.write(
-				CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 2,
-				graph.getResource(mIndexes.spot).texture());
+	frameSet.write(gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.index")))
+			.write(gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")))
+			.write(gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.albedo.index")))
+			.write(gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.orm.index")))
+			.write(graph.getResource(mIndexes.ssao).texture())
+			.write(ctx.pbrBuffers->irradiance->texture())
+			.write(ctx.pbrBuffers->prefilter->texture())
+			.write(ctx.pbrBuffers->brdfLUT->texture())
+			.write(graph.getResource(mIndexes.directional).texture())
+			.write(graph.getResource(mIndexes.point).texture())
+			.write(graph.getResource(mIndexes.spot).texture());
 
-	encoder.bindDescriptorSet(frameSet);
+	encoder.bindDescriptorSet(passLayout, frameSet);
 }
 
 void DeferredLightingPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {

@@ -29,7 +29,7 @@ DescriptorSet* FXAA::render(GraphicsEncoder& encoder,
 
 	encoder.bindPipeline(mPipeline);
 	encoder.setUniform("inverseResolution", glm::vec2(1.0 / renderTarget->width(), 1.0 / renderTarget->height()));
-	encoder.bindDescriptorSet(dscSet);
+	encoder.bindDescriptorSet(mPipeline.layout().descriptorSets[0], dscSet);
 	encoder.draw(3);
 
 	return &renderTargetDscSet;

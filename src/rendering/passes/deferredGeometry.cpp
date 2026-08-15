@@ -116,7 +116,8 @@ void DeferredGeometryPass::execute(const RenderContext& ctx, const FrameGraph& g
 	const auto pipelineCullMode = mPipeline.rasterizationState().cullMode;
 
 	for (const auto& cmd: *mCommands) {
-		encoder.bindDescriptorSet(ctx.renderData->material.descriptorSets[cmd.material.idx]);
+		const auto& materialLayout = mPipeline.layout().descriptorSets[0];
+		encoder.bindDescriptorSet(materialLayout, ctx.renderData->material.descriptorSets[cmd.material.idx]);
 
 		const MaterialPushConstants pushConstants = {
 			.flags = cmd.material.flags,

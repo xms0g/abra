@@ -1,19 +1,22 @@
 #include "descriptorSet.h"
+#include <cassert>
 
-TextureView DescriptorSet::texture(const uint32_t binding) {
-	return mDescriptors[binding].rs<TextureView>();
+TextureView DescriptorSet::texture(const uint32_t index) {
+	return mDescriptors[index].rs<TextureView>();
 }
 
-DescriptorSet& DescriptorSet::write(const uint32_t binding, const TextureView texture) {
-	mDescriptors[binding] = {.type = DescriptorType::SampledImage, .binding = binding, .resource = texture};
+DescriptorSet& DescriptorSet::write(const TextureView texture) {
+	assert(mCount < MAX_DESCRIPTOR_SETS);
+	mDescriptors[mCount++] = {.resource = texture};
 	return *this;
 }
 
-DescriptorSet& DescriptorSet::write(const uint32_t binding, BufferView buffer) {
-	mDescriptors[binding] =  {.type = DescriptorType::UniformBuffer, .binding = binding, .resource = buffer};
+DescriptorSet& DescriptorSet::write(BufferView buffer) {
+	assert(mCount < MAX_DESCRIPTOR_SETS);
+	mDescriptors[mCount++] =  {.resource = buffer};
 	return *this;
 }
 
-const std::array<Descriptor, MAX_DESCRIPTOR_SETS>& DescriptorSet::descriptors() const {
-	return mDescriptors;
+const Descriptor& DescriptorSet::descriptor(const uint32_t index) const {
+	return mDescriptors[index];
 }

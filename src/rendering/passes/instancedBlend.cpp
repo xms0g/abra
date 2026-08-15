@@ -117,23 +117,17 @@ void InstancedBlendPass::configure(const RenderContext& ctx,
 	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
 	mPipeline = GraphicsPipeline{createInfo};
 
-	DescriptorSet frameSet{};
-	frameSet.write(
-				CONFIG_MANAGER.get<int32_t>("shadow.map.slot"),
-				graph.getResource(mIndexes.directional).texture())
-			.write(
-				CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 1,
-				graph.getResource(mIndexes.point).texture())
-			.write(
-				CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 2,
-				graph.getResource(mIndexes.spot).texture());
-
-	encoder.bindDescriptorSet(frameSet);
-
 	mIndexes.sceneBuffer = graph.getResourceID("sceneBuffer");
 	mIndexes.directional = graph.getResourceID("directional");
 	mIndexes.point = graph.getResourceID("point");
 	mIndexes.spot = graph.getResourceID("spot");
+
+	DescriptorSet frameSet{};
+	frameSet.write(graph.getResource(mIndexes.directional).texture())
+			.write(graph.getResource(mIndexes.point).texture())
+			.write(graph.getResource(mIndexes.spot).texture());
+
+	encoder.bindDescriptorSet(passLayout, frameSet);
 
 	mObjects = std::span(
 		ctx.queueRegistry->get<RenderInstanceGroup>("blendInstanced").data(),
@@ -151,7 +145,11 @@ void InstancedBlendPass::execute(const RenderContext& ctx, const FrameGraph& gra
 
 		encoder.bindFrameBuffer(graph.getResource(mIndexes.sceneBuffer));
 		encoder.bindPipeline(mPipeline);
-		encoder.bindDescriptorSet(ctx.renderData->material.descriptorSets[object.matBatch.materialIndex]);
+
+		const auto& materialLayout = mPipeline.layout().descriptorSets[0];
+		encoder.bindDescriptorSet(
+			materialLayout,
+			ctx.renderData->material.descriptorSets[object.matBatch.materialIndex]);
 
 		const MaterialPushConstants pushConstants = {
 			.flags = object.matBatch.materialFlags,

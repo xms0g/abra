@@ -46,10 +46,10 @@ void Bloom::configure(const FrameGraph& graph) {
 	mRenderTargets = {&graph.getResource(graph.getResourceID("bloomPing")), &graph.getResource(graph.getResourceID("bloomPong"))};
 
 	DescriptorSet pingDescSet{};
-	pingDescSet.write(0, mRenderTargets[0]->texture());
+	pingDescSet.write(mRenderTargets[0]->texture());
 
 	DescriptorSet pongDescSet{};
-	pongDescSet.write(0, mRenderTargets[1]->texture());
+	pongDescSet.write(mRenderTargets[1]->texture());
 
 	mRenderTargetsDescSets = {pingDescSet, pongDescSet};
 }
@@ -77,7 +77,7 @@ DescriptorSet* Bloom::brightFilterPass(GraphicsEncoder& encoder, const Descripto
 	encoder.clearFrameBuffer(ClearMask::Color);
 
 	encoder.bindPipeline(mPipelines[0]);
-	encoder.bindDescriptorSet(dscSet);
+	encoder.bindDescriptorSet(mPipelines[0].layout().descriptorSets[0], dscSet);
 	encoder.draw(3);
 
 	DescriptorSet* renderTargetDescSet = &mRenderTargetsDescSets[toggle];
@@ -93,7 +93,7 @@ DescriptorSet* Bloom::blurPass(GraphicsEncoder& encoder, DescriptorSet& dscSet, 
 	for (int i = 0; i < 10; ++i) {
 		encoder.bindFrameBuffer(*mRenderTargets[toggle]);
 		encoder.setUniform("horizontal", (i & 1) == 0);
-		encoder.bindDescriptorSet(*renderTargetDescSet);
+		encoder.bindDescriptorSet(mPipelines[1].layout().descriptorSets[0], *renderTargetDescSet);
 		encoder.draw(3);
 
 		renderTargetDescSet = &mRenderTargetsDescSets[toggle];
@@ -108,14 +108,14 @@ DescriptorSet* Bloom::combinePass(GraphicsEncoder& encoder,
                                   DescriptorSet& blurDscSet,
                                   const bool& toggle) {
 	DescriptorSet combineDescSet{};
-	combineDescSet.write(0, dscSet.texture(0));
-	combineDescSet.write(1, blurDscSet.texture(0));
+	combineDescSet.write(dscSet.texture(0));
+	combineDescSet.write(blurDscSet.texture(0));
 
 	encoder.bindFrameBuffer(*mRenderTargets[toggle]);
 	//encoder.clearFrameBuffer(ClearMask::Color);
 
 	encoder.bindPipeline(mPipelines[2]);
-	encoder.bindDescriptorSet(combineDescSet);
+	encoder.bindDescriptorSet(mPipelines[2].layout().descriptorSets[0], combineDescSet);
 	encoder.draw(3);
 
 	return &mRenderTargetsDescSets[toggle];

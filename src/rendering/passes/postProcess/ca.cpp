@@ -27,7 +27,7 @@ DescriptorSet* CA::render(GraphicsEncoder& encoder,
 
 	encoder.bindPipeline(mPipeline);
 	encoder.setUniform("intensity", mIntensity);
-	encoder.bindDescriptorSet(dscSet);
+	encoder.bindDescriptorSet(mPipeline.layout().descriptorSets[0], dscSet);
 	encoder.draw(3);
 
 	return &renderTargetDscSet;

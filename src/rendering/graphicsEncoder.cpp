@@ -149,27 +149,31 @@ void GraphicsEncoder::pushConstants(const void* data) const {
 	}
 }
 
-void GraphicsEncoder::bindDescriptorSet(const DescriptorSet& descriptorSet) {
-	for (const auto& [type, binding, resource]: descriptorSet.descriptors()) {
-		switch (type) {
-			case DescriptorType::UniformBuffer: {
-				const auto& [id, target, size] = std::get<BufferView>(resource);
+void GraphicsEncoder::bindDescriptorSet(const DescriptorSetLayout& layout, const DescriptorSet& descriptorSet) {
+	for (int i = 0; i < layout.bindings.size(); ++i) {
+		const auto& descBinding = layout.bindings[i];
+		auto& descriptor = descriptorSet.descriptor(i);
 
-				glBindBufferRange(target, binding, id, 0, size);
+		switch (descBinding.type) {
+			case DescriptorType::None:
+				break;
+			case DescriptorType::UniformBuffer: {
+				const auto& buffer = std::get<BufferView>(descriptor.resource);
+
+				glBindBufferRange(buffer.target, descBinding.binding, buffer.id, 0, buffer.size);
 				break;
 			}
-			case DescriptorType::SampledImage: {
-				const auto& texture = std::get<TextureView>(resource);
 
-				if (mState.bindingCache.textures[binding] != texture) {
-					mState.bindingCache.textures[binding] = texture;
-					bindTexture(texture, binding);
+			case DescriptorType::SampledImage:{
+				const auto& texture = std::get<TextureView>(descriptor.resource);
+
+				if (mState.bindingCache.textures[descBinding.binding] != texture) {
+					mState.bindingCache.textures[descBinding.binding] = texture;
+					bindTexture(texture, descBinding.binding);
 				}
 
 				break;
 			}
-			case DescriptorType::None:
-				break;
 		}
 	}
 }

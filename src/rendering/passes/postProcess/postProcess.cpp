@@ -54,10 +54,10 @@ void PostProcessPass::configure(const RenderContext& ctx,
 	mRenderTargets = {&graph.getResource(graph.getResourceID("ping")), &graph.getResource(graph.getResourceID("pong"))};
 
 	DescriptorSet pingDescSet{};
-	pingDescSet.write(0, mRenderTargets[0]->texture());
+	pingDescSet.write(mRenderTargets[0]->texture());
 
 	DescriptorSet pongDescSet{};
-	pongDescSet.write(0, mRenderTargets[1]->texture());
+	pongDescSet.write(mRenderTargets[1]->texture());
 
 	mRenderTargetsDescSets = {pingDescSet, pongDescSet};
 	eventBus.subscribeToEvent<PostProcessPass, GuiPostProcessEvent>(this, &PostProcessPass::onGuiUpdate);
@@ -67,7 +67,7 @@ void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph,
 	bool toggle = false;
 
 	DescriptorSet sceneDescSet{};
-	sceneDescSet.write(0, graph.getResource(mIndexes.sceneBuffer).texture());
+	sceneDescSet.write(graph.getResource(mIndexes.sceneBuffer).texture());
 
 	DescriptorSet* dscSet = &sceneDescSet;
 	for (const auto& effect: mEffects) {
@@ -80,7 +80,7 @@ void PostProcessPass::execute(const RenderContext& ctx, const FrameGraph& graph,
 
 	encoder.bindFrameBuffer();
 	encoder.bindPipeline(mPipeline);
-	encoder.bindDescriptorSet(*dscSet);
+	encoder.bindDescriptorSet(mPipeline.layout().descriptorSets[0], *dscSet);
 	encoder.draw(3);
 }
 

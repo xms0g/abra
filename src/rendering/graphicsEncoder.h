@@ -53,7 +53,7 @@ public:
 
 	void pushConstants(const void* data) const;
 
-	void bindDescriptorSet(const DescriptorSet& descriptorSet);
+	void bindDescriptorSet(const DescriptorSetLayout& layout, const DescriptorSet& descriptorSet);
 
 	void blitFramebuffer(const FrameBuffer& src, const FrameBuffer& dst, BlitMask mask) const;
 

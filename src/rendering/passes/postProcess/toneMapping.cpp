@@ -27,7 +27,7 @@ DescriptorSet* ToneMapping::render(GraphicsEncoder& encoder,
 
 	encoder.bindPipeline(mPipeline);
 	encoder.setUniform("exposure", mExposure);
-	encoder.bindDescriptorSet(dscSet);
+	encoder.bindDescriptorSet(mPipeline.layout().descriptorSets[0], dscSet);
 	encoder.draw(3);
 
 	return &renderTargetDscSet;

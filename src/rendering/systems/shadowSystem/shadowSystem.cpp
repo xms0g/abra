@@ -83,9 +83,9 @@ void ShadowSystem::configure(const RenderContext& ctx,
 		},
 	};
 
-	PipelineLayout layout = {.descriptorSets = {bufferLayout}};
-	GraphicsPipelineCreateInfo depthCreateInfo = {.rendering = depthInfo, .layout = layout};
-	GraphicsPipelineCreateInfo cubeDepthCreateInfo = {.rendering = cubeDepthInfo, .layout = layout};
+	PipelineLayout pipelineLayout = {.descriptorSets = {bufferLayout}};
+	GraphicsPipelineCreateInfo depthCreateInfo = {.rendering = depthInfo, .layout = pipelineLayout};
+	GraphicsPipelineCreateInfo cubeDepthCreateInfo = {.rendering = cubeDepthInfo, .layout = pipelineLayout};
 
 	mPipelines[0] = GraphicsPipeline{depthCreateInfo};
 	mPipelines[1] = GraphicsPipeline{cubeDepthCreateInfo};
@@ -96,13 +96,20 @@ void ShadowSystem::configure(const RenderContext& ctx,
 
 	mUBO = UniformBuffer{DYNAMIC, sizeof(UniformBufferObject)};
 
-	DescriptorSet shadowSet{};
-	shadowSet.write(
-		CONFIG_MANAGER.get<int32_t>("shadow.ubo.binding"),
-		{.id = mUBO.id(), .target = mUBO.target(), .size = sizeof(UniformBufferObject)}
-		);
+	const DescriptorSetLayout layout = {
+		.bindings = {
+			{
+				.name = CONFIG_MANAGER.get<std::string>("shadow.ubo.blockName"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("shadow.ubo.binding"),
+			}
+		}
+	};
 
-	encoder.bindDescriptorSet(shadowSet);
+	DescriptorSet shadowSet{};
+	shadowSet.write({.id = mUBO.id(), .target = mUBO.target(), .size = sizeof(UniformBufferObject)});
+
+	encoder.bindDescriptorSet(layout, shadowSet);
 
 	eventBus.subscribeToEvent<ShadowSystem, UpdateShadowMapEvent>(this, &ShadowSystem::onGuiUpdate);
 
@@ -180,7 +187,7 @@ void ShadowSystem::perspectiveShadowPass(UniformBufferObject& ubo) {
 
 void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
 	UniformBufferObject ubo{};
-	ubo.omniFarPlane = glm::vec4(CONFIG_MANAGER.get<float>("shadow.omnidirectional.farPlane"), 0.0f, 0.0f,0.0f);
+	ubo.omniFarPlane = glm::vec4(CONFIG_MANAGER.get<float>("shadow.omnidirectional.farPlane"), 0.0f, 0.0f, 0.0f);
 
 	directionalShadowPass(ubo);
 	omnidirectionalShadowPass();

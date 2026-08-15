@@ -113,13 +113,19 @@ void Renderer::createUniformBuffers() {
 	// Create camera buffer
 	mCameraUBO = UniformBuffer{DYNAMIC, sizeof(UniformBufferObject)};
 
+	const DescriptorSetLayout layout{
+		.bindings = {
+			{
+				.name = CONFIG_MANAGER.get<std::string>("camera.ubo.blockName"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo.binding"),
+			},
+		}
+	};
 	DescriptorSet cameraSet{};
-	cameraSet.write(
-		CONFIG_MANAGER.get<int32_t>("camera.ubo.binding"),
-		{.id = mCameraUBO.id(), .target = mCameraUBO.target(), .size = sizeof(UniformBufferObject)}
-	);
+	cameraSet.write({.id = mCameraUBO.id(), .target = mCameraUBO.target(), .size = sizeof(UniformBufferObject)});
 
-	mEncoder.bindDescriptorSet(cameraSet);
+	mEncoder.bindDescriptorSet(layout, cameraSet);
 }
 
 void Renderer::createPBRBuffers() {
@@ -515,12 +521,12 @@ TextureView Renderer::createEnvMap(const Texture& hdrTexture) {
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
 	DescriptorSet descriptorSet{};
-	descriptorSet.write(0, {.id = hdrTexture.id, .target = hdrTexture.target});
+	descriptorSet.write({.id = hdrTexture.id, .target = hdrTexture.target});
 
 	// convert HDR equirectangular environment map to cubemap equivalent
 	encoder.bindPipeline(pipeline);
 	encoder.setUniform("projection", mCaptureProjection);
-	encoder.bindDescriptorSet(descriptorSet);
+	encoder.bindDescriptorSet(materialLayout, descriptorSet);
 
 	encoder.bindFrameBuffer(*mPBRBuffers.environment);
 	encoder.setViewport({
@@ -604,12 +610,12 @@ void Renderer::createIrradianceMap(const TextureView environment) {
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
 	DescriptorSet descriptorSet{};
-	descriptorSet.write(0, environment);
+	descriptorSet.write(environment);
 
 	// solve diffuse integral by convolution to create an irradiance (cube)map.
 	encoder.bindPipeline(pipeline);
 	encoder.setUniform("projection", mCaptureProjection);
-	encoder.bindDescriptorSet(descriptorSet);
+	encoder.bindDescriptorSet(passLayout, descriptorSet);
 
 	encoder.bindFrameBuffer(*mPBRBuffers.irradiance);
 	encoder.setViewport({
@@ -692,7 +698,7 @@ void Renderer::createPrefilterMap(const TextureView environment) {
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
 	DescriptorSet descriptorSet{};
-	descriptorSet.write(0, environment);
+	descriptorSet.write(environment);
 
 	// run a quasi monte-carlo simulation on the environment lighting to create a prefilter (cube)map.
 	encoder.bindPipeline(pipeline);
@@ -700,7 +706,7 @@ void Renderer::createPrefilterMap(const TextureView environment) {
 	encoder.setUniform("resolution",
 	                   static_cast<float>(CONFIG_MANAGER.get<int32_t>("PBR.envMap.size")));
 
-	encoder.bindDescriptorSet(descriptorSet);
+	encoder.bindDescriptorSet(passLayout, descriptorSet);
 
 	encoder.bindFrameBuffer(*mPBRBuffers.prefilter);
 	encoder.setViewport({

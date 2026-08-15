@@ -20,8 +20,6 @@ struct BufferView {
 };
 
 struct Descriptor {
-	DescriptorType type{};
-	uint32_t binding{};
 	std::variant<TextureView, BufferView> resource{};
 
 	template<typename T>
@@ -44,15 +42,16 @@ class DescriptorSet {
 public:
 	DescriptorSet() = default;
 
-	TextureView texture(uint32_t binding);
+	TextureView texture(uint32_t index);
 
-	DescriptorSet& write(uint32_t binding, TextureView texture);
+	DescriptorSet& write(TextureView texture);
 
-	DescriptorSet& write(uint32_t binding, BufferView buffer);
+	DescriptorSet& write(BufferView buffer);
 
 	[[nodiscard]]
-	const std::array<Descriptor, MAX_DESCRIPTOR_SETS>& descriptors() const;
+	const Descriptor& descriptor(uint32_t index) const;
 
 private:
 	std::array<Descriptor, MAX_DESCRIPTOR_SETS> mDescriptors;
+	uint32_t mCount{0};
 };

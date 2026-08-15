@@ -48,14 +48,20 @@ void LightSystem::configure(RenderContext& ctx, GraphicsEncoder& encoder, EventB
 	mCtx->light.spotLights = std::span(mSpotLights.data(), mSpotLights.size());
 
 	mUBO = UniformBuffer{DYNAMIC, sizeof(UniformBufferObject)};
+	const DescriptorSetLayout layout = {
+		.bindings = {
+			{
+				.name = CONFIG_MANAGER.get<std::string>("light.ubo.blockName"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("light.ubo.binding"),
+			}
+		}
+	};
 
 	DescriptorSet lightSet{};
-	lightSet.write(
-	CONFIG_MANAGER.get<int32_t>("light.ubo.binding"),
-	{.id = mUBO.id(), .target = mUBO.target(), .size = sizeof(UniformBufferObject)}
-	);
+	lightSet.write({.id = mUBO.id(), .target = mUBO.target(), .size = sizeof(UniformBufferObject)});
 
-	encoder.bindDescriptorSet(lightSet);
+	encoder.bindDescriptorSet(layout, lightSet);
 
 	updateLightUBO();
 }
@@ -110,7 +116,7 @@ void LightSystem::onGuiUpdate(const GuiLightEvent& event) {
 		const Entity& entity,
 		const GuiLightEvent& e,
 		std::vector<TLightComponent*>& lightList) {
-		if (const auto& light= entity.tryGetComponent<TLightComponent>()) {
+		if (const auto& light = entity.tryGetComponent<TLightComponent>()) {
 			mCtx->renderData->material.colors[e.matIdx] = light->diffuse;
 			auto& transform = entity.getComponent<TransformComponent>();
 			light->position = transform.position;

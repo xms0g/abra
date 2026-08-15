@@ -118,17 +118,11 @@ void SSAOPass::configure(const RenderContext& ctx,
 	const auto& gBuffer = graph.getResource(mIndexes.gBuffer);
 
 	DescriptorSet frameSet{};
-	frameSet.write(
-				CONFIG_MANAGER.get<int32_t>("gBuffer.position.slot"),
-				gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.index")))
-			.write(
-				CONFIG_MANAGER.get<int32_t>("gBuffer.normal.slot"),
-				gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")))
-			.write(
-				CONFIG_MANAGER.get<int32_t>("ssao.noise.slot"),
-				{.id = mNoiseTexture.id, .target = mNoiseTexture.target});
+	frameSet.write(gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.index")))
+			.write(gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")))
+			.write({.id = mNoiseTexture.id, .target = mNoiseTexture.target});
 
-	encoder.bindDescriptorSet(frameSet);
+	encoder.bindDescriptorSet(ssaoPassLayout, frameSet);
 }
 
 void SSAOPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
@@ -189,14 +183,20 @@ void SSAOPass::createKernel(GraphicsEncoder& encoder) {
 	ubo.resolution = glm::vec4(width, height, width / 4, height / 4);
 
 	mUBO = UniformBuffer{DYNAMIC, sizeof(UniformBufferObject)};
+	const DescriptorSetLayout layout = {
+		.bindings = {
+			{
+				.name = CONFIG_MANAGER.get<std::string>("ssao.ubo.blockName"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("ssao.ubo.binding"),
+			}
+		}
+	};
 
 	DescriptorSet ssaoSet{};
-	ssaoSet.write(
-		CONFIG_MANAGER.get<int32_t>("ssao.ubo.binding"),
-		{.id = mUBO.id(), .target = mUBO.target(), .size = sizeof(UniformBufferObject)}
-	);
+	ssaoSet.write({.id = mUBO.id(), .target = mUBO.target(), .size = sizeof(UniformBufferObject)});
 
-	encoder.bindDescriptorSet(ssaoSet);
+	encoder.bindDescriptorSet(layout, ssaoSet);
 	mUBO.copyToMemory(&ubo, 0, sizeof(UniformBufferObject));
 }
 
