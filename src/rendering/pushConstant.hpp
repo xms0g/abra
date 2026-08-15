@@ -2,7 +2,7 @@
 #include <array>
 #include <string>
 
-#define MAX_PUSH_CONSTANTS 16
+#define MAX_PUSH_CONSTANT_COUNT 16
 #define PUSH_CONSTANT(Name, Type, Field, PCType)\
 	{.name = Name, .offset = offsetof(Type, Field), .type = PCType}
 
@@ -20,6 +20,6 @@ struct PushConstant {
 };
 
 struct PushConstantLayout {
-	std::array<PushConstant, MAX_PUSH_CONSTANTS> constants;
+	std::array<PushConstant, MAX_PUSH_CONSTANT_COUNT> constants;
 	uint32_t count{};
 };

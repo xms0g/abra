@@ -88,7 +88,7 @@ private:
 
 	struct EncoderState {
 		struct TextureBindingCache {
-			std::array<TextureView, 32> textures;
+			std::array<TextureView, MAX_DESCRIPTOR_COUNT> textures;
 
 			void reset() {
 				textures.fill({});
