@@ -158,18 +158,35 @@ void SSAOPass::blur(const FrameGraph& graph, GraphicsEncoder& encoder) {
 }
 
 void SSAOPass::createKernel(GraphicsEncoder& encoder) {
-	const int32_t kernelSize = CONFIG_MANAGER.get<int32_t>("ssao.kernelSize");
-
-	std::vector<glm::vec4> kernel;
-	kernel.resize(kernelSize);
-	kernel = math::random::generateKernel(kernelSize);
-
 	struct alignas(16) UniformBufferObject {
 		glm::vec4 samples[16];
 		glm::vec4 settings;
 		glm::vec4 resolution;
 	};
 	UniformBufferObject ubo{};
+
+	mUBO = UniformBuffer{DYNAMIC, sizeof(UniformBufferObject)};
+
+	const DescriptorSetLayout layout = {
+		.bindings = {
+			{
+				.name = CONFIG_MANAGER.get<std::string>("ssao.ubo.blockName"),
+				.type = DescriptorType::UniformBuffer,
+				.binding = CONFIG_MANAGER.get<int32_t>("ssao.ubo.binding"),
+			}
+		}
+	};
+
+	DescriptorSet ssaoSet{};
+	ssaoSet.write({.id = mUBO.id(), .target = mUBO.target(), .size = sizeof(UniformBufferObject)});
+
+	encoder.bindDescriptorSet(layout, ssaoSet);
+
+	const int32_t kernelSize = CONFIG_MANAGER.get<int32_t>("ssao.kernelSize");
+
+	std::vector<glm::vec4> kernel;
+	kernel.resize(kernelSize);
+	kernel = math::random::generateKernel(kernelSize);
 
 	for (size_t i = 0; i < kernel.size(); ++i) {
 		ubo.samples[i] = kernel[i];
@@ -186,21 +203,6 @@ void SSAOPass::createKernel(GraphicsEncoder& encoder) {
 
 	ubo.resolution = glm::vec4(width, height, width / 4, height / 4);
 
-	mUBO = UniformBuffer{DYNAMIC, sizeof(UniformBufferObject)};
-	const DescriptorSetLayout layout = {
-		.bindings = {
-			{
-				.name = CONFIG_MANAGER.get<std::string>("ssao.ubo.blockName"),
-				.type = DescriptorType::UniformBuffer,
-				.binding = CONFIG_MANAGER.get<int32_t>("ssao.ubo.binding"),
-			}
-		}
-	};
-
-	DescriptorSet ssaoSet{};
-	ssaoSet.write({.id = mUBO.id(), .target = mUBO.target(), .size = sizeof(UniformBufferObject)});
-
-	encoder.bindDescriptorSet(layout, ssaoSet);
 	mUBO.copyToMemory(&ubo, 0, sizeof(UniformBufferObject));
 }
 
