@@ -30,8 +30,8 @@ private:
 
 	[[nodiscard]]
 	DescriptorSet* combinePass(GraphicsEncoder& encoder,
-	                           DescriptorSet& dscSet,
-	                           DescriptorSet& blurDscSet,
+	                           const DescriptorSet& dscSet,
+	                           const DescriptorSet& blurDscSet,
 	                           const bool& toggle);
 
 	std::array<FrameBuffer*, 2> mRenderTargets{};

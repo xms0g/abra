@@ -104,12 +104,12 @@ DescriptorSet* Bloom::blurPass(GraphicsEncoder& encoder, DescriptorSet& dscSet, 
 }
 
 DescriptorSet* Bloom::combinePass(GraphicsEncoder& encoder,
-                                  DescriptorSet& dscSet,
-                                  DescriptorSet& blurDscSet,
+                                  const DescriptorSet& dscSet,
+                                  const DescriptorSet& blurDscSet,
                                   const bool& toggle) {
 	DescriptorSet combineDescSet{};
-	combineDescSet.write(dscSet.texture(0));
-	combineDescSet.write(blurDscSet.texture(0));
+	combineDescSet.write(dscSet[0]);
+	combineDescSet.write(blurDscSet[0]);
 
 	encoder.bindFrameBuffer(*mRenderTargets[toggle]);
 	//encoder.clearFrameBuffer(ClearMask::Color);

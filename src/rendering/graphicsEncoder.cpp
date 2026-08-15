@@ -152,7 +152,7 @@ void GraphicsEncoder::pushConstants(const void* data) const {
 void GraphicsEncoder::bindDescriptorSet(const DescriptorSetLayout& layout, const DescriptorSet& descriptorSet) {
 	for (int i = 0; i < layout.bindings.size(); ++i) {
 		const auto& descBinding = layout.bindings[i];
-		auto& descriptor = descriptorSet.descriptor(i);
+		auto& descriptor = descriptorSet[i];
 
 		switch (descBinding.type) {
 			case DescriptorType::None:

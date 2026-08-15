@@ -5,7 +5,7 @@
 #include <span>
 #include "texture/texture.h"
 
-#define MAX_DESCRIPTOR_SETS 32
+#define MAX_DESCRIPTOR_COUNT 32
 
 enum class DescriptorType : uint32_t {
 	None,
@@ -42,7 +42,7 @@ class DescriptorSet {
 public:
 	DescriptorSet() = default;
 
-	TextureView texture(uint32_t index);
+	DescriptorSet& write(const Descriptor& descriptor);
 
 	DescriptorSet& write(TextureView texture);
 
@@ -51,7 +51,9 @@ public:
 	[[nodiscard]]
 	const Descriptor& descriptor(uint32_t index) const;
 
+	const Descriptor& operator[](uint32_t index) const;
+
 private:
-	std::array<Descriptor, MAX_DESCRIPTOR_SETS> mDescriptors;
+	std::array<Descriptor, MAX_DESCRIPTOR_COUNT> mDescriptors;
 	uint32_t mCount{0};
 };
