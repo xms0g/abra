@@ -113,7 +113,7 @@ Model::Sphere::Sphere(glm::vec3 color,
 	mMeshes[0].emplace_back(vertices, indices);
 
 	uint32_t flags{0};
-	std::vector<Texture> textures;
+	std::vector<MaterialTexture> textures;
 	if (!albedo.empty()) {
 		textures.emplace_back(0, ALBEDO, TextureTarget::Texture2D, albedo);
 	}

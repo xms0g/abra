@@ -7,26 +7,6 @@ enum class Attachment : uint32_t {
 	Depth = GL_DEPTH_ATTACHMENT,
 };
 
-enum class BaseFormat : int32_t {
-	Red = GL_RED,
-	RG = GL_RG,
-	RGB = GL_RGB,
-	RGBA = GL_RGBA,
-};
-
-enum class InternalFormat : int32_t {
-	Red = GL_R8,
-	RG = GL_RG8,
-	RGB = GL_RGB8,
-	RGBA = GL_RGBA8,
-	RedFloat = GL_R16F,
-	RGFloat = GL_RG16F,
-	RGBFloat = GL_RGB16F,
-	RGBAFloat = GL_RGBA16F,
-	Depth24 = GL_DEPTH_COMPONENT24,
-	Depth32F = GL_DEPTH_COMPONENT32F,
-};
-
 class FrameBuffer {
 public:
 	FrameBuffer(int32_t width, int32_t height);

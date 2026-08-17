@@ -42,7 +42,7 @@ void ResourceManager::uploadMaterialsToGPU() {
 				if (material.textures.size() == 1) {
 					const std::string path = fs::resolvePath(assetRoot / material.textures.front().path);
 
-					Texture texture = Texture::loadHDR(path);
+					MaterialTexture texture = MaterialTexture::loadHDR(path);
 
 					material.textures.clear();
 					material.textures.push_back(std::move(texture));
@@ -55,7 +55,7 @@ void ResourceManager::uploadMaterialsToGPU() {
 						paths.push_back(fs::resolvePath(assetRoot / texture.path));
 					}
 
-					Texture texture = Texture::loadCubemap(paths);
+					MaterialTexture texture = MaterialTexture::loadCubemap(paths);
 					Texture::generateMipmaps({.id = texture.id, .target = texture.target});
 
 					material.textures.clear();
@@ -72,9 +72,9 @@ void ResourceManager::uploadMaterialsToGPU() {
 				}
 
 				auto p = fs::resolvePath(assetRoot / texture.path);
-				texture.id = Texture::load(p, material.flags,
-				                           texture.type == aiTextureType_DIFFUSE || texture.type ==
-				                           aiTextureType_EMISSIVE);
+				texture.id = MaterialTexture::load(p, material.flags,
+				                           texture.type == aiTextureType_DIFFUSE ||
+				                           texture.type == aiTextureType_EMISSIVE);
 
 				Texture::generateMipmaps({.id = texture.id, .target = texture.target});
 

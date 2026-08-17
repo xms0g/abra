@@ -370,9 +370,7 @@ FrameBuffer& FrameBuffer::configureAttachments() {
 }
 
 void FrameBuffer::checkStatus() {
-	const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
-	if (status != GL_FRAMEBUFFER_COMPLETE) {
+	if (const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER); status != GL_FRAMEBUFFER_COMPLETE) {
 		switch (status) {
 			case GL_FRAMEBUFFER_UNDEFINED:
 				throw std::runtime_error("FRAMEBUFFER_UNDEFINED\n");

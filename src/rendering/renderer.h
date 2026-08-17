@@ -56,7 +56,7 @@ private:
 
 	void sortEntities();
 
-	TextureView createEnvMap(const Texture& hdrTexture);
+	TextureView createEnvMap(const MaterialTexture& hdrTexture);
 
 	void createIrradianceMap(TextureView environment);
 

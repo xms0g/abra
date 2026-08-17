@@ -71,7 +71,45 @@ void Texture::generateMipmaps(const TextureView handle) {
 	glBindTexture(toUnderlying(handle.target), 0);
 }
 
-uint32_t Texture::load(const std::string_view path, const uint32_t flags, const bool isSRGBA) {
+MaterialTexture::MaterialTexture(const uint32_t id, const uint32_t type, const TextureTarget target, std::string path)
+	: id(id),
+	  type(type),
+	  target(target),
+	  path(std::move(path)) {
+}
+
+MaterialTexture::~MaterialTexture() {
+	if (id != 0)
+		glDeleteTextures(1, &id);
+}
+
+MaterialTexture::MaterialTexture(MaterialTexture&& other) noexcept
+	: id(std::exchange(other.id, 0)),
+	  type(std::exchange(other.type, 0)),
+	  target(std::exchange(other.target, {})),
+	  path(std::move(other.path)) {
+}
+
+MaterialTexture& MaterialTexture::operator=(MaterialTexture&& other) noexcept {
+	if (this != &other) {
+		if (id != 0)
+			glDeleteTextures(1, &id);
+
+		id = std::exchange(other.id, 0);
+		type = std::exchange(other.type, 0);
+		target = std::exchange(other.target, {});
+		path = std::move(other.path);
+	}
+
+	return *this;
+}
+
+void MaterialTexture::info(const std::string_view path, int32_t& width, int32_t& height) {
+	int32_t channel;
+	stbi_info(path.data(), &width, &height, &channel);
+}
+
+uint32_t MaterialTexture::load(const std::string_view path, const uint32_t flags, const bool isSRGBA) {
 	uint32_t textureID;
 
 	int32_t width, height, channel;
@@ -99,12 +137,7 @@ uint32_t Texture::load(const std::string_view path, const uint32_t flags, const 
 	return textureID;
 }
 
-void Texture::info(const std::string_view path, int32_t& width, int32_t& height) {
-	int32_t channel;
-	stbi_info(path.data(), &width, &height, &channel);
-}
-
-Texture Texture::loadCubemap(const std::vector<std::string>& faces) {
+MaterialTexture MaterialTexture::loadCubemap(const std::vector<std::string>& faces) {
 	uint32_t textureID;
 
 	glGenTextures(1, &textureID);
@@ -136,7 +169,7 @@ Texture Texture::loadCubemap(const std::vector<std::string>& faces) {
 	return {textureID, 0, TextureTarget::TextureCubeMap, ""};
 }
 
-Texture Texture::loadHDR(const std::string_view path) {
+MaterialTexture MaterialTexture::loadHDR(const std::string_view path) {
 	uint32_t texID;
 	int32_t width, height, channel;
 

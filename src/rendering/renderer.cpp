@@ -461,7 +461,7 @@ void Renderer::sortEntities() {
 	// }
 }
 
-TextureView Renderer::createEnvMap(const Texture& hdrTexture) {
+TextureView Renderer::createEnvMap(const MaterialTexture& hdrTexture) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
