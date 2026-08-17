@@ -6,7 +6,7 @@
 #include "../material/material.hpp"
 #include "../glUtils.hpp"
 
-Texture::Texture(const uint32_t id, const uint32_t type, const TextureTarget target, std::string path)
+Texture::Texture(const uint32_t id, const TextureTarget target)
 	: id(id),
 	  target(target) {
 }
@@ -33,29 +33,46 @@ Texture& Texture::operator=(Texture&& other) noexcept {
 	return *this;
 }
 
-Texture Texture::generate(const int32_t width, const int32_t height, const float* data) {
+Texture Texture::generate(const float* data, const TextureConfig& config) {
 	uint32_t textureID;
 
+	const auto target = toUnderlying(config.target);
+	const auto format = toUnderlying(config.format);
+	const auto internalFormat = toUnderlying(config.internalFormat);
+	const auto dataType = toUnderlying(config.dataType);
+
 	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_2D, textureID);
+	glBindTexture(target, textureID);
 
-	glTexImage2D(
-		GL_TEXTURE_2D,
-		0,
-		GL_RGB16F,
-		width,
-		height,
-		0,
-		GL_RGB,
-		GL_FLOAT,
-		data);
+	glTexParameteri(target, GL_TEXTURE_WRAP_S, toUnderlying(config.parameters.wrapS));
+	glTexParameteri(target, GL_TEXTURE_WRAP_T, toUnderlying(config.parameters.wrapT));
+	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, toUnderlying(config.parameters.minFilter));
+	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, toUnderlying(config.parameters.magFilter));
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	switch (config.target) {
+		case TextureTarget::Texture2D: {
+			glTexImage2D(
+				target,
+				0,
+				internalFormat,
+				config.width,
+				config.height,
+				0,
+				format,
+				dataType,
+				data);
+		}
+		case TextureTarget::Texture2DMultisample:
+			break;
+		case TextureTarget::Texture2DArray:
+			break;
+		case TextureTarget::TextureCubeMap:
+			break;
+		case TextureTarget::TextureCubeMapArray:
+			break;
+	}
 
-	return {textureID, 0, TextureTarget::Texture2D, ""};
+	return {textureID, TextureTarget::Texture2D};
 }
 
 void Texture::generateMipmaps(const TextureView handle) {

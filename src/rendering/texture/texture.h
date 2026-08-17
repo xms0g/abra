@@ -98,7 +98,7 @@ struct Texture {
 
 	Texture() = default;
 
-	Texture(uint32_t id, uint32_t type, TextureTarget target = TextureTarget::Texture2D, std::string path = "");
+	Texture(uint32_t id, TextureTarget target);
 
 	~Texture();
 
@@ -110,7 +110,7 @@ struct Texture {
 
 	Texture& operator=(Texture&& other) noexcept;
 
-	static Texture generate(int32_t width, int32_t height, const float* data);
+	static Texture generate(const float* data, const TextureConfig& config);
 
 	static void generateMipmaps(TextureView handle);
 };
@@ -137,5 +137,5 @@ struct MaterialTexture {
 
 	static void info(std::string_view path, int32_t& width, int32_t& height);
 
-	static MaterialTexture load(std::span<const std::string>, const TextureConfig& config);
+	static MaterialTexture load(std::span<const std::string> paths, const TextureConfig& config);
 };

@@ -213,5 +213,20 @@ void SSAOPass::createNoiseTexture() {
 	noise.resize(textureSize * textureSize);
 
 	noise = math::random::generateNoise(textureSize * textureSize);
-	mNoiseTexture = Texture::generate(textureSize, textureSize, noise.data());
+	mNoiseTexture = Texture::generate(noise.data(), {
+		.target = TextureTarget::Texture2D,
+		.internalFormat = InternalFormat::RGBFloat,
+		.format = BaseFormat::RGB,
+		.parameters = {
+			.minFilter = TextureFilter::Nearest,
+			.magFilter = TextureFilter::Nearest,
+			.wrapS = TextureWrap::Repeat,
+			.wrapT = TextureWrap::Repeat,
+		},
+		.dataType = DataType::Float,
+		.width = textureSize,
+		.height = textureSize,
+		.samples = 1,
+		.layers = 1,
+	});
 }
