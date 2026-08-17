@@ -42,7 +42,24 @@ void ResourceManager::uploadMaterialsToGPU() {
 				if (material.textures.size() == 1) {
 					const std::string path = fs::resolvePath(assetRoot / material.textures.front().path);
 
-					MaterialTexture texture = MaterialTexture::loadHDR(path);
+					std::string paths[] = {path};
+					MaterialTexture texture = MaterialTexture::load(paths, {
+						.target = TextureTarget::Texture2D,
+						.internalFormat = InternalFormat::RGBFloat,
+						.format = BaseFormat::RGB,
+						.parameters = {
+							.minFilter = TextureFilter::Linear,
+							.magFilter = TextureFilter::Linear,
+							.wrapS = TextureWrap::ClampToEdge,
+							.wrapT = TextureWrap::ClampToEdge,
+						},
+						.dataType = DataType::Float,
+						.isHDR = true,
+						.width = 0,
+						.height = 0,
+						.samples = 1,
+						.layers = 1,
+					});
 
 					material.textures.clear();
 					material.textures.push_back(std::move(texture));
@@ -55,7 +72,23 @@ void ResourceManager::uploadMaterialsToGPU() {
 						paths.push_back(fs::resolvePath(assetRoot / texture.path));
 					}
 
-					MaterialTexture texture = MaterialTexture::loadCubemap(paths);
+					MaterialTexture texture = MaterialTexture::load(paths, {
+						.target = TextureTarget::TextureCubeMap,
+						.internalFormat = InternalFormat::SRGB8Alpha8,
+						.format = BaseFormat::RGBA,
+						.parameters = {
+							.minFilter = TextureFilter::Linear,
+							.magFilter = TextureFilter::Linear,
+							.wrapS = TextureWrap::ClampToEdge,
+							.wrapT = TextureWrap::ClampToEdge,
+							.wrapR = TextureWrap::ClampToEdge,
+						},
+						.dataType = DataType::UnsignedByte,
+						.width = 0,
+						.height = 0,
+						.samples = 1,
+						.layers = 1,
+					});
 					Texture::generateMipmaps({.id = texture.id, .target = texture.target});
 
 					material.textures.clear();
@@ -72,9 +105,26 @@ void ResourceManager::uploadMaterialsToGPU() {
 				}
 
 				auto p = fs::resolvePath(assetRoot / texture.path);
-				texture.id = MaterialTexture::load(p, material.flags,
-				                           texture.type == aiTextureType_DIFFUSE ||
-				                           texture.type == aiTextureType_EMISSIVE);
+				bool isSRGBA = texture.type == aiTextureType_DIFFUSE || texture.type == aiTextureType_EMISSIVE;
+
+				std::string paths[] = {p};
+
+				texture = MaterialTexture::load(paths, {
+					.target = TextureTarget::Texture2D,
+					.internalFormat = isSRGBA ? InternalFormat::SRGB8Alpha8 : InternalFormat::RGBA,
+					.format = BaseFormat::RGBA,
+					.parameters = {
+						.minFilter = TextureFilter::Linear,
+						.magFilter = TextureFilter::Linear,
+						.wrapS = material.flags & BLEND ? TextureWrap::ClampToEdge : TextureWrap::Repeat,
+						.wrapT = material.flags & BLEND ? TextureWrap::ClampToEdge : TextureWrap::Repeat,
+					},
+					.dataType = DataType::UnsignedByte,
+					.width = 0,
+					.height = 0,
+					.samples = 1,
+					.layers = 1,
+				});
 
 				Texture::generateMipmaps({.id = texture.id, .target = texture.target});
 

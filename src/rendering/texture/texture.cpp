@@ -8,9 +8,7 @@
 
 Texture::Texture(const uint32_t id, const uint32_t type, const TextureTarget target, std::string path)
 	: id(id),
-	  type(type),
-	  target(target),
-	  path(std::move(path)) {
+	  target(target) {
 }
 
 Texture::~Texture() {
@@ -20,9 +18,7 @@ Texture::~Texture() {
 
 Texture::Texture(Texture&& other) noexcept
 	: id(std::exchange(other.id, 0)),
-	  type(std::exchange(other.type, 0)),
-	  target(std::exchange(other.target, {})),
-	  path(std::move(other.path)) {
+	  target(std::exchange(other.target, {})) {
 }
 
 Texture& Texture::operator=(Texture&& other) noexcept {
@@ -31,9 +27,7 @@ Texture& Texture::operator=(Texture&& other) noexcept {
 			glDeleteTextures(1, &id);
 
 		id = std::exchange(other.id, 0);
-		type = std::exchange(other.type, 0);
 		target = std::exchange(other.target, {});
-		path = std::move(other.path);
 	}
 
 	return *this;
@@ -109,89 +103,85 @@ void MaterialTexture::info(const std::string_view path, int32_t& width, int32_t&
 	stbi_info(path.data(), &width, &height, &channel);
 }
 
-uint32_t MaterialTexture::load(const std::string_view path, const uint32_t flags, const bool isSRGBA) {
+MaterialTexture MaterialTexture::load(const std::span<const std::string> paths, const TextureConfig& config) {
 	uint32_t textureID;
-
 	int32_t width, height, channel;
-	unsigned char* data = stbi_load(path.data(), &width, &height, &channel, 4);
 
-	if (!data) {
-		throw std::runtime_error(std::format("Texture failed to load at path: {}", path));
-	}
-
-	const int32_t internalFormat = isSRGBA ? GL_SRGB8_ALPHA8 : GL_RGBA8;
+	const auto target = toUnderlying(config.target);
+	const auto format = toUnderlying(config.format);
+	const auto internalFormat = toUnderlying(config.internalFormat);
+	const auto dataType = toUnderlying(config.dataType);
 
 	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_2D, textureID);
+	glBindTexture(target, textureID);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glTexParameteri(target, GL_TEXTURE_WRAP_S, toUnderlying(config.parameters.wrapS));
+	glTexParameteri(target, GL_TEXTURE_WRAP_T, toUnderlying(config.parameters.wrapT));
+	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, toUnderlying(config.parameters.minFilter));
+	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, toUnderlying(config.parameters.magFilter));
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, flags & BLEND ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, flags & BLEND ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	switch (config.target) {
+		case TextureTarget::Texture2D: {
+			void* data = nullptr;
+			const char* path = paths[0].c_str();
 
-	stbi_image_free(data);
-	glBindTexture(GL_TEXTURE_2D, 0);
+			if (config.isHDR) {
+				stbi_set_flip_vertically_on_load(true);
 
-	return textureID;
-}
+				data = stbi_loadf(path, &width, &height, &channel, 0);
+				if (!data) {
+					throw std::runtime_error(std::format("HDR texture failed to load at path: {}", path));
+				}
+			} else {
+				data = stbi_load(path, &width, &height, &channel, 4);
+				if (!data) {
+					throw std::runtime_error(std::format("Texture failed to load at path: {}", path));
+				}
+			}
 
-MaterialTexture MaterialTexture::loadCubemap(const std::vector<std::string>& faces) {
-	uint32_t textureID;
+			glTexImage2D(
+				target,
+				0,
+				internalFormat,
+				width,
+				height,
+				0,
+				format,
+				dataType,
+				data);
 
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+			stbi_image_free(data);
+			glBindTexture(target, 0);
 
-	int32_t width, height, depth;
-	for (uint32_t i = 0; i < faces.size(); i++) {
-		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &depth, 0);
-
-		if (!data) {
-			glDeleteTextures(1, &textureID);
-			throw std::runtime_error(std::format("Cubemap texture failed to load at path: {}", faces[i]));
+			stbi_set_flip_vertically_on_load(false);
+			return {textureID, 0, TextureTarget::Texture2D, path};
 		}
+		case TextureTarget::TextureCubeMap: {
+			for (uint32_t i = 0; i < paths.size(); i++) {
+				unsigned char* data = stbi_load(paths[i].c_str(), &width, &height, &channel, 0);
 
-		const GLenum format = depth == 4 ? GL_RGBA : GL_RGB;
-		const int32_t internalFormat = depth == 4 ? GL_SRGB8_ALPHA8 : GL_SRGB8;
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE,
-		             data);
+				if (!data) {
+					glDeleteTextures(1, &textureID);
+					throw std::runtime_error(std::format("Cubemap texture failed to load at path: {}", paths[i]));
+				}
 
-		stbi_image_free(data);
+				glTexImage2D(
+					GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+					0,
+					internalFormat,
+					width,
+					height,
+					0,
+					format,
+					dataType,
+					data);
+
+				stbi_image_free(data);
+			}
+			glTexParameteri(target, GL_TEXTURE_WRAP_R, toUnderlying(config.parameters.wrapR));
+			glBindTexture(target, 0);
+			return {textureID, 0, TextureTarget::TextureCubeMap, ""};
+		}
 	}
-
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-	return {textureID, 0, TextureTarget::TextureCubeMap, ""};
-}
-
-MaterialTexture MaterialTexture::loadHDR(const std::string_view path) {
-	uint32_t texID;
-	int32_t width, height, channel;
-
-	stbi_set_flip_vertically_on_load(true);
-
-	float* data = stbi_loadf(path.data(), &width, &height, &channel, 0);
-	if (!data) {
-		throw std::runtime_error(std::format("HDR texture failed to load at path: {}", path));
-	}
-
-	glGenTextures(1, &texID);
-	glBindTexture(GL_TEXTURE_2D, texID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	stbi_image_free(data);
-
-	stbi_set_flip_vertically_on_load(false);
-
-	return {texID, 0, TextureTarget::Texture2D, ""};
+	return {};
 }
