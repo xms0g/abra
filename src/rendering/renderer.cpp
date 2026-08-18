@@ -281,28 +281,38 @@ void Renderer::createFrameBuffers() {
 		glEnable(GL_MULTISAMPLE);
 		const int32_t sampleCount = CONFIG_MANAGER.get<int32_t>("msaa.sample_count");
 
-		auto& intermediateBuffer = mGraph.addResource("intermediateBuffer",
-		                                              std::make_unique<FrameBuffer>(width, height));
+		auto& intermediateBuffer = mGraph.addResource(
+			"intermediateBuffer",
+			std::make_unique<FrameBuffer>(width, height));
 
 		mEncoder.bindFrameBuffer(intermediateBuffer);
 
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
-			intermediateBuffer.withTextureFP(BaseFormat::RGBA)
+			Texture color = Texture::generateColorAttachmentFP(intermediateBuffer.width(), intermediateBuffer.height());
+			intermediateBuffer.attachColor(color)
 					.withRenderBufferDepth(InternalFormat::Depth24)
+					.configureDrawBuffers()
 					.checkStatus();
 
 			mEncoder.bindFrameBuffer(sceneBuffer);
-			sceneBuffer.withTextureFPMultisampled(sampleCount, BaseFormat::RGBA)
+
+			Texture colorFPMult = Texture::generateColorAttachmentFPMultisampled(sceneBuffer.width(), sceneBuffer.height(), sampleCount);
+			sceneBuffer.attachColor(colorFPMult)
 					.withRenderBufferDepthMultisampled(sampleCount, InternalFormat::Depth24)
+					.configureDrawBuffers()
 					.checkStatus();
 		} else {
-			intermediateBuffer.withTexture(BaseFormat::RGBA)
+			Texture color = Texture::generateColorAttachment(intermediateBuffer.width(), intermediateBuffer.height());
+			intermediateBuffer.attachColor(color)
 					.withRenderBufferDepth(InternalFormat::Depth24)
+					.configureDrawBuffers()
 					.checkStatus();
 
 			mEncoder.bindFrameBuffer(sceneBuffer);
-			sceneBuffer.withTextureMultisampled(sampleCount, BaseFormat::RGBA)
+			Texture colorMulti = Texture::generateColorAttachmentMultisampled(sceneBuffer.width(), sceneBuffer.height(), sampleCount);
+			sceneBuffer.attachColor(colorMulti)
 					.withRenderBufferDepthMultisampled(sampleCount, InternalFormat::Depth24)
+					.configureDrawBuffers()
 					.checkStatus();
 		}
 	} else {
@@ -312,8 +322,12 @@ void Renderer::createFrameBuffers() {
 					.withTextureDepth(InternalFormat::Depth24)
 					.checkStatus();
 		} else {
-			sceneBuffer.withTexture(BaseFormat::RGBA)
-					.withTextureDepth(InternalFormat::Depth24)
+			Texture color = Texture::generateColorAttachment(sceneBuffer.width(), sceneBuffer.height());
+			Texture depth = Texture::generateDepthAttachment(sceneBuffer.width(), sceneBuffer.height());
+
+			sceneBuffer.attachColor(color)
+					.attachDepth(depth)
+					.configureDrawBuffers()
 					.checkStatus();
 		}
 	}
@@ -322,31 +336,45 @@ void Renderer::createFrameBuffers() {
 	auto& gBuffer = mGraph.addResource("gBuffer", std::make_unique<FrameBuffer>(width, height));
 
 	mEncoder.bindFrameBuffer(gBuffer);
-	gBuffer.withTextureFP(BaseFormat::RGBA) // position
-			.withTextureFP(BaseFormat::RGBA); // normal
+	Texture position = Texture::generateColorAttachmentFP(gBuffer.width(), gBuffer.height());
+	Texture normal = Texture::generateColorAttachmentFP(gBuffer.width(), gBuffer.height());
+	gBuffer.attachColor(position) // position
+			.attachColor(normal); // normal
 	if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
 		// albedo
-		gBuffer.withTextureFP(BaseFormat::RGBA);
+		Texture albedo = Texture::generateColorAttachmentFP(gBuffer.width(), gBuffer.height());
+		gBuffer.attachColor(albedo);
 	} else {
-		gBuffer.withTexture(BaseFormat::RGBA);
+		Texture albedo = Texture::generateColorAttachment(gBuffer.width(), gBuffer.height());
+		gBuffer.attachColor(albedo);
 	}
 	// Emissive placed into alpha channels in position, normal, albedo
 
-	gBuffer.withTexture(BaseFormat::RGBA) // orm
-			.configureAttachments()
-			.withTextureDepth(InternalFormat::Depth24)
+	Texture gOrm = Texture::generateColorAttachment(gBuffer.width(), gBuffer.height());
+	Texture gDepth = Texture::generateDepthAttachment(gBuffer.width(), gBuffer.height());
+	gBuffer.attachColor(gOrm) // orm
+			.attachDepth(gDepth)
+			.configureDrawBuffers()
 			.checkStatus();
 
 	// SSAO
 	auto& ssao = mGraph.addResource("ssao", std::make_unique<FrameBuffer>(width / 2, height / 2));
 
 	mEncoder.bindFrameBuffer(ssao);
-	ssao.withTexture(BaseFormat::Red).checkStatus();
+
+	Texture ssaoTexture = Texture::generateColorAttachment(ssao.width(), ssao.height());
+	ssao.attachColor(ssaoTexture)
+			.configureDrawBuffers()
+			.checkStatus();
 
 	auto& ssaoBlur = mGraph.addResource("ssaoBlur", std::make_unique<FrameBuffer>(width / 2, height / 2));
 
 	mEncoder.bindFrameBuffer(ssaoBlur);
-	ssaoBlur.withTexture(BaseFormat::Red).checkStatus();
+
+	Texture ssaoBlurTexture = Texture::generateColorAttachment(ssaoBlur.width(), ssaoBlur.height());
+	ssaoBlur.attachColor(ssaoBlurTexture)
+			.configureDrawBuffers()
+			.checkStatus();
 
 	// Shadow Maps
 	auto& directional = mGraph.addResource("directional", std::make_unique<FrameBuffer>(
@@ -354,8 +382,10 @@ void Renderer::createFrameBuffers() {
 		                                       CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
 
 	mEncoder.bindFrameBuffer(directional);
-	directional.withTextureDepth(InternalFormat::Depth24)
-			.withNoColorAttachment()
+
+	Texture depth = Texture::generateDepthAttachment(directional.width(), directional.height());
+	directional.attachDepth(depth)
+			.configureDrawBuffers()
 			.checkStatus();
 
 	auto& point = mGraph.addResource("point", std::make_unique<FrameBuffer>(
@@ -363,8 +393,10 @@ void Renderer::createFrameBuffers() {
 		                                 CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
 
 	mEncoder.bindFrameBuffer(point);
-	point.withTextureCubemapDepthArray(CONFIG_MANAGER.get<int32_t>("light.max_point"), InternalFormat::Depth24)
-			.withNoColorAttachment()
+
+	Texture depthPoint = Texture::generateDepthAttachmentCubemapArray(point.width(), point.height(), CONFIG_MANAGER.get<int32_t>("light.max_point"));
+	point.attachDepth(depthPoint)
+			.configureDrawBuffers()
 			.checkStatus();
 
 	auto& spot = mGraph.addResource("spot", std::make_unique<FrameBuffer>(
@@ -372,8 +404,10 @@ void Renderer::createFrameBuffers() {
 		                                CONFIG_MANAGER.get<int32_t>("shadow.map.height")));
 
 	mEncoder.bindFrameBuffer(spot);
-	spot.withTextureDepthArray(CONFIG_MANAGER.get<int32_t>("light.max_spot"), InternalFormat::Depth24)
-			.withNoColorAttachment()
+
+	Texture depthSpot = Texture::generateDepthAttachmentArray(spot.width(), spot.height(), CONFIG_MANAGER.get<int32_t>("light.max_spot"));
+	spot.attachDepth(depthSpot)
+			.configureDrawBuffers()
 			.checkStatus();
 
 	// PostProcess Render Targets
@@ -382,11 +416,13 @@ void Renderer::createFrameBuffers() {
 
 		mEncoder.bindFrameBuffer(target);
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
-			target.withTextureFP(BaseFormat::RGBA);
+			Texture color = Texture::generateColorAttachmentFP(target.width(), target.height());
+			target.attachColor(color);
 		} else {
-			target.withTexture(BaseFormat::RGBA);
+			Texture color = Texture::generateColorAttachment(target.width(), target.height());
+			target.attachColor(color);
 		}
-		target.checkStatus();
+		target.configureDrawBuffers().checkStatus();
 	};
 
 	addPPRenderTarget("ping");

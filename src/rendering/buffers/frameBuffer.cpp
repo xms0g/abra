@@ -4,6 +4,7 @@
 #include <vector>
 #include "glad/glad.h"
 #include "../glUtils.hpp"
+#include "../texture/texture.h"
 
 FrameBuffer::FrameBuffer(const int32_t width, const int32_t height)
 	: mWidth(width),
@@ -70,6 +71,28 @@ int32_t FrameBuffer::height() const {
 
 TextureView FrameBuffer::texture(const uint32_t index) const {
 	return {.id = mTextures[index].id, .target = mTextures[index].target};
+}
+
+FrameBuffer& FrameBuffer::attachColor(Texture& texture) {
+	mTextures.emplace_back(std::move(texture));
+
+	const auto& tex = mTextures.back();
+	const GLenum attachment = GL_COLOR_ATTACHMENT0 + mColorAttachmentCount++;
+	glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, toUnderlying(tex.target), tex.id, 0);
+
+	return *this;
+}
+
+FrameBuffer& FrameBuffer::attachDepth(Texture& texture) {
+	mTextures.emplace_back(std::move(texture));
+
+	if (const auto& tex = mTextures.back(); tex.target == TextureTarget::Texture2D) {
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, toUnderlying(tex.target), tex.id, 0);
+	} else {
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, tex.id, 0);
+	}
+
+	return *this;
 }
 
 FrameBuffer& FrameBuffer::withTexture(const BaseFormat format) {
@@ -359,12 +382,20 @@ FrameBuffer& FrameBuffer::withNoColorAttachment() {
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::configureAttachments() {
-	if (mTextures.empty()) {
-		throw std::runtime_error("ERROR::FRAMEBUFFER::NO_TEXTURES_ATTACHED!\n");
-	}
+FrameBuffer& FrameBuffer::configureDrawBuffers() {
+	std::vector<GLenum> buffers;
+	buffers.reserve(mColorAttachmentCount);
 
-	glDrawBuffers(static_cast<int32_t>(mAttachments.size()), mAttachments.data());
+	for (uint32_t i = 0; i < mColorAttachmentCount; ++i)
+		buffers.push_back(GL_COLOR_ATTACHMENT0 + i);
+
+	if (buffers.empty()) {
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+	} else {
+		glDrawBuffers(static_cast<int32_t>(buffers.size()), buffers.data());
+		glReadBuffer(GL_COLOR_ATTACHMENT0);
+	}
 
 	return *this;
 }
@@ -425,10 +456,10 @@ InternalFormat FrameBuffer::getInternalFormat(const BaseFormat format, const boo
 	}
 
 	switch (format) {
-		case BaseFormat::Red: return InternalFormat::Red;
-		case BaseFormat::RG: return InternalFormat::RG;
-		case BaseFormat::RGB: return InternalFormat::RGB;
-		default: return InternalFormat::RGBA;
+		case BaseFormat::Red: return InternalFormat::Red8;
+		case BaseFormat::RG: return InternalFormat::RG8;
+		case BaseFormat::RGB: return InternalFormat::RGB8;
+		default: return InternalFormat::RGBA8;
 	}
 
 	assert(false && "Unsupported format");

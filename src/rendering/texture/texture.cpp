@@ -33,21 +33,21 @@ Texture& Texture::operator=(Texture&& other) noexcept {
 	return *this;
 }
 
-Texture Texture::generate(const float* data, const TextureConfig& config) {
+Texture Texture::generate(const void* data, const TextureConfig& config) {
 	uint32_t textureID;
 
 	const auto target = toUnderlying(config.target);
 	const auto format = toUnderlying(config.format);
 	const auto internalFormat = toUnderlying(config.internalFormat);
 	const auto dataType = toUnderlying(config.dataType);
+	const auto wrapS = toUnderlying(config.parameters.wrapS);
+	const auto wrapT = toUnderlying(config.parameters.wrapT);
+	const auto wrapR = toUnderlying(config.parameters.wrapR);
+	const auto minFilter = toUnderlying(config.parameters.minFilter);
+	const auto magFilter = toUnderlying(config.parameters.magFilter);
 
 	glGenTextures(1, &textureID);
 	glBindTexture(target, textureID);
-
-	glTexParameteri(target, GL_TEXTURE_WRAP_S, toUnderlying(config.parameters.wrapS));
-	glTexParameteri(target, GL_TEXTURE_WRAP_T, toUnderlying(config.parameters.wrapT));
-	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, toUnderlying(config.parameters.minFilter));
-	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, toUnderlying(config.parameters.magFilter));
 
 	switch (config.target) {
 		case TextureTarget::Texture2D: {
@@ -61,18 +61,208 @@ Texture Texture::generate(const float* data, const TextureConfig& config) {
 				format,
 				dataType,
 				data);
+
+			glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapS);
+			glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapT);
+			glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
+			glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter);
+
+			break;
 		}
-		case TextureTarget::Texture2DMultisample:
+		case TextureTarget::Texture2DMultisample: {
+			glTexImage2DMultisample(
+				target,
+				config.samples,
+				internalFormat,
+				config.width,
+				config.height,
+				GL_TRUE);
 			break;
-		case TextureTarget::Texture2DArray:
+		}
+		case TextureTarget::Texture2DArray: {
+			glTexImage3D(
+				target,
+			0,
+				internalFormat,
+				config.width,
+				config.height,
+				config.layers,
+				0,
+				format,
+				dataType,
+				nullptr);
+
+			glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapS);
+			glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapT);
+			glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
+			glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter);
+
 			break;
-		case TextureTarget::TextureCubeMap:
+		}
+		case TextureTarget::TextureCubeMap: {
+			glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapS);
+			glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapT);
+			glTexParameteri(target, GL_TEXTURE_WRAP_R, wrapR);
+			glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
+			glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter);
+
 			break;
-		case TextureTarget::TextureCubeMapArray:
+		}
+		case TextureTarget::TextureCubeMapArray: {
+			glTexImage3D(
+				target,
+				0,
+				internalFormat,
+				config.width,
+				config.height,
+				config.layers * 6,
+				0,
+				format,
+				dataType,
+				nullptr);
+
+			glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapS);
+			glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapT);
+			glTexParameteri(target, GL_TEXTURE_WRAP_R, wrapR);
+			glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
+			glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter);
+
 			break;
+		}
 	}
 
-	return {textureID, TextureTarget::Texture2D};
+	if (config.parameters.wrapS == TextureWrap::ClampToBorder ||
+		config.parameters.wrapR == TextureWrap::ClampToBorder ||
+		config.parameters.wrapT == TextureWrap::ClampToBorder) {
+		constexpr float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
+		glTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, borderColor);
+	}
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	return {textureID, config.target};
+}
+
+Texture Texture::generateColorAttachment(const int width, const int height) {
+	return generate(nullptr, {
+		.target = TextureTarget::Texture2D,
+		.internalFormat = InternalFormat::RGBA8,
+		.format = BaseFormat::RGBA,
+		.parameters = {
+			.minFilter = TextureFilter::Linear,
+			.magFilter = TextureFilter::Linear,
+			.wrapS = TextureWrap::ClampToEdge,
+			.wrapT = TextureWrap::ClampToEdge,
+		},
+		.dataType = DataType::UnsignedByte,
+		.width = width,
+		.height = height,
+		.samples = 1,
+		.layers = 1,
+	});
+}
+
+Texture Texture::generateColorAttachmentMultisampled(const int width, const int height, const int samples) {
+	return generate(nullptr, {
+		.target = TextureTarget::Texture2DMultisample,
+		.internalFormat = InternalFormat::RGBA8,
+		.format = BaseFormat::RGBA,
+		.dataType = DataType::UnsignedByte,
+		.width = width,
+		.height = height,
+		.samples = samples,
+		.layers = 1,
+	});
+}
+
+Texture Texture::generateColorAttachmentFP(const int width, const int height) {
+	return generate(nullptr, {
+		.target = TextureTarget::Texture2D,
+		.internalFormat = InternalFormat::RGBAFloat,
+		.format = BaseFormat::RGBA,
+		.parameters = {
+			.minFilter = TextureFilter::Linear,
+			.magFilter = TextureFilter::Linear,
+			.wrapS = TextureWrap::ClampToEdge,
+			.wrapT = TextureWrap::ClampToEdge,
+		},
+		.dataType = DataType::UnsignedByte,
+		.width = width,
+		.height = height,
+		.samples = 1,
+		.layers = 1,
+	});
+}
+
+Texture Texture::generateColorAttachmentFPMultisampled(const int width, const int height, int samples) {
+	return generate(nullptr, {
+		.target = TextureTarget::Texture2DMultisample,
+		.internalFormat = InternalFormat::RGBAFloat,
+		.format = BaseFormat::RGBA,
+		.dataType = DataType::Float,
+		.width = width,
+		.height = height,
+		.samples = samples,
+		.layers = 1,
+	});
+}
+
+Texture Texture::generateDepthAttachment(const int width, const int height) {
+	return generate(nullptr, {
+		.target = TextureTarget::Texture2D,
+		.internalFormat = InternalFormat::Depth24,
+		.format = BaseFormat::Depth,
+		.parameters = {
+			.minFilter = TextureFilter::Nearest,
+			.magFilter = TextureFilter::Nearest,
+			.wrapS = TextureWrap::ClampToEdge,
+			.wrapT = TextureWrap::ClampToEdge,
+		},
+		.dataType = DataType::Float,
+		.width = width,
+		.height = height,
+		.samples = 1,
+		.layers = 1,
+	});
+}
+
+Texture Texture::generateDepthAttachmentArray(const int width, const int height, const int layers) {
+	return generate(nullptr, {
+		.target = TextureTarget::Texture2DArray,
+		.internalFormat = InternalFormat::Depth24,
+		.format = BaseFormat::Depth,
+		.parameters = {
+			.minFilter = TextureFilter::Nearest,
+			.magFilter = TextureFilter::Nearest,
+			.wrapS = TextureWrap::ClampToEdge,
+			.wrapT = TextureWrap::ClampToEdge,
+		},
+		.dataType = DataType::Float,
+		.width = width,
+		.height = height,
+		.samples = 1,
+		.layers = layers,
+	});
+}
+
+Texture Texture::generateDepthAttachmentCubemapArray(const int width, const int height, const int layers) {
+	return generate(nullptr, {
+		.target = TextureTarget::TextureCubeMapArray,
+		.internalFormat = InternalFormat::Depth24,
+		.format = BaseFormat::Depth,
+		.parameters = {
+			.minFilter = TextureFilter::Nearest,
+			.magFilter = TextureFilter::Nearest,
+			.wrapS = TextureWrap::ClampToEdge,
+			.wrapT = TextureWrap::ClampToEdge,
+			.wrapR = TextureWrap::ClampToBorder,
+		},
+		.dataType = DataType::Float,
+		.width = width,
+		.height = height,
+		.samples = 1,
+		.layers = layers,
+	});
 }
 
 void Texture::generateMipmaps(const TextureView handle) {

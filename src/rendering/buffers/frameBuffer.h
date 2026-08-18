@@ -36,6 +36,10 @@ public:
 	[[nodiscard]]
 	TextureView texture(uint32_t index = 0) const;
 
+	FrameBuffer& attachColor(Texture& texture);
+
+	FrameBuffer& attachDepth(Texture& texture);
+
 	FrameBuffer& withTexture(BaseFormat format);
 
 	FrameBuffer& withTextureMultisampled(int32_t multisampledCount, BaseFormat format);
@@ -64,7 +68,7 @@ public:
 
 	FrameBuffer& withNoColorAttachment();
 
-	FrameBuffer& configureAttachments();
+	FrameBuffer& configureDrawBuffers();
 
 	void checkStatus();
 
@@ -79,12 +83,8 @@ private:
 	uint32_t mRBHandle{0};
 	int32_t mWidth{0};
 	int32_t mHeight{0};
+	uint32_t mColorAttachmentCount{0};
 
-	struct TextureDescription {
-		uint32_t id{0};
-		TextureTarget target{};
-	};
-
-	std::vector<TextureDescription> mTextures;
+	std::vector<Texture> mTextures;
 	std::vector<uint32_t> mAttachments;
 };

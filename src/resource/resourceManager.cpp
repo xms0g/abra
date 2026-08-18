@@ -111,7 +111,7 @@ void ResourceManager::uploadMaterialsToGPU() {
 
 				texture = MaterialTexture::load(paths, {
 					.target = TextureTarget::Texture2D,
-					.internalFormat = isSRGBA ? InternalFormat::SRGB8Alpha8 : InternalFormat::RGBA,
+					.internalFormat = isSRGBA ? InternalFormat::SRGB8Alpha8 : InternalFormat::RGBA8,
 					.format = BaseFormat::RGBA,
 					.parameters = {
 						.minFilter = TextureFilter::Linear,

@@ -28,13 +28,14 @@ enum class BaseFormat : int32_t {
 	RG = GL_RG,
 	RGB = GL_RGB,
 	RGBA = GL_RGBA,
+	Depth = GL_DEPTH_COMPONENT,
 };
 
 enum class InternalFormat : int32_t {
-	Red = GL_R8,
-	RG = GL_RG8,
-	RGB = GL_RGB8,
-	RGBA = GL_RGBA8,
+	Red8 = GL_R8,
+	RG8 = GL_RG8,
+	RGB8 = GL_RGB8,
+	RGBA8 = GL_RGBA8,
 	RedFloat = GL_R16F,
 	RGFloat = GL_RG16F,
 	RGBFloat = GL_RGB16F,
@@ -54,6 +55,7 @@ enum class TextureWrap : int32_t {
 	Repeat = GL_REPEAT,
 	MirroredRepeat = GL_MIRRORED_REPEAT,
 	ClampToEdge = GL_CLAMP_TO_EDGE,
+	ClampToBorder = GL_CLAMP_TO_BORDER,
 };
 
 enum class DataType : int32_t {
@@ -110,7 +112,21 @@ struct Texture {
 
 	Texture& operator=(Texture&& other) noexcept;
 
-	static Texture generate(const float* data, const TextureConfig& config);
+	static Texture generate(const void* data, const TextureConfig& config);
+
+	static Texture generateColorAttachment(int width, int height);
+
+	static Texture generateColorAttachmentMultisampled(int width, int height, int samples);
+
+	static Texture generateColorAttachmentFP(int width, int height);
+
+	static Texture generateColorAttachmentFPMultisampled(int width, int height, int samples);
+
+	static Texture generateDepthAttachment(int width, int height);
+
+	static Texture generateDepthAttachmentArray(int width, int height, int layers);
+
+	static Texture generateDepthAttachmentCubemapArray(int width, int height, int layers);
 
 	static void generateMipmaps(TextureView handle);
 };
