@@ -72,7 +72,7 @@ Model::Plane::Plane(glm::vec3 color,
 	mMeshes[0].emplace_back(vertices, indices);
 	mMeshes.at(0).at(0).uploadToGPU();
 
-	std::vector<MaterialTexture> textures;
+	std::vector<Texture> textures;
 
 	if (!diffuseTexture.empty()) {
 		textures.emplace_back(0, ALBEDO, TextureTarget::Texture2D, diffuseTexture);

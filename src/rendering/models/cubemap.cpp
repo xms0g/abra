@@ -58,7 +58,7 @@ Model::Cubemap::Cubemap(std::vector<std::string>& faces) {
 	std::vector<uint32_t> indices;
 	mMeshes[0].emplace_back(vertices, indices);
 
-	std::vector<MaterialTexture> textures;
+	std::vector<Texture> textures;
 	textures.reserve(faces.size());
 
 	for (const auto& face : faces) {

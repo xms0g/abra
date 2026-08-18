@@ -139,9 +139,9 @@ void Renderer::createPBRBuffers() {
 	const auto& texture = textures.front();
 
 	if (texture.target == TextureTarget::Texture2D) {
-		const TextureView view = createEnvMap(texture);
+		const auto [id, target] = createEnvMap(texture);
 		textures.clear();
-		textures.emplace_back(view.id, 0, view.target, "");
+		textures.emplace_back(id, 0, target, "");
 	}
 
 	createIrradianceMap({.id = texture.id, .target = texture.target});
@@ -509,7 +509,7 @@ void Renderer::sortEntities() {
 	// }
 }
 
-TextureView Renderer::createEnvMap(const MaterialTexture& hdrTexture) {
+TextureView Renderer::createEnvMap(const Texture& hdrTexture) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};

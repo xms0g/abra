@@ -6,9 +6,11 @@
 #include "../material/material.hpp"
 #include "../glUtils.hpp"
 
-Texture::Texture(const uint32_t id, const TextureTarget target)
+Texture::Texture(const uint32_t id, const uint32_t type, const TextureTarget target, std::string path)
 	: id(id),
-	  target(target) {
+      type(type),
+      target(target),
+      path(std::move(path)) {
 }
 
 Texture::~Texture() {
@@ -18,7 +20,9 @@ Texture::~Texture() {
 
 Texture::Texture(Texture&& other) noexcept
 	: id(std::exchange(other.id, 0)),
-	  target(std::exchange(other.target, {})) {
+	  type(std::exchange(other.type, 0)),
+	  target(std::exchange(other.target, {})),
+      path(std::move(other.path)) {
 }
 
 Texture& Texture::operator=(Texture&& other) noexcept {
@@ -27,10 +31,104 @@ Texture& Texture::operator=(Texture&& other) noexcept {
 			glDeleteTextures(1, &id);
 
 		id = std::exchange(other.id, 0);
+		type = std::exchange(other.type, 0);
 		target = std::exchange(other.target, {});
+		path = std::move(other.path);
 	}
 
 	return *this;
+}
+
+void Texture::uploadCubeFace(const uint32_t face,
+							const void* data,
+							const int32_t width,
+							const int32_t height,
+							const int32_t format,
+							const int32_t internalFormat,
+							const int32_t dataType) const {
+	assert(target == TextureTarget::TextureCubeMap);
+	assert(face < 6);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, id);
+
+	glTexImage2D(
+		GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
+		0,
+		internalFormat,
+		width,
+		height,
+		0,
+		format,
+		dataType,
+		data
+	);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+}
+
+void Texture::info(const std::string_view path, int32_t& width, int32_t& height) {
+	int32_t channel;
+	stbi_info(path.data(), &width, &height, &channel);
+}
+
+Texture Texture::load(const std::span<const std::string> paths, TextureConfig& config) {
+	int32_t width, height, channel;
+
+	switch (config.target) {
+		case TextureTarget::Texture2D: {
+			void* data = nullptr;
+			const char* path = paths[0].c_str();
+
+			if (config.isHDR) {
+				stbi_set_flip_vertically_on_load(true);
+
+				data = stbi_loadf(path, &width, &height, &channel, 0);
+				if (!data) {
+					throw std::runtime_error(std::format("HDR texture failed to load at path: {}", path));
+				}
+
+				config.width = width;
+				config.height = height;
+			} else {
+				data = stbi_load(path, &width, &height, &channel, 4);
+				if (!data) {
+					throw std::runtime_error(std::format("Texture failed to load at path: {}", path));
+				}
+
+				config.width = width;
+				config.height = height;
+			}
+
+			auto texture = generate(data, config);
+
+			stbi_image_free(data);
+			stbi_set_flip_vertically_on_load(false);
+			return texture;
+		}
+		case TextureTarget::TextureCubeMap: {
+			if (paths.size() != 6) {
+				throw std::runtime_error("Cubemap texture must have 6 paths");
+			}
+
+			auto texture = generate(nullptr, config);
+
+			for (uint32_t i = 0; i < 6; ++i) {
+				unsigned char* data = stbi_load(paths[i].c_str(), &width, &height, &channel, 0);
+
+				if (!data) {
+					throw std::runtime_error(std::format("Cubemap texture failed to load at path: {}", paths[i]));
+				}
+
+				texture.uploadCubeFace(i, data, width, height, toUnderlying(config.format), toUnderlying(config.internalFormat), toUnderlying(config.dataType));
+
+				stbi_image_free(data);
+			}
+
+			return texture;
+		}
+	}
+
+	return {};
 }
 
 Texture Texture::generate(const void* data, const TextureConfig& config) {
@@ -90,7 +188,7 @@ Texture Texture::generate(const void* data, const TextureConfig& config) {
 				0,
 				format,
 				dataType,
-				nullptr);
+				data);
 
 			glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapS);
 			glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapT);
@@ -110,7 +208,7 @@ Texture Texture::generate(const void* data, const TextureConfig& config) {
 					0,
 					format,
 					dataType,
-					nullptr);
+					data);
 			}
 
 			glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapS);
@@ -132,7 +230,7 @@ Texture Texture::generate(const void* data, const TextureConfig& config) {
 				0,
 				format,
 				dataType,
-				nullptr);
+				data);
 
 			glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapS);
 			glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapT);
@@ -151,9 +249,9 @@ Texture Texture::generate(const void* data, const TextureConfig& config) {
 		glTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, borderColor);
 	}
 
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(target, 0);
 
-	return {textureID, config.target};
+	return {textureID, 0, config.target, ""};
 }
 
 Texture Texture::generateColorAttachment(const int width, const int height) {
@@ -303,125 +401,4 @@ void Texture::generateMipmaps(const TextureView handle) {
 	glGenerateMipmap(toUnderlying(handle.target));
 	glTexParameteri(toUnderlying(handle.target), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glBindTexture(toUnderlying(handle.target), 0);
-}
-
-MaterialTexture::MaterialTexture(const uint32_t id, const uint32_t type, const TextureTarget target, std::string path)
-	: id(id),
-	  type(type),
-	  target(target),
-	  path(std::move(path)) {
-}
-
-MaterialTexture::~MaterialTexture() {
-	if (id != 0)
-		glDeleteTextures(1, &id);
-}
-
-MaterialTexture::MaterialTexture(MaterialTexture&& other) noexcept
-	: id(std::exchange(other.id, 0)),
-	  type(std::exchange(other.type, 0)),
-	  target(std::exchange(other.target, {})),
-	  path(std::move(other.path)) {
-}
-
-MaterialTexture& MaterialTexture::operator=(MaterialTexture&& other) noexcept {
-	if (this != &other) {
-		if (id != 0)
-			glDeleteTextures(1, &id);
-
-		id = std::exchange(other.id, 0);
-		type = std::exchange(other.type, 0);
-		target = std::exchange(other.target, {});
-		path = std::move(other.path);
-	}
-
-	return *this;
-}
-
-void MaterialTexture::info(const std::string_view path, int32_t& width, int32_t& height) {
-	int32_t channel;
-	stbi_info(path.data(), &width, &height, &channel);
-}
-
-MaterialTexture MaterialTexture::load(const std::span<const std::string> paths, const TextureConfig& config) {
-	uint32_t textureID;
-	int32_t width, height, channel;
-
-	const auto target = toUnderlying(config.target);
-	const auto format = toUnderlying(config.format);
-	const auto internalFormat = toUnderlying(config.internalFormat);
-	const auto dataType = toUnderlying(config.dataType);
-
-	glGenTextures(1, &textureID);
-	glBindTexture(target, textureID);
-
-	glTexParameteri(target, GL_TEXTURE_WRAP_S, toUnderlying(config.parameters.wrapS));
-	glTexParameteri(target, GL_TEXTURE_WRAP_T, toUnderlying(config.parameters.wrapT));
-	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, toUnderlying(config.parameters.minFilter));
-	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, toUnderlying(config.parameters.magFilter));
-
-	switch (config.target) {
-		case TextureTarget::Texture2D: {
-			void* data = nullptr;
-			const char* path = paths[0].c_str();
-
-			if (config.isHDR) {
-				stbi_set_flip_vertically_on_load(true);
-
-				data = stbi_loadf(path, &width, &height, &channel, 0);
-				if (!data) {
-					throw std::runtime_error(std::format("HDR texture failed to load at path: {}", path));
-				}
-			} else {
-				data = stbi_load(path, &width, &height, &channel, 4);
-				if (!data) {
-					throw std::runtime_error(std::format("Texture failed to load at path: {}", path));
-				}
-			}
-
-			glTexImage2D(
-				target,
-				0,
-				internalFormat,
-				width,
-				height,
-				0,
-				format,
-				dataType,
-				data);
-
-			stbi_image_free(data);
-			glBindTexture(target, 0);
-
-			stbi_set_flip_vertically_on_load(false);
-			return {textureID, 0, TextureTarget::Texture2D, path};
-		}
-		case TextureTarget::TextureCubeMap: {
-			for (uint32_t i = 0; i < paths.size(); i++) {
-				unsigned char* data = stbi_load(paths[i].c_str(), &width, &height, &channel, 0);
-
-				if (!data) {
-					glDeleteTextures(1, &textureID);
-					throw std::runtime_error(std::format("Cubemap texture failed to load at path: {}", paths[i]));
-				}
-
-				glTexImage2D(
-					GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-					0,
-					internalFormat,
-					width,
-					height,
-					0,
-					format,
-					dataType,
-					data);
-
-				stbi_image_free(data);
-			}
-			glTexParameteri(target, GL_TEXTURE_WRAP_R, toUnderlying(config.parameters.wrapR));
-			glBindTexture(target, 0);
-			return {textureID, 0, TextureTarget::TextureCubeMap, ""};
-		}
-	}
-	return {};
 }

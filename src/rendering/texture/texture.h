@@ -96,11 +96,13 @@ struct TextureView {
 
 struct Texture {
 	uint32_t id{};
+	uint32_t type{};
 	TextureTarget target{};
+	std::string path;
 
 	Texture() = default;
 
-	Texture(uint32_t id, TextureTarget target);
+	Texture(uint32_t id, uint32_t type, TextureTarget target, std::string path = "");
 
 	~Texture();
 
@@ -111,6 +113,18 @@ struct Texture {
 	Texture(Texture&& other) noexcept;
 
 	Texture& operator=(Texture&& other) noexcept;
+
+	void uploadCubeFace(uint32_t face,
+	                    const void* data,
+	                    int32_t width,
+	                    int32_t height,
+	                    int32_t format,
+	                    int32_t internalFormat,
+	                    int32_t dataType) const;
+
+	static void info(std::string_view path, int32_t& width, int32_t& height);
+
+	static Texture load(std::span<const std::string> paths, TextureConfig& config);
 
 	static Texture generate(const void* data, const TextureConfig& config);
 
@@ -131,29 +145,4 @@ struct Texture {
 	static Texture generateDepthAttachmentCubemapArray(int width, int height, int layers);
 
 	static void generateMipmaps(TextureView handle);
-};
-
-struct MaterialTexture {
-	uint32_t id{};
-	uint32_t type{};
-	TextureTarget target{};
-	std::string path;
-
-	MaterialTexture() = default;
-
-	MaterialTexture(uint32_t id, uint32_t type, TextureTarget target = TextureTarget::Texture2D, std::string path = "");
-
-	~MaterialTexture();
-
-	MaterialTexture(const MaterialTexture&) = delete;
-
-	MaterialTexture& operator=(const MaterialTexture&) = delete;
-
-	MaterialTexture(MaterialTexture&& other) noexcept;
-
-	MaterialTexture& operator=(MaterialTexture&& other) noexcept;
-
-	static void info(std::string_view path, int32_t& width, int32_t& height);
-
-	static MaterialTexture load(std::span<const std::string> paths, const TextureConfig& config);
 };

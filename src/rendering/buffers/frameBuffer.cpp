@@ -36,8 +36,8 @@ FrameBuffer& FrameBuffer::operator=(FrameBuffer&& other) noexcept {
 
 FrameBuffer::~FrameBuffer() {
 	if (!mTextures.empty()) {
-		for (const auto& [id, target]: mTextures) {
-			glDeleteTextures(1, &id);
+		for (const auto& texture: mTextures) {
+			glDeleteTextures(1, &texture.id);
 		}
 	}
 

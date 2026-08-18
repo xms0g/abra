@@ -43,7 +43,7 @@ void ResourceManager::uploadMaterialsToGPU() {
 					const std::string path = fs::resolvePath(assetRoot / material.textures.front().path);
 
 					std::string paths[] = {path};
-					MaterialTexture texture = MaterialTexture::load(paths, {
+					TextureConfig config = {
 						.target = TextureTarget::Texture2D,
 						.internalFormat = InternalFormat::RGBFloat,
 						.format = BaseFormat::RGB,
@@ -59,7 +59,8 @@ void ResourceManager::uploadMaterialsToGPU() {
 						.height = 0,
 						.samples = 1,
 						.layers = 1,
-					});
+					};
+					Texture texture = Texture::load(paths, config);
 
 					material.textures.clear();
 					material.textures.push_back(std::move(texture));
@@ -72,7 +73,7 @@ void ResourceManager::uploadMaterialsToGPU() {
 						paths.push_back(fs::resolvePath(assetRoot / texture.path));
 					}
 
-					MaterialTexture texture = MaterialTexture::load(paths, {
+					TextureConfig config = {
 						.target = TextureTarget::TextureCubeMap,
 						.internalFormat = InternalFormat::SRGB8Alpha8,
 						.format = BaseFormat::RGBA,
@@ -88,7 +89,8 @@ void ResourceManager::uploadMaterialsToGPU() {
 						.height = 0,
 						.samples = 1,
 						.layers = 1,
-					});
+					};
+					Texture texture = Texture::load(paths, config);
 					Texture::generateMipmaps({.id = texture.id, .target = texture.target});
 
 					material.textures.clear();
@@ -104,12 +106,12 @@ void ResourceManager::uploadMaterialsToGPU() {
 					continue;
 				}
 
-				auto p = fs::resolvePath(assetRoot / texture.path);
-				bool isSRGBA = texture.type == aiTextureType_DIFFUSE || texture.type == aiTextureType_EMISSIVE;
+				const auto p = fs::resolvePath(assetRoot / texture.path);
+				const bool isSRGBA = texture.type == aiTextureType_DIFFUSE || texture.type == aiTextureType_EMISSIVE;
 
 				std::string paths[] = {p};
 
-				texture = MaterialTexture::load(paths, {
+				TextureConfig config = {
 					.target = TextureTarget::Texture2D,
 					.internalFormat = isSRGBA ? InternalFormat::SRGB8Alpha8 : InternalFormat::RGBA8,
 					.format = BaseFormat::RGBA,
@@ -124,7 +126,8 @@ void ResourceManager::uploadMaterialsToGPU() {
 					.height = 0,
 					.samples = 1,
 					.layers = 1,
-				});
+				};
+				texture = Texture::load(paths, config);
 
 				Texture::generateMipmaps({.id = texture.id, .target = texture.target});
 

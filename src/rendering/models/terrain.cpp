@@ -17,7 +17,7 @@ Model::Terrain::Terrain(glm::vec3 color,
 	std::string path = fs::resolvePath(assetRoot / heightTexture);
 
 	int32_t width, height;
-	MaterialTexture::info(path, width, height);
+	Texture::info(path, width, height);
 
 	std::vector<float> v;
 
@@ -63,7 +63,7 @@ Model::Terrain::Terrain(glm::vec3 color,
 	mMeshes[0].emplace_back(vertices, indices);
 
 	uint32_t flags{0};
-	std::vector<MaterialTexture> textures;
+	std::vector<Texture> textures;
 	if (!heightTexture.empty()) {
 		flags |= HAS_HEIGHT_MAP;
 		textures.emplace_back(0, HEIGHT, TextureTarget::Texture2D, heightTexture);
