@@ -122,6 +122,8 @@ struct Texture {
 
 	static Texture generateColorAttachmentFPMultisampled(int width, int height, int samples);
 
+	static Texture generateColorAttachmentCubemap(int width, int height);
+
 	static Texture generateDepthAttachment(int width, int height);
 
 	static Texture generateDepthAttachmentArray(int width, int height, int layers);

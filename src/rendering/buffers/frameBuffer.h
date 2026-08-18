@@ -40,24 +40,6 @@ public:
 
 	FrameBuffer& attachDepth(Texture& texture);
 
-	FrameBuffer& withTexture(BaseFormat format);
-
-	FrameBuffer& withTextureMultisampled(int32_t multisampledCount, BaseFormat format);
-
-	FrameBuffer& withTextureFP(BaseFormat format);
-
-	FrameBuffer& withTextureFPMultisampled(int32_t multisampledCount, BaseFormat format);
-
-	FrameBuffer& withTextureDepth(InternalFormat format);
-
-	FrameBuffer& withTextureDepthArray(int32_t layerCount, InternalFormat format);
-
-	FrameBuffer& withTextureCubeMap();
-
-	FrameBuffer& withTextureCubemapDepth(InternalFormat format);
-
-	FrameBuffer& withTextureCubemapDepthArray(int32_t layerCount, InternalFormat format);
-
 	FrameBuffer& withRenderBufferDepth(InternalFormat format);
 
 	FrameBuffer& withRenderBufferDepthMultisampled(int32_t multisampledCount, InternalFormat format);
@@ -66,18 +48,11 @@ public:
 
 	FrameBuffer& withRenderBufferDepthStencilMultisampled(int32_t multisampledCount, InternalFormat format);
 
-	FrameBuffer& withNoColorAttachment();
-
 	FrameBuffer& configureDrawBuffers();
 
 	void checkStatus();
 
 private:
-	void setAttachment(uint32_t textureID, uint32_t target);
-
-	static void setDepthTextureParameters(uint32_t target, int32_t dim);
-
-	static InternalFormat getInternalFormat(BaseFormat format, bool isFloat = false);
 
 	uint32_t mFBHandle{0};
 	uint32_t mRBHandle{0};
@@ -86,5 +61,4 @@ private:
 	uint32_t mColorAttachmentCount{0};
 
 	std::vector<Texture> mTextures;
-	std::vector<uint32_t> mAttachments;
 };

@@ -318,8 +318,11 @@ void Renderer::createFrameBuffers() {
 	} else {
 		mEncoder.bindFrameBuffer(sceneBuffer);
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
-			sceneBuffer.withTextureFP(BaseFormat::RGBA)
-					.withTextureDepth(InternalFormat::Depth24)
+			Texture color = Texture::generateColorAttachmentFP(sceneBuffer.width(), sceneBuffer.height());
+			Texture depth = Texture::generateDepthAttachment(sceneBuffer.width(), sceneBuffer.height());
+
+			sceneBuffer.attachColor(color)
+					.attachDepth(depth)
 					.checkStatus();
 		} else {
 			Texture color = Texture::generateColorAttachment(sceneBuffer.width(), sceneBuffer.height());
@@ -547,8 +550,11 @@ TextureView Renderer::createEnvMap(const MaterialTexture& hdrTexture) {
 		CONFIG_MANAGER.get<int32_t>("PBR.envMap.size"));
 
 	encoder.bindFrameBuffer(*envMap);
-	envMap->withTextureCubeMap()
+
+	Texture cubemap = Texture::generateColorAttachmentCubemap(envMap->width(), envMap->height());
+	envMap->attachColor(cubemap)
 			.withRenderBufferDepth(InternalFormat::Depth24)
+			.configureDrawBuffers()
 			.checkStatus();
 
 	mPBRBuffers.environment = std::move(envMap);
@@ -636,8 +642,11 @@ void Renderer::createIrradianceMap(const TextureView environment) {
 		CONFIG_MANAGER.get<int32_t>("PBR.irradianceMap.size"));
 
 	encoder.bindFrameBuffer(*irradianceMap);
-	irradianceMap->withTextureCubeMap()
+
+	Texture cubemap = Texture::generateColorAttachmentCubemap(irradianceMap->width(), irradianceMap->height());
+	irradianceMap->attachColor(cubemap)
 			.withRenderBufferDepth(InternalFormat::Depth24)
+			.configureDrawBuffers()
 			.checkStatus();
 
 	mPBRBuffers.irradiance = std::move(irradianceMap);
@@ -722,8 +731,11 @@ void Renderer::createPrefilterMap(const TextureView environment) {
 		CONFIG_MANAGER.get<int32_t>("PBR.prefilterMap.size"));
 
 	encoder.bindFrameBuffer(*prefilterMap);
-	prefilterMap->withTextureCubeMap()
+
+	Texture cubemap = Texture::generateColorAttachmentCubemap(prefilterMap->width(), prefilterMap->height());
+	prefilterMap->attachColor(cubemap)
 			.withRenderBufferDepth(InternalFormat::Depth24)
+			.configureDrawBuffers()
 			.checkStatus();
 
 	Texture::generateMipmaps(prefilterMap->texture());
@@ -819,7 +831,25 @@ void Renderer::createBrdfLUT() {
 		CONFIG_MANAGER.get<int32_t>("PBR.brdfLUT.size"));
 
 	encoder.bindFrameBuffer(*brdfLUT);
-	brdfLUT->withTextureFP(BaseFormat::RG)
+
+	Texture color = Texture::generate(nullptr, {
+		.target = TextureTarget::Texture2D,
+		.internalFormat = InternalFormat::RGFloat,
+		.format = BaseFormat::RG,
+		.parameters = {
+			.minFilter = TextureFilter::Linear,
+			.magFilter = TextureFilter::Linear,
+			.wrapS = TextureWrap::ClampToEdge,
+			.wrapT = TextureWrap::ClampToEdge,
+		},
+		.dataType = DataType::Float,
+		.width = brdfLUT->width(),
+		.height = brdfLUT->height(),
+		.samples = 1,
+		.layers = 1,
+	});
+	brdfLUT->attachColor(color)
+			.configureDrawBuffers()
 			.checkStatus();
 
 	mPBRBuffers.brdfLUT = std::move(brdfLUT);

@@ -100,6 +100,19 @@ Texture Texture::generate(const void* data, const TextureConfig& config) {
 			break;
 		}
 		case TextureTarget::TextureCubeMap: {
+			for (uint32_t i = 0; i < 6; ++i) {
+				glTexImage2D(
+					GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+					0,
+					internalFormat,
+					config.width,
+					config.height,
+					0,
+					format,
+					dataType,
+					nullptr);
+			}
+
 			glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapS);
 			glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapT);
 			glTexParameteri(target, GL_TEXTURE_WRAP_R, wrapR);
@@ -186,7 +199,7 @@ Texture Texture::generateColorAttachmentFP(const int width, const int height) {
 			.wrapS = TextureWrap::ClampToEdge,
 			.wrapT = TextureWrap::ClampToEdge,
 		},
-		.dataType = DataType::UnsignedByte,
+		.dataType = DataType::Float,
 		.width = width,
 		.height = height,
 		.samples = 1,
@@ -203,6 +216,26 @@ Texture Texture::generateColorAttachmentFPMultisampled(const int width, const in
 		.width = width,
 		.height = height,
 		.samples = samples,
+		.layers = 1,
+	});
+}
+
+Texture Texture::generateColorAttachmentCubemap(const int width, const int height) {
+	return generate(nullptr, {
+		.target = TextureTarget::TextureCubeMap,
+		.internalFormat = InternalFormat::RGBFloat,
+		.format = BaseFormat::RGB,
+		.parameters = {
+			.minFilter = TextureFilter::Linear,
+			.magFilter = TextureFilter::Linear,
+			.wrapS = TextureWrap::ClampToEdge,
+			.wrapT = TextureWrap::ClampToEdge,
+			.wrapR = TextureWrap::ClampToEdge,
+		},
+		.dataType = DataType::Float,
+		.width = width,
+		.height = height,
+		.samples = 1,
 		.layers = 1,
 	});
 }
