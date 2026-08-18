@@ -24,7 +24,7 @@ public:
 	~FrameBuffer();
 
 	[[nodiscard]]
-	uint32_t fbHandle() const;
+	uint32_t handle() const;
 
 	[[nodiscard]]
 	int32_t width() const;

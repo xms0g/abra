@@ -44,7 +44,7 @@ FrameBuffer::~FrameBuffer() {
 	glDeleteFramebuffers(1, &mHandle);
 }
 
-uint32_t FrameBuffer::fbHandle() const {
+uint32_t FrameBuffer::handle() const {
 	return mHandle;
 }
 
