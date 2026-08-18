@@ -14,7 +14,7 @@ Texture::Texture(const uint32_t id, const uint32_t type, const TextureTarget tar
 }
 
 Texture::~Texture() {
-	if (id != 0)
+	if (id)
 		glDeleteTextures(1, &id);
 }
 
@@ -27,7 +27,7 @@ Texture::Texture(Texture&& other) noexcept
 
 Texture& Texture::operator=(Texture&& other) noexcept {
 	if (this != &other) {
-		if (id != 0)
+		if (id)
 			glDeleteTextures(1, &id);
 
 		id = std::exchange(other.id, 0);

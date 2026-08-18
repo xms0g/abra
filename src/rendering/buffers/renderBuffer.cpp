@@ -21,17 +21,18 @@ RenderBuffer::RenderBuffer(const InternalFormat format, const int32_t width, con
 }
 
 RenderBuffer::~RenderBuffer() {
-	glDeleteRenderbuffers(1, &mHandle);
+	if (mHandle)
+		glDeleteRenderbuffers(1, &mHandle);
 }
 
 RenderBuffer::RenderBuffer(RenderBuffer&& other) noexcept
-	: mHandle(other.mHandle),
-	  mFormat(other.mFormat) {
+	: mHandle(std::exchange(other.mHandle, 0)),
+	  mFormat(std::exchange(other.mFormat, {})) {
 }
 
 RenderBuffer& RenderBuffer::operator=(RenderBuffer&& other) noexcept {
 	if (this != &other) {
-		if (mHandle != 0)
+		if (mHandle)
 			glDeleteRenderbuffers(1, &mHandle);
 		mHandle = std::exchange(other.mHandle, 0);
 		mFormat = std::exchange(other.mFormat, {});

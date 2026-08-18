@@ -14,9 +14,9 @@ FrameBuffer::FrameBuffer(const int32_t width, const int32_t height)
 }
 
 FrameBuffer::FrameBuffer(FrameBuffer&& other) noexcept
-	: mHandle(other.mHandle),
-	  mWidth(other.mWidth),
-	  mHeight(other.mHeight),
+	: mHandle(std::exchange(other.mHandle, 0)),
+	  mWidth(std::exchange(other.mWidth, 0)),
+	  mHeight(std::exchange(other.mHeight, 0)),
 	  mTextures(std::move(other.mTextures)) {
 }
 

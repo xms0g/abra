@@ -31,7 +31,7 @@ public:
 
 	Buffer& operator=(Buffer&& other) noexcept {
 		if (this != &other) {
-			if (mHandle != 0)
+			if (mHandle)
 				glDeleteBuffers(1, &mHandle);
 
 			mHandle = std::exchange(other.mHandle, 0);
@@ -43,7 +43,7 @@ public:
 	}
 
 	virtual ~Buffer() {
-		if (mHandle != 0)
+		if (mHandle)
 			glDeleteBuffers(1, &mHandle);
 	}
 

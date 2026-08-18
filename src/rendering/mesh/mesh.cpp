@@ -25,8 +25,8 @@ Mesh::Mesh(Mesh&& other) noexcept
 	  mVAO(std::move(other.mVAO)),
 	  mVBO(std::move(other.mVBO)),
 	  mIBO(std::move(other.mIBO)),
-	  mMin(other.mMin),
-	  mMax(other.mMax) {
+	  mMin(std::exchange(other.mMin, glm::vec3(0))),
+	  mMax(std::exchange(other.mMax, glm::vec3(0))) {
 }
 
 Mesh& Mesh::operator=(Mesh&& other) noexcept {
