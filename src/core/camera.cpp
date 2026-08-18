@@ -1,5 +1,4 @@
 #include "camera.h"
-#include <SDL.h>
 #include "glm/gtc/matrix_transform.hpp"
 #include "../config/configManager.h"
 #include "../event/eventBus.hpp"
@@ -61,8 +60,8 @@ void Camera::configure(EventBus& eventBus) {
 	mZoom = CONFIG_MANAGER.get<float>("camera.zoom");
 	mHalfVSide = mZFar * tanf(glm::radians(mZoom) * 0.5f);
 
-	const float width = static_cast<float>(CONFIG_MANAGER.get<int32_t>("window.width"));
-	const float height = static_cast<float>(CONFIG_MANAGER.get<int32_t>("window.height"));
+	const auto width = static_cast<float>(CONFIG_MANAGER.get<int32_t>("window.width"));
+	const auto height = static_cast<float>(CONFIG_MANAGER.get<int32_t>("window.height"));
 	mHalfHSide = mHalfVSide * (width / height);
 
 	update();
@@ -87,13 +86,13 @@ void Camera::update() {
 void Camera::processKeyboard(const KeyPressedEvent& event) {
 	const float velocity = mMovementSpeed * event.deltaTime;
 
-	if (event.direction == SDL_SCANCODE_W)
+	if (event.key == Key::W)
 		mPosition += mFront * velocity;
-	if (event.direction == SDL_SCANCODE_S)
+	if (event.key == Key::S)
 		mPosition -= mFront * velocity;
-	if (event.direction == SDL_SCANCODE_A)
+	if (event.key == Key::A)
 		mPosition -= mRight * velocity;
-	if (event.direction == SDL_SCANCODE_D)
+	if (event.key == Key::D)
 		mPosition += mRight * velocity;
 }
 
@@ -108,8 +107,5 @@ void Camera::processMouseMovement(const MouseMovementEvent& event) {
 	mPitch += yoffset;
 
 	// make sure that when pitch is out of bounds, screen doesn't get flipped
-	if (mPitch > 89.0f)
-		mPitch = 89.0f;
-	if (mPitch < -89.0f)
-		mPitch = -89.0f;
+	mPitch = std::clamp(mPitch, -89.0f, 89.0f);
 }

@@ -2,12 +2,16 @@
 #include <cstdint>
 #include "event.hpp"
 
+enum class Key : uint8_t {
+	W, A, S, D
+};
+
 struct KeyPressedEvent : Event {
-	explicit KeyPressedEvent(const uint32_t dir, const float dt)
-		: direction(dir),
+	explicit KeyPressedEvent(const Key k, const float dt)
+		: key(k),
 		  deltaTime(dt) {
 	}
 
-	uint32_t direction;
+	Key key;
 	float deltaTime;
 };

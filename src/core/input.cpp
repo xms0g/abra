@@ -44,8 +44,8 @@ void Input::process(EventBus& eventBus, SDL_Window* window, const float dt, bool
 	const auto* keyState = SDL_GetKeyboardState(nullptr);
 
 	if (keyState[SDL_SCANCODE_ESCAPE]) isRunning = false;
-	if (keyState[SDL_SCANCODE_W]) eventBus.emitEvent<KeyPressedEvent>(SDL_SCANCODE_W, dt);
-	if (keyState[SDL_SCANCODE_S]) eventBus.emitEvent<KeyPressedEvent>(SDL_SCANCODE_S, dt);
-	if (keyState[SDL_SCANCODE_A]) eventBus.emitEvent<KeyPressedEvent>(SDL_SCANCODE_A, dt);
-	if (keyState[SDL_SCANCODE_D]) eventBus.emitEvent<KeyPressedEvent>(SDL_SCANCODE_D, dt);
+	if (keyState[SDL_SCANCODE_W]) eventBus.emitEvent<KeyPressedEvent>(Key::W, dt);
+	if (keyState[SDL_SCANCODE_S]) eventBus.emitEvent<KeyPressedEvent>(Key::S, dt);
+	if (keyState[SDL_SCANCODE_A]) eventBus.emitEvent<KeyPressedEvent>(Key::A, dt);
+	if (keyState[SDL_SCANCODE_D]) eventBus.emitEvent<KeyPressedEvent>(Key::D, dt);
 }
