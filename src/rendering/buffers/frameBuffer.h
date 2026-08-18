@@ -2,6 +2,8 @@
 #include <vector>
 #include "../texture/texture.h"
 
+class RenderBuffer;
+
 enum class Attachment : uint32_t {
 	Color0 = GL_COLOR_ATTACHMENT0,
 	Depth = GL_DEPTH_ATTACHMENT,
@@ -25,9 +27,6 @@ public:
 	uint32_t fbHandle() const;
 
 	[[nodiscard]]
-	uint32_t rbHandle() const;
-
-	[[nodiscard]]
 	int32_t width() const;
 
 	[[nodiscard]]
@@ -36,17 +35,15 @@ public:
 	[[nodiscard]]
 	TextureView texture(uint32_t index = 0) const;
 
+	RenderBuffer& renderBuffer(uint32_t index = 0);
+
 	FrameBuffer& attachColor(Texture& texture);
 
 	FrameBuffer& attachDepth(Texture& texture);
 
-	FrameBuffer& withRenderBufferDepth(InternalFormat format);
+	FrameBuffer& attachDepth(RenderBuffer& renderBuffer);
 
-	FrameBuffer& withRenderBufferDepthMultisampled(int32_t multisampledCount, InternalFormat format);
-
-	FrameBuffer& withRenderBufferDepthStencil(InternalFormat format);
-
-	FrameBuffer& withRenderBufferDepthStencilMultisampled(int32_t multisampledCount, InternalFormat format);
+	FrameBuffer& attachDepthStencil(RenderBuffer& renderBuffer);
 
 	FrameBuffer& configureDrawBuffers();
 
@@ -54,11 +51,10 @@ public:
 
 private:
 
-	uint32_t mFBHandle{0};
-	uint32_t mRBHandle{0};
+	uint32_t mHandle{0};
 	int32_t mWidth{0};
 	int32_t mHeight{0};
 	uint32_t mColorAttachmentCount{0};
-
 	std::vector<Texture> mTextures;
+	std::vector<RenderBuffer> mRenderBuffers;
 };

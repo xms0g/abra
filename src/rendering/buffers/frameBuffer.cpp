@@ -3,18 +3,18 @@
 #include <iostream>
 #include <vector>
 #include "glad/glad.h"
+#include "renderBuffer.h"
 #include "../glUtils.hpp"
 #include "../texture/texture.h"
 
 FrameBuffer::FrameBuffer(const int32_t width, const int32_t height)
 	: mWidth(width),
 	  mHeight(height) {
-	glGenFramebuffers(1, &mFBHandle);
+	glGenFramebuffers(1, &mHandle);
 }
 
 FrameBuffer::FrameBuffer(FrameBuffer&& other) noexcept
-	: mFBHandle(other.mFBHandle),
-	  mRBHandle(other.mRBHandle),
+	: mHandle(other.mHandle),
 	  mWidth(other.mWidth),
 	  mHeight(other.mHeight),
 	  mTextures(std::move(other.mTextures)) {
@@ -22,15 +22,11 @@ FrameBuffer::FrameBuffer(FrameBuffer&& other) noexcept
 
 FrameBuffer& FrameBuffer::operator=(FrameBuffer&& other) noexcept {
 	if (this != &other) {
-		if (mFBHandle) {
-			glDeleteFramebuffers(1, &mFBHandle);
-		}
-		if (mRBHandle) {
-			glDeleteRenderbuffers(1, &mRBHandle);
+		if (mHandle) {
+			glDeleteFramebuffers(1, &mHandle);
 		}
 
-		mFBHandle = std::exchange(other.mFBHandle, 0);
-		mRBHandle = std::exchange(other.mRBHandle, 0);
+		mHandle = std::exchange(other.mHandle, 0);
 		mWidth = std::exchange(other.mWidth, 0);
 		mHeight = std::exchange(other.mHeight, 0);
 		mTextures = std::move(other.mTextures);
@@ -45,18 +41,11 @@ FrameBuffer::~FrameBuffer() {
 		}
 	}
 
-	glDeleteFramebuffers(1, &mFBHandle);
-
-	if (mRBHandle)
-		glDeleteRenderbuffers(1, &mRBHandle);
+	glDeleteFramebuffers(1, &mHandle);
 }
 
 uint32_t FrameBuffer::fbHandle() const {
-	return mFBHandle;
-}
-
-uint32_t FrameBuffer::rbHandle() const {
-	return mRBHandle;
+	return mHandle;
 }
 
 int32_t FrameBuffer::width() const {
@@ -69,6 +58,10 @@ int32_t FrameBuffer::height() const {
 
 TextureView FrameBuffer::texture(const uint32_t index) const {
 	return {.id = mTextures[index].id, .target = mTextures[index].target};
+}
+
+RenderBuffer& FrameBuffer::renderBuffer(const uint32_t index) {
+	return mRenderBuffers[index];
 }
 
 FrameBuffer& FrameBuffer::attachColor(Texture& texture) {
@@ -93,49 +86,19 @@ FrameBuffer& FrameBuffer::attachDepth(Texture& texture) {
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withRenderBufferDepth(const InternalFormat format) {
-	glGenRenderbuffers(1, &mRBHandle);
-	glBindRenderbuffer(GL_RENDERBUFFER, mRBHandle);
+FrameBuffer& FrameBuffer::attachDepth(RenderBuffer& renderBuffer) {
+	mRenderBuffers.emplace_back(std::move(renderBuffer));
 
-	glRenderbufferStorage(GL_RENDERBUFFER, toUnderlying(format), mWidth, mHeight);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRBHandle);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
+	const auto& buffer = mRenderBuffers.back();
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, buffer.handle());
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::withRenderBufferDepthMultisampled(const int32_t multisampledCount,
-                                                            const InternalFormat format) {
-	glGenRenderbuffers(1, &mRBHandle);
-	glBindRenderbuffer(GL_RENDERBUFFER, mRBHandle);
+FrameBuffer& FrameBuffer::attachDepthStencil(RenderBuffer& renderBuffer) {
+	mRenderBuffers.emplace_back(std::move(renderBuffer));
 
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisampledCount, toUnderlying(format), mWidth, mHeight);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRBHandle);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-	return *this;
-}
-
-FrameBuffer& FrameBuffer::withRenderBufferDepthStencil(const InternalFormat format) {
-	glGenRenderbuffers(1, &mRBHandle);
-	glBindRenderbuffer(GL_RENDERBUFFER, mRBHandle);
-
-	glRenderbufferStorage(GL_RENDERBUFFER, toUnderlying(format), mWidth, mHeight);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mRBHandle);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-	return *this;
-}
-
-FrameBuffer& FrameBuffer::withRenderBufferDepthStencilMultisampled(const int32_t multisampledCount,
-                                                                   const InternalFormat format) {
-	glGenRenderbuffers(1, &mRBHandle);
-	glBindRenderbuffer(GL_RENDERBUFFER, mRBHandle);
-
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisampledCount, toUnderlying(format), mWidth, mHeight);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mRBHandle);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
+	const auto& buffer = mRenderBuffers.back();
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, buffer.handle());
 	return *this;
 }
 

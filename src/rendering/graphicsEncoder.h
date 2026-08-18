@@ -55,8 +55,6 @@ public:
 
 	void blitFramebuffer(const FrameBuffer& src, const FrameBuffer& dst, BlitMask mask) const;
 
-	void resizeRenderBuffer(const FrameBuffer& fb, int32_t width, int32_t height);
-
 	void attachTexture(const FrameBuffer& fb, uint32_t index, Attachment attachment, int32_t mip, int32_t layer) const;
 
 	void clearFrameBuffer(ClearMask mask) const;

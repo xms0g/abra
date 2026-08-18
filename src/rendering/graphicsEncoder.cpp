@@ -183,12 +183,6 @@ void GraphicsEncoder::blitFramebuffer(const FrameBuffer& src, const FrameBuffer&
 	                  toUnderlying(mask), GL_NEAREST);
 }
 
-void GraphicsEncoder::resizeRenderBuffer(const FrameBuffer& fb, const int32_t width, const int32_t height) {
-	glBindRenderbuffer(GL_RENDERBUFFER, fb.rbHandle());
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
-	setViewport({.x = 0, .y = 0, .width = width, .height = height});
-}
-
 void GraphicsEncoder::attachTexture(const FrameBuffer& fb,
                                     const uint32_t index,
                                     const Attachment attachment,

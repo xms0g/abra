@@ -42,6 +42,7 @@
 #include "../ECS/components/mesh.hpp"
 #include "../ECS/components/material.hpp"
 #include "../event/eventBus.hpp"
+#include "buffers/renderBuffer.h"
 
 Renderer::Renderer(Registry& registry, const Camera& camera, Window& window) {
 	RequireComponent<MeshComponent>();
@@ -289,29 +290,37 @@ void Renderer::createFrameBuffers() {
 
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
 			Texture color = Texture::generateColorAttachmentFP(intermediateBuffer.width(), intermediateBuffer.height());
+			auto renderBuffer = RenderBuffer{InternalFormat::Depth24, intermediateBuffer.width(), intermediateBuffer.height()};
+
 			intermediateBuffer.attachColor(color)
-					.withRenderBufferDepth(InternalFormat::Depth24)
+					.attachDepth(renderBuffer)
 					.configureDrawBuffers()
 					.checkStatus();
 
 			mEncoder.bindFrameBuffer(sceneBuffer);
 
 			Texture colorFPMult = Texture::generateColorAttachmentFPMultisampled(sceneBuffer.width(), sceneBuffer.height(), sampleCount);
+			auto renderBufferMult = RenderBuffer{InternalFormat::Depth24, sceneBuffer.width(), sceneBuffer.height(), sampleCount};
+
 			sceneBuffer.attachColor(colorFPMult)
-					.withRenderBufferDepthMultisampled(sampleCount, InternalFormat::Depth24)
+					.attachDepth(renderBufferMult)
 					.configureDrawBuffers()
 					.checkStatus();
 		} else {
 			Texture color = Texture::generateColorAttachment(intermediateBuffer.width(), intermediateBuffer.height());
+			auto renderBuffer = RenderBuffer{InternalFormat::Depth24, intermediateBuffer.width(), intermediateBuffer.height()};
+
 			intermediateBuffer.attachColor(color)
-					.withRenderBufferDepth(InternalFormat::Depth24)
+					.attachDepth(renderBuffer)
 					.configureDrawBuffers()
 					.checkStatus();
 
 			mEncoder.bindFrameBuffer(sceneBuffer);
 			Texture colorMulti = Texture::generateColorAttachmentMultisampled(sceneBuffer.width(), sceneBuffer.height(), sampleCount);
+			auto renderBufferMulti = RenderBuffer{InternalFormat::Depth24, sceneBuffer.width(), sceneBuffer.height(), sampleCount};
+
 			sceneBuffer.attachColor(colorMulti)
-					.withRenderBufferDepthMultisampled(sampleCount, InternalFormat::Depth24)
+					.attachDepth(renderBufferMulti)
 					.configureDrawBuffers()
 					.checkStatus();
 		}
@@ -552,8 +561,9 @@ TextureView Renderer::createEnvMap(const MaterialTexture& hdrTexture) {
 	encoder.bindFrameBuffer(*envMap);
 
 	Texture cubemap = Texture::generateColorAttachmentCubemap(envMap->width(), envMap->height());
+	auto renderBuffer = RenderBuffer{InternalFormat::Depth24, envMap->width(), envMap->height()};
 	envMap->attachColor(cubemap)
-			.withRenderBufferDepth(InternalFormat::Depth24)
+			.attachDepth(renderBuffer)
 			.configureDrawBuffers()
 			.checkStatus();
 
@@ -644,8 +654,9 @@ void Renderer::createIrradianceMap(const TextureView environment) {
 	encoder.bindFrameBuffer(*irradianceMap);
 
 	Texture cubemap = Texture::generateColorAttachmentCubemap(irradianceMap->width(), irradianceMap->height());
+	auto renderBuffer = RenderBuffer{InternalFormat::Depth24, irradianceMap->width(), irradianceMap->height()};
 	irradianceMap->attachColor(cubemap)
-			.withRenderBufferDepth(InternalFormat::Depth24)
+			.attachDepth(renderBuffer)
 			.configureDrawBuffers()
 			.checkStatus();
 
@@ -733,8 +744,9 @@ void Renderer::createPrefilterMap(const TextureView environment) {
 	encoder.bindFrameBuffer(*prefilterMap);
 
 	Texture cubemap = Texture::generateColorAttachmentCubemap(prefilterMap->width(), prefilterMap->height());
+	auto renderBuffer = RenderBuffer{InternalFormat::Depth24, prefilterMap->width(), prefilterMap->height()};
 	prefilterMap->attachColor(cubemap)
-			.withRenderBufferDepth(InternalFormat::Depth24)
+			.attachDepth(renderBuffer)
 			.configureDrawBuffers()
 			.checkStatus();
 
@@ -767,7 +779,8 @@ void Renderer::createPrefilterMap(const TextureView environment) {
 
 	for (int32_t i = 0; i < mipLevels; ++i) {
 		const auto mipSize = static_cast<int32_t>(prefilterMapSize * std::pow(0.5, i));
-		encoder.resizeRenderBuffer(*mPBRBuffers.prefilter, mipSize, mipSize);
+		mPBRBuffers.prefilter->renderBuffer(0).resize(mipSize, mipSize);
+		encoder.setViewport({.x = 0, .y = 0, .width = mipSize, .height = mipSize});
 
 		const float roughness = static_cast<float>(i) / static_cast<float>(mipLevels - 1);
 		encoder.setUniform("roughness", roughness);
