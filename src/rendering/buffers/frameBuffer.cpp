@@ -68,7 +68,7 @@ FrameBuffer& FrameBuffer::attachColor(Texture& texture) {
 	mTextures.emplace_back(std::move(texture));
 
 	const auto& tex = mTextures.back();
-	const GLenum attachment = GL_COLOR_ATTACHMENT0 + mColorAttachmentCount++;
+	const GLenum attachment = toUnderlying(Attachment::Color0) + mColorAttachmentCount++;
 	glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, toUnderlying(tex.target), tex.id, 0);
 
 	return *this;
@@ -78,9 +78,9 @@ FrameBuffer& FrameBuffer::attachDepth(Texture& texture) {
 	mTextures.emplace_back(std::move(texture));
 
 	if (const auto& tex = mTextures.back(); tex.target == TextureTarget::Texture2D) {
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, toUnderlying(tex.target), tex.id, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, toUnderlying(Attachment::Depth), toUnderlying(tex.target), tex.id, 0);
 	} else {
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, tex.id, 0);
+		glFramebufferTexture(GL_FRAMEBUFFER, toUnderlying(Attachment::Depth), tex.id, 0);
 	}
 
 	return *this;
@@ -90,7 +90,7 @@ FrameBuffer& FrameBuffer::attachDepth(RenderBuffer& renderBuffer) {
 	mRenderBuffers.emplace_back(std::move(renderBuffer));
 
 	const auto& buffer = mRenderBuffers.back();
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, buffer.handle());
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, toUnderlying(Attachment::Depth), GL_RENDERBUFFER, buffer.handle());
 	return *this;
 }
 
