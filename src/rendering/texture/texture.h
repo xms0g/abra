@@ -124,6 +124,8 @@ struct Texture {
 
 	static void info(std::string_view path, int32_t& width, int32_t& height);
 
+	static void configureParameters(const TextureConfig& config);
+
 	static Texture load(std::span<const std::string> paths, const TextureConfig& config);
 
 	static Texture generate(const void* data, const TextureConfig& config);

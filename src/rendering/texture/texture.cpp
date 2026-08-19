@@ -40,12 +40,12 @@ Texture& Texture::operator=(Texture&& other) noexcept {
 }
 
 void Texture::uploadCubeFace(const uint32_t face,
-							const void* data,
-							const int32_t width,
-							const int32_t height,
-							const int32_t format,
-							const int32_t internalFormat,
-							const int32_t dataType) const {
+							 const void* data,
+							 const int32_t width,
+							 const int32_t height,
+							 const int32_t format,
+							 const int32_t internalFormat,
+							 const int32_t dataType) const {
 	assert(target == TextureTarget::TextureCubeMap);
 	assert(face < 6);
 
@@ -69,6 +69,36 @@ void Texture::uploadCubeFace(const uint32_t face,
 void Texture::info(const std::string_view path, int32_t& width, int32_t& height) {
 	int32_t channel;
 	stbi_info(path.data(), &width, &height, &channel);
+}
+
+void Texture::configureParameters(const TextureConfig& config) {
+	const auto target = toUnderlying(config.target);
+	const auto wrapS = toUnderlying(config.parameters.wrapS);
+	const auto wrapT = toUnderlying(config.parameters.wrapT);
+	const auto wrapR = toUnderlying(config.parameters.wrapR);
+	const auto minFilter = toUnderlying(config.parameters.minFilter);
+	const auto magFilter = toUnderlying(config.parameters.magFilter);
+
+	if (config.target == TextureTarget::Texture2DMultisample) {
+		return;
+	}
+
+	glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapS);
+	glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapT);
+
+	if (config.target == TextureTarget::TextureCubeMap || config.target == TextureTarget::TextureCubeMapArray) {
+		glTexParameteri(target, GL_TEXTURE_WRAP_R, wrapR);
+	}
+
+	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
+	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter);
+
+	if (config.parameters.wrapS == TextureWrap::ClampToBorder ||
+		config.parameters.wrapR == TextureWrap::ClampToBorder ||
+		config.parameters.wrapT == TextureWrap::ClampToBorder) {
+		constexpr float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
+		glTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, borderColor);
+	}
 }
 
 Texture Texture::load(const std::span<const std::string> paths, const TextureConfig& config) {
@@ -134,8 +164,6 @@ Texture Texture::load(const std::span<const std::string> paths, const TextureCon
 }
 
 Texture Texture::generate(const void* data, const TextureConfig& config) {
-	uint32_t textureID;
-
 	const auto target = toUnderlying(config.target);
 	const auto format = toUnderlying(config.format);
 	const auto internalFormat = toUnderlying(config.internalFormat);
@@ -146,6 +174,7 @@ Texture Texture::generate(const void* data, const TextureConfig& config) {
 	const auto minFilter = toUnderlying(config.parameters.minFilter);
 	const auto magFilter = toUnderlying(config.parameters.magFilter);
 
+	uint32_t textureID;
 	glGenTextures(1, &textureID);
 	glBindTexture(target, textureID);
 
@@ -161,11 +190,6 @@ Texture Texture::generate(const void* data, const TextureConfig& config) {
 				format,
 				dataType,
 				data);
-
-			glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapS);
-			glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapT);
-			glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
-			glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter);
 
 			break;
 		}
@@ -192,11 +216,6 @@ Texture Texture::generate(const void* data, const TextureConfig& config) {
 				dataType,
 				data);
 
-			glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapS);
-			glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapT);
-			glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
-			glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter);
-
 			break;
 		}
 		case TextureTarget::TextureCubeMap: {
@@ -213,12 +232,6 @@ Texture Texture::generate(const void* data, const TextureConfig& config) {
 					data);
 			}
 
-			glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapS);
-			glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapT);
-			glTexParameteri(target, GL_TEXTURE_WRAP_R, wrapR);
-			glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
-			glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter);
-
 			break;
 		}
 		case TextureTarget::TextureCubeMapArray: {
@@ -234,22 +247,11 @@ Texture Texture::generate(const void* data, const TextureConfig& config) {
 				dataType,
 				data);
 
-			glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapS);
-			glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapT);
-			glTexParameteri(target, GL_TEXTURE_WRAP_R, wrapR);
-			glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
-			glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter);
-
 			break;
 		}
 	}
 
-	if (config.parameters.wrapS == TextureWrap::ClampToBorder ||
-		config.parameters.wrapR == TextureWrap::ClampToBorder ||
-		config.parameters.wrapT == TextureWrap::ClampToBorder) {
-		constexpr float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
-		glTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, borderColor);
-	}
+	configureParameters(config);
 
 	glBindTexture(target, 0);
 
