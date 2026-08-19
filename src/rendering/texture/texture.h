@@ -81,10 +81,10 @@ struct TextureConfig {
 	TextureParameters parameters{};
 	DataType dataType{};
 	bool isHDR{false};
-	int width{};
-	int height{};
-	int samples{1};
-	int layers{1};
+	int32_t width{};
+	int32_t height{};
+	int32_t samples{1};
+	int32_t layers{1};
 };
 
 struct TextureView {
@@ -114,13 +114,13 @@ struct Texture {
 
 	Texture& operator=(Texture&& other) noexcept;
 
-	void uploadCubeFace(uint32_t face,
-	                    const void* data,
-	                    int32_t width,
-	                    int32_t height,
-	                    int32_t format,
-	                    int32_t internalFormat,
-	                    int32_t dataType) const;
+	void upload(uint32_t face,
+				const void* data,
+				int32_t width,
+				int32_t height,
+				BaseFormat format,
+				InternalFormat internalFormat,
+				DataType dataType) const;
 
 	static void info(std::string_view path, int32_t& width, int32_t& height);
 
@@ -128,25 +128,25 @@ struct Texture {
 
 	static Texture load(std::span<const std::string> paths, const TextureConfig& config);
 
-	static Texture generate(const void* data, const TextureConfig& config);
+	static Texture generate(const TextureConfig& config);
 
-	static Texture generateColorAttachment(int width, int height);
+	static Texture generateColorAttachment(int32_t width, int32_t height);
 
-	static Texture generateColorAttachmentRed(int width, int height);
+	static Texture generateColorAttachmentRed(int32_t width, int32_t height);
 
-	static Texture generateColorAttachmentMultisampled(int width, int height, int samples);
+	static Texture generateColorAttachmentMultisampled(int32_t width, int32_t height, int32_t samples);
 
-	static Texture generateColorAttachmentFP(int width, int height);
+	static Texture generateColorAttachmentFP(int32_t width, int32_t height);
 
-	static Texture generateColorAttachmentFPMultisampled(int width, int height, int samples);
+	static Texture generateColorAttachmentFPMultisampled(int32_t width, int32_t height, int32_t samples);
 
-	static Texture generateColorAttachmentCubemap(int width, int height);
+	static Texture generateColorAttachmentCubemap(int32_t width, int32_t height);
 
-	static Texture generateDepthAttachment(int width, int height);
+	static Texture generateDepthAttachment(int32_t width, int32_t height);
 
-	static Texture generateDepthAttachmentArray(int width, int height, int layers);
+	static Texture generateDepthAttachmentArray(int32_t width, int32_t height, int32_t layers);
 
-	static Texture generateDepthAttachmentCubemapArray(int width, int height, int layers);
+	static Texture generateDepthAttachmentCubemapArray(int32_t width, int32_t height, int32_t layers);
 
 	static void generateMipmaps(TextureView handle);
 };

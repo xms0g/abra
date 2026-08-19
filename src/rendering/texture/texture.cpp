@@ -39,31 +39,46 @@ Texture& Texture::operator=(Texture&& other) noexcept {
 	return *this;
 }
 
-void Texture::uploadCubeFace(const uint32_t face,
-							 const void* data,
-							 const int32_t width,
-							 const int32_t height,
-							 const int32_t format,
-							 const int32_t internalFormat,
-							 const int32_t dataType) const {
-	assert(target == TextureTarget::TextureCubeMap);
-	assert(face < 6);
+void Texture::upload(const uint32_t face,
+					 const void* data,
+					 const int32_t width,
+					 const int32_t height,
+					 BaseFormat format,
+					 InternalFormat internalFormat,
+					 DataType dataType) const {
+	switch (target) {
+		case TextureTarget::Texture2D: {
+			glBindTexture(GL_TEXTURE_2D, id);
+			glTexImage2D(
+				toUnderlying(target),
+				0,
+				toUnderlying(internalFormat),
+				width,
+				height,
+				0,
+				toUnderlying(format),
+				toUnderlying(dataType),
+				data);
+			break;
+		}
+		case TextureTarget::TextureCubeMap: {
+			assert(face < 6);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, id);
 
-	glBindTexture(GL_TEXTURE_CUBE_MAP, id);
-
-	glTexImage2D(
-		GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
-		0,
-		internalFormat,
-		width,
-		height,
-		0,
-		format,
-		dataType,
-		data
-	);
-
-	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+			glTexImage2D(
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
+				0,
+				toUnderlying(internalFormat),
+				width,
+				height,
+				0,
+				toUnderlying(format),
+				toUnderlying(dataType),
+				data
+			);
+			break;
+		}
+	}
 }
 
 void Texture::info(const std::string_view path, int32_t& width, int32_t& height) {
@@ -72,32 +87,25 @@ void Texture::info(const std::string_view path, int32_t& width, int32_t& height)
 }
 
 void Texture::configureParameters(const TextureConfig& config) {
-	const auto target = toUnderlying(config.target);
-	const auto wrapS = toUnderlying(config.parameters.wrapS);
-	const auto wrapT = toUnderlying(config.parameters.wrapT);
-	const auto wrapR = toUnderlying(config.parameters.wrapR);
-	const auto minFilter = toUnderlying(config.parameters.minFilter);
-	const auto magFilter = toUnderlying(config.parameters.magFilter);
-
 	if (config.target == TextureTarget::Texture2DMultisample) {
 		return;
 	}
 
-	glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapS);
-	glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapT);
+	glTexParameteri(toUnderlying(config.target), GL_TEXTURE_WRAP_S, toUnderlying(config.parameters.wrapS));
+	glTexParameteri(toUnderlying(config.target), GL_TEXTURE_WRAP_T, toUnderlying(config.parameters.wrapT));
 
 	if (config.target == TextureTarget::TextureCubeMap || config.target == TextureTarget::TextureCubeMapArray) {
-		glTexParameteri(target, GL_TEXTURE_WRAP_R, wrapR);
+		glTexParameteri(toUnderlying(config.target), GL_TEXTURE_WRAP_R, toUnderlying(config.parameters.wrapR));
 	}
 
-	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
-	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter);
+	glTexParameteri(toUnderlying(config.target), GL_TEXTURE_MIN_FILTER, toUnderlying(config.parameters.minFilter));
+	glTexParameteri(toUnderlying(config.target), GL_TEXTURE_MAG_FILTER, toUnderlying(config.parameters.magFilter));
 
 	if (config.parameters.wrapS == TextureWrap::ClampToBorder ||
 		config.parameters.wrapR == TextureWrap::ClampToBorder ||
 		config.parameters.wrapT == TextureWrap::ClampToBorder) {
 		constexpr float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
-		glTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, borderColor);
+		glTexParameterfv(toUnderlying(config.target), GL_TEXTURE_BORDER_COLOR, borderColor);
 	}
 }
 
@@ -130,7 +138,8 @@ Texture Texture::load(const std::span<const std::string> paths, const TextureCon
 				cfg.height = height;
 			}
 
-			auto texture = generate(data, cfg);
+			auto texture = generate(cfg);
+			texture.upload(0, data, width, height, config.format, config.internalFormat, config.dataType);
 
 			stbi_image_free(data);
 			stbi_set_flip_vertically_on_load(false);
@@ -141,7 +150,7 @@ Texture Texture::load(const std::span<const std::string> paths, const TextureCon
 				throw std::runtime_error("Cubemap texture must have 6 paths");
 			}
 
-			auto texture = generate(nullptr, config);
+			auto texture = generate(config);
 
 			for (uint32_t i = 0; i < 6; ++i) {
 				unsigned char* data = stbi_load(paths[i].c_str(), &width, &height, &channel, 0);
@@ -150,7 +159,7 @@ Texture Texture::load(const std::span<const std::string> paths, const TextureCon
 					throw std::runtime_error(std::format("Cubemap texture failed to load at path: {}", paths[i]));
 				}
 
-				texture.uploadCubeFace(i, data, width, height, toUnderlying(config.format), toUnderlying(config.internalFormat), toUnderlying(config.dataType));
+				texture.upload(i, data, width, height, config.format, config.internalFormat, config.dataType);
 
 				stbi_image_free(data);
 			}
@@ -163,16 +172,11 @@ Texture Texture::load(const std::span<const std::string> paths, const TextureCon
 	return {};
 }
 
-Texture Texture::generate(const void* data, const TextureConfig& config) {
+Texture Texture::generate(const TextureConfig& config) {
 	const auto target = toUnderlying(config.target);
 	const auto format = toUnderlying(config.format);
 	const auto internalFormat = toUnderlying(config.internalFormat);
 	const auto dataType = toUnderlying(config.dataType);
-	const auto wrapS = toUnderlying(config.parameters.wrapS);
-	const auto wrapT = toUnderlying(config.parameters.wrapT);
-	const auto wrapR = toUnderlying(config.parameters.wrapR);
-	const auto minFilter = toUnderlying(config.parameters.minFilter);
-	const auto magFilter = toUnderlying(config.parameters.magFilter);
 
 	uint32_t textureID;
 	glGenTextures(1, &textureID);
@@ -189,7 +193,7 @@ Texture Texture::generate(const void* data, const TextureConfig& config) {
 				0,
 				format,
 				dataType,
-				data);
+				nullptr);
 
 			break;
 		}
@@ -214,7 +218,7 @@ Texture Texture::generate(const void* data, const TextureConfig& config) {
 				0,
 				format,
 				dataType,
-				data);
+				nullptr);
 
 			break;
 		}
@@ -229,7 +233,7 @@ Texture Texture::generate(const void* data, const TextureConfig& config) {
 					0,
 					format,
 					dataType,
-					data);
+					nullptr);
 			}
 
 			break;
@@ -245,7 +249,7 @@ Texture Texture::generate(const void* data, const TextureConfig& config) {
 				0,
 				format,
 				dataType,
-				data);
+				nullptr);
 
 			break;
 		}
@@ -258,8 +262,8 @@ Texture Texture::generate(const void* data, const TextureConfig& config) {
 	return {textureID, 0, config.target, ""};
 }
 
-Texture Texture::generateColorAttachment(const int width, const int height) {
-	return generate(nullptr, {
+Texture Texture::generateColorAttachment(const int32_t width, const int32_t height) {
+	return generate({
 		.target = TextureTarget::Texture2D,
 		.internalFormat = InternalFormat::RGBA8,
 		.format = BaseFormat::RGBA,
@@ -277,8 +281,8 @@ Texture Texture::generateColorAttachment(const int width, const int height) {
 	});
 }
 
-Texture Texture::generateColorAttachmentRed(const int width, const int height) {
-	return generate(nullptr, {
+Texture Texture::generateColorAttachmentRed(const int32_t width, const int32_t height) {
+	return generate({
 		.target = TextureTarget::Texture2D,
 		.internalFormat = InternalFormat::Red8,
 		.format = BaseFormat::Red,
@@ -296,8 +300,8 @@ Texture Texture::generateColorAttachmentRed(const int width, const int height) {
 	});
 }
 
-Texture Texture::generateColorAttachmentMultisampled(const int width, const int height, const int samples) {
-	return generate(nullptr, {
+Texture Texture::generateColorAttachmentMultisampled(const int32_t width, const int32_t height, const int32_t samples) {
+	return generate({
 		.target = TextureTarget::Texture2DMultisample,
 		.internalFormat = InternalFormat::RGBA8,
 		.format = BaseFormat::RGBA,
@@ -309,8 +313,8 @@ Texture Texture::generateColorAttachmentMultisampled(const int width, const int 
 	});
 }
 
-Texture Texture::generateColorAttachmentFP(const int width, const int height) {
-	return generate(nullptr, {
+Texture Texture::generateColorAttachmentFP(const int32_t width, const int32_t height) {
+	return generate({
 		.target = TextureTarget::Texture2D,
 		.internalFormat = InternalFormat::RGBAFloat,
 		.format = BaseFormat::RGBA,
@@ -328,8 +332,8 @@ Texture Texture::generateColorAttachmentFP(const int width, const int height) {
 	});
 }
 
-Texture Texture::generateColorAttachmentFPMultisampled(const int width, const int height, int samples) {
-	return generate(nullptr, {
+Texture Texture::generateColorAttachmentFPMultisampled(const int32_t width, const int32_t height, int32_t samples) {
+	return generate({
 		.target = TextureTarget::Texture2DMultisample,
 		.internalFormat = InternalFormat::RGBAFloat,
 		.format = BaseFormat::RGBA,
@@ -341,8 +345,8 @@ Texture Texture::generateColorAttachmentFPMultisampled(const int width, const in
 	});
 }
 
-Texture Texture::generateColorAttachmentCubemap(const int width, const int height) {
-	return generate(nullptr, {
+Texture Texture::generateColorAttachmentCubemap(const int32_t width, const int32_t height) {
+	return generate({
 		.target = TextureTarget::TextureCubeMap,
 		.internalFormat = InternalFormat::RGBFloat,
 		.format = BaseFormat::RGB,
@@ -361,8 +365,8 @@ Texture Texture::generateColorAttachmentCubemap(const int width, const int heigh
 	});
 }
 
-Texture Texture::generateDepthAttachment(const int width, const int height) {
-	return generate(nullptr, {
+Texture Texture::generateDepthAttachment(const int32_t width, const int32_t height) {
+	return generate({
 		.target = TextureTarget::Texture2D,
 		.internalFormat = InternalFormat::Depth24,
 		.format = BaseFormat::Depth,
@@ -380,8 +384,8 @@ Texture Texture::generateDepthAttachment(const int width, const int height) {
 	});
 }
 
-Texture Texture::generateDepthAttachmentArray(const int width, const int height, const int layers) {
-	return generate(nullptr, {
+Texture Texture::generateDepthAttachmentArray(const int32_t width, const int32_t height, const int32_t layers) {
+	return generate({
 		.target = TextureTarget::Texture2DArray,
 		.internalFormat = InternalFormat::Depth24,
 		.format = BaseFormat::Depth,
@@ -399,8 +403,8 @@ Texture Texture::generateDepthAttachmentArray(const int width, const int height,
 	});
 }
 
-Texture Texture::generateDepthAttachmentCubemapArray(const int width, const int height, const int layers) {
-	return generate(nullptr, {
+Texture Texture::generateDepthAttachmentCubemapArray(const int32_t width, const int32_t height, const int32_t layers) {
+	return generate({
 		.target = TextureTarget::TextureCubeMapArray,
 		.internalFormat = InternalFormat::Depth24,
 		.format = BaseFormat::Depth,

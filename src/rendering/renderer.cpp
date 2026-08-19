@@ -845,7 +845,7 @@ void Renderer::createBrdfLUT() {
 
 	encoder.bindFrameBuffer(*brdfLUT);
 
-	Texture color = Texture::generate(nullptr, {
+	Texture color = Texture::generate({
 		.target = TextureTarget::Texture2D,
 		.internalFormat = InternalFormat::RGFloat,
 		.format = BaseFormat::RG,
