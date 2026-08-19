@@ -273,6 +273,25 @@ Texture Texture::generateColorAttachment(const int width, const int height) {
 	});
 }
 
+Texture Texture::generateColorAttachmentRed(const int width, const int height) {
+	return generate(nullptr, {
+		.target = TextureTarget::Texture2D,
+		.internalFormat = InternalFormat::Red8,
+		.format = BaseFormat::Red,
+		.parameters = {
+			.minFilter = TextureFilter::Linear,
+			.magFilter = TextureFilter::Linear,
+			.wrapS = TextureWrap::ClampToEdge,
+			.wrapT = TextureWrap::ClampToEdge,
+		},
+		.dataType = DataType::UnsignedByte,
+		.width = width,
+		.height = height,
+		.samples = 1,
+		.layers = 1,
+	});
+}
+
 Texture Texture::generateColorAttachmentMultisampled(const int width, const int height, const int samples) {
 	return generate(nullptr, {
 		.target = TextureTarget::Texture2DMultisample,

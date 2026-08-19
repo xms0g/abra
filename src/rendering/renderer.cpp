@@ -374,7 +374,7 @@ void Renderer::createFrameBuffers() {
 
 	mEncoder.bindFrameBuffer(ssao);
 
-	Texture ssaoTexture = Texture::generateColorAttachment(ssao.width(), ssao.height());
+	Texture ssaoTexture = Texture::generateColorAttachmentRed(ssao.width(), ssao.height());
 	ssao.attachColor(ssaoTexture)
 			.configureDrawBuffers()
 			.checkStatus();
@@ -383,7 +383,7 @@ void Renderer::createFrameBuffers() {
 
 	mEncoder.bindFrameBuffer(ssaoBlur);
 
-	Texture ssaoBlurTexture = Texture::generateColorAttachment(ssaoBlur.width(), ssaoBlur.height());
+	Texture ssaoBlurTexture = Texture::generateColorAttachmentRed(ssaoBlur.width(), ssaoBlur.height());
 	ssaoBlur.attachColor(ssaoBlurTexture)
 			.configureDrawBuffers()
 			.checkStatus();

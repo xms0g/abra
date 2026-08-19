@@ -130,6 +130,8 @@ struct Texture {
 
 	static Texture generateColorAttachment(int width, int height);
 
+	static Texture generateColorAttachmentRed(int width, int height);
+
 	static Texture generateColorAttachmentMultisampled(int width, int height, int samples);
 
 	static Texture generateColorAttachmentFP(int width, int height);
