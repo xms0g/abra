@@ -290,37 +290,37 @@ void Renderer::createFrameBuffers() {
 
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
 			Texture color = Texture::generateColorAttachmentFP(intermediateBuffer.width(), intermediateBuffer.height());
-			auto renderBuffer = RenderBuffer{InternalFormat::Depth24, intermediateBuffer.width(), intermediateBuffer.height()};
+			auto rb = RenderBuffer{InternalFormat::Depth24, intermediateBuffer.width(), intermediateBuffer.height()};
 
 			intermediateBuffer.attachColor(color)
-					.attachDepth(renderBuffer)
+					.attachDepth(rb)
 					.configureDrawBuffers()
 					.checkStatus();
 
 			mEncoder.bindFrameBuffer(sceneBuffer);
 
 			Texture colorFPMult = Texture::generateColorAttachmentFPMultisampled(sceneBuffer.width(), sceneBuffer.height(), sampleCount);
-			auto renderBufferMult = RenderBuffer{InternalFormat::Depth24, sceneBuffer.width(), sceneBuffer.height(), sampleCount};
+			auto rbMulti = RenderBuffer{InternalFormat::Depth24, sceneBuffer.width(), sceneBuffer.height(), sampleCount};
 
 			sceneBuffer.attachColor(colorFPMult)
-					.attachDepth(renderBufferMult)
+					.attachDepth(rbMulti)
 					.configureDrawBuffers()
 					.checkStatus();
 		} else {
 			Texture color = Texture::generateColorAttachment(intermediateBuffer.width(), intermediateBuffer.height());
-			auto renderBuffer = RenderBuffer{InternalFormat::Depth24, intermediateBuffer.width(), intermediateBuffer.height()};
+			auto rb = RenderBuffer{InternalFormat::Depth24, intermediateBuffer.width(), intermediateBuffer.height()};
 
 			intermediateBuffer.attachColor(color)
-					.attachDepth(renderBuffer)
+					.attachDepth(rb)
 					.configureDrawBuffers()
 					.checkStatus();
 
 			mEncoder.bindFrameBuffer(sceneBuffer);
 			Texture colorMulti = Texture::generateColorAttachmentMultisampled(sceneBuffer.width(), sceneBuffer.height(), sampleCount);
-			auto renderBufferMulti = RenderBuffer{InternalFormat::Depth24, sceneBuffer.width(), sceneBuffer.height(), sampleCount};
+			auto rbMulti = RenderBuffer{InternalFormat::Depth24, sceneBuffer.width(), sceneBuffer.height(), sampleCount};
 
 			sceneBuffer.attachColor(colorMulti)
-					.attachDepth(renderBufferMulti)
+					.attachDepth(rbMulti)
 					.configureDrawBuffers()
 					.checkStatus();
 		}
@@ -328,17 +328,17 @@ void Renderer::createFrameBuffers() {
 		mEncoder.bindFrameBuffer(sceneBuffer);
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
 			Texture color = Texture::generateColorAttachmentFP(sceneBuffer.width(), sceneBuffer.height());
-			Texture depth = Texture::generateDepthAttachment(sceneBuffer.width(), sceneBuffer.height());
+			auto rbDepth = RenderBuffer{InternalFormat::Depth24, sceneBuffer.width(), sceneBuffer.height()};
 
 			sceneBuffer.attachColor(color)
-					.attachDepth(depth)
+					.attachDepth(rbDepth)
 					.checkStatus();
 		} else {
 			Texture color = Texture::generateColorAttachment(sceneBuffer.width(), sceneBuffer.height());
-			Texture depth = Texture::generateDepthAttachment(sceneBuffer.width(), sceneBuffer.height());
+			auto rbDepth = RenderBuffer{InternalFormat::Depth24, sceneBuffer.width(), sceneBuffer.height()};
 
 			sceneBuffer.attachColor(color)
-					.attachDepth(depth)
+					.attachDepth(rbDepth)
 					.configureDrawBuffers()
 					.checkStatus();
 		}
@@ -364,6 +364,7 @@ void Renderer::createFrameBuffers() {
 
 	Texture gOrm = Texture::generateColorAttachment(gBuffer.width(), gBuffer.height());
 	Texture gDepth = Texture::generateDepthAttachment(gBuffer.width(), gBuffer.height());
+
 	gBuffer.attachColor(gOrm) // orm
 			.attachDepth(gDepth)
 			.configureDrawBuffers()
