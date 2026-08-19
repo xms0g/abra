@@ -71,15 +71,16 @@ void Texture::info(const std::string_view path, int32_t& width, int32_t& height)
 	stbi_info(path.data(), &width, &height, &channel);
 }
 
-Texture Texture::load(const std::span<const std::string> paths, TextureConfig& config) {
+Texture Texture::load(const std::span<const std::string> paths, const TextureConfig& config) {
 	int32_t width, height, channel;
 
 	switch (config.target) {
 		case TextureTarget::Texture2D: {
+			TextureConfig cfg = config;
 			void* data = nullptr;
 			const char* path = paths[0].c_str();
 
-			if (config.isHDR) {
+			if (cfg.isHDR) {
 				stbi_set_flip_vertically_on_load(true);
 
 				data = stbi_loadf(path, &width, &height, &channel, 0);
@@ -87,19 +88,19 @@ Texture Texture::load(const std::span<const std::string> paths, TextureConfig& c
 					throw std::runtime_error(std::format("HDR texture failed to load at path: {}", path));
 				}
 
-				config.width = width;
-				config.height = height;
+				cfg.width = width;
+				cfg.height = height;
 			} else {
 				data = stbi_load(path, &width, &height, &channel, 4);
 				if (!data) {
 					throw std::runtime_error(std::format("Texture failed to load at path: {}", path));
 				}
 
-				config.width = width;
-				config.height = height;
+				cfg.width = width;
+				cfg.height = height;
 			}
 
-			auto texture = generate(data, config);
+			auto texture = generate(data, cfg);
 
 			stbi_image_free(data);
 			stbi_set_flip_vertically_on_load(false);
@@ -126,6 +127,7 @@ Texture Texture::load(const std::span<const std::string> paths, TextureConfig& c
 
 			return texture;
 		}
+		default: break;
 	}
 
 	return {};
