@@ -125,20 +125,17 @@ Texture Texture::load(const std::span<const std::string> paths, const TextureCon
 				if (!data) {
 					throw std::runtime_error(std::format("HDR texture failed to load at path: {}", path));
 				}
-
-				cfg.width = width;
-				cfg.height = height;
 			} else {
 				data = stbi_load(path, &width, &height, &channel, 4);
 				if (!data) {
 					throw std::runtime_error(std::format("Texture failed to load at path: {}", path));
 				}
-
-				cfg.width = width;
-				cfg.height = height;
 			}
 
+			cfg.width = width;
+			cfg.height = height;
 			auto texture = generate(cfg);
+
 			texture.upload(0, data, width, height, config.format, config.internalFormat, config.dataType);
 
 			stbi_image_free(data);
@@ -146,11 +143,17 @@ Texture Texture::load(const std::span<const std::string> paths, const TextureCon
 			return texture;
 		}
 		case TextureTarget::TextureCubeMap: {
+			TextureConfig cfg = config;
+
 			if (paths.size() != 6) {
 				throw std::runtime_error("Cubemap texture must have 6 paths");
 			}
 
-			auto texture = generate(config);
+			info(paths[0], width, height);
+			cfg.width = width;
+			cfg.height = height;
+
+			auto texture = generate(cfg);
 
 			for (uint32_t i = 0; i < 6; ++i) {
 				unsigned char* data = stbi_load(paths[i].c_str(), &width, &height, &channel, 0);

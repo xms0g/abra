@@ -75,8 +75,8 @@ void ResourceManager::uploadMaterialsToGPU() {
 
 					Texture texture = Texture::load(paths, {
 						.target = TextureTarget::TextureCubeMap,
-						.internalFormat = InternalFormat::SRGB8Alpha8,
-						.format = BaseFormat::RGBA,
+						.internalFormat = InternalFormat::SRGB8,
+						.format = BaseFormat::RGB,
 						.parameters = {
 							.minFilter = TextureFilter::Linear,
 							.magFilter = TextureFilter::Linear,
