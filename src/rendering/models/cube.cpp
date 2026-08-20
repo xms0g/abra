@@ -118,22 +118,22 @@ Model::Cube::Cube(glm::vec3 color,
 
 	mMeshes[0].emplace_back(vertices, indices);
 
-	std::vector<Texture> textures;
+	std::vector<MaterialTexture> textures;
 
 	if (!diffuseTexture.empty()) {
-		textures.emplace_back(0, ALBEDO, TextureTarget::Texture2D, diffuseTexture);
+		textures.emplace_back(diffuseTexture, TextureType::Albedo, nullptr);
 	}
 
 	if (!specularTexture.empty()) {
-		textures.emplace_back(0, SPECULAR, TextureTarget::Texture2D, specularTexture);
+		textures.emplace_back(specularTexture, TextureType::Specular, nullptr);
 	}
 
 	if (!normalTexture.empty()) {
-		textures.emplace_back(0, NORMAL, TextureTarget::Texture2D, normalTexture);
+		textures.emplace_back(normalTexture, TextureType::Normal, nullptr);
 	}
 
 	if (!heightTexture.empty()) {
-		textures.emplace_back(0, HEIGHT, TextureTarget::Texture2D, heightTexture);
+		textures.emplace_back(heightTexture, TextureType::Height, nullptr);
 	}
 
 	uint32_t flags{0};

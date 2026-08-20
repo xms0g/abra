@@ -46,10 +46,10 @@ void Bloom::configure(const FrameGraph& graph) {
 	mRenderTargets = {&graph.getResource(graph.getResourceID("bloomPing")), &graph.getResource(graph.getResourceID("bloomPong"))};
 
 	DescriptorSet pingDescSet{};
-	pingDescSet.write(mRenderTargets[0]->texture());
+	pingDescSet.write(*mRenderTargets[0]->texture());
 
 	DescriptorSet pongDescSet{};
-	pongDescSet.write(mRenderTargets[1]->texture());
+	pongDescSet.write(*mRenderTargets[1]->texture());
 
 	mRenderTargetsDescSets = {pingDescSet, pongDescSet};
 }

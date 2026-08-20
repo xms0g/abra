@@ -1,5 +1,6 @@
 #include "descriptorSet.h"
 #include <cassert>
+#include "buffers/buffer.hpp"
 
 DescriptorSet& DescriptorSet::write(const Descriptor& descriptor) {
 	assert(mCount < MAX_DESCRIPTOR_COUNT);
@@ -7,13 +8,13 @@ DescriptorSet& DescriptorSet::write(const Descriptor& descriptor) {
 	return *this;
 }
 
-DescriptorSet& DescriptorSet::write(const TextureView texture) {
+DescriptorSet& DescriptorSet::write(const Texture& texture) {
 	assert(mCount < MAX_DESCRIPTOR_COUNT);
 	mDescriptors[mCount++] = {.resource = texture};
 	return *this;
 }
 
-DescriptorSet& DescriptorSet::write(BufferView buffer) {
+DescriptorSet& DescriptorSet::write(const Buffer& buffer) {
 	assert(mCount < MAX_DESCRIPTOR_COUNT);
 	mDescriptors[mCount++] = {.resource = buffer};
 	return *this;

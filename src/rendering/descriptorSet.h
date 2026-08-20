@@ -7,24 +7,26 @@
 
 #define MAX_DESCRIPTOR_COUNT 32
 
+class Buffer;
+
 enum class DescriptorType : uint32_t {
 	None,
 	UniformBuffer,
 	SampledImage
 };
 
-struct BufferView {
-	uint32_t id{0};
-	uint32_t target{0};
-	int32_t size{0};
-};
-
 struct Descriptor {
-	std::variant<TextureView, BufferView> resource{};
+	using ResourceRef = std::variant<std::monostate, std::reference_wrapper<const Texture>, std::reference_wrapper<const Buffer>>;
+	ResourceRef resource;
+
+	[[nodiscard]]
+	bool isValid() const {
+		return !std::holds_alternative<std::monostate>(resource);
+	}
 
 	template<typename T>
-	T rs() {
-		return std::get<T>(resource);
+	const T& rs() const {
+		return std::get<std::reference_wrapper<const T>>(resource).get();
 	}
 };
 
@@ -40,13 +42,11 @@ struct DescriptorSetLayout {
 
 class DescriptorSet {
 public:
-	DescriptorSet() = default;
-
 	DescriptorSet& write(const Descriptor& descriptor);
 
-	DescriptorSet& write(TextureView texture);
+	DescriptorSet& write(const Texture& texture);
 
-	DescriptorSet& write(BufferView buffer);
+	DescriptorSet& write(const Buffer& buffer);
 
 	[[nodiscard]]
 	const Descriptor& descriptor(uint32_t index) const;
@@ -54,6 +54,6 @@ public:
 	const Descriptor& operator[](uint32_t index) const;
 
 private:
-	std::array<Descriptor, MAX_DESCRIPTOR_COUNT> mDescriptors;
+	std::array<Descriptor, MAX_DESCRIPTOR_COUNT> mDescriptors{};
 	uint32_t mCount{0};
 };

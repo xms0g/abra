@@ -6,6 +6,7 @@
 #include <assimp/scene.h>
 #include "../job/threadPool.h"
 #include "../rendering/types.hpp"
+#include "../rendering/texture/texture.h"
 
 #define RESOURCE_MANAGER ResourceManager::instance()
 
@@ -52,6 +53,8 @@ private:
 	static void processMaterials(const aiScene* scene, MaterialLoadContext& materialLoadCtx);
 
 	static void loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& materialLoadCtx);
+
+	static TextureType fromAssimpToTextureType(aiTextureType type);
 
 	struct MaterialLoadContext {
 		MaterialMap materials;

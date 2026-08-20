@@ -54,7 +54,6 @@ void ForwardOpaquePass::configure(const RenderContext& ctx,
 			{.name = "material.texture_albedo", .type = DescriptorType::SampledImage, .binding = 0},
 			{.name = "material.texture_specular", .type = DescriptorType::SampledImage, .binding = 1},
 			{.name = "material.texture_normal", .type = DescriptorType::SampledImage, .binding = 2},
-			{.name = "material.texture_height", .type = DescriptorType::SampledImage, .binding = 3},
 		}
 	};
 	DescriptorSetLayout bufferLayout = {
@@ -110,9 +109,9 @@ void ForwardOpaquePass::configure(const RenderContext& ctx,
 	mIndexes.spot = graph.getResourceID("spot");
 
 	DescriptorSet frameSet{};
-	frameSet.write(graph.getResource(mIndexes.directional).texture())
-			.write(graph.getResource(mIndexes.point).texture())
-			.write(graph.getResource(mIndexes.spot).texture());
+	frameSet.write(*graph.getResource(mIndexes.directional).texture())
+			.write(*graph.getResource(mIndexes.point).texture())
+			.write(*graph.getResource(mIndexes.spot).texture());
 
 	encoder.bindDescriptorSet(passLayout, frameSet);
 

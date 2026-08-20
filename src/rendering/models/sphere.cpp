@@ -113,17 +113,17 @@ Model::Sphere::Sphere(glm::vec3 color,
 	mMeshes[0].emplace_back(vertices, indices);
 
 	uint32_t flags{0};
-	std::vector<Texture> textures;
+	std::vector<MaterialTexture> textures;
 	if (!albedo.empty()) {
-		textures.emplace_back(0, ALBEDO, TextureTarget::Texture2D, albedo);
+		textures.emplace_back(albedo, TextureType::Albedo, nullptr);
 	}
 
 	if (!normal.empty()) {
-		textures.emplace_back(0, NORMAL, TextureTarget::Texture2D, normal);
+		textures.emplace_back(normal, TextureType::Normal, nullptr);
 	}
 
 	if (!orm.empty()) {
-		textures.emplace_back(0, ROUGHNESS_METALLIC, TextureTarget::Texture2D, orm);
+		textures.emplace_back(orm, TextureType::Roughness_Metallic, nullptr);
 		flags |= PBR;
 		flags |= HAS_ORM;
 	}

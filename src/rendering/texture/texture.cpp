@@ -6,111 +6,33 @@
 #include "../material/material.hpp"
 #include "../glUtils.hpp"
 
-Texture::Texture(const uint32_t id, const uint32_t type, const TextureTarget target, std::string path)
-	: id(id),
-      type(type),
-      target(target),
-      path(std::move(path)) {
+MaterialTexture::MaterialTexture(std::string path, TextureType type, std::shared_ptr<Texture> gpuResource)
+	: path(std::move(path)),
+	  type(type),
+	  gpuPtr(std::move(gpuResource)) {
 }
 
-Texture::~Texture() {
-	if (id)
-		glDeleteTextures(1, &id);
+MaterialTexture::MaterialTexture(MaterialTexture&& other) noexcept
+	: path(std::move(other.path)),
+	  type(std::exchange(other.type, {})),
+	  gpuPtr(std::move(other.gpuPtr)) {
 }
 
-Texture::Texture(Texture&& other) noexcept
-	: id(std::exchange(other.id, 0)),
-	  type(std::exchange(other.type, 0)),
-	  target(std::exchange(other.target, {})),
-      path(std::move(other.path)) {
-}
-
-Texture& Texture::operator=(Texture&& other) noexcept {
-	if (this != &other) {
-		if (id)
-			glDeleteTextures(1, &id);
-
-		id = std::exchange(other.id, 0);
-		type = std::exchange(other.type, 0);
-		target = std::exchange(other.target, {});
-		path = std::move(other.path);
-	}
-
+MaterialTexture& MaterialTexture::operator=(MaterialTexture&& other) noexcept {
+	if (this == &other)
+		return *this;
+	path = std::move(other.path);
+	type = std::exchange(other.type, {});
+	gpuPtr = std::move(other.gpuPtr);
 	return *this;
 }
 
-void Texture::upload(const uint32_t face,
-					 const void* data,
-					 const int32_t width,
-					 const int32_t height,
-					 const BaseFormat format,
-					 const InternalFormat internalFormat,
-					 const DataType dataType) const {
-	switch (target) {
-		case TextureTarget::Texture2D: {
-			glBindTexture(GL_TEXTURE_2D, id);
-			glTexImage2D(
-				toUnderlying(target),
-				0,
-				toUnderlying(internalFormat),
-				width,
-				height,
-				0,
-				toUnderlying(format),
-				toUnderlying(dataType),
-				data);
-			break;
-		}
-		case TextureTarget::TextureCubeMap: {
-			assert(face < 6);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, id);
-
-			glTexImage2D(
-				GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
-				0,
-				toUnderlying(internalFormat),
-				width,
-				height,
-				0,
-				toUnderlying(format),
-				toUnderlying(dataType),
-				data
-			);
-			break;
-		}
-		default: break;
-	}
-}
-
-void Texture::info(const std::string_view path, int32_t& width, int32_t& height) {
+void MaterialTexture::info(const std::string_view path, int32_t& width, int32_t& height) {
 	int32_t channel;
 	stbi_info(path.data(), &width, &height, &channel);
 }
 
-void Texture::configureParameters(const TextureConfig& config) {
-	if (config.target == TextureTarget::Texture2DMultisample) {
-		return;
-	}
-
-	glTexParameteri(toUnderlying(config.target), GL_TEXTURE_WRAP_S, toUnderlying(config.parameters.wrapS));
-	glTexParameteri(toUnderlying(config.target), GL_TEXTURE_WRAP_T, toUnderlying(config.parameters.wrapT));
-
-	if (config.target == TextureTarget::TextureCubeMap || config.target == TextureTarget::TextureCubeMapArray) {
-		glTexParameteri(toUnderlying(config.target), GL_TEXTURE_WRAP_R, toUnderlying(config.parameters.wrapR));
-	}
-
-	glTexParameteri(toUnderlying(config.target), GL_TEXTURE_MIN_FILTER, toUnderlying(config.parameters.minFilter));
-	glTexParameteri(toUnderlying(config.target), GL_TEXTURE_MAG_FILTER, toUnderlying(config.parameters.magFilter));
-
-	if (config.parameters.wrapS == TextureWrap::ClampToBorder ||
-		config.parameters.wrapR == TextureWrap::ClampToBorder ||
-		config.parameters.wrapT == TextureWrap::ClampToBorder) {
-		constexpr float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
-		glTexParameterfv(toUnderlying(config.target), GL_TEXTURE_BORDER_COLOR, borderColor);
-	}
-}
-
-Texture Texture::load(const std::span<const std::string> paths, const TextureConfig& config) {
+MaterialTexture MaterialTexture::load(const std::span<const std::string> paths, const TextureConfig& config) {
 	int32_t width, height, channel;
 
 	switch (config.target) {
@@ -135,13 +57,13 @@ Texture Texture::load(const std::span<const std::string> paths, const TextureCon
 
 			cfg.width = width;
 			cfg.height = height;
-			auto texture = generate(cfg);
+			auto texture = std::make_shared<Texture>(cfg);
 
-			texture.upload(0, data, width, height, config.format, config.internalFormat, config.dataType);
+			texture->copyToMemory(0, data);
 
 			stbi_image_free(data);
 			stbi_set_flip_vertically_on_load(false);
-			return texture;
+			return MaterialTexture{path, TextureType::Albedo, std::move(texture)};
 		}
 		case TextureTarget::TextureCubeMap: {
 			TextureConfig cfg = config;
@@ -154,7 +76,7 @@ Texture Texture::load(const std::span<const std::string> paths, const TextureCon
 			cfg.width = width;
 			cfg.height = height;
 
-			auto texture = generate(cfg);
+			auto texture = std::make_shared<Texture>(cfg);
 
 			for (uint32_t i = 0; i < 6; ++i) {
 				unsigned char* data = stbi_load(paths[i].c_str(), &width, &height, &channel, 0);
@@ -163,28 +85,33 @@ Texture Texture::load(const std::span<const std::string> paths, const TextureCon
 					throw std::runtime_error(std::format("Cubemap texture failed to load at path: {}", paths[i]));
 				}
 
-				texture.upload(i, data, cfg.width, cfg.height, cfg.format, cfg.internalFormat, cfg.dataType);
+				texture->copyToMemory(i, data);
 
 				stbi_image_free(data);
 			}
 
-			return texture;
+			return MaterialTexture{"", TextureType::Albedo, std::move(texture)};
 		}
-		default: break;
+		default:
+			break;
 	}
 
 	return {};
 }
 
-Texture Texture::generate(const TextureConfig& config) {
+Texture::Texture(const TextureConfig& config)
+	: mTarget(config.target),
+	  mWidth(config.width),
+	  mHeight(config.height),
+	  mFormat(config.format),
+	  mDataType(config.dataType) {
 	const auto target = toUnderlying(config.target);
 	const auto format = toUnderlying(config.format);
 	const auto internalFormat = toUnderlying(config.internalFormat);
 	const auto dataType = toUnderlying(config.dataType);
 
-	uint32_t textureID;
-	glGenTextures(1, &textureID);
-	glBindTexture(target, textureID);
+	glGenTextures(1, &mID);
+	glBindTexture(target, mID);
 
 	switch (config.target) {
 		case TextureTarget::Texture2D: {
@@ -214,7 +141,7 @@ Texture Texture::generate(const TextureConfig& config) {
 		case TextureTarget::Texture2DArray: {
 			glTexImage3D(
 				target,
-			0,
+				0,
 				internalFormat,
 				config.width,
 				config.height,
@@ -262,12 +189,115 @@ Texture Texture::generate(const TextureConfig& config) {
 	configureParameters(config);
 
 	glBindTexture(target, 0);
-
-	return {textureID, 0, config.target, ""};
 }
 
-Texture Texture::generateColorAttachment(const int32_t width, const int32_t height) {
-	return generate({
+Texture::~Texture() {
+	if (mID)
+		glDeleteTextures(1, &mID);
+}
+
+Texture::Texture(Texture&& other) noexcept
+	: mID(std::exchange(other.mID, 0)),
+	  mTarget(std::exchange(other.mTarget, {})),
+	  mWidth(std::exchange(other.mWidth, 0)),
+	  mHeight(std::exchange(other.mHeight, 0)),
+	  mFormat(std::exchange(other.mFormat, {})),
+	  mDataType(std::exchange(other.mDataType, {})) {
+}
+
+Texture& Texture::operator=(Texture&& other) noexcept {
+	if (this != &other) {
+		if (mID)
+			glDeleteTextures(1, &mID);
+
+		mID = std::exchange(other.mID, 0);
+		mTarget = std::exchange(other.mTarget, {});
+		mWidth = std::exchange(other.mWidth, 0);
+		mHeight = std::exchange(other.mHeight, 0);
+		mFormat = std::exchange(other.mFormat, {});
+		mDataType = std::exchange(other.mDataType, {});
+	}
+
+	return *this;
+}
+
+uint32_t Texture::id() const {
+	return mID;
+}
+
+TextureTarget Texture::target() const {
+	return mTarget;
+}
+
+void Texture::copyToMemory(const uint32_t face, const void* pixels) const {
+	switch (mTarget) {
+		case TextureTarget::Texture2D: {
+			glBindTexture(GL_TEXTURE_2D, mID);
+			glTexSubImage2D(
+				toUnderlying(mTarget),
+				0,
+				0,
+				0,
+				mWidth,
+				mHeight,
+				toUnderlying(mFormat),
+				toUnderlying(mDataType),
+				pixels);
+			break;
+		}
+		case TextureTarget::TextureCubeMap: {
+			assert(face < 6);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, mID);
+
+			glTexSubImage2D(
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
+				0,
+				0,
+				0,
+				mWidth,
+				mHeight,
+				toUnderlying(mFormat),
+				toUnderlying(mDataType),
+				pixels
+			);
+			break;
+		}
+		default: break;
+	}
+}
+
+void Texture::generateMipmaps() const {
+	glBindTexture(toUnderlying(mTarget), mID);
+	glGenerateMipmap(toUnderlying(mTarget));
+	glTexParameteri(toUnderlying(mTarget), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glBindTexture(toUnderlying(mTarget), 0);
+}
+
+void Texture::configureParameters(const TextureConfig& config) {
+	if (config.target == TextureTarget::Texture2DMultisample) {
+		return;
+	}
+
+	glTexParameteri(toUnderlying(config.target), GL_TEXTURE_WRAP_S, toUnderlying(config.parameters.wrapS));
+	glTexParameteri(toUnderlying(config.target), GL_TEXTURE_WRAP_T, toUnderlying(config.parameters.wrapT));
+
+	if (config.target == TextureTarget::TextureCubeMap || config.target == TextureTarget::TextureCubeMapArray) {
+		glTexParameteri(toUnderlying(config.target), GL_TEXTURE_WRAP_R, toUnderlying(config.parameters.wrapR));
+	}
+
+	glTexParameteri(toUnderlying(config.target), GL_TEXTURE_MIN_FILTER, toUnderlying(config.parameters.minFilter));
+	glTexParameteri(toUnderlying(config.target), GL_TEXTURE_MAG_FILTER, toUnderlying(config.parameters.magFilter));
+
+	if (config.parameters.wrapS == TextureWrap::ClampToBorder ||
+	    config.parameters.wrapR == TextureWrap::ClampToBorder ||
+	    config.parameters.wrapT == TextureWrap::ClampToBorder) {
+		constexpr float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
+		glTexParameterfv(toUnderlying(config.target), GL_TEXTURE_BORDER_COLOR, borderColor);
+	}
+}
+
+std::shared_ptr<Texture> Texture::generateColorAttachment(const int32_t width, const int32_t height) {
+	return std::make_shared<Texture>(TextureConfig{
 		.target = TextureTarget::Texture2D,
 		.internalFormat = InternalFormat::RGBA8,
 		.format = BaseFormat::RGBA,
@@ -285,8 +315,8 @@ Texture Texture::generateColorAttachment(const int32_t width, const int32_t heig
 	});
 }
 
-Texture Texture::generateColorAttachmentRed(const int32_t width, const int32_t height) {
-	return generate({
+std::shared_ptr<Texture> Texture::generateColorAttachmentRed(const int32_t width, const int32_t height) {
+	return std::make_shared<Texture>(TextureConfig{
 		.target = TextureTarget::Texture2D,
 		.internalFormat = InternalFormat::Red8,
 		.format = BaseFormat::Red,
@@ -304,8 +334,8 @@ Texture Texture::generateColorAttachmentRed(const int32_t width, const int32_t h
 	});
 }
 
-Texture Texture::generateColorAttachmentMultisampled(const int32_t width, const int32_t height, const int32_t samples) {
-	return generate({
+std::shared_ptr<Texture> Texture::generateColorAttachmentMultisampled(const int32_t width, const int32_t height, const int32_t samples) {
+	return std::make_shared<Texture>(TextureConfig{
 		.target = TextureTarget::Texture2DMultisample,
 		.internalFormat = InternalFormat::RGBA8,
 		.format = BaseFormat::RGBA,
@@ -317,8 +347,8 @@ Texture Texture::generateColorAttachmentMultisampled(const int32_t width, const 
 	});
 }
 
-Texture Texture::generateColorAttachmentFP(const int32_t width, const int32_t height) {
-	return generate({
+std::shared_ptr<Texture> Texture::generateColorAttachmentFP(const int32_t width, const int32_t height) {
+	return std::make_shared<Texture>(TextureConfig{
 		.target = TextureTarget::Texture2D,
 		.internalFormat = InternalFormat::RGBAFloat,
 		.format = BaseFormat::RGBA,
@@ -336,8 +366,8 @@ Texture Texture::generateColorAttachmentFP(const int32_t width, const int32_t he
 	});
 }
 
-Texture Texture::generateColorAttachmentFPMultisampled(const int32_t width, const int32_t height, int32_t samples) {
-	return generate({
+std::shared_ptr<Texture> Texture::generateColorAttachmentFPMultisampled(const int32_t width, const int32_t height, int32_t samples) {
+	return std::make_shared<Texture>(TextureConfig{
 		.target = TextureTarget::Texture2DMultisample,
 		.internalFormat = InternalFormat::RGBAFloat,
 		.format = BaseFormat::RGBA,
@@ -349,8 +379,8 @@ Texture Texture::generateColorAttachmentFPMultisampled(const int32_t width, cons
 	});
 }
 
-Texture Texture::generateColorAttachmentCubemap(const int32_t width, const int32_t height) {
-	return generate({
+std::shared_ptr<Texture> Texture::generateColorAttachmentCubemap(const int32_t width, const int32_t height) {
+	return std::make_shared<Texture>(TextureConfig{
 		.target = TextureTarget::TextureCubeMap,
 		.internalFormat = InternalFormat::RGBFloat,
 		.format = BaseFormat::RGB,
@@ -369,8 +399,8 @@ Texture Texture::generateColorAttachmentCubemap(const int32_t width, const int32
 	});
 }
 
-Texture Texture::generateDepthAttachment(const int32_t width, const int32_t height) {
-	return generate({
+std::shared_ptr<Texture> Texture::generateDepthAttachment(const int32_t width, const int32_t height) {
+	return std::make_shared<Texture>(TextureConfig{
 		.target = TextureTarget::Texture2D,
 		.internalFormat = InternalFormat::Depth24,
 		.format = BaseFormat::Depth,
@@ -388,8 +418,8 @@ Texture Texture::generateDepthAttachment(const int32_t width, const int32_t heig
 	});
 }
 
-Texture Texture::generateDepthAttachmentArray(const int32_t width, const int32_t height, const int32_t layers) {
-	return generate({
+std::shared_ptr<Texture> Texture::generateDepthAttachmentArray(const int32_t width, const int32_t height, const int32_t layers) {
+	return std::make_shared<Texture>(TextureConfig{
 		.target = TextureTarget::Texture2DArray,
 		.internalFormat = InternalFormat::Depth24,
 		.format = BaseFormat::Depth,
@@ -407,8 +437,8 @@ Texture Texture::generateDepthAttachmentArray(const int32_t width, const int32_t
 	});
 }
 
-Texture Texture::generateDepthAttachmentCubemapArray(const int32_t width, const int32_t height, const int32_t layers) {
-	return generate({
+std::shared_ptr<Texture> Texture::generateDepthAttachmentCubemapArray(const int32_t width, const int32_t height, const int32_t layers) {
+	return std::make_shared<Texture>(TextureConfig{
 		.target = TextureTarget::TextureCubeMapArray,
 		.internalFormat = InternalFormat::Depth24,
 		.format = BaseFormat::Depth,
@@ -425,11 +455,4 @@ Texture Texture::generateDepthAttachmentCubemapArray(const int32_t width, const 
 		.samples = 1,
 		.layers = layers,
 	});
-}
-
-void Texture::generateMipmaps(const TextureView handle) {
-	glBindTexture(toUnderlying(handle.target), handle.id);
-	glGenerateMipmap(toUnderlying(handle.target));
-	glTexParameteri(toUnderlying(handle.target), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glBindTexture(toUnderlying(handle.target), 0);
 }

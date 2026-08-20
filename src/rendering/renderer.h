@@ -56,11 +56,11 @@ private:
 
 	void sortEntities();
 
-	TextureView createEnvMap(const Texture& hdrTexture);
+	const std::shared_ptr<Texture>& createEnvMap(const MaterialTexture& hdrTexture);
 
-	void createIrradianceMap(TextureView environment);
+	void createIrradianceMap(const Texture& environment);
 
-	void createPrefilterMap(TextureView environment);
+	void createPrefilterMap(const Texture& environment);
 
 	void createBrdfLUT();
 

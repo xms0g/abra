@@ -1,9 +1,9 @@
 #include "uniformBuffer.h"
 
 UniformBuffer::UniformBuffer(const BufferUsage usage, const int32_t size)
-	: Buffer(GL_UNIFORM_BUFFER, usage) {
+	: Buffer(GL_UNIFORM_BUFFER, size, usage) {
 	bind();
-	glBufferData(mTarget, size, nullptr, usage);
+	glBufferData(target(), size, nullptr, usage);
 	unbind();
 }
 

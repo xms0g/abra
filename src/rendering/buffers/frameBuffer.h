@@ -33,13 +33,13 @@ public:
 	int32_t height() const;
 
 	[[nodiscard]]
-	TextureView texture(uint32_t index = 0) const;
+	const std::shared_ptr<Texture>& texture(uint32_t index = 0) const;
 
 	RenderBuffer& renderBuffer(uint32_t index = 0);
 
-	FrameBuffer& attachColor(Texture& texture);
+	FrameBuffer& attachColor(std::shared_ptr<Texture>& texture);
 
-	FrameBuffer& attachDepth(Texture& texture);
+	FrameBuffer& attachDepth(std::shared_ptr<Texture>& texture);
 
 	FrameBuffer& attachDepth(RenderBuffer& renderBuffer);
 
@@ -55,6 +55,6 @@ private:
 	int32_t mWidth{0};
 	int32_t mHeight{0};
 	uint32_t mColorAttachmentCount{0};
-	std::vector<Texture> mTextures;
+	std::vector<std::shared_ptr<Texture>> mTextures;
 	std::vector<RenderBuffer> mRenderBuffers;
 };

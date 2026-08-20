@@ -107,7 +107,7 @@ void ShadowSystem::configure(const RenderContext& ctx,
 	};
 
 	DescriptorSet shadowSet{};
-	shadowSet.write({.id = mUBO.id(), .target = mUBO.target(), .size = sizeof(UniformBufferObject)});
+	shadowSet.write(mUBO);
 
 	encoder.bindDescriptorSet(layout, shadowSet);
 

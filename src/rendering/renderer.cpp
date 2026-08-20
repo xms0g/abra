@@ -124,7 +124,7 @@ void Renderer::createUniformBuffers() {
 		}
 	};
 	DescriptorSet cameraSet{};
-	cameraSet.write({.id = mCameraUBO.id(), .target = mCameraUBO.target(), .size = sizeof(UniformBufferObject)});
+	cameraSet.write(mCameraUBO);
 
 	mEncoder.bindDescriptorSet(layout, cameraSet);
 }
@@ -136,16 +136,16 @@ void Renderer::createPBRBuffers() {
 
 	const auto& matComponent = entityIt->getComponent<MaterialComponent>();
 	auto& textures = matComponent.materials->at(0).textures;
-	const auto& texture = textures.front();
 
-	if (texture.target == TextureTarget::Texture2D) {
-		const auto [id, target] = createEnvMap(texture);
+	if (const auto& texture = textures.front(); texture.gpuPtr->target() == TextureTarget::Texture2D) {
+		const auto tex = createEnvMap(texture);
 		textures.clear();
-		textures.emplace_back(id, 0, target, "");
+		textures.emplace_back("", TextureType::Albedo, tex);
 	}
 
-	createIrradianceMap({.id = texture.id, .target = texture.target});
-	createPrefilterMap({.id = texture.id, .target = texture.target});
+	const auto& texture = textures.front();
+	createIrradianceMap(*texture.gpuPtr);
+	createPrefilterMap(*texture.gpuPtr);
 	createBrdfLUT();
 }
 
@@ -289,7 +289,7 @@ void Renderer::createFrameBuffers() {
 		mEncoder.bindFrameBuffer(intermediateBuffer);
 
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
-			Texture color = Texture::generateColorAttachmentFP(intermediateBuffer.width(), intermediateBuffer.height());
+			auto color = Texture::generateColorAttachmentFP(intermediateBuffer.width(), intermediateBuffer.height());
 			auto rb = RenderBuffer{InternalFormat::Depth24, intermediateBuffer.width(), intermediateBuffer.height()};
 
 			intermediateBuffer.attachColor(color)
@@ -299,7 +299,7 @@ void Renderer::createFrameBuffers() {
 
 			mEncoder.bindFrameBuffer(sceneBuffer);
 
-			Texture colorFPMult = Texture::generateColorAttachmentFPMultisampled(sceneBuffer.width(), sceneBuffer.height(), sampleCount);
+			auto colorFPMult = Texture::generateColorAttachmentFPMultisampled(sceneBuffer.width(), sceneBuffer.height(), sampleCount);
 			auto rbMulti = RenderBuffer{InternalFormat::Depth24, sceneBuffer.width(), sceneBuffer.height(), sampleCount};
 
 			sceneBuffer.attachColor(colorFPMult)
@@ -307,7 +307,7 @@ void Renderer::createFrameBuffers() {
 					.configureDrawBuffers()
 					.checkStatus();
 		} else {
-			Texture color = Texture::generateColorAttachment(intermediateBuffer.width(), intermediateBuffer.height());
+			auto color = Texture::generateColorAttachment(intermediateBuffer.width(), intermediateBuffer.height());
 			auto rb = RenderBuffer{InternalFormat::Depth24, intermediateBuffer.width(), intermediateBuffer.height()};
 
 			intermediateBuffer.attachColor(color)
@@ -316,7 +316,7 @@ void Renderer::createFrameBuffers() {
 					.checkStatus();
 
 			mEncoder.bindFrameBuffer(sceneBuffer);
-			Texture colorMulti = Texture::generateColorAttachmentMultisampled(sceneBuffer.width(), sceneBuffer.height(), sampleCount);
+			auto colorMulti = Texture::generateColorAttachmentMultisampled(sceneBuffer.width(), sceneBuffer.height(), sampleCount);
 			auto rbMulti = RenderBuffer{InternalFormat::Depth24, sceneBuffer.width(), sceneBuffer.height(), sampleCount};
 
 			sceneBuffer.attachColor(colorMulti)
@@ -327,14 +327,14 @@ void Renderer::createFrameBuffers() {
 	} else {
 		mEncoder.bindFrameBuffer(sceneBuffer);
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
-			Texture color = Texture::generateColorAttachmentFP(sceneBuffer.width(), sceneBuffer.height());
+			auto color = Texture::generateColorAttachmentFP(sceneBuffer.width(), sceneBuffer.height());
 			auto rbDepth = RenderBuffer{InternalFormat::Depth24, sceneBuffer.width(), sceneBuffer.height()};
 
 			sceneBuffer.attachColor(color)
 					.attachDepth(rbDepth)
 					.checkStatus();
 		} else {
-			Texture color = Texture::generateColorAttachment(sceneBuffer.width(), sceneBuffer.height());
+			auto color = Texture::generateColorAttachment(sceneBuffer.width(), sceneBuffer.height());
 			auto rbDepth = RenderBuffer{InternalFormat::Depth24, sceneBuffer.width(), sceneBuffer.height()};
 
 			sceneBuffer.attachColor(color)
@@ -348,22 +348,22 @@ void Renderer::createFrameBuffers() {
 	auto& gBuffer = mGraph.addResource("gBuffer", std::make_unique<FrameBuffer>(width, height));
 
 	mEncoder.bindFrameBuffer(gBuffer);
-	Texture position = Texture::generateColorAttachmentFP(gBuffer.width(), gBuffer.height());
-	Texture normal = Texture::generateColorAttachmentFP(gBuffer.width(), gBuffer.height());
+	auto position = Texture::generateColorAttachmentFP(gBuffer.width(), gBuffer.height());
+	auto normal = Texture::generateColorAttachmentFP(gBuffer.width(), gBuffer.height());
 	gBuffer.attachColor(position) // position
 			.attachColor(normal); // normal
 	if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
 		// albedo
-		Texture albedo = Texture::generateColorAttachmentFP(gBuffer.width(), gBuffer.height());
+		auto albedo = Texture::generateColorAttachmentFP(gBuffer.width(), gBuffer.height());
 		gBuffer.attachColor(albedo);
 	} else {
-		Texture albedo = Texture::generateColorAttachment(gBuffer.width(), gBuffer.height());
+		auto albedo = Texture::generateColorAttachment(gBuffer.width(), gBuffer.height());
 		gBuffer.attachColor(albedo);
 	}
 	// Emissive placed into alpha channels in position, normal, albedo
 
-	Texture gOrm = Texture::generateColorAttachment(gBuffer.width(), gBuffer.height());
-	Texture gDepth = Texture::generateDepthAttachment(gBuffer.width(), gBuffer.height());
+	auto gOrm = Texture::generateColorAttachment(gBuffer.width(), gBuffer.height());
+	auto gDepth = Texture::generateDepthAttachment(gBuffer.width(), gBuffer.height());
 
 	gBuffer.attachColor(gOrm) // orm
 			.attachDepth(gDepth)
@@ -375,7 +375,7 @@ void Renderer::createFrameBuffers() {
 
 	mEncoder.bindFrameBuffer(ssao);
 
-	Texture ssaoTexture = Texture::generateColorAttachmentRed(ssao.width(), ssao.height());
+	auto ssaoTexture = Texture::generateColorAttachmentRed(ssao.width(), ssao.height());
 	ssao.attachColor(ssaoTexture)
 			.configureDrawBuffers()
 			.checkStatus();
@@ -384,7 +384,7 @@ void Renderer::createFrameBuffers() {
 
 	mEncoder.bindFrameBuffer(ssaoBlur);
 
-	Texture ssaoBlurTexture = Texture::generateColorAttachmentRed(ssaoBlur.width(), ssaoBlur.height());
+	auto ssaoBlurTexture = Texture::generateColorAttachmentRed(ssaoBlur.width(), ssaoBlur.height());
 	ssaoBlur.attachColor(ssaoBlurTexture)
 			.configureDrawBuffers()
 			.checkStatus();
@@ -396,7 +396,7 @@ void Renderer::createFrameBuffers() {
 
 	mEncoder.bindFrameBuffer(directional);
 
-	Texture depth = Texture::generateDepthAttachment(directional.width(), directional.height());
+	auto depth = Texture::generateDepthAttachment(directional.width(), directional.height());
 	directional.attachDepth(depth)
 			.configureDrawBuffers()
 			.checkStatus();
@@ -407,7 +407,7 @@ void Renderer::createFrameBuffers() {
 
 	mEncoder.bindFrameBuffer(point);
 
-	Texture depthPoint = Texture::generateDepthAttachmentCubemapArray(point.width(), point.height(), CONFIG_MANAGER.get<int32_t>("light.max_point"));
+	auto depthPoint = Texture::generateDepthAttachmentCubemapArray(point.width(), point.height(), CONFIG_MANAGER.get<int32_t>("light.max_point"));
 	point.attachDepth(depthPoint)
 			.configureDrawBuffers()
 			.checkStatus();
@@ -418,7 +418,7 @@ void Renderer::createFrameBuffers() {
 
 	mEncoder.bindFrameBuffer(spot);
 
-	Texture depthSpot = Texture::generateDepthAttachmentArray(spot.width(), spot.height(), CONFIG_MANAGER.get<int32_t>("light.max_spot"));
+	auto depthSpot = Texture::generateDepthAttachmentArray(spot.width(), spot.height(), CONFIG_MANAGER.get<int32_t>("light.max_spot"));
 	spot.attachDepth(depthSpot)
 			.configureDrawBuffers()
 			.checkStatus();
@@ -429,10 +429,10 @@ void Renderer::createFrameBuffers() {
 
 		mEncoder.bindFrameBuffer(target);
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
-			Texture color = Texture::generateColorAttachmentFP(target.width(), target.height());
+			auto color = Texture::generateColorAttachmentFP(target.width(), target.height());
 			target.attachColor(color);
 		} else {
-			Texture color = Texture::generateColorAttachment(target.width(), target.height());
+			auto color = Texture::generateColorAttachment(target.width(), target.height());
 			target.attachColor(color);
 		}
 		target.configureDrawBuffers().checkStatus();
@@ -510,7 +510,7 @@ void Renderer::sortEntities() {
 	// }
 }
 
-TextureView Renderer::createEnvMap(const Texture& hdrTexture) {
+const std::shared_ptr<Texture>& Renderer::createEnvMap(const MaterialTexture& hdrTexture) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
@@ -561,7 +561,7 @@ TextureView Renderer::createEnvMap(const Texture& hdrTexture) {
 
 	encoder.bindFrameBuffer(*envMap);
 
-	Texture cubemap = Texture::generateColorAttachmentCubemap(envMap->width(), envMap->height());
+	auto cubemap = Texture::generateColorAttachmentCubemap(envMap->width(), envMap->height());
 	auto renderBuffer = RenderBuffer{InternalFormat::Depth24, envMap->width(), envMap->height()};
 	envMap->attachColor(cubemap)
 			.attachDepth(renderBuffer)
@@ -575,7 +575,7 @@ TextureView Renderer::createEnvMap(const Texture& hdrTexture) {
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
 	DescriptorSet descriptorSet{};
-	descriptorSet.write({.id = hdrTexture.id, .target = hdrTexture.target});
+	descriptorSet.write(*hdrTexture.gpuPtr);
 
 	// convert HDR equirectangular environment map to cubemap equivalent
 	encoder.bindPipeline(pipeline);
@@ -598,12 +598,12 @@ TextureView Renderer::createEnvMap(const Texture& hdrTexture) {
 	}
 
 	encoder.unbindFrameBuffer();
-	Texture::generateMipmaps(mPBRBuffers.environment->texture());
+	mPBRBuffers.environment->texture()->generateMipmaps();
 
 	return mPBRBuffers.environment->texture();
 }
 
-void Renderer::createIrradianceMap(const TextureView environment) {
+void Renderer::createIrradianceMap(const Texture& environment) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
@@ -654,7 +654,7 @@ void Renderer::createIrradianceMap(const TextureView environment) {
 
 	encoder.bindFrameBuffer(*irradianceMap);
 
-	Texture cubemap = Texture::generateColorAttachmentCubemap(irradianceMap->width(), irradianceMap->height());
+	auto cubemap = Texture::generateColorAttachmentCubemap(irradianceMap->width(), irradianceMap->height());
 	auto renderBuffer = RenderBuffer{InternalFormat::Depth24, irradianceMap->width(), irradianceMap->height()};
 	irradianceMap->attachColor(cubemap)
 			.attachDepth(renderBuffer)
@@ -693,7 +693,7 @@ void Renderer::createIrradianceMap(const TextureView environment) {
 	encoder.unbindFrameBuffer();
 }
 
-void Renderer::createPrefilterMap(const TextureView environment) {
+void Renderer::createPrefilterMap(const Texture& environment) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
@@ -744,14 +744,14 @@ void Renderer::createPrefilterMap(const TextureView environment) {
 
 	encoder.bindFrameBuffer(*prefilterMap);
 
-	Texture cubemap = Texture::generateColorAttachmentCubemap(prefilterMap->width(), prefilterMap->height());
+	auto cubemap = Texture::generateColorAttachmentCubemap(prefilterMap->width(), prefilterMap->height());
 	auto renderBuffer = RenderBuffer{InternalFormat::Depth24, prefilterMap->width(), prefilterMap->height()};
 	prefilterMap->attachColor(cubemap)
 			.attachDepth(renderBuffer)
 			.configureDrawBuffers()
 			.checkStatus();
 
-	Texture::generateMipmaps(prefilterMap->texture());
+	prefilterMap->texture()->generateMipmaps();
 
 	mPBRBuffers.prefilter = std::move(prefilterMap);
 
@@ -846,7 +846,7 @@ void Renderer::createBrdfLUT() {
 
 	encoder.bindFrameBuffer(*brdfLUT);
 
-	Texture color = Texture::generate({
+	auto color = std::make_shared<Texture>(TextureConfig{
 		.target = TextureTarget::Texture2D,
 		.internalFormat = InternalFormat::RGFloat,
 		.format = BaseFormat::RG,

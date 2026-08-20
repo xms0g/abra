@@ -32,7 +32,7 @@ void ResourceManager::uploadMeshesToGPU() {
 }
 
 void ResourceManager::uploadMaterialsToGPU() {
-	std::unordered_map<std::string, uint32_t> idByPath;
+	std::unordered_map<std::string, std::shared_ptr<Texture>> idByPath;
 	static std::filesystem::path assetRoot = CONFIG_MANAGER.get<std::string>("path.asset");
 
 	for (auto& [entityID, materials]: mMaterialsByEntity) {
@@ -40,11 +40,11 @@ void ResourceManager::uploadMaterialsToGPU() {
 			if (material.textureTarget == TextureTarget::TextureCubeMap) {
 				// HDR texture
 				if (material.textures.size() == 1) {
-					const std::string path = fs::resolvePath(assetRoot / material.textures.front().path);
-
+					auto& texture = material.textures.front();
+					const std::string path = fs::resolvePath(assetRoot / texture.path);
 					std::string paths[] = {path};
 
-					Texture texture = Texture::load(paths, {
+					MaterialTexture loadedTexture = MaterialTexture::load(paths, {
 						.target = TextureTarget::Texture2D,
 						.internalFormat = InternalFormat::RGBFloat,
 						.format = BaseFormat::RGB,
@@ -63,7 +63,7 @@ void ResourceManager::uploadMaterialsToGPU() {
 					});
 
 					material.textures.clear();
-					material.textures.push_back(std::move(texture));
+					material.textures.push_back(std::move(loadedTexture));
 				} else {
 					// Handle 6 faces-cubemap
 					std::vector<std::string> paths;
@@ -73,7 +73,7 @@ void ResourceManager::uploadMaterialsToGPU() {
 						paths.push_back(fs::resolvePath(assetRoot / texture.path));
 					}
 
-					Texture texture = Texture::load(paths, {
+					MaterialTexture texture = MaterialTexture::load(paths, {
 						.target = TextureTarget::TextureCubeMap,
 						.internalFormat = InternalFormat::SRGB8,
 						.format = BaseFormat::RGB,
@@ -90,7 +90,8 @@ void ResourceManager::uploadMaterialsToGPU() {
 						.samples = 1,
 						.layers = 1,
 					});
-					Texture::generateMipmaps({.id = texture.id, .target = texture.target});
+
+					texture.gpuPtr->generateMipmaps();
 
 					material.textures.clear();
 					material.textures.push_back(std::move(texture));
@@ -101,16 +102,18 @@ void ResourceManager::uploadMaterialsToGPU() {
 
 			for (auto& texture: material.textures) {
 				if (idByPath.contains(texture.path)) {
-					texture.id = idByPath.at(texture.path);
+					texture.gpuPtr = idByPath.at(texture.path);
 					continue;
 				}
 
 				const auto p = fs::resolvePath(assetRoot / texture.path);
-				const bool isSRGBA = texture.type == aiTextureType_DIFFUSE || texture.type == aiTextureType_EMISSIVE;
+				const bool isSRGBA =
+					texture.type == fromAssimpToTextureType(aiTextureType_DIFFUSE) ||
+					texture.type == fromAssimpToTextureType(aiTextureType_EMISSIVE);
 
 				std::string paths[] = {p};
 
-				texture = Texture::load(paths, {
+				texture = MaterialTexture::load(paths, {
 					.target = TextureTarget::Texture2D,
 					.internalFormat = isSRGBA ? InternalFormat::SRGB8Alpha8 : InternalFormat::RGBA8,
 					.format = BaseFormat::RGBA,
@@ -127,9 +130,9 @@ void ResourceManager::uploadMaterialsToGPU() {
 					.layers = 1,
 				});
 
-				Texture::generateMipmaps({.id = texture.id, .target = texture.target});
+				texture.gpuPtr->generateMipmaps();
 
-				idByPath.emplace(texture.path, texture.id);
+				idByPath.emplace(texture.path, texture.gpuPtr);
 			}
 		}
 	}
@@ -334,6 +337,28 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 			}
 		}
 
-		material.textures.emplace_back(0, static_cast<uint32_t>(req.type), TextureTarget::Texture2D, std::move(path));
+		material.textures.emplace_back(std::move(path), fromAssimpToTextureType(req.type), nullptr);
 	}
+}
+
+TextureType ResourceManager::fromAssimpToTextureType(const aiTextureType type) {
+	switch (type) {
+		case aiTextureType_DIFFUSE:
+			return TextureType::Albedo;
+		case aiTextureType_SPECULAR:
+			return TextureType::Specular;
+		case aiTextureType_NORMALS:
+			return TextureType::Normal;
+		case aiTextureType_LIGHTMAP:
+			return TextureType::Ao;
+		case aiTextureType_EMISSIVE:
+			return TextureType::Emissive;
+		case aiTextureType_UNKNOWN:
+			return TextureType::Roughness_Metallic;
+		case aiTextureType_HEIGHT:
+			return TextureType::Height;
+		default:
+			break;
+	}
+	return {};
 }

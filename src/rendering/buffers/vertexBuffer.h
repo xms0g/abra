@@ -4,7 +4,7 @@
 
 class VertexBuffer final : public Buffer {
 public:
-	explicit VertexBuffer(BufferUsage usage, uint32_t size = 0);
+	explicit VertexBuffer(BufferUsage usage, int32_t size = 0);
 
 	void copyToMemory(const void* data, uint32_t size, uint32_t offset) const;
 };

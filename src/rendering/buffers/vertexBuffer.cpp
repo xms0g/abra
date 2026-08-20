@@ -1,7 +1,7 @@
 #include "vertexBuffer.h"
 
-VertexBuffer::VertexBuffer(const BufferUsage usage, const uint32_t size)
-	: Buffer(GL_ARRAY_BUFFER, usage) {
+VertexBuffer::VertexBuffer(const BufferUsage usage, const int32_t size)
+	: Buffer(GL_ARRAY_BUFFER, size, usage) {
 	if (size > 0) {
 		bind();
 		glBufferData(mTarget, size, nullptr, mUsage);

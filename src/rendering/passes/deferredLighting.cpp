@@ -145,17 +145,17 @@ void DeferredLightingPass::configure(const RenderContext& ctx,
 	const auto& gBuffer = graph.getResource(mIndexes.gBuffer);
 
 	DescriptorSet frameSet{};
-	frameSet.write(gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.index")))
-			.write(gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")))
-			.write(gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.albedo.index")))
-			.write(gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.orm.index")))
-			.write(graph.getResource(mIndexes.ssao).texture())
-			.write(ctx.pbrBuffers->irradiance->texture())
-			.write(ctx.pbrBuffers->prefilter->texture())
-			.write(ctx.pbrBuffers->brdfLUT->texture())
-			.write(graph.getResource(mIndexes.directional).texture())
-			.write(graph.getResource(mIndexes.point).texture())
-			.write(graph.getResource(mIndexes.spot).texture());
+	frameSet.write(*gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.index")))
+			.write(*gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")))
+			.write(*gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.albedo.index")))
+			.write(*gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.orm.index")))
+			.write(*graph.getResource(mIndexes.ssao).texture())
+			.write(*ctx.pbrBuffers->irradiance->texture())
+			.write(*ctx.pbrBuffers->prefilter->texture())
+			.write(*ctx.pbrBuffers->brdfLUT->texture())
+			.write(*graph.getResource(mIndexes.directional).texture())
+			.write(*graph.getResource(mIndexes.point).texture())
+			.write(*graph.getResource(mIndexes.spot).texture());
 
 	encoder.bindDescriptorSet(passLayout, frameSet);
 }

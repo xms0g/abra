@@ -58,11 +58,11 @@ Model::Cubemap::Cubemap(std::vector<std::string>& faces) {
 	std::vector<uint32_t> indices;
 	mMeshes[0].emplace_back(vertices, indices);
 
-	std::vector<Texture> textures;
+	std::vector<MaterialTexture> textures;
 	textures.reserve(faces.size());
 
 	for (const auto& face : faces) {
-		textures.emplace_back(0, ALBEDO,TextureTarget::Texture2D,  face);
+		textures.emplace_back(face, TextureType::Albedo, nullptr);
 	}
 	Material material;
 	material.textureTarget = TextureTarget::TextureCubeMap;

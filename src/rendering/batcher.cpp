@@ -76,7 +76,7 @@ MaterialBatch Batcher::batchMaterial(const uint32_t matID,
 
 	DescriptorSet descriptorSet;
 	for (const auto& texture: material.textures) {
-		descriptorSet.write({.id = texture.id, .target = texture.target});
+		descriptorSet.write(*texture.gpuPtr);
 	}
 	renderData.emplaceDescriptorSet(descriptorSet);
 

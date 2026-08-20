@@ -50,31 +50,31 @@ int32_t FrameBuffer::height() const {
 	return mHeight;
 }
 
-TextureView FrameBuffer::texture(const uint32_t index) const {
-	return {.id = mTextures[index].id, .target = mTextures[index].target};
+const std::shared_ptr<Texture>& FrameBuffer::texture(const uint32_t index) const {
+	return mTextures[index];
 }
 
 RenderBuffer& FrameBuffer::renderBuffer(const uint32_t index) {
 	return mRenderBuffers[index];
 }
 
-FrameBuffer& FrameBuffer::attachColor(Texture& texture) {
+FrameBuffer& FrameBuffer::attachColor(std::shared_ptr<Texture>& texture) {
 	mTextures.emplace_back(std::move(texture));
 
 	const auto& tex = mTextures.back();
 	const GLenum attachment = toUnderlying(Attachment::Color0) + mColorAttachmentCount++;
-	glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, toUnderlying(tex.target), tex.id, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, toUnderlying(tex->target()), tex->id(), 0);
 
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::attachDepth(Texture& texture) {
+FrameBuffer& FrameBuffer::attachDepth(std::shared_ptr<Texture>& texture) {
 	mTextures.emplace_back(std::move(texture));
 
-	if (const auto& tex = mTextures.back(); tex.target == TextureTarget::Texture2D) {
-		glFramebufferTexture2D(GL_FRAMEBUFFER, toUnderlying(Attachment::Depth), toUnderlying(tex.target), tex.id, 0);
+	if (const auto& tex = mTextures.back(); tex->target() == TextureTarget::Texture2D) {
+		glFramebufferTexture2D(GL_FRAMEBUFFER, toUnderlying(Attachment::Depth), toUnderlying(tex->target()), tex->id(), 0);
 	} else {
-		glFramebufferTexture(GL_FRAMEBUFFER, toUnderlying(Attachment::Depth), tex.id, 0);
+		glFramebufferTexture(GL_FRAMEBUFFER, toUnderlying(Attachment::Depth), tex->id(), 0);
 	}
 
 	return *this;

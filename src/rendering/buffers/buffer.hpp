@@ -12,8 +12,9 @@ class Buffer {
 public:
 	Buffer() = default;
 
-	Buffer(const uint32_t target, const BufferUsage usage)
+	Buffer(const uint32_t target, const int32_t size, const BufferUsage usage)
 		: mTarget(target),
+		  mSize(size),
 		  mUsage(usage) {
 		glGenBuffers(1, &mHandle);
 	}
@@ -26,6 +27,7 @@ public:
 	Buffer(Buffer&& other) noexcept
 		: mHandle(std::exchange(other.mHandle, 0)),
 		  mTarget(std::exchange(other.mTarget, 0)),
+		  mSize(std::exchange(other.mSize, 0)),
 		  mUsage(other.mUsage) {
 	}
 
@@ -36,6 +38,7 @@ public:
 
 			mHandle = std::exchange(other.mHandle, 0);
 			mTarget = std::exchange(other.mTarget, 0);
+			mSize = std::exchange(other.mSize, 0);
 			mUsage = other.mUsage;
 		}
 
@@ -48,13 +51,18 @@ public:
 	}
 
 	[[nodiscard]]
-	uint32_t id() const {
+	uint32_t handle() const {
 		return mHandle;
 	}
 
 	[[nodiscard]]
 	uint32_t target() const {
 		return mTarget;
+	}
+
+	[[nodiscard]]
+	int32_t size() const {
+		return mSize;
 	}
 
 	void bind() const {
@@ -68,5 +76,6 @@ public:
 protected:
 	uint32_t mHandle{0};
 	uint32_t mTarget{0};
+	int32_t mSize{0};
 	BufferUsage mUsage{};
 };

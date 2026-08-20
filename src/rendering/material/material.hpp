@@ -25,7 +25,7 @@ struct Material {
 	TextureTarget textureTarget{};
 	glm::vec3 color{0.0f};
 	float alphaCutoff{0.0f};
-	std::vector<Texture> textures;
+	std::vector<MaterialTexture> textures;
 
 	Material() = default;
 

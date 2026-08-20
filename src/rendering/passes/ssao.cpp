@@ -118,9 +118,9 @@ void SSAOPass::configure(const RenderContext& ctx,
 	const auto& gBuffer = graph.getResource(mIndexes.gBuffer);
 
 	DescriptorSet frameSet{};
-	frameSet.write(gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.index")))
-			.write(gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")))
-			.write({.id = mNoiseTexture.id, .target = mNoiseTexture.target});
+	frameSet.write(*gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.index")))
+			.write(*gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")))
+			.write(mNoiseTexture);
 
 	encoder.bindDescriptorSet(ssaoPassLayout, frameSet);
 }
@@ -151,7 +151,7 @@ void SSAOPass::blur(const FrameGraph& graph, GraphicsEncoder& encoder) {
 	encoder.bindPipeline(mPipelines[1]);
 
 	DescriptorSet ssaoSet{};
-	ssaoSet.write(graph.getResource(mIndexes.ssao).texture());
+	ssaoSet.write(*graph.getResource(mIndexes.ssao).texture());
 	encoder.bindDescriptorSet(mPipelines[1].layout().descriptorSets[0], ssaoSet);
 
 	encoder.draw(3);
@@ -178,7 +178,7 @@ void SSAOPass::createKernel(GraphicsEncoder& encoder) {
 	};
 
 	DescriptorSet ssaoSet{};
-	ssaoSet.write({.id = mUBO.id(), .target = mUBO.target(), .size = sizeof(UniformBufferObject)});
+	ssaoSet.write(mUBO);
 
 	encoder.bindDescriptorSet(layout, ssaoSet);
 
@@ -213,7 +213,7 @@ void SSAOPass::createNoiseTexture() {
 	noise.resize(textureSize * textureSize);
 
 	noise = math::random::generateNoise(textureSize * textureSize);
-	mNoiseTexture = Texture::generate({
+	mNoiseTexture = Texture({
 		.target = TextureTarget::Texture2D,
 		.internalFormat = InternalFormat::RGBFloat,
 		.format = BaseFormat::RGB,
@@ -229,5 +229,6 @@ void SSAOPass::createNoiseTexture() {
 		.samples = 1,
 		.layers = 1,
 	});
-	mNoiseTexture.upload(0, noise.data(), textureSize, textureSize, BaseFormat::RGB, InternalFormat::RGBFloat, DataType::Float);
+
+	mNoiseTexture.copyToMemory(0, noise.data());
 }

@@ -5,14 +5,16 @@
 #include <span>
 #include "glad/glad.h"
 
-enum TextureType {
-	ALBEDO = 1,
-	SPECULAR = 2,
-	EMISSION = 4,
-	HEIGHT = 5,
-	NORMAL = 6,
-	AO = 10,
-	ROUGHNESS_METALLIC = 18
+class Texture;
+
+enum class TextureType {
+	Albedo,
+	Specular,
+	Emissive,
+	Height,
+	Normal,
+	Ao,
+	Roughness_Metallic
 };
 
 enum class TextureTarget : uint32_t {
@@ -94,59 +96,79 @@ struct TextureView {
 	bool operator==(const TextureView& other) const = default;
 };
 
-struct Texture {
-	uint32_t id{};
-	uint32_t type{};
-	TextureTarget target{};
+struct MaterialTexture {
 	std::string path;
+	TextureType type{};
+	std::shared_ptr<Texture> gpuPtr;
 
+	MaterialTexture() = default;
+
+	MaterialTexture(std::string path, TextureType type, std::shared_ptr<Texture> gpuResource);
+
+	MaterialTexture(const MaterialTexture& other) = delete;
+
+	MaterialTexture& operator=(const MaterialTexture& other) = delete;
+
+	MaterialTexture(MaterialTexture&& other) noexcept;
+
+	MaterialTexture& operator=(MaterialTexture&& other) noexcept;
+
+	static void info(std::string_view path, int32_t& width, int32_t& height);
+
+	static MaterialTexture load(std::span<const std::string> paths, const TextureConfig& config);
+};
+
+class Texture {
+public:
 	Texture() = default;
 
-	Texture(uint32_t id, uint32_t type, TextureTarget target, std::string path = "");
+	explicit Texture(const TextureConfig& config);
 
 	~Texture();
 
-	Texture(const Texture&) = delete;
+	Texture(const Texture& other) = delete;
 
-	Texture& operator=(const Texture&) = delete;
+	Texture& operator=(const Texture& other) = delete;
 
 	Texture(Texture&& other) noexcept;
 
 	Texture& operator=(Texture&& other) noexcept;
 
-	void upload(uint32_t face,
-				const void* data,
-				int32_t width,
-				int32_t height,
-				BaseFormat format,
-				InternalFormat internalFormat,
-				DataType dataType) const;
+	[[nodiscard]]
+	uint32_t id() const;
 
-	static void info(std::string_view path, int32_t& width, int32_t& height);
+	[[nodiscard]]
+	TextureTarget target() const;
+
+	void copyToMemory(uint32_t face, const void* pixels) const;
+
+	void generateMipmaps() const;
 
 	static void configureParameters(const TextureConfig& config);
 
-	static Texture load(std::span<const std::string> paths, const TextureConfig& config);
+	static std::shared_ptr<Texture> generateColorAttachment(int32_t width, int32_t height);
 
-	static Texture generate(const TextureConfig& config);
+	static std::shared_ptr<Texture> generateColorAttachmentRed(int32_t width, int32_t height);
 
-	static Texture generateColorAttachment(int32_t width, int32_t height);
+	static std::shared_ptr<Texture> generateColorAttachmentMultisampled(int32_t width, int32_t height, int32_t samples);
 
-	static Texture generateColorAttachmentRed(int32_t width, int32_t height);
+	static std::shared_ptr<Texture> generateColorAttachmentFP(int32_t width, int32_t height);
 
-	static Texture generateColorAttachmentMultisampled(int32_t width, int32_t height, int32_t samples);
+	static std::shared_ptr<Texture> generateColorAttachmentFPMultisampled(int32_t width, int32_t height, int32_t samples);
 
-	static Texture generateColorAttachmentFP(int32_t width, int32_t height);
+	static std::shared_ptr<Texture> generateColorAttachmentCubemap(int32_t width, int32_t height);
 
-	static Texture generateColorAttachmentFPMultisampled(int32_t width, int32_t height, int32_t samples);
+	static std::shared_ptr<Texture> generateDepthAttachment(int32_t width, int32_t height);
 
-	static Texture generateColorAttachmentCubemap(int32_t width, int32_t height);
+	static std::shared_ptr<Texture> generateDepthAttachmentArray(int32_t width, int32_t height, int32_t layers);
 
-	static Texture generateDepthAttachment(int32_t width, int32_t height);
+	static std::shared_ptr<Texture> generateDepthAttachmentCubemapArray(int32_t width, int32_t height, int32_t layers);
 
-	static Texture generateDepthAttachmentArray(int32_t width, int32_t height, int32_t layers);
-
-	static Texture generateDepthAttachmentCubemapArray(int32_t width, int32_t height, int32_t layers);
-
-	static void generateMipmaps(TextureView handle);
+private:
+	uint32_t mID{};
+	TextureTarget mTarget{};
+	int32_t mWidth{};
+	int32_t mHeight{};
+	BaseFormat mFormat{};
+	DataType mDataType{};
 };

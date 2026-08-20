@@ -1,6 +1,7 @@
 #include "graphicsEncoder.h"
 #include "graphicsPipeline.h"
 #include "descriptorSet.h"
+#include "buffers/buffer.hpp"
 #include "buffers/frameBuffer.h"
 
 void GraphicsEncoder::beginRendering(const RenderingInfo& info) {
@@ -147,25 +148,25 @@ void GraphicsEncoder::pushConstants(const void* data) const {
 void GraphicsEncoder::bindDescriptorSet(const DescriptorSetLayout& layout, const DescriptorSet& descriptorSet) {
 	for (int i = 0; i < layout.bindings.size(); ++i) {
 		const auto& descBinding = layout.bindings[i];
+
 		auto& descriptor = descriptorSet[i];
+		if (!descriptor.isValid()) continue;
 
 		switch (descBinding.type) {
 			case DescriptorType::None:
 				break;
 			case DescriptorType::UniformBuffer: {
-				const auto& buffer = std::get<BufferView>(descriptor.resource);
+				const auto& buffer = descriptor.rs<Buffer>();
 
-				glBindBufferRange(buffer.target, descBinding.binding, buffer.id, 0, buffer.size);
+				glBindBufferRange(buffer.target(), descBinding.binding, buffer.handle(), 0, buffer.size());
 				break;
 			}
 
 			case DescriptorType::SampledImage:{
-				const auto& texture = std::get<TextureView>(descriptor.resource);
-
-				if (mState.bindingCache.textures[descBinding.binding] != texture) {
-					mState.bindingCache.textures[descBinding.binding] = texture;
+				if (const auto& texture = descriptor.rs<Texture>(); mState.bindingCache.textures[descBinding.binding] != texture.id()) {
+					mState.bindingCache.textures[descBinding.binding] = texture.id();
 					glActiveTexture(GL_TEXTURE0 + descBinding.binding);
-					glBindTexture(toUnderlying(texture.target), texture.id);
+					glBindTexture(toUnderlying(texture.target()), texture.id());
 				}
 
 				break;
@@ -188,13 +189,13 @@ void GraphicsEncoder::attachTexture(const FrameBuffer& fb,
                                     const Attachment attachment,
                                     const int32_t mip,
                                     const int32_t layer) const {
-	switch (auto [id, target] = fb.texture(index); target) {
+	switch (const auto& texture = fb.texture(index); texture->target()) {
 		case TextureTarget::Texture2D:
 			glFramebufferTexture2D(
 				GL_FRAMEBUFFER,
 				toUnderlying(attachment),
 				GL_TEXTURE_2D,
-				id,
+				texture->id(),
 				mip);
 			break;
 		case TextureTarget::TextureCubeMap:
@@ -204,7 +205,7 @@ void GraphicsEncoder::attachTexture(const FrameBuffer& fb,
 				GL_FRAMEBUFFER,
 				toUnderlying(attachment),
 				GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer,
-				id,
+				texture->id(),
 				mip);
 			break;
 		case TextureTarget::Texture2DArray:
@@ -212,7 +213,7 @@ void GraphicsEncoder::attachTexture(const FrameBuffer& fb,
 			glFramebufferTextureLayer(
 				GL_FRAMEBUFFER,
 				toUnderlying(attachment),
-				id,
+				texture->id(),
 				mip,
 				layer);
 			break;
