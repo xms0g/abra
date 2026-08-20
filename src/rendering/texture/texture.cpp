@@ -78,6 +78,7 @@ void Texture::upload(const uint32_t face,
 			);
 			break;
 		}
+		default: break;
 	}
 }
 
