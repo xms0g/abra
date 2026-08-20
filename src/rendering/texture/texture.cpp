@@ -70,10 +70,6 @@ MaterialTexture MaterialTexture::load(const std::span<const std::string> paths, 
 		case TextureTarget::TextureCubeMap: {
 			TextureConfig cfg = config;
 
-			if (paths.size() != 6) {
-				throw std::runtime_error("Cubemap texture must have 6 paths");
-			}
-
 			info(paths[0], width, height);
 			cfg.width = width;
 			cfg.height = height;

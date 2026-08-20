@@ -66,11 +66,14 @@ void ResourceManager::uploadMaterialsToGPU() {
 					material.textures.push_back(std::move(loadedTexture));
 				} else {
 					// Handle 6 faces-cubemap
-					std::vector<std::string> paths;
-					paths.reserve(material.textures.size());
+					if (material.textures.size() != 6) {
+						throw std::runtime_error("Invalid number of textures for cubemap");
+					}
 
-					for (auto& texture: material.textures) {
-						paths.push_back(fs::resolvePath(assetRoot / texture.path));
+					std::array<std::string, 6> paths;
+
+					for (uint32_t i = 0; i < 6; ++i) {
+						paths[i] = fs::resolvePath(assetRoot / material.textures[i].path);
 					}
 
 					MaterialTexture texture = MaterialTexture::load(paths, {
