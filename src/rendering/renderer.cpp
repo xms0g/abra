@@ -138,14 +138,14 @@ void Renderer::createPBRBuffers() {
 	auto& textures = matComponent.materials->at(0).textures;
 
 	if (const auto& texture = textures.front(); texture.texture->target() == TextureTarget::Texture2D) {
-		const auto tex = createEnvMap(texture);
+		const auto& tex = createEnvMap(texture);
 		textures.clear();
 		textures.emplace_back("", TextureType::Albedo, tex);
 	}
 
-	const auto& texture = textures.front();
-	createIrradianceMap(*texture.texture);
-	createPrefilterMap(*texture.texture);
+	const auto& skyboxTexture = textures.front();
+	createIrradianceMap(*skyboxTexture.texture);
+	createPrefilterMap(*skyboxTexture.texture);
 	createBrdfLUT();
 }
 

@@ -59,40 +59,35 @@ RenderBuffer& FrameBuffer::renderBuffer(const uint32_t index) {
 }
 
 FrameBuffer& FrameBuffer::attachColor(std::shared_ptr<GPUTexture>& texture) {
-	mTextures.emplace_back(std::move(texture));
-
-	const auto& tex = mTextures.back();
 	const GLenum attachment = toUnderlying(Attachment::Color0) + mColorAttachmentCount++;
-	glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, toUnderlying(tex->target()), tex->id(), 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, toUnderlying(texture->target()), texture->id(), 0);
 
+	mTextures.emplace_back(std::move(texture));
 	return *this;
 }
 
 FrameBuffer& FrameBuffer::attachDepth(std::shared_ptr<GPUTexture>& texture) {
-	mTextures.emplace_back(std::move(texture));
-
-	if (const auto& tex = mTextures.back(); tex->target() == TextureTarget::Texture2D) {
-		glFramebufferTexture2D(GL_FRAMEBUFFER, toUnderlying(Attachment::Depth), toUnderlying(tex->target()), tex->id(), 0);
+	if (texture->target() == TextureTarget::Texture2D) {
+		glFramebufferTexture2D(GL_FRAMEBUFFER, toUnderlying(Attachment::Depth), toUnderlying(texture->target()), texture->id(), 0);
 	} else {
-		glFramebufferTexture(GL_FRAMEBUFFER, toUnderlying(Attachment::Depth), tex->id(), 0);
+		glFramebufferTexture(GL_FRAMEBUFFER, toUnderlying(Attachment::Depth), texture->id(), 0);
 	}
 
+	mTextures.emplace_back(std::move(texture));
 	return *this;
 }
 
 FrameBuffer& FrameBuffer::attachDepth(RenderBuffer& renderBuffer) {
-	mRenderBuffers.emplace_back(std::move(renderBuffer));
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, toUnderlying(Attachment::Depth), GL_RENDERBUFFER, renderBuffer.handle());
 
-	const auto& buffer = mRenderBuffers.back();
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, toUnderlying(Attachment::Depth), GL_RENDERBUFFER, buffer.handle());
+	mRenderBuffers.emplace_back(std::move(renderBuffer));
 	return *this;
 }
 
 FrameBuffer& FrameBuffer::attachDepthStencil(RenderBuffer& renderBuffer) {
-	mRenderBuffers.emplace_back(std::move(renderBuffer));
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, renderBuffer.handle());
 
-	const auto& buffer = mRenderBuffers.back();
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, buffer.handle());
+	mRenderBuffers.emplace_back(std::move(renderBuffer));
 	return *this;
 }
 
