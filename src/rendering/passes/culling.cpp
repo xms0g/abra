@@ -82,9 +82,7 @@ void CullingPass::cullScene(
 			const glm::vec3& max = ctx.renderData->mesh.maxCounts[meshIdx];
 			const glm::vec3& min = ctx.renderData->mesh.minCounts[meshIdx];
 
-			const bool isVisible = math::AABB::isMeshInFrustum(frustum, min, max, model);
-
-			if (isVisible) {
+			if (math::AABB::isMeshInFrustum(frustum, min, max, model)) {
 				outQueue.push_back({
 					.entityID = entityID,
 					.debugMode = ctx.renderData->entity.debugModes[entityID],

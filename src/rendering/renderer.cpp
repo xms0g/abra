@@ -137,15 +137,15 @@ void Renderer::createPBRBuffers() {
 	const auto& matComponent = entityIt->getComponent<MaterialComponent>();
 	auto& textures = matComponent.materials->at(0).textures;
 
-	if (const auto& texture = textures.front(); texture.gpuPtr->target() == TextureTarget::Texture2D) {
+	if (const auto& texture = textures.front(); texture.texture->target() == TextureTarget::Texture2D) {
 		const auto tex = createEnvMap(texture);
 		textures.clear();
 		textures.emplace_back("", TextureType::Albedo, tex);
 	}
 
 	const auto& texture = textures.front();
-	createIrradianceMap(*texture.gpuPtr);
-	createPrefilterMap(*texture.gpuPtr);
+	createIrradianceMap(*texture.texture);
+	createPrefilterMap(*texture.texture);
 	createBrdfLUT();
 }
 
@@ -289,7 +289,7 @@ void Renderer::createFrameBuffers() {
 		mEncoder.bindFrameBuffer(intermediateBuffer);
 
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
-			auto color = Texture::generateColorAttachmentFP(intermediateBuffer.width(), intermediateBuffer.height());
+			auto color = GPUTexture::generateColorAttachmentFP(intermediateBuffer.width(), intermediateBuffer.height());
 			auto rb = RenderBuffer{InternalFormat::Depth24, intermediateBuffer.width(), intermediateBuffer.height()};
 
 			intermediateBuffer.attachColor(color)
@@ -299,7 +299,7 @@ void Renderer::createFrameBuffers() {
 
 			mEncoder.bindFrameBuffer(sceneBuffer);
 
-			auto colorFPMult = Texture::generateColorAttachmentFPMultisampled(sceneBuffer.width(), sceneBuffer.height(), sampleCount);
+			auto colorFPMult = GPUTexture::generateColorAttachmentFPMultisampled(sceneBuffer.width(), sceneBuffer.height(), sampleCount);
 			auto rbMulti = RenderBuffer{InternalFormat::Depth24, sceneBuffer.width(), sceneBuffer.height(), sampleCount};
 
 			sceneBuffer.attachColor(colorFPMult)
@@ -307,7 +307,7 @@ void Renderer::createFrameBuffers() {
 					.configureDrawBuffers()
 					.checkStatus();
 		} else {
-			auto color = Texture::generateColorAttachment(intermediateBuffer.width(), intermediateBuffer.height());
+			auto color = GPUTexture::generateColorAttachment(intermediateBuffer.width(), intermediateBuffer.height());
 			auto rb = RenderBuffer{InternalFormat::Depth24, intermediateBuffer.width(), intermediateBuffer.height()};
 
 			intermediateBuffer.attachColor(color)
@@ -316,7 +316,7 @@ void Renderer::createFrameBuffers() {
 					.checkStatus();
 
 			mEncoder.bindFrameBuffer(sceneBuffer);
-			auto colorMulti = Texture::generateColorAttachmentMultisampled(sceneBuffer.width(), sceneBuffer.height(), sampleCount);
+			auto colorMulti = GPUTexture::generateColorAttachmentMultisampled(sceneBuffer.width(), sceneBuffer.height(), sampleCount);
 			auto rbMulti = RenderBuffer{InternalFormat::Depth24, sceneBuffer.width(), sceneBuffer.height(), sampleCount};
 
 			sceneBuffer.attachColor(colorMulti)
@@ -327,14 +327,14 @@ void Renderer::createFrameBuffers() {
 	} else {
 		mEncoder.bindFrameBuffer(sceneBuffer);
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
-			auto color = Texture::generateColorAttachmentFP(sceneBuffer.width(), sceneBuffer.height());
+			auto color = GPUTexture::generateColorAttachmentFP(sceneBuffer.width(), sceneBuffer.height());
 			auto rbDepth = RenderBuffer{InternalFormat::Depth24, sceneBuffer.width(), sceneBuffer.height()};
 
 			sceneBuffer.attachColor(color)
 					.attachDepth(rbDepth)
 					.checkStatus();
 		} else {
-			auto color = Texture::generateColorAttachment(sceneBuffer.width(), sceneBuffer.height());
+			auto color = GPUTexture::generateColorAttachment(sceneBuffer.width(), sceneBuffer.height());
 			auto rbDepth = RenderBuffer{InternalFormat::Depth24, sceneBuffer.width(), sceneBuffer.height()};
 
 			sceneBuffer.attachColor(color)
@@ -348,22 +348,22 @@ void Renderer::createFrameBuffers() {
 	auto& gBuffer = mGraph.addResource("gBuffer", std::make_unique<FrameBuffer>(width, height));
 
 	mEncoder.bindFrameBuffer(gBuffer);
-	auto position = Texture::generateColorAttachmentFP(gBuffer.width(), gBuffer.height());
-	auto normal = Texture::generateColorAttachmentFP(gBuffer.width(), gBuffer.height());
+	auto position = GPUTexture::generateColorAttachmentFP(gBuffer.width(), gBuffer.height());
+	auto normal = GPUTexture::generateColorAttachmentFP(gBuffer.width(), gBuffer.height());
 	gBuffer.attachColor(position) // position
 			.attachColor(normal); // normal
 	if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
 		// albedo
-		auto albedo = Texture::generateColorAttachmentFP(gBuffer.width(), gBuffer.height());
+		auto albedo = GPUTexture::generateColorAttachmentFP(gBuffer.width(), gBuffer.height());
 		gBuffer.attachColor(albedo);
 	} else {
-		auto albedo = Texture::generateColorAttachment(gBuffer.width(), gBuffer.height());
+		auto albedo = GPUTexture::generateColorAttachment(gBuffer.width(), gBuffer.height());
 		gBuffer.attachColor(albedo);
 	}
 	// Emissive placed into alpha channels in position, normal, albedo
 
-	auto gOrm = Texture::generateColorAttachment(gBuffer.width(), gBuffer.height());
-	auto gDepth = Texture::generateDepthAttachment(gBuffer.width(), gBuffer.height());
+	auto gOrm = GPUTexture::generateColorAttachment(gBuffer.width(), gBuffer.height());
+	auto gDepth = GPUTexture::generateDepthAttachment(gBuffer.width(), gBuffer.height());
 
 	gBuffer.attachColor(gOrm) // orm
 			.attachDepth(gDepth)
@@ -375,7 +375,7 @@ void Renderer::createFrameBuffers() {
 
 	mEncoder.bindFrameBuffer(ssao);
 
-	auto ssaoTexture = Texture::generateColorAttachmentRed(ssao.width(), ssao.height());
+	auto ssaoTexture = GPUTexture::generateColorAttachmentRed(ssao.width(), ssao.height());
 	ssao.attachColor(ssaoTexture)
 			.configureDrawBuffers()
 			.checkStatus();
@@ -384,7 +384,7 @@ void Renderer::createFrameBuffers() {
 
 	mEncoder.bindFrameBuffer(ssaoBlur);
 
-	auto ssaoBlurTexture = Texture::generateColorAttachmentRed(ssaoBlur.width(), ssaoBlur.height());
+	auto ssaoBlurTexture = GPUTexture::generateColorAttachmentRed(ssaoBlur.width(), ssaoBlur.height());
 	ssaoBlur.attachColor(ssaoBlurTexture)
 			.configureDrawBuffers()
 			.checkStatus();
@@ -396,7 +396,7 @@ void Renderer::createFrameBuffers() {
 
 	mEncoder.bindFrameBuffer(directional);
 
-	auto depth = Texture::generateDepthAttachment(directional.width(), directional.height());
+	auto depth = GPUTexture::generateDepthAttachment(directional.width(), directional.height());
 	directional.attachDepth(depth)
 			.configureDrawBuffers()
 			.checkStatus();
@@ -407,7 +407,7 @@ void Renderer::createFrameBuffers() {
 
 	mEncoder.bindFrameBuffer(point);
 
-	auto depthPoint = Texture::generateDepthAttachmentCubemapArray(point.width(), point.height(), CONFIG_MANAGER.get<int32_t>("light.max_point"));
+	auto depthPoint = GPUTexture::generateDepthAttachmentCubemapArray(point.width(), point.height(), CONFIG_MANAGER.get<int32_t>("light.max_point"));
 	point.attachDepth(depthPoint)
 			.configureDrawBuffers()
 			.checkStatus();
@@ -418,7 +418,7 @@ void Renderer::createFrameBuffers() {
 
 	mEncoder.bindFrameBuffer(spot);
 
-	auto depthSpot = Texture::generateDepthAttachmentArray(spot.width(), spot.height(), CONFIG_MANAGER.get<int32_t>("light.max_spot"));
+	auto depthSpot = GPUTexture::generateDepthAttachmentArray(spot.width(), spot.height(), CONFIG_MANAGER.get<int32_t>("light.max_spot"));
 	spot.attachDepth(depthSpot)
 			.configureDrawBuffers()
 			.checkStatus();
@@ -429,10 +429,10 @@ void Renderer::createFrameBuffers() {
 
 		mEncoder.bindFrameBuffer(target);
 		if (CONFIG_MANAGER.get<bool>("hdr.enabled")) {
-			auto color = Texture::generateColorAttachmentFP(target.width(), target.height());
+			auto color = GPUTexture::generateColorAttachmentFP(target.width(), target.height());
 			target.attachColor(color);
 		} else {
-			auto color = Texture::generateColorAttachment(target.width(), target.height());
+			auto color = GPUTexture::generateColorAttachment(target.width(), target.height());
 			target.attachColor(color);
 		}
 		target.configureDrawBuffers().checkStatus();
@@ -510,7 +510,7 @@ void Renderer::sortEntities() {
 	// }
 }
 
-const std::shared_ptr<Texture>& Renderer::createEnvMap(const MaterialTexture& hdrTexture) {
+const std::shared_ptr<GPUTexture>& Renderer::createEnvMap(const MaterialTexture& hdrTexture) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
@@ -561,7 +561,7 @@ const std::shared_ptr<Texture>& Renderer::createEnvMap(const MaterialTexture& hd
 
 	encoder.bindFrameBuffer(*envMap);
 
-	auto cubemap = Texture::generateColorAttachmentCubemap(envMap->width(), envMap->height());
+	auto cubemap = GPUTexture::generateColorAttachmentCubemap(envMap->width(), envMap->height());
 	auto renderBuffer = RenderBuffer{InternalFormat::Depth24, envMap->width(), envMap->height()};
 	envMap->attachColor(cubemap)
 			.attachDepth(renderBuffer)
@@ -575,7 +575,7 @@ const std::shared_ptr<Texture>& Renderer::createEnvMap(const MaterialTexture& hd
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
 	DescriptorSet descriptorSet{};
-	descriptorSet.write(*hdrTexture.gpuPtr);
+	descriptorSet.write(*hdrTexture.texture);
 
 	// convert HDR equirectangular environment map to cubemap equivalent
 	encoder.bindPipeline(pipeline);
@@ -603,7 +603,7 @@ const std::shared_ptr<Texture>& Renderer::createEnvMap(const MaterialTexture& hd
 	return mPBRBuffers.environment->texture();
 }
 
-void Renderer::createIrradianceMap(const Texture& environment) {
+void Renderer::createIrradianceMap(const GPUTexture& environment) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
@@ -654,7 +654,7 @@ void Renderer::createIrradianceMap(const Texture& environment) {
 
 	encoder.bindFrameBuffer(*irradianceMap);
 
-	auto cubemap = Texture::generateColorAttachmentCubemap(irradianceMap->width(), irradianceMap->height());
+	auto cubemap = GPUTexture::generateColorAttachmentCubemap(irradianceMap->width(), irradianceMap->height());
 	auto renderBuffer = RenderBuffer{InternalFormat::Depth24, irradianceMap->width(), irradianceMap->height()};
 	irradianceMap->attachColor(cubemap)
 			.attachDepth(renderBuffer)
@@ -693,7 +693,7 @@ void Renderer::createIrradianceMap(const Texture& environment) {
 	encoder.unbindFrameBuffer();
 }
 
-void Renderer::createPrefilterMap(const Texture& environment) {
+void Renderer::createPrefilterMap(const GPUTexture& environment) {
 	constexpr PipelinePrimitiveAssemblyState primitiveAssemblyState = {
 		.topology = PrimitiveTopology::Triangles,
 	};
@@ -744,7 +744,7 @@ void Renderer::createPrefilterMap(const Texture& environment) {
 
 	encoder.bindFrameBuffer(*prefilterMap);
 
-	auto cubemap = Texture::generateColorAttachmentCubemap(prefilterMap->width(), prefilterMap->height());
+	auto cubemap = GPUTexture::generateColorAttachmentCubemap(prefilterMap->width(), prefilterMap->height());
 	auto renderBuffer = RenderBuffer{InternalFormat::Depth24, prefilterMap->width(), prefilterMap->height()};
 	prefilterMap->attachColor(cubemap)
 			.attachDepth(renderBuffer)
@@ -846,7 +846,7 @@ void Renderer::createBrdfLUT() {
 
 	encoder.bindFrameBuffer(*brdfLUT);
 
-	auto color = std::make_shared<Texture>(TextureConfig{
+	auto color = std::make_shared<GPUTexture>(TextureConfig{
 		.target = TextureTarget::Texture2D,
 		.internalFormat = InternalFormat::RGFloat,
 		.format = BaseFormat::RG,

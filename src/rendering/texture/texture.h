@@ -5,8 +5,6 @@
 #include <span>
 #include "glad/glad.h"
 
-class Texture;
-
 enum class TextureType {
 	Albedo,
 	Specular,
@@ -89,21 +87,15 @@ struct TextureConfig {
 	int32_t layers{1};
 };
 
-struct TextureView {
-	uint32_t id{0};
-	TextureTarget target{};
-
-	bool operator==(const TextureView& other) const = default;
-};
-
+class GPUTexture;
 struct MaterialTexture {
 	std::string path;
 	TextureType type{};
-	std::shared_ptr<Texture> gpuPtr;
+	std::shared_ptr<GPUTexture> texture;
 
 	MaterialTexture() = default;
 
-	MaterialTexture(std::string path, TextureType type, std::shared_ptr<Texture> gpuResource);
+	MaterialTexture(std::string path, TextureType type, std::shared_ptr<GPUTexture> gpuResource);
 
 	MaterialTexture(const MaterialTexture& other) = delete;
 
@@ -118,21 +110,21 @@ struct MaterialTexture {
 	static MaterialTexture load(std::span<const std::string> paths, const TextureConfig& config);
 };
 
-class Texture {
+class GPUTexture {
 public:
-	Texture() = default;
+	GPUTexture() = default;
 
-	explicit Texture(const TextureConfig& config);
+	explicit GPUTexture(const TextureConfig& config);
 
-	~Texture();
+	~GPUTexture();
 
-	Texture(const Texture& other) = delete;
+	GPUTexture(const GPUTexture& other) = delete;
 
-	Texture& operator=(const Texture& other) = delete;
+	GPUTexture& operator=(const GPUTexture& other) = delete;
 
-	Texture(Texture&& other) noexcept;
+	GPUTexture(GPUTexture&& other) noexcept;
 
-	Texture& operator=(Texture&& other) noexcept;
+	GPUTexture& operator=(GPUTexture&& other) noexcept;
 
 	[[nodiscard]]
 	uint32_t id() const;
@@ -146,23 +138,23 @@ public:
 
 	static void configureParameters(const TextureConfig& config);
 
-	static std::shared_ptr<Texture> generateColorAttachment(int32_t width, int32_t height);
+	static std::shared_ptr<GPUTexture> generateColorAttachment(int32_t width, int32_t height);
 
-	static std::shared_ptr<Texture> generateColorAttachmentRed(int32_t width, int32_t height);
+	static std::shared_ptr<GPUTexture> generateColorAttachmentRed(int32_t width, int32_t height);
 
-	static std::shared_ptr<Texture> generateColorAttachmentMultisampled(int32_t width, int32_t height, int32_t samples);
+	static std::shared_ptr<GPUTexture> generateColorAttachmentMultisampled(int32_t width, int32_t height, int32_t samples);
 
-	static std::shared_ptr<Texture> generateColorAttachmentFP(int32_t width, int32_t height);
+	static std::shared_ptr<GPUTexture> generateColorAttachmentFP(int32_t width, int32_t height);
 
-	static std::shared_ptr<Texture> generateColorAttachmentFPMultisampled(int32_t width, int32_t height, int32_t samples);
+	static std::shared_ptr<GPUTexture> generateColorAttachmentFPMultisampled(int32_t width, int32_t height, int32_t samples);
 
-	static std::shared_ptr<Texture> generateColorAttachmentCubemap(int32_t width, int32_t height);
+	static std::shared_ptr<GPUTexture> generateColorAttachmentCubemap(int32_t width, int32_t height);
 
-	static std::shared_ptr<Texture> generateDepthAttachment(int32_t width, int32_t height);
+	static std::shared_ptr<GPUTexture> generateDepthAttachment(int32_t width, int32_t height);
 
-	static std::shared_ptr<Texture> generateDepthAttachmentArray(int32_t width, int32_t height, int32_t layers);
+	static std::shared_ptr<GPUTexture> generateDepthAttachmentArray(int32_t width, int32_t height, int32_t layers);
 
-	static std::shared_ptr<Texture> generateDepthAttachmentCubemapArray(int32_t width, int32_t height, int32_t layers);
+	static std::shared_ptr<GPUTexture> generateDepthAttachmentCubemapArray(int32_t width, int32_t height, int32_t layers);
 
 private:
 	uint32_t mID{};

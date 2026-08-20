@@ -15,7 +15,7 @@ enum class DescriptorType : uint32_t {
 };
 
 struct Descriptor {
-	using ResourceRef = std::variant<std::monostate, std::reference_wrapper<const Texture>, std::reference_wrapper<const Buffer>>;
+	using ResourceRef = std::variant<std::monostate, std::reference_wrapper<const GPUTexture>, std::reference_wrapper<const Buffer>>;
 	ResourceRef resource;
 
 	[[nodiscard]]
@@ -43,7 +43,7 @@ class DescriptorSet {
 public:
 	DescriptorSet& write(const Descriptor& descriptor);
 
-	DescriptorSet& write(const Texture& texture);
+	DescriptorSet& write(const GPUTexture& texture);
 
 	DescriptorSet& write(const Buffer& buffer);
 

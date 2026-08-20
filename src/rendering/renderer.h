@@ -56,11 +56,11 @@ private:
 
 	void sortEntities();
 
-	const std::shared_ptr<Texture>& createEnvMap(const MaterialTexture& hdrTexture);
+	const std::shared_ptr<GPUTexture>& createEnvMap(const MaterialTexture& hdrTexture);
 
-	void createIrradianceMap(const Texture& environment);
+	void createIrradianceMap(const GPUTexture& environment);
 
-	void createPrefilterMap(const Texture& environment);
+	void createPrefilterMap(const GPUTexture& environment);
 
 	void createBrdfLUT();
 

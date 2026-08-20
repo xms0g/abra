@@ -33,13 +33,13 @@ public:
 	int32_t height() const;
 
 	[[nodiscard]]
-	const std::shared_ptr<Texture>& texture(uint32_t index = 0) const;
+	const std::shared_ptr<GPUTexture>& texture(uint32_t index = 0) const;
 
 	RenderBuffer& renderBuffer(uint32_t index = 0);
 
-	FrameBuffer& attachColor(std::shared_ptr<Texture>& texture);
+	FrameBuffer& attachColor(std::shared_ptr<GPUTexture>& texture);
 
-	FrameBuffer& attachDepth(std::shared_ptr<Texture>& texture);
+	FrameBuffer& attachDepth(std::shared_ptr<GPUTexture>& texture);
 
 	FrameBuffer& attachDepth(RenderBuffer& renderBuffer);
 
@@ -55,6 +55,6 @@ private:
 	int32_t mWidth{0};
 	int32_t mHeight{0};
 	uint32_t mColorAttachmentCount{0};
-	std::vector<std::shared_ptr<Texture>> mTextures;
+	std::vector<std::shared_ptr<GPUTexture>> mTextures;
 	std::vector<RenderBuffer> mRenderBuffers;
 };

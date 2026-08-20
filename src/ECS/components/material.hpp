@@ -1,7 +1,7 @@
 #pragma once
 
 struct Material;
-struct Texture;
+struct GPUTexture;
 
 struct MaterialComponent {
 	using MaterialMap = std::unordered_map<uint32_t, Material>;

@@ -213,7 +213,7 @@ void SSAOPass::createNoiseTexture() {
 	noise.resize(textureSize * textureSize);
 
 	noise = math::random::generateNoise(textureSize * textureSize);
-	mNoiseTexture = Texture({
+	mNoiseTexture = GPUTexture({
 		.target = TextureTarget::Texture2D,
 		.internalFormat = InternalFormat::RGBFloat,
 		.format = BaseFormat::RGB,

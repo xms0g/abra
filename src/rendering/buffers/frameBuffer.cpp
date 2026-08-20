@@ -50,7 +50,7 @@ int32_t FrameBuffer::height() const {
 	return mHeight;
 }
 
-const std::shared_ptr<Texture>& FrameBuffer::texture(const uint32_t index) const {
+const std::shared_ptr<GPUTexture>& FrameBuffer::texture(const uint32_t index) const {
 	return mTextures[index];
 }
 
@@ -58,7 +58,7 @@ RenderBuffer& FrameBuffer::renderBuffer(const uint32_t index) {
 	return mRenderBuffers[index];
 }
 
-FrameBuffer& FrameBuffer::attachColor(std::shared_ptr<Texture>& texture) {
+FrameBuffer& FrameBuffer::attachColor(std::shared_ptr<GPUTexture>& texture) {
 	mTextures.emplace_back(std::move(texture));
 
 	const auto& tex = mTextures.back();
@@ -68,7 +68,7 @@ FrameBuffer& FrameBuffer::attachColor(std::shared_ptr<Texture>& texture) {
 	return *this;
 }
 
-FrameBuffer& FrameBuffer::attachDepth(std::shared_ptr<Texture>& texture) {
+FrameBuffer& FrameBuffer::attachDepth(std::shared_ptr<GPUTexture>& texture) {
 	mTextures.emplace_back(std::move(texture));
 
 	if (const auto& tex = mTextures.back(); tex->target() == TextureTarget::Texture2D) {

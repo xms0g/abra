@@ -6,24 +6,26 @@
 #include "../material/material.hpp"
 #include "../glUtils.hpp"
 
-MaterialTexture::MaterialTexture(std::string path, TextureType type, std::shared_ptr<Texture> gpuResource)
+MaterialTexture::MaterialTexture(std::string path, TextureType type, std::shared_ptr<GPUTexture> gpuResource)
 	: path(std::move(path)),
 	  type(type),
-	  gpuPtr(std::move(gpuResource)) {
+	  texture(std::move(gpuResource)) {
 }
 
 MaterialTexture::MaterialTexture(MaterialTexture&& other) noexcept
 	: path(std::move(other.path)),
 	  type(std::exchange(other.type, {})),
-	  gpuPtr(std::move(other.gpuPtr)) {
+	  texture(std::move(other.texture)) {
 }
 
 MaterialTexture& MaterialTexture::operator=(MaterialTexture&& other) noexcept {
-	if (this == &other)
-		return *this;
-	path = std::move(other.path);
-	type = std::exchange(other.type, {});
-	gpuPtr = std::move(other.gpuPtr);
+	if (this != &other) {
+		path = std::move(other.path);
+		type = std::exchange(other.type, {});
+		texture = std::move(other.texture);
+
+	}
+
 	return *this;
 }
 
@@ -57,13 +59,13 @@ MaterialTexture MaterialTexture::load(const std::span<const std::string> paths, 
 
 			cfg.width = width;
 			cfg.height = height;
-			auto texture = std::make_shared<Texture>(cfg);
+			auto gpuPtr = std::make_shared<GPUTexture>(cfg);
 
-			texture->copyToMemory(0, data);
+			gpuPtr->copyToMemory(0, data);
 
 			stbi_image_free(data);
 			stbi_set_flip_vertically_on_load(false);
-			return MaterialTexture{path, TextureType::Albedo, std::move(texture)};
+			return {path, TextureType::Albedo, std::move(gpuPtr)};
 		}
 		case TextureTarget::TextureCubeMap: {
 			TextureConfig cfg = config;
@@ -76,7 +78,7 @@ MaterialTexture MaterialTexture::load(const std::span<const std::string> paths, 
 			cfg.width = width;
 			cfg.height = height;
 
-			auto texture = std::make_shared<Texture>(cfg);
+			auto gpuPtr = std::make_shared<GPUTexture>(cfg);
 
 			for (uint32_t i = 0; i < 6; ++i) {
 				unsigned char* data = stbi_load(paths[i].c_str(), &width, &height, &channel, 0);
@@ -85,12 +87,12 @@ MaterialTexture MaterialTexture::load(const std::span<const std::string> paths, 
 					throw std::runtime_error(std::format("Cubemap texture failed to load at path: {}", paths[i]));
 				}
 
-				texture->copyToMemory(i, data);
+				gpuPtr->copyToMemory(i, data);
 
 				stbi_image_free(data);
 			}
 
-			return MaterialTexture{"", TextureType::Albedo, std::move(texture)};
+			return {"", TextureType::Albedo, std::move(gpuPtr)};
 		}
 		default:
 			break;
@@ -99,7 +101,7 @@ MaterialTexture MaterialTexture::load(const std::span<const std::string> paths, 
 	return {};
 }
 
-Texture::Texture(const TextureConfig& config)
+GPUTexture::GPUTexture(const TextureConfig& config)
 	: mTarget(config.target),
 	  mWidth(config.width),
 	  mHeight(config.height),
@@ -191,12 +193,12 @@ Texture::Texture(const TextureConfig& config)
 	glBindTexture(target, 0);
 }
 
-Texture::~Texture() {
+GPUTexture::~GPUTexture() {
 	if (mID)
 		glDeleteTextures(1, &mID);
 }
 
-Texture::Texture(Texture&& other) noexcept
+GPUTexture::GPUTexture(GPUTexture&& other) noexcept
 	: mID(std::exchange(other.mID, 0)),
 	  mTarget(std::exchange(other.mTarget, {})),
 	  mWidth(std::exchange(other.mWidth, 0)),
@@ -205,7 +207,7 @@ Texture::Texture(Texture&& other) noexcept
 	  mDataType(std::exchange(other.mDataType, {})) {
 }
 
-Texture& Texture::operator=(Texture&& other) noexcept {
+GPUTexture& GPUTexture::operator=(GPUTexture&& other) noexcept {
 	if (this != &other) {
 		if (mID)
 			glDeleteTextures(1, &mID);
@@ -221,15 +223,15 @@ Texture& Texture::operator=(Texture&& other) noexcept {
 	return *this;
 }
 
-uint32_t Texture::id() const {
+uint32_t GPUTexture::id() const {
 	return mID;
 }
 
-TextureTarget Texture::target() const {
+TextureTarget GPUTexture::target() const {
 	return mTarget;
 }
 
-void Texture::copyToMemory(const uint32_t face, const void* pixels) const {
+void GPUTexture::copyToMemory(const uint32_t face, const void* pixels) const {
 	switch (mTarget) {
 		case TextureTarget::Texture2D: {
 			glBindTexture(GL_TEXTURE_2D, mID);
@@ -266,14 +268,14 @@ void Texture::copyToMemory(const uint32_t face, const void* pixels) const {
 	}
 }
 
-void Texture::generateMipmaps() const {
+void GPUTexture::generateMipmaps() const {
 	glBindTexture(toUnderlying(mTarget), mID);
 	glGenerateMipmap(toUnderlying(mTarget));
 	glTexParameteri(toUnderlying(mTarget), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glBindTexture(toUnderlying(mTarget), 0);
 }
 
-void Texture::configureParameters(const TextureConfig& config) {
+void GPUTexture::configureParameters(const TextureConfig& config) {
 	if (config.target == TextureTarget::Texture2DMultisample) {
 		return;
 	}
@@ -296,8 +298,8 @@ void Texture::configureParameters(const TextureConfig& config) {
 	}
 }
 
-std::shared_ptr<Texture> Texture::generateColorAttachment(const int32_t width, const int32_t height) {
-	return std::make_shared<Texture>(TextureConfig{
+std::shared_ptr<GPUTexture> GPUTexture::generateColorAttachment(const int32_t width, const int32_t height) {
+	return std::make_shared<GPUTexture>(TextureConfig{
 		.target = TextureTarget::Texture2D,
 		.internalFormat = InternalFormat::RGBA8,
 		.format = BaseFormat::RGBA,
@@ -315,8 +317,8 @@ std::shared_ptr<Texture> Texture::generateColorAttachment(const int32_t width, c
 	});
 }
 
-std::shared_ptr<Texture> Texture::generateColorAttachmentRed(const int32_t width, const int32_t height) {
-	return std::make_shared<Texture>(TextureConfig{
+std::shared_ptr<GPUTexture> GPUTexture::generateColorAttachmentRed(const int32_t width, const int32_t height) {
+	return std::make_shared<GPUTexture>(TextureConfig{
 		.target = TextureTarget::Texture2D,
 		.internalFormat = InternalFormat::Red8,
 		.format = BaseFormat::Red,
@@ -334,8 +336,8 @@ std::shared_ptr<Texture> Texture::generateColorAttachmentRed(const int32_t width
 	});
 }
 
-std::shared_ptr<Texture> Texture::generateColorAttachmentMultisampled(const int32_t width, const int32_t height, const int32_t samples) {
-	return std::make_shared<Texture>(TextureConfig{
+std::shared_ptr<GPUTexture> GPUTexture::generateColorAttachmentMultisampled(const int32_t width, const int32_t height, const int32_t samples) {
+	return std::make_shared<GPUTexture>(TextureConfig{
 		.target = TextureTarget::Texture2DMultisample,
 		.internalFormat = InternalFormat::RGBA8,
 		.format = BaseFormat::RGBA,
@@ -347,8 +349,8 @@ std::shared_ptr<Texture> Texture::generateColorAttachmentMultisampled(const int3
 	});
 }
 
-std::shared_ptr<Texture> Texture::generateColorAttachmentFP(const int32_t width, const int32_t height) {
-	return std::make_shared<Texture>(TextureConfig{
+std::shared_ptr<GPUTexture> GPUTexture::generateColorAttachmentFP(const int32_t width, const int32_t height) {
+	return std::make_shared<GPUTexture>(TextureConfig{
 		.target = TextureTarget::Texture2D,
 		.internalFormat = InternalFormat::RGBAFloat,
 		.format = BaseFormat::RGBA,
@@ -366,8 +368,8 @@ std::shared_ptr<Texture> Texture::generateColorAttachmentFP(const int32_t width,
 	});
 }
 
-std::shared_ptr<Texture> Texture::generateColorAttachmentFPMultisampled(const int32_t width, const int32_t height, int32_t samples) {
-	return std::make_shared<Texture>(TextureConfig{
+std::shared_ptr<GPUTexture> GPUTexture::generateColorAttachmentFPMultisampled(const int32_t width, const int32_t height, int32_t samples) {
+	return std::make_shared<GPUTexture>(TextureConfig{
 		.target = TextureTarget::Texture2DMultisample,
 		.internalFormat = InternalFormat::RGBAFloat,
 		.format = BaseFormat::RGBA,
@@ -379,8 +381,8 @@ std::shared_ptr<Texture> Texture::generateColorAttachmentFPMultisampled(const in
 	});
 }
 
-std::shared_ptr<Texture> Texture::generateColorAttachmentCubemap(const int32_t width, const int32_t height) {
-	return std::make_shared<Texture>(TextureConfig{
+std::shared_ptr<GPUTexture> GPUTexture::generateColorAttachmentCubemap(const int32_t width, const int32_t height) {
+	return std::make_shared<GPUTexture>(TextureConfig{
 		.target = TextureTarget::TextureCubeMap,
 		.internalFormat = InternalFormat::RGBFloat,
 		.format = BaseFormat::RGB,
@@ -399,8 +401,8 @@ std::shared_ptr<Texture> Texture::generateColorAttachmentCubemap(const int32_t w
 	});
 }
 
-std::shared_ptr<Texture> Texture::generateDepthAttachment(const int32_t width, const int32_t height) {
-	return std::make_shared<Texture>(TextureConfig{
+std::shared_ptr<GPUTexture> GPUTexture::generateDepthAttachment(const int32_t width, const int32_t height) {
+	return std::make_shared<GPUTexture>(TextureConfig{
 		.target = TextureTarget::Texture2D,
 		.internalFormat = InternalFormat::Depth24,
 		.format = BaseFormat::Depth,
@@ -418,8 +420,8 @@ std::shared_ptr<Texture> Texture::generateDepthAttachment(const int32_t width, c
 	});
 }
 
-std::shared_ptr<Texture> Texture::generateDepthAttachmentArray(const int32_t width, const int32_t height, const int32_t layers) {
-	return std::make_shared<Texture>(TextureConfig{
+std::shared_ptr<GPUTexture> GPUTexture::generateDepthAttachmentArray(const int32_t width, const int32_t height, const int32_t layers) {
+	return std::make_shared<GPUTexture>(TextureConfig{
 		.target = TextureTarget::Texture2DArray,
 		.internalFormat = InternalFormat::Depth24,
 		.format = BaseFormat::Depth,
@@ -437,8 +439,8 @@ std::shared_ptr<Texture> Texture::generateDepthAttachmentArray(const int32_t wid
 	});
 }
 
-std::shared_ptr<Texture> Texture::generateDepthAttachmentCubemapArray(const int32_t width, const int32_t height, const int32_t layers) {
-	return std::make_shared<Texture>(TextureConfig{
+std::shared_ptr<GPUTexture> GPUTexture::generateDepthAttachmentCubemapArray(const int32_t width, const int32_t height, const int32_t layers) {
+	return std::make_shared<GPUTexture>(TextureConfig{
 		.target = TextureTarget::TextureCubeMapArray,
 		.internalFormat = InternalFormat::Depth24,
 		.format = BaseFormat::Depth,

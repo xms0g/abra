@@ -37,6 +37,6 @@ private:
 
 	ResourceIndexes mIndexes{};
 	UniformBuffer mUBO{};
-	Texture mNoiseTexture{};
+	GPUTexture mNoiseTexture{};
 	std::array<GraphicsPipeline, 2> mPipelines;
 };
