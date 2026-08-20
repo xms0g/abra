@@ -19,7 +19,7 @@ Model::Quad::Quad() {
 	mVAO = std::make_unique<VertexArray>();
 	mVAO->bind();
 
-	mVBO = std::make_unique<VertexBuffer>(STATIC);
+	mVBO = std::make_unique<VertexBuffer>(BufferUsage::Static);
 	mVBO->bind();
 
 	mVBO->copyToMemory(&vertices[0], sizeof(vertices), 0);

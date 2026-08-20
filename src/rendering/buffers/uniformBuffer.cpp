@@ -1,13 +1,14 @@
 #include "uniformBuffer.h"
+#include "../glUtils.hpp"
 
 UniformBuffer::UniformBuffer(const BufferUsage usage, const int32_t size)
-	: Buffer(GL_UNIFORM_BUFFER, size, usage) {
+	: Buffer(BufferType::Uniform, size, usage) {
 	bind();
-	glBufferData(target(), size, nullptr, usage);
+	glBufferData(toUnderlying(mTarget), size, nullptr, toUnderlying(usage));
 	unbind();
 }
 
 void UniformBuffer::copyToMemory(const void* data, const size_t offset, const int32_t size) const {
 	bind();
-	glBufferSubData(mTarget, static_cast<long>(offset), static_cast<long>(size), data);
+	glBufferSubData(toUnderlying(mTarget), static_cast<long>(offset), static_cast<long>(size), data);
 }

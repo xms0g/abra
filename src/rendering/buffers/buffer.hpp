@@ -1,18 +1,25 @@
 #pragma once
 #include <utility>
 #include "glad/glad.h"
+#include "../glUtils.hpp"
 
-enum BufferUsage {
-	STATIC = GL_STATIC_DRAW,
-	DYNAMIC = GL_DYNAMIC_DRAW,
-	STREAM = GL_STREAM_DRAW
+enum class BufferUsage: uint32_t {
+	Static = GL_STATIC_DRAW,
+	Dynamic = GL_DYNAMIC_DRAW,
+	Stream = GL_STREAM_DRAW
+};
+
+enum class BufferType: uint32_t {
+	Vertex = GL_ARRAY_BUFFER,
+	Index = GL_ELEMENT_ARRAY_BUFFER,
+	Uniform = GL_UNIFORM_BUFFER
 };
 
 class Buffer {
 public:
 	Buffer() = default;
 
-	Buffer(const uint32_t target, const int32_t size, const BufferUsage usage)
+	Buffer(const BufferType target, const int32_t size, const BufferUsage usage)
 		: mTarget(target),
 		  mSize(size),
 		  mUsage(usage) {
@@ -26,7 +33,7 @@ public:
 
 	Buffer(Buffer&& other) noexcept
 		: mHandle(std::exchange(other.mHandle, 0)),
-		  mTarget(std::exchange(other.mTarget, 0)),
+		  mTarget(std::exchange(other.mTarget, {})),
 		  mSize(std::exchange(other.mSize, 0)),
 		  mUsage(other.mUsage) {
 	}
@@ -37,7 +44,7 @@ public:
 				glDeleteBuffers(1, &mHandle);
 
 			mHandle = std::exchange(other.mHandle, 0);
-			mTarget = std::exchange(other.mTarget, 0);
+			mTarget = std::exchange(other.mTarget, {});
 			mSize = std::exchange(other.mSize, 0);
 			mUsage = other.mUsage;
 		}
@@ -56,7 +63,7 @@ public:
 	}
 
 	[[nodiscard]]
-	uint32_t target() const {
+	BufferType target() const {
 		return mTarget;
 	}
 
@@ -66,16 +73,16 @@ public:
 	}
 
 	void bind() const {
-		glBindBuffer(mTarget, mHandle);
+		glBindBuffer(toUnderlying(mTarget), mHandle);
 	}
 
 	void unbind() const {
-		glBindBuffer(mTarget, 0);
+		glBindBuffer(toUnderlying(mTarget), 0);
 	}
 
 protected:
 	uint32_t mHandle{0};
-	uint32_t mTarget{0};
+	BufferType mTarget{};
 	int32_t mSize{0};
 	BufferUsage mUsage{};
 };

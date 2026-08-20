@@ -167,7 +167,7 @@ void InstancedOpaquePass::prepareInstanceBuffer(const std::vector<uint32_t>& vao
 	}
 
 	// Allocate the full block of memory once
-	mVBO = std::make_unique<VertexBuffer>(STATIC, totalRequiredSize);
+	mVBO = std::make_unique<VertexBuffer>(BufferUsage::Static, totalRequiredSize);
 
 	// Setup attributes now that the buffer is allocated
 	int32_t currentOffset = 0;

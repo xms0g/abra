@@ -85,8 +85,8 @@ void Mesh::uploadToGPU() {
 	mVAO = std::make_unique<VertexArray>();
 	mVAO->bind();
 
-	mVBO = std::make_unique<VertexBuffer>(STATIC);
-	mIBO = std::make_unique<IndexBuffer>(STATIC);
+	mVBO = std::make_unique<VertexBuffer>(BufferUsage::Static);
+	mIBO = std::make_unique<IndexBuffer>(BufferUsage::Static);
 	// bind the buffer to be used
 	mVBO->bind();
 	mVBO->copyToMemory(mVertices.data(), static_cast<uint32_t>(mVertices.size() * sizeof(Vertex)), 0);

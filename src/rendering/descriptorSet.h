@@ -10,7 +10,6 @@
 class Buffer;
 
 enum class DescriptorType : uint32_t {
-	None,
 	UniformBuffer,
 	SampledImage
 };
@@ -25,14 +24,14 @@ struct Descriptor {
 	}
 
 	template<typename T>
-	const T& rs() const {
+	const T& refRes() const {
 		return std::get<std::reference_wrapper<const T>>(resource).get();
 	}
 };
 
 struct DescriptorBinding {
 	std::string name;
-	DescriptorType type;
+	DescriptorType type{};
 	int32_t binding{};
 };
 

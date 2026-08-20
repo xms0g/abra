@@ -150,20 +150,19 @@ void GraphicsEncoder::bindDescriptorSet(const DescriptorSetLayout& layout, const
 		const auto& descBinding = layout.bindings[i];
 
 		auto& descriptor = descriptorSet[i];
+
 		if (!descriptor.isValid()) continue;
 
 		switch (descBinding.type) {
-			case DescriptorType::None:
-				break;
 			case DescriptorType::UniformBuffer: {
-				const auto& buffer = descriptor.rs<Buffer>();
+				const auto& buffer = descriptor.refRes<Buffer>();
 
-				glBindBufferRange(buffer.target(), descBinding.binding, buffer.handle(), 0, buffer.size());
+				glBindBufferRange(toUnderlying(buffer.target()), descBinding.binding, buffer.handle(), 0, buffer.size());
 				break;
 			}
 
 			case DescriptorType::SampledImage:{
-				if (const auto& texture = descriptor.rs<Texture>(); mState.bindingCache.textures[descBinding.binding] != texture.id()) {
+				if (const auto& texture = descriptor.refRes<Texture>(); mState.bindingCache.textures[descBinding.binding] != texture.id()) {
 					mState.bindingCache.textures[descBinding.binding] = texture.id();
 					glActiveTexture(GL_TEXTURE0 + descBinding.binding);
 					glBindTexture(toUnderlying(texture.target()), texture.id());

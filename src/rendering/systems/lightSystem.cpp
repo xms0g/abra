@@ -47,7 +47,7 @@ void LightSystem::configure(RenderContext& ctx, GraphicsEncoder& encoder, EventB
 	mCtx->light.pointLights = std::span(mPointLights.data(), mPointLights.size());
 	mCtx->light.spotLights = std::span(mSpotLights.data(), mSpotLights.size());
 
-	mUBO = UniformBuffer{DYNAMIC, sizeof(UniformBufferObject)};
+	mUBO = UniformBuffer{BufferUsage::Dynamic, sizeof(UniformBufferObject)};
 	const DescriptorSetLayout layout = {
 		.bindings = {
 			{

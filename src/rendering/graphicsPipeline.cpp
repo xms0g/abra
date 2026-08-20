@@ -28,8 +28,6 @@ GraphicsPipeline::GraphicsPipeline(const GraphicsPipelineCreateInfo& createInfo)
 				case DescriptorType::SampledImage:
 					mState.shader.setValue(name, binding);
 					break;
-				case DescriptorType::None:
-					break;
 			}
 		}
 	}

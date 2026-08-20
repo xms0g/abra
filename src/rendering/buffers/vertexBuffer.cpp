@@ -1,21 +1,22 @@
 #include "vertexBuffer.h"
+#include "../glUtils.hpp"
 
 VertexBuffer::VertexBuffer(const BufferUsage usage, const int32_t size)
-	: Buffer(GL_ARRAY_BUFFER, size, usage) {
+	: Buffer(BufferType::Vertex, size, usage) {
 	if (size > 0) {
 		bind();
-		glBufferData(mTarget, size, nullptr, mUsage);
+		glBufferData(toUnderlying(mTarget), size, nullptr, toUnderlying(mUsage));
 		unbind();
 	}
 }
 
 void VertexBuffer::copyToMemory(const void* data, const uint32_t size, const uint32_t offset) const {
 	switch (mUsage) {
-		case STATIC:
-			glBufferData(mTarget, size, data, mUsage);
+		case BufferUsage::Static:
+			glBufferData(toUnderlying(mTarget), size, data, toUnderlying(mUsage));
 			break;
-		case DYNAMIC: {
-			glBufferSubData(mTarget, offset, size, data);
+		case BufferUsage::Dynamic: {
+			glBufferSubData(toUnderlying(mTarget), offset, size, data);
 			break;
 		}
 		default: break;
