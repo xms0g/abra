@@ -43,9 +43,9 @@ void Texture::upload(const uint32_t face,
 					 const void* data,
 					 const int32_t width,
 					 const int32_t height,
-					 BaseFormat format,
-					 InternalFormat internalFormat,
-					 DataType dataType) const {
+					 const BaseFormat format,
+					 const InternalFormat internalFormat,
+					 const DataType dataType) const {
 	switch (target) {
 		case TextureTarget::Texture2D: {
 			glBindTexture(GL_TEXTURE_2D, id);
@@ -162,7 +162,7 @@ Texture Texture::load(const std::span<const std::string> paths, const TextureCon
 					throw std::runtime_error(std::format("Cubemap texture failed to load at path: {}", paths[i]));
 				}
 
-				texture.upload(i, data, width, height, config.format, config.internalFormat, config.dataType);
+				texture.upload(i, data, cfg.width, cfg.height, cfg.format, cfg.internalFormat, cfg.dataType);
 
 				stbi_image_free(data);
 			}
