@@ -174,7 +174,7 @@ void InstancedBlendPass::prepareInstanceBuffer(const std::vector<uint32_t>& vaos
 	}
 
 	// Allocate the full block of memory once
-	mVBO = std::make_unique<VertexBuffer>(BufferUsage::Static, totalRequiredSize);
+	mVBO = std::make_unique<VertexBuffer>(totalRequiredSize, BufferUsage::Static);
 
 	// Setup attributes now that the buffer is allocated
 	int32_t currentOffset = 0;
@@ -210,7 +210,7 @@ void InstancedBlendPass::uploadInstanceData() const {
 		}
 
 		const size_t uploadSize = gpuData.size() * sizeof(InstanceData);
-		mVBO->copyToMemory(gpuData.data(), static_cast<int32_t>(uploadSize), currentOffset);
+		mVBO->copyToMemory(gpuData.data(), currentOffset, static_cast<int32_t>(uploadSize));
 		currentOffset += static_cast<int32_t>(uploadSize);
 	}
 

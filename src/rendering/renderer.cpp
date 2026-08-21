@@ -112,7 +112,7 @@ void Renderer::createSystems(Registry& registry) {
 
 void Renderer::createUniformBuffers() {
 	// Create camera buffer
-	mCameraUBO = UniformBuffer{BufferUsage::Dynamic, sizeof(UniformBufferObject)};
+	mCameraUBO = UniformBuffer{sizeof(UniformBufferObject), BufferUsage::Dynamic};
 
 	const DescriptorSetLayout layout{
 		.bindings = {

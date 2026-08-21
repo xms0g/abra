@@ -4,9 +4,9 @@
 
 class VertexBuffer final : public Buffer {
 public:
-	explicit VertexBuffer(BufferUsage usage, int32_t size = 0);
+	explicit VertexBuffer(int32_t size, BufferUsage usage);
 
-	void copyToMemory(const void* data, uint32_t size, uint32_t offset) const;
+	void copyToMemory(const void* data, uint32_t offset, uint32_t size) const;
 };
 
 struct VertexAttribute {

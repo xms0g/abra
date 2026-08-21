@@ -19,10 +19,10 @@ Model::Quad::Quad() {
 	mVAO = std::make_unique<VertexArray>();
 	mVAO->bind();
 
-	mVBO = std::make_unique<VertexBuffer>(BufferUsage::Static);
+	mVBO = std::make_unique<VertexBuffer>(0, BufferUsage::Static);
 	mVBO->bind();
 
-	mVBO->copyToMemory(&vertices[0], sizeof(vertices), 0);
+	mVBO->copyToMemory(&vertices[0], 0, sizeof(vertices));
 
 	VertexLayout layout;
 	layout.pushVector<glm::vec2>(0);	// Position

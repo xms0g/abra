@@ -94,7 +94,7 @@ void ShadowSystem::configure(const RenderContext& ctx,
 	mOmnidirShadow = std::make_unique<OmnidirectionalShadow>(ctx);
 	mPersShadow = std::make_unique<PerspectiveShadow>(ctx);
 
-	mUBO = UniformBuffer{BufferUsage::Dynamic, sizeof(UniformBufferObject)};
+	mUBO = UniformBuffer{sizeof(UniformBufferObject), BufferUsage::Dynamic};
 
 	const DescriptorSetLayout layout = {
 		.bindings = {

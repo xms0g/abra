@@ -1,7 +1,7 @@
 #include "vertexBuffer.h"
 #include "../glUtils.hpp"
 
-VertexBuffer::VertexBuffer(const BufferUsage usage, const int32_t size)
+VertexBuffer::VertexBuffer(const int32_t size, const BufferUsage usage)
 	: Buffer(BufferType::Vertex, size, usage) {
 	if (size > 0) {
 		bind();
@@ -10,7 +10,9 @@ VertexBuffer::VertexBuffer(const BufferUsage usage, const int32_t size)
 	}
 }
 
-void VertexBuffer::copyToMemory(const void* data, const uint32_t size, const uint32_t offset) const {
+void VertexBuffer::copyToMemory(const void* data, const uint32_t offset, const uint32_t size) const {
+	bind();
+
 	switch (mUsage) {
 		case BufferUsage::Static:
 			glBufferData(toUnderlying(mTarget), size, data, toUnderlying(mUsage));

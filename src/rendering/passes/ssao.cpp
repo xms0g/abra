@@ -165,7 +165,7 @@ void SSAOPass::createKernel(GraphicsEncoder& encoder) {
 	};
 	UniformBufferObject ubo{};
 
-	mUBO = UniformBuffer{BufferUsage::Dynamic, sizeof(UniformBufferObject)};
+	mUBO = UniformBuffer{sizeof(UniformBufferObject), BufferUsage::Dynamic};
 
 	const DescriptorSetLayout layout = {
 		.bindings = {
