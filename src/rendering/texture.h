@@ -95,7 +95,7 @@ struct MaterialTexture {
 
 	MaterialTexture() = default;
 
-	MaterialTexture(std::string path, TextureType type, const std::shared_ptr<GPUTexture>& texture);
+	MaterialTexture(std::string path, TextureType type, std::shared_ptr<GPUTexture> texture);
 
 	MaterialTexture(const MaterialTexture& other) = delete;
 

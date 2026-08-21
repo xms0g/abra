@@ -6,10 +6,10 @@
 #include "image/stb_image.h"
 #include "glUtils.hpp"
 
-MaterialTexture::MaterialTexture(std::string path, const TextureType type, const std::shared_ptr<GPUTexture>& texture)
+MaterialTexture::MaterialTexture(std::string path, const TextureType type, std::shared_ptr<GPUTexture> texture)
 	: path(std::move(path)),
 	  type(type),
-	  texture(texture) {
+	  texture(std::move(texture)) {
 }
 
 MaterialTexture::MaterialTexture(MaterialTexture&& other) noexcept
