@@ -262,25 +262,25 @@ void ResourceManager::processMaterials(const aiScene* scene, MaterialLoadContext
 		const aiMaterial* material = scene->mMaterials[matID];
 
 		for (const auto& type: textureTypes) {
-			TextureLoadRequest req{.mat = material, .type = type, .materialID = matID};
-			loadMaterialTextures(req, materialLoadCtx);
+			TextureLoadRequest req{.type = type, .materialID = matID};
+			loadMaterialTextures(material, req, materialLoadCtx);
 		}
 	}
 }
 
-void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& materialLoadCtx) {
+void ResourceManager::loadMaterialTextures(const aiMaterial* mat, const TextureLoadRequest& req, MaterialLoadContext& materialLoadCtx) {
 	if (!materialLoadCtx.materials.contains(req.materialID)) {
 		uint32_t flags{0};
 		flags |= CASTSHADOW;
 
 		if (int twoSided{0};
-			req.mat->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
+			mat->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
 			flags |= twoSided != 0 ? TWOSIDED : 0;
 		}
 
 		if (float matPBR{0.0f};
-			req.mat->Get(AI_MATKEY_METALLIC_FACTOR, matPBR) == AI_SUCCESS ||
-			req.mat->Get(AI_MATKEY_ROUGHNESS_FACTOR, matPBR) == AI_SUCCESS) {
+			mat->Get(AI_MATKEY_METALLIC_FACTOR, matPBR) == AI_SUCCESS ||
+			mat->Get(AI_MATKEY_ROUGHNESS_FACTOR, matPBR) == AI_SUCCESS) {
 			flags |= (matPBR > 0.0f) ? PBR : 0;
 		}
 
@@ -288,7 +288,7 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 		float alphaCutoff{0.0f};
 
 		if (aiString alphaMode;
-			req.mat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode) == AI_SUCCESS) {
+			mat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode) == AI_SUCCESS) {
 			if (std::strcmp(alphaMode.C_Str(), "OPAQUE") == 0) {
 				if (!(flags & PBR)) {
 					flags |= OPAQUE;
@@ -299,7 +299,7 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 				} else {
 					flags |= OPAQUE | ALPHACUTOFF;
 				}
-				req.mat->Get(AI_MATKEY_GLTF_ALPHACUTOFF, alphaCutoff);
+				mat->Get(AI_MATKEY_GLTF_ALPHACUTOFF, alphaCutoff);
 			} else if (std::strcmp(alphaMode.C_Str(), "BLEND") == 0) {
 				flags |= BLEND;
 			}
@@ -313,14 +313,15 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 	}
 
 	auto& material = materialLoadCtx.materials[req.materialID];
+	const auto reqType = fromTextureTypeToAssimp(req.type);
 
-	for (uint32_t i = 0; i < req.mat->GetTextureCount(req.type); ++i) {
+	for (uint32_t i = 0; i < mat->GetTextureCount(reqType); ++i) {
 		aiString str;
 
-		req.mat->GetTexture(req.type, i, &str);
+		mat->GetTexture(reqType, i, &str);
 		std::string path = materialLoadCtx.textureDir + str.C_Str();
 
-		switch (req.type) {
+		switch (reqType) {
 			case aiTextureType_HEIGHT:
 				material.flags |= HAS_HEIGHT_MAP;
 				break;
@@ -340,7 +341,7 @@ void ResourceManager::loadMaterialTextures(const TextureLoadRequest& req, Materi
 			}
 		}
 
-		material.textures.emplace_back(std::move(path), fromAssimpToTextureType(req.type), nullptr);
+		material.textures.emplace_back(std::move(path), req.type, nullptr);
 	}
 }
 
@@ -362,6 +363,26 @@ TextureType ResourceManager::fromAssimpToTextureType(const aiTextureType type) {
 			return TextureType::Height;
 		default:
 			break;
+	}
+	return {};
+}
+
+aiTextureType ResourceManager::fromTextureTypeToAssimp(const TextureType type) {
+	switch (type) {
+		case TextureType::Albedo:
+			return aiTextureType_DIFFUSE;
+		case TextureType::Specular:
+			return aiTextureType_SPECULAR;
+		case TextureType::Normal:
+			return aiTextureType_NORMALS;
+		case TextureType::Ao:
+			return aiTextureType_LIGHTMAP;
+		case TextureType::Emissive:
+			return aiTextureType_EMISSIVE;
+		case TextureType::Roughness_Metallic:
+			return aiTextureType_UNKNOWN;
+		case TextureType::Height:
+			return aiTextureType_HEIGHT;
 	}
 	return {};
 }

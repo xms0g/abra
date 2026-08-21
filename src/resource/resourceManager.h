@@ -52,9 +52,11 @@ private:
 
 	static void processMaterials(const aiScene* scene, MaterialLoadContext& materialLoadCtx);
 
-	static void loadMaterialTextures(const TextureLoadRequest& req, MaterialLoadContext& materialLoadCtx);
+	static void loadMaterialTextures(const aiMaterial* mat, const TextureLoadRequest& req, MaterialLoadContext& materialLoadCtx);
 
 	static TextureType fromAssimpToTextureType(aiTextureType type);
+
+	static aiTextureType fromTextureTypeToAssimp(TextureType type);
 
 	struct MaterialLoadContext {
 		MaterialMap materials;
@@ -64,8 +66,7 @@ private:
 	};
 
 	struct TextureLoadRequest {
-		const aiMaterial* mat;
-		aiTextureType type;
+		TextureType type;
 		uint32_t materialID;
 	};
 
@@ -76,13 +77,13 @@ private:
 	ThreadPool mThreadPool{};
 	std::mutex mResourceMutex;
 
-	static constexpr aiTextureType textureTypes[] = {
-		aiTextureType_DIFFUSE,
-		aiTextureType_NORMALS,
-		aiTextureType_UNKNOWN,
-		aiTextureType_LIGHTMAP,
-		aiTextureType_EMISSIVE,
-		aiTextureType_HEIGHT
+	static constexpr TextureType textureTypes[] = {
+		TextureType::Albedo,
+		TextureType::Normal,
+		TextureType::Roughness_Metallic,
+		TextureType::Ao,
+		TextureType::Emissive,
+		TextureType::Height
 	};
 };
 
