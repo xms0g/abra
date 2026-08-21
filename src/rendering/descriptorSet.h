@@ -3,7 +3,7 @@
 #include <vector>
 #include <cstdint>
 #include <span>
-#include "texture/texture.h"
+#include "texture.h"
 
 #define MAX_DESCRIPTOR_COUNT 32
 

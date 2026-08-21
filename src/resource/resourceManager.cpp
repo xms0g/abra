@@ -8,7 +8,7 @@
 #include "../rendering/material/material.hpp"
 #include "../rendering/mesh/mesh.h"
 #include "../rendering/mesh/vertex.hpp"
-#include "../rendering/texture/texture.h"
+#include "../rendering/texture.h"
 
 ResourceManager& ResourceManager::instance() {
 	static ResourceManager instance;

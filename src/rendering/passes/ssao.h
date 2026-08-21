@@ -2,7 +2,7 @@
 #include "IPass.hpp"
 #include "../graphicsPipeline.h"
 #include "../buffers/uniformBuffer.h"
-#include "../texture/texture.h"
+#include "../texture.h"
 
 class FrameBuffer;
 class Shader;

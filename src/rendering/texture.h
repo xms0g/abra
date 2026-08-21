@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <string>
-#include <string_view>
 #include <span>
 #include "glad/glad.h"
 
@@ -96,7 +95,7 @@ struct MaterialTexture {
 
 	MaterialTexture() = default;
 
-	MaterialTexture(std::string path, TextureType type, std::shared_ptr<GPUTexture> gpuResource);
+	MaterialTexture(std::string path, TextureType type, const std::shared_ptr<GPUTexture>& texture);
 
 	MaterialTexture(const MaterialTexture& other) = delete;
 

@@ -3,7 +3,7 @@
 #include "../frameGraph.h"
 #include "../descriptorSet.h"
 #include "../graphicsEncoder.h"
-#include "../texture/texture.h"
+#include "../texture.h"
 #include "../context/renderContext.hpp"
 #include "../../config/configManager.h"
 #include "../../math/random.h"

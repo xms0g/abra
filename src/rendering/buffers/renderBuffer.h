@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include "../texture/texture.h"
+#include "../texture.h"
 
 class RenderBuffer {
 public:

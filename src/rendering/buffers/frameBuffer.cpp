@@ -5,7 +5,7 @@
 #include "glad/glad.h"
 #include "renderBuffer.h"
 #include "../glUtils.hpp"
-#include "../texture/texture.h"
+#include "../texture.h"
 
 FrameBuffer::FrameBuffer(const int32_t width, const int32_t height)
 	: mWidth(width),

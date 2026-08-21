@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "../texture/texture.h"
+#include "../texture.h"
 
 class RenderBuffer;
 

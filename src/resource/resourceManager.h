@@ -6,7 +6,7 @@
 #include <assimp/scene.h>
 #include "../job/threadPool.h"
 #include "../rendering/types.hpp"
-#include "../rendering/texture/texture.h"
+#include "../rendering/texture.h"
 
 #define RESOURCE_MANAGER ResourceManager::instance()
 

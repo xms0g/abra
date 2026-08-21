@@ -1,7 +1,7 @@
 #include "cube.h"
 #include "../mesh/mesh.h"
 #include "../mesh/vertex.hpp"
-#include "../texture/texture.h"
+#include "../texture.h"
 #include "../material/material.hpp"
 
 Model::Cube::Cube(glm::vec3 color,

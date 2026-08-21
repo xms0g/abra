@@ -2,7 +2,7 @@
 #include <string>
 #include "../../graphicsEncoder.h"
 #include "../../graphicsPipeline.h"
-#include "../../texture/texture.h"
+#include "../../texture.h"
 #include "../../../event/events/guiPostProcessEvent.hpp"
 
 namespace Model {

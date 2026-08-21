@@ -1,7 +1,7 @@
 #pragma once
 #include <span>
 #include "glm/glm.hpp"
-#include "texture/texture.h"
+#include "texture.h"
 
 struct MaterialView {
 	uint32_t idx;

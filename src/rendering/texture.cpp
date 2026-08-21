@@ -1,15 +1,15 @@
 #include "texture.h"
+#include <cassert>
 #include <iostream>
 #include <utility>
 #include "glad/glad.h"
 #include "image/stb_image.h"
-#include "../material/material.hpp"
-#include "../glUtils.hpp"
+#include "glUtils.hpp"
 
-MaterialTexture::MaterialTexture(std::string path, TextureType type, std::shared_ptr<GPUTexture> gpuResource)
+MaterialTexture::MaterialTexture(std::string path, const TextureType type, const std::shared_ptr<GPUTexture>& texture)
 	: path(std::move(path)),
 	  type(type),
-	  texture(std::move(gpuResource)) {
+	  texture(texture) {
 }
 
 MaterialTexture::MaterialTexture(MaterialTexture&& other) noexcept
