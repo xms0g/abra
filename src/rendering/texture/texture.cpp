@@ -23,7 +23,6 @@ MaterialTexture& MaterialTexture::operator=(MaterialTexture&& other) noexcept {
 		path = std::move(other.path);
 		type = std::exchange(other.type, {});
 		texture = std::move(other.texture);
-
 	}
 
 	return *this;

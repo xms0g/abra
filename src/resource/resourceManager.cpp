@@ -76,7 +76,7 @@ void ResourceManager::uploadMaterialsToGPU() {
 						paths[i] = fs::resolvePath(assetRoot / material.textures[i].path);
 					}
 
-					MaterialTexture texture = MaterialTexture::load(paths, {
+					MaterialTexture loadedTexture = MaterialTexture::load(paths, {
 						.target = TextureTarget::TextureCubeMap,
 						.internalFormat = InternalFormat::SRGB8,
 						.format = BaseFormat::RGB,
@@ -94,29 +94,29 @@ void ResourceManager::uploadMaterialsToGPU() {
 						.layers = 1,
 					});
 
-					texture.texture->generateMipmaps();
+					loadedTexture.texture->generateMipmaps();
 
 					material.textures.clear();
-					material.textures.push_back(std::move(texture));
+					material.textures.push_back(std::move(loadedTexture));
 				}
 
 				continue;
 			}
 
-			for (auto& texture: material.textures) {
-				if (idByPath.contains(texture.path)) {
-					texture.texture = idByPath.at(texture.path);
+			for (auto& matTexture: material.textures) {
+				if (idByPath.contains(matTexture.path)) {
+					matTexture.texture = idByPath.at(matTexture.path);
 					continue;
 				}
 
-				const auto p = fs::resolvePath(assetRoot / texture.path);
+				const auto p = fs::resolvePath(assetRoot / matTexture.path);
 				const bool isSRGBA =
-					texture.type == fromAssimpToTextureType(aiTextureType_DIFFUSE) ||
-					texture.type == fromAssimpToTextureType(aiTextureType_EMISSIVE);
+					matTexture.type == fromAssimpToTextureType(aiTextureType_DIFFUSE) ||
+					matTexture.type == fromAssimpToTextureType(aiTextureType_EMISSIVE);
 
 				std::string paths[] = {p};
 
-				texture = MaterialTexture::load(paths, {
+				matTexture = MaterialTexture::load(paths, {
 					.target = TextureTarget::Texture2D,
 					.internalFormat = isSRGBA ? InternalFormat::SRGB8Alpha8 : InternalFormat::RGBA8,
 					.format = BaseFormat::RGBA,
@@ -133,9 +133,9 @@ void ResourceManager::uploadMaterialsToGPU() {
 					.layers = 1,
 				});
 
-				texture.texture->generateMipmaps();
+				matTexture.texture->generateMipmaps();
 
-				idByPath.emplace(texture.path, texture.texture);
+				idByPath.emplace(matTexture.path, matTexture.texture);
 			}
 		}
 	}
