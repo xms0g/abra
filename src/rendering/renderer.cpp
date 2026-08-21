@@ -453,14 +453,14 @@ void Renderer::configureSystems(EventBus& eventBus) {
 void Renderer::updateUniformBuffers() const {
 	const UniformBufferObject ubo = {
 		.view = mRenderCtx.camera->viewMatrix(),
-		.inverseView = glm::inverse(mRenderCtx.camera->viewMatrix()),
 		.skyView = glm::mat4(glm::mat3(mRenderCtx.camera->viewMatrix())),
 		.cameraPos = glm::vec4(mRenderCtx.camera->position(), 1.0),
 		.projection = glm::perspective(
 			glm::radians(mRenderCtx.camera->zoom()),
 			CONFIG_MANAGER.get<float>("window.aspectRatio"),
 			mRenderCtx.camera->znear(),
-			mRenderCtx.camera->zfar())
+			mRenderCtx.camera->zfar()),
+		.inverseProjection = glm::inverse(ubo.projection),
 	};
 
 	mCameraUBO.copyToMemory(&ubo, 0, sizeof(UniformBufferObject));

@@ -66,10 +66,10 @@ private:
 
 	struct alignas(16) UniformBufferObject {
 		glm::mat4 view;
-		glm::mat4 inverseView;
 		glm::mat4 skyView;
 		glm::vec4 cameraPos;
 		glm::mat4 projection;
+		glm::mat4 inverseProjection;
 	};
 
 	struct ResourceIndexes {

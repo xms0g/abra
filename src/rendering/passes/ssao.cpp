@@ -54,9 +54,9 @@ void SSAOPass::configure(const RenderContext& ctx,
 	DescriptorSetLayout ssaoPassLayout = {
 		.bindings = {
 			{
-				.name = "gPosition",
+				.name = "gDepth",
 				.type = DescriptorType::SampledImage,
-				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.position.slot")
+				.binding = CONFIG_MANAGER.get<int32_t>("gBuffer.depth.slot")
 			},
 			{
 				.name = "gNormal",
@@ -118,7 +118,7 @@ void SSAOPass::configure(const RenderContext& ctx,
 	const auto& gBuffer = graph.getResource(mIndexes.gBuffer);
 
 	DescriptorSet frameSet{};
-	frameSet.write(*gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.index")))
+	frameSet.write(*gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.depth.index")))
 			.write(*gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")))
 			.write(mNoiseTexture);
 

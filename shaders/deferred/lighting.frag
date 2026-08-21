@@ -19,8 +19,8 @@ out vec4 fragColor;
 void main() {
     vec4 positionSample = texture(gPosition, fs_in.TexCoord);
     vec4 normalSample = texture(gNormal, fs_in.TexCoord);
-    vec3 fragWorldPos = (inverseView * vec4(positionSample.xyz, 1.0)).xyz;
-    vec3 N = normalize((mat3(inverseView) * normalSample.xyz));
+    vec3 fragWorldPos = positionSample.xyz;
+    vec3 N = normalSample.xyz;
     vec3 V = normalize(cameraPos.xyz - fragWorldPos);
     vec3 R = reflect(-V, N);
 

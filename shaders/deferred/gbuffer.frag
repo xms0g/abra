@@ -2,7 +2,7 @@
 in VS_OUT
 {
     vec2 TexCoord;
-    vec3 ViewPos;
+    vec3 WorldPos;
     mat3 TBN;
     vec3 TangentViewDir;
 } fs_in;
@@ -26,9 +26,9 @@ void main() {
     }
 
     // store the fragment position vector in the first gbuffer texture
-    gPosition.rgb = fs_in.ViewPos;
+    gPosition.rgb = fs_in.WorldPos;
     // also store the per-fragment normals into the gbuffer
-    gNormal.rgb = normalize(mat3(view) * normal(fs_in.TBN, texCoord, true));
+    gNormal.rgb = normal(fs_in.TBN, texCoord, true);
     // and the diffuse per-fragment color
     gAlbedo.rgb = albedoSample.rgb;
     // Occulusion - Roughness - Metallic
