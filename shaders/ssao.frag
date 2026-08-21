@@ -18,12 +18,9 @@ layout (std140) uniform SSAOBlock
 };
 
 vec3 viewPosFromDepth(vec2 texCoord) {
-    float z = texture(gDepth, texCoord).r;
-    // Get x/y in clip space
-    float x = texCoord.x * 2.0 - 1.0;
-    float y = texCoord.y * 2.0 - 1.0;
-
-    vec4 clipPos = vec4(x, y, z * 2.0 - 1.0, 1.0);
+    float depth = texture(gDepth, texCoord).r;
+    // Get x/y/z in clip space
+    vec4 clipPos = vec4(vec3(texCoord * 2.0 - 1.0, depth * 2.0 - 1.0), 1.0);
     vec4 viewPos = inverseProjection * clipPos;
 
     return viewPos.xyz / viewPos.w;
@@ -31,7 +28,7 @@ vec3 viewPosFromDepth(vec2 texCoord) {
 
 float viewZFromDepth(vec2 texCoord) {
     float depth = texture(gDepth, texCoord).r;
-    // Get x/y in clip space
+    // Get x/y/z in clip space
     vec3 clip = vec3(texCoord * 2.0 - 1.0, depth * 2.0 - 1.0);
 
     float viewZ = dot(inverseProjection[2].xyz, clip) + inverseProjection[3][2];
