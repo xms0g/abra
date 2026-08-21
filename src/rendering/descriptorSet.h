@@ -7,7 +7,7 @@
 
 #define MAX_DESCRIPTOR_COUNT 32
 
-class Buffer;
+class GPUBuffer;
 
 enum class DescriptorType : uint32_t {
 	UniformBuffer,
@@ -15,7 +15,7 @@ enum class DescriptorType : uint32_t {
 };
 
 struct Descriptor {
-	using ResourceRef = std::variant<std::monostate, std::reference_wrapper<const GPUTexture>, std::reference_wrapper<const Buffer>>;
+	using ResourceRef = std::variant<std::monostate, std::reference_wrapper<const GPUTexture>, std::reference_wrapper<const GPUBuffer>>;
 	ResourceRef resource;
 
 	[[nodiscard]]
@@ -45,7 +45,7 @@ public:
 
 	DescriptorSet& write(const GPUTexture& texture);
 
-	DescriptorSet& write(const Buffer& buffer);
+	DescriptorSet& write(const GPUBuffer& buffer);
 
 	[[nodiscard]]
 	const Descriptor& descriptor(uint32_t index) const;

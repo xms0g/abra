@@ -155,7 +155,7 @@ void GraphicsEncoder::bindDescriptorSet(const DescriptorSetLayout& layout, const
 
 		switch (descBinding.type) {
 			case DescriptorType::UniformBuffer: {
-				const auto& buffer = descriptor.refRes<Buffer>();
+				const auto& buffer = descriptor.refRes<GPUBuffer>();
 
 				glBindBufferRange(toUnderlying(buffer.target()), descBinding.binding, buffer.handle(), 0, buffer.size());
 				break;

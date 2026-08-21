@@ -14,7 +14,7 @@ DescriptorSet& DescriptorSet::write(const GPUTexture& texture) {
 	return *this;
 }
 
-DescriptorSet& DescriptorSet::write(const Buffer& buffer) {
+DescriptorSet& DescriptorSet::write(const GPUBuffer& buffer) {
 	assert(mCount < MAX_DESCRIPTOR_COUNT);
 	mDescriptors[mCount++] = {.resource = buffer};
 	return *this;

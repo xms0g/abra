@@ -2,7 +2,7 @@
 #include "../glUtils.hpp"
 
 UniformBuffer::UniformBuffer(const int32_t size, const BufferUsage usage)
-	: Buffer(BufferType::Uniform, size, usage) {
+	: GPUBuffer(BufferType::Uniform, size, usage) {
 	bind();
 	glBufferData(toUnderlying(mTarget), size, nullptr, toUnderlying(usage));
 	unbind();

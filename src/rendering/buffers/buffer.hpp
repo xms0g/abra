@@ -15,11 +15,11 @@ enum class BufferType: uint32_t {
 	Uniform = GL_UNIFORM_BUFFER
 };
 
-class Buffer {
+class GPUBuffer {
 public:
-	Buffer() = default;
+	GPUBuffer() = default;
 
-	Buffer(const BufferType target, const int32_t size, const BufferUsage usage)
+	GPUBuffer(const BufferType target, const int32_t size, const BufferUsage usage)
 		: mTarget(target),
 		  mSize(size),
 		  mUsage(usage) {
@@ -27,18 +27,18 @@ public:
 	}
 
 
-	Buffer(const Buffer& other) = delete;
+	GPUBuffer(const GPUBuffer& other) = delete;
 
-	Buffer& operator=(const Buffer& other) = delete;
+	GPUBuffer& operator=(const GPUBuffer& other) = delete;
 
-	Buffer(Buffer&& other) noexcept
+	GPUBuffer(GPUBuffer&& other) noexcept
 		: mHandle(std::exchange(other.mHandle, 0)),
 		  mTarget(std::exchange(other.mTarget, {})),
 		  mSize(std::exchange(other.mSize, 0)),
 		  mUsage(other.mUsage) {
 	}
 
-	Buffer& operator=(Buffer&& other) noexcept {
+	GPUBuffer& operator=(GPUBuffer&& other) noexcept {
 		if (this != &other) {
 			if (mHandle)
 				glDeleteBuffers(1, &mHandle);
@@ -52,7 +52,7 @@ public:
 		return *this;
 	}
 
-	virtual ~Buffer() {
+	virtual ~GPUBuffer() {
 		if (mHandle)
 			glDeleteBuffers(1, &mHandle);
 	}

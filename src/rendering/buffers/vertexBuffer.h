@@ -2,7 +2,7 @@
 #include <vector>
 #include "buffer.hpp"
 
-class VertexBuffer final : public Buffer {
+class VertexBuffer final : public GPUBuffer {
 public:
 	explicit VertexBuffer(int32_t size, BufferUsage usage);
 

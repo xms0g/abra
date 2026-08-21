@@ -1,7 +1,7 @@
 #pragma once
 #include "buffer.hpp"
 
-class UniformBuffer final : public Buffer {
+class UniformBuffer final : public GPUBuffer {
 public:
 	UniformBuffer() = default;
 

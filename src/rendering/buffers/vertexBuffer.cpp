@@ -2,7 +2,7 @@
 #include "../glUtils.hpp"
 
 VertexBuffer::VertexBuffer(const int32_t size, const BufferUsage usage)
-	: Buffer(BufferType::Vertex, size, usage) {
+	: GPUBuffer(BufferType::Vertex, size, usage) {
 	if (size > 0) {
 		bind();
 		glBufferData(toUnderlying(mTarget), size, nullptr, toUnderlying(mUsage));

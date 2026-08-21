@@ -1,7 +1,7 @@
 #pragma once
 #include "buffer.hpp"
 
-class IndexBuffer final : public Buffer {
+class IndexBuffer final : public GPUBuffer {
 public:
 	explicit IndexBuffer(BufferUsage usage);
 
