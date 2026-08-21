@@ -13,6 +13,7 @@
 #include "systems/shadowSystem/shadowSystem.h"
 #include "buffers/frameBuffer.h"
 #include "buffers/uniformBuffer.h"
+#include "buffers/renderBuffer.h"
 #include "mesh/mesh.h"
 #include "mesh/vertexArray.h"
 #include "models/cube.h"
@@ -42,7 +43,6 @@
 #include "../ECS/components/mesh.hpp"
 #include "../ECS/components/material.hpp"
 #include "../event/eventBus.hpp"
-#include "buffers/renderBuffer.h"
 
 Renderer::Renderer(Registry& registry, const Camera& camera, Window& window) {
 	RequireComponent<MeshComponent>();
