@@ -29,6 +29,17 @@ vec3 viewPosFromDepth(vec2 texCoord) {
     return viewPos.xyz / viewPos.w;
 }
 
+float viewZFromDepth(vec2 texCoord) {
+    float depth = texture(gDepth, texCoord).r;
+    // Get x/y in clip space
+    vec3 clip = vec3(texCoord * 2.0 - 1.0, depth * 2.0 - 1.0);
+
+    float viewZ = dot(inverseProjection[2].xyz, clip) + inverseProjection[3][2];
+    float viewW = dot(inverseProjection[3].xyz, clip) + inverseProjection[3][3];
+
+    return viewZ / viewW;
+}
+
 out vec4 fragColor;
 
 void main() {
@@ -62,7 +73,7 @@ void main() {
         offset.xyz = offset.xyz * 0.5 + 0.5;// transform to range 0.0 - 1.0
 
         // get sample depth
-        float sampleDepth = viewPosFromDepth(offset.xy).z;
+        float sampleDepth = viewZFromDepth(offset.xy);
 
         // range check & accumulate
         float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPosView.z - sampleDepth));
