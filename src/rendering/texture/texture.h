@@ -88,6 +88,7 @@ struct TextureConfig {
 };
 
 class GPUTexture;
+
 struct MaterialTexture {
 	std::string path;
 	TextureType type{};
@@ -142,11 +143,13 @@ public:
 
 	static std::shared_ptr<GPUTexture> generateColorAttachmentRed(int32_t width, int32_t height);
 
-	static std::shared_ptr<GPUTexture> generateColorAttachmentMultisampled(int32_t width, int32_t height, int32_t samples);
+	static std::shared_ptr<GPUTexture> generateColorAttachmentMultisampled(
+		int32_t width, int32_t height, int32_t samples);
 
 	static std::shared_ptr<GPUTexture> generateColorAttachmentFP(int32_t width, int32_t height);
 
-	static std::shared_ptr<GPUTexture> generateColorAttachmentFPMultisampled(int32_t width, int32_t height, int32_t samples);
+	static std::shared_ptr<GPUTexture> generateColorAttachmentFPMultisampled(
+		int32_t width, int32_t height, int32_t samples);
 
 	static std::shared_ptr<GPUTexture> generateColorAttachmentCubemap(int32_t width, int32_t height);
 
@@ -154,7 +157,8 @@ public:
 
 	static std::shared_ptr<GPUTexture> generateDepthAttachmentArray(int32_t width, int32_t height, int32_t layers);
 
-	static std::shared_ptr<GPUTexture> generateDepthAttachmentCubemapArray(int32_t width, int32_t height, int32_t layers);
+	static std::shared_ptr<GPUTexture> generateDepthAttachmentCubemapArray(
+		int32_t width, int32_t height, int32_t layers);
 
 private:
 	uint32_t mID{};
