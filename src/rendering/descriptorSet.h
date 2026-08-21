@@ -24,7 +24,7 @@ struct Descriptor {
 	}
 
 	template<typename T>
-	const T& refRes() const {
+	const T& resRef() const {
 		return std::get<std::reference_wrapper<const T>>(resource).get();
 	}
 };
