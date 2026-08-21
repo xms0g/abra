@@ -60,7 +60,7 @@ MaterialTexture MaterialTexture::load(const std::span<const std::string> paths, 
 			cfg.height = height;
 			auto gpuPtr = std::make_shared<GPUTexture>(cfg);
 
-			gpuPtr->copyToMemory(0, data);
+			gpuPtr->copyToMemory(data, 0);
 
 			stbi_image_free(data);
 			stbi_set_flip_vertically_on_load(false);
@@ -82,7 +82,7 @@ MaterialTexture MaterialTexture::load(const std::span<const std::string> paths, 
 					throw std::runtime_error(std::format("Cubemap texture failed to load at path: {}", paths[i]));
 				}
 
-				gpuPtr->copyToMemory(i, data);
+				gpuPtr->copyToMemory(data, i);
 
 				stbi_image_free(data);
 			}
@@ -226,7 +226,7 @@ TextureTarget GPUTexture::target() const {
 	return mTarget;
 }
 
-void GPUTexture::copyToMemory(const uint32_t face, const void* pixels) const {
+void GPUTexture::copyToMemory(const void* pixels, const uint32_t face) const {
 	switch (mTarget) {
 		case TextureTarget::Texture2D: {
 			glBindTexture(GL_TEXTURE_2D, mID);

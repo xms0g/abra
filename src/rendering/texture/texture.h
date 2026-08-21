@@ -133,7 +133,7 @@ public:
 	[[nodiscard]]
 	TextureTarget target() const;
 
-	void copyToMemory(uint32_t face, const void* pixels) const;
+	void copyToMemory(const void* pixels, uint32_t face) const;
 
 	void generateMipmaps() const;
 

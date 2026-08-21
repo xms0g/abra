@@ -230,5 +230,5 @@ void SSAOPass::createNoiseTexture() {
 		.layers = 1,
 	});
 
-	mNoiseTexture.copyToMemory(0, noise.data());
+	mNoiseTexture.copyToMemory(noise.data(), 0);
 }
