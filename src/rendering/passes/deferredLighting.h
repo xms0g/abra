@@ -23,10 +23,6 @@ private:
 	struct ResourceIndexes {
 		uint32_t gBuffer;
 		uint32_t sceneBuffer;
-		uint32_t ssao;
-		uint32_t directional;
-		uint32_t point;
-		uint32_t spot;
 	};
 
 	ResourceIndexes mIndexes{};

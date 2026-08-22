@@ -30,7 +30,6 @@ private:
 	void createNoiseTexture();
 
 	struct ResourceIndexes {
-		uint32_t gBuffer;
 		uint32_t ssao;
 		uint32_t blur;
 	};

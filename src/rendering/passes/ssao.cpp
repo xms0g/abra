@@ -111,11 +111,10 @@ void SSAOPass::configure(const RenderContext& ctx,
 	GraphicsPipelineCreateInfo blurCreateInfo = {.rendering = blurInfo, .layout = blurLayout};
 	mPipelines[1] = GraphicsPipeline{blurCreateInfo};
 
-	mIndexes.gBuffer = graph.getResourceID("gBuffer");
 	mIndexes.ssao = graph.getResourceID("ssao");
 	mIndexes.blur = graph.getResourceID("ssaoBlur");
 
-	const auto& gBuffer = graph.getResource(mIndexes.gBuffer);
+	const auto& gBuffer = graph.getResource(graph.getResourceID("gBuffer"));
 
 	DescriptorSet frameSet{};
 	frameSet.write(*gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.depth.index")))

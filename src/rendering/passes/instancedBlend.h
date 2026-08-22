@@ -31,9 +31,6 @@ private:
 
 	struct ResourceIndexes {
 		uint32_t sceneBuffer;
-		uint32_t directional;
-		uint32_t point;
-		uint32_t spot;
 	};
 
 	void prepareInstanceBuffer(const std::vector<uint32_t>& vaos);

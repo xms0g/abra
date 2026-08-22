@@ -104,14 +104,11 @@ void ForwardOpaquePass::configure(const RenderContext& ctx,
 	mPipeline = GraphicsPipeline{createInfo};
 
 	mIndexes.sceneBuffer = graph.getResourceID("sceneBuffer");
-	mIndexes.directional = graph.getResourceID("directional");
-	mIndexes.point = graph.getResourceID("point");
-	mIndexes.spot = graph.getResourceID("spot");
 
 	DescriptorSet frameSet{};
-	frameSet.write(*graph.getResource(mIndexes.directional).texture())
-			.write(*graph.getResource(mIndexes.point).texture())
-			.write(*graph.getResource(mIndexes.spot).texture());
+	frameSet.write(*graph.getResource(graph.getResourceID("directional")).texture())
+			.write(*graph.getResource(graph.getResourceID("point")).texture())
+			.write(*graph.getResource(graph.getResourceID("spot")).texture());
 
 	encoder.bindDescriptorSet(passLayout, frameSet);
 

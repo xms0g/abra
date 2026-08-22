@@ -137,10 +137,6 @@ void DeferredLightingPass::configure(const RenderContext& ctx,
 
 	mIndexes.gBuffer = graph.getResourceID("gBuffer");
 	mIndexes.sceneBuffer = graph.getResourceID("sceneBuffer");
-	mIndexes.ssao = graph.getResourceID("ssaoBlur");
-	mIndexes.directional = graph.getResourceID("directional");
-	mIndexes.point = graph.getResourceID("point");
-	mIndexes.spot = graph.getResourceID("spot");
 
 	const auto& gBuffer = graph.getResource(mIndexes.gBuffer);
 
@@ -149,13 +145,13 @@ void DeferredLightingPass::configure(const RenderContext& ctx,
 			.write(*gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")))
 			.write(*gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.albedo.index")))
 			.write(*gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.orm.index")))
-			.write(*graph.getResource(mIndexes.ssao).texture())
+			.write(*graph.getResource(graph.getResourceID("ssaoBlur")).texture())
 			.write(*ctx.pbrBuffers->irradiance->texture())
 			.write(*ctx.pbrBuffers->prefilter->texture())
 			.write(*ctx.pbrBuffers->brdfLUT->texture())
-			.write(*graph.getResource(mIndexes.directional).texture())
-			.write(*graph.getResource(mIndexes.point).texture())
-			.write(*graph.getResource(mIndexes.spot).texture());
+			.write(*graph.getResource(graph.getResourceID("directional")).texture())
+			.write(*graph.getResource(graph.getResourceID("point")).texture())
+			.write(*graph.getResource(graph.getResourceID("spot")).texture());
 
 	encoder.bindDescriptorSet(passLayout, frameSet);
 }
