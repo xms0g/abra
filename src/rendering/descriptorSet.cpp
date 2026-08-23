@@ -2,28 +2,28 @@
 #include <cassert>
 #include "buffers/buffer.hpp"
 
-DescriptorSet& DescriptorSet::write(const Descriptor& descriptor) {
-	assert(mCount < MAX_DESCRIPTOR_COUNT);
-	mDescriptors[mCount++] = descriptor;
+bool DescriptorSet::contains(const uint32_t binding) const {
+	return binding < MAX_DESCRIPTOR_COUNT && mDescriptors[binding].has_value();
+}
+
+DescriptorSet& DescriptorSet::write(const uint32_t binding, const Descriptor& descriptor) {
+	assert(binding < MAX_DESCRIPTOR_COUNT);
+	mDescriptors[binding] = descriptor;
 	return *this;
 }
 
-DescriptorSet& DescriptorSet::write(const GPUTexture& texture) {
-	assert(mCount < MAX_DESCRIPTOR_COUNT);
-	mDescriptors[mCount++] = {.resource = texture};
+DescriptorSet& DescriptorSet::write(const uint32_t binding, const GPUTexture& texture) {
+	assert(binding < MAX_DESCRIPTOR_COUNT);
+	mDescriptors[binding] = {.resource = texture};
 	return *this;
 }
 
-DescriptorSet& DescriptorSet::write(const GPUBuffer& buffer) {
-	assert(mCount < MAX_DESCRIPTOR_COUNT);
-	mDescriptors[mCount++] = {.resource = buffer};
+DescriptorSet& DescriptorSet::write(const uint32_t binding, const GPUBuffer& buffer) {
+	assert(binding < MAX_DESCRIPTOR_COUNT);
+	mDescriptors[binding] = {.resource = buffer};
 	return *this;
 }
 
-const Descriptor& DescriptorSet::descriptor(const uint32_t index) const {
-	return mDescriptors[index];
-}
-
-const Descriptor& DescriptorSet::operator[](const uint32_t index) const {
-	return mDescriptors[index];
+const Descriptor& DescriptorSet::operator[](const uint32_t binding) const {
+	return mDescriptors[binding].value();
 }

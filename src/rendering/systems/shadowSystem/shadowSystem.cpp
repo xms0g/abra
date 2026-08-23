@@ -107,7 +107,7 @@ void ShadowSystem::configure(const RenderContext& ctx,
 	};
 
 	DescriptorSet shadowSet{};
-	shadowSet.write(mUBO);
+	shadowSet.write(CONFIG_MANAGER.get<int32_t>("shadow.ubo.binding"), mUBO);
 
 	encoder.bindDescriptorSet(layout, shadowSet);
 

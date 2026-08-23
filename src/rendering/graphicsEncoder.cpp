@@ -146,12 +146,11 @@ void GraphicsEncoder::pushConstants(const void* data) const {
 }
 
 void GraphicsEncoder::bindDescriptorSet(const DescriptorSetLayout& layout, const DescriptorSet& descriptorSet) {
-	for (int i = 0; i < layout.bindings.size(); ++i) {
-		const auto& descBinding = layout.bindings[i];
+	for (const auto& descBinding: layout.bindings) {
+		if (!descriptorSet.contains(descBinding.binding))
+			continue;
 
-		auto& descriptor = descriptorSet[i];
-
-		if (!descriptor.isValid()) continue;
+		auto& descriptor = descriptorSet[descBinding.binding];
 
 		switch (descBinding.type) {
 			case DescriptorType::UniformBuffer: {

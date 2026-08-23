@@ -112,9 +112,12 @@ void ForwardBlendPass::configure(const RenderContext& ctx,
 	mIndexes.sceneBuffer = graph.getResourceID("sceneBuffer");
 
 	DescriptorSet frameSet{};
-	frameSet.write(*graph.getResource(graph.getResourceID("directional")).texture())
-			.write(*graph.getResource(graph.getResourceID("point")).texture())
-			.write(*graph.getResource(graph.getResourceID("spot")).texture());
+	frameSet.write(CONFIG_MANAGER.get<int32_t>("shadow.map.slot"),
+	               *graph.getResource(graph.getResourceID("directional")).texture())
+			.write(CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 1,
+			       *graph.getResource(graph.getResourceID("point")).texture())
+			.write(CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 2,
+			       *graph.getResource(graph.getResourceID("spot")).texture());
 
 	encoder.bindDescriptorSet(passLayout, frameSet);
 

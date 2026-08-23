@@ -124,7 +124,7 @@ void Renderer::createUniformBuffers() {
 		}
 	};
 	DescriptorSet cameraSet{};
-	cameraSet.write(mCameraUBO);
+	cameraSet.write(CONFIG_MANAGER.get<int32_t>("camera.ubo.binding"), mCameraUBO);
 
 	mEncoder.bindDescriptorSet(layout, cameraSet);
 }
@@ -575,7 +575,7 @@ const std::shared_ptr<GPUTexture>& Renderer::createEnvMap(const MaterialTexture&
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
 	DescriptorSet descriptorSet{};
-	descriptorSet.write(*hdrTexture.texture);
+	descriptorSet.write(0, *hdrTexture.texture);
 
 	// convert HDR equirectangular environment map to cubemap equivalent
 	encoder.bindPipeline(pipeline);
@@ -668,7 +668,7 @@ void Renderer::createIrradianceMap(const GPUTexture& environment) {
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
 	DescriptorSet descriptorSet{};
-	descriptorSet.write(environment);
+	descriptorSet.write(0, environment);
 
 	// solve diffuse integral by convolution to create an irradiance (cube)map.
 	encoder.bindPipeline(pipeline);
@@ -760,7 +760,7 @@ void Renderer::createPrefilterMap(const GPUTexture& environment) {
 	const auto& cubeMesh = cube.meshes().at(0).front();
 
 	DescriptorSet descriptorSet{};
-	descriptorSet.write(environment);
+	descriptorSet.write(0, environment);
 
 	// run a quasi monte-carlo simulation on the environment lighting to create a prefilter (cube)map.
 	encoder.bindPipeline(pipeline);

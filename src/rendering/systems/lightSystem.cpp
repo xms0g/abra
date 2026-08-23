@@ -59,7 +59,7 @@ void LightSystem::configure(RenderContext& ctx, GraphicsEncoder& encoder, EventB
 	};
 
 	DescriptorSet lightSet{};
-	lightSet.write(mUBO);
+	lightSet.write(CONFIG_MANAGER.get<int32_t>("light.ubo.binding"), mUBO);
 
 	encoder.bindDescriptorSet(layout, lightSet);
 

@@ -117,9 +117,11 @@ void SSAOPass::configure(const RenderContext& ctx,
 	const auto& gBuffer = graph.getResource(graph.getResourceID("gBuffer"));
 
 	DescriptorSet frameSet{};
-	frameSet.write(*gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.depth.index")))
-			.write(*gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")))
-			.write(mNoiseTexture);
+	frameSet.write(CONFIG_MANAGER.get<int32_t>("gBuffer.depth.slot"),
+	               *gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.depth.index")))
+			.write(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.slot"),
+			       *gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")))
+			.write(CONFIG_MANAGER.get<int32_t>("ssao.noise.slot"), mNoiseTexture);
 
 	encoder.bindDescriptorSet(ssaoPassLayout, frameSet);
 }
@@ -150,7 +152,7 @@ void SSAOPass::blur(const FrameGraph& graph, GraphicsEncoder& encoder) {
 	encoder.bindPipeline(mPipelines[1]);
 
 	DescriptorSet ssaoSet{};
-	ssaoSet.write(*graph.getResource(mIndexes.ssao).texture());
+	ssaoSet.write(0, *graph.getResource(mIndexes.ssao).texture());
 	encoder.bindDescriptorSet(mPipelines[1].layout().descriptorSets[0], ssaoSet);
 
 	encoder.draw(3);
@@ -177,7 +179,7 @@ void SSAOPass::createKernel(GraphicsEncoder& encoder) {
 	};
 
 	DescriptorSet ssaoSet{};
-	ssaoSet.write(mUBO);
+	ssaoSet.write(CONFIG_MANAGER.get<int32_t>("ssao.ubo.binding"), mUBO);
 
 	encoder.bindDescriptorSet(layout, ssaoSet);
 

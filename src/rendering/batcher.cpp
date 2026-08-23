@@ -75,8 +75,9 @@ MaterialBatch Batcher::batchMaterial(const uint32_t matID,
 	renderData.emplaceMaterial(material.flags, material.color, material.alphaCutoff);
 
 	DescriptorSet descriptorSet;
-	for (const auto& texture: material.textures) {
-		descriptorSet.write(*texture.texture);
+	uint32_t binding = 0;
+	for (const auto& matTexture: material.textures) {
+		descriptorSet.write(binding++, *matTexture.texture);
 	}
 	renderData.emplaceDescriptorSet(descriptorSet);
 

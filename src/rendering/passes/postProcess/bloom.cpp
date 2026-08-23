@@ -46,10 +46,10 @@ void Bloom::configure(const FrameGraph& graph) {
 	mRenderTargets = {&graph.getResource(graph.getResourceID("bloomPing")), &graph.getResource(graph.getResourceID("bloomPong"))};
 
 	DescriptorSet pingDescSet{};
-	pingDescSet.write(*mRenderTargets[0]->texture());
+	pingDescSet.write(0, *mRenderTargets[0]->texture());
 
 	DescriptorSet pongDescSet{};
-	pongDescSet.write(*mRenderTargets[1]->texture());
+	pongDescSet.write(0, *mRenderTargets[1]->texture());
 
 	mRenderTargetsDescSets = {pingDescSet, pongDescSet};
 }
@@ -108,11 +108,10 @@ DescriptorSet* Bloom::combinePass(GraphicsEncoder& encoder,
                                   const DescriptorSet& blurDscSet,
                                   const bool& toggle) {
 	DescriptorSet combineDescSet{};
-	combineDescSet.write(dscSet[0]);
-	combineDescSet.write(blurDscSet[0]);
+	combineDescSet.write(0, dscSet[0]);
+	combineDescSet.write(1, blurDscSet[0]);
 
 	encoder.bindFrameBuffer(*mRenderTargets[toggle]);
-	//encoder.clearFrameBuffer(ClearMask::Color);
 
 	encoder.bindPipeline(mPipelines[2]);
 	encoder.bindDescriptorSet(mPipelines[2].layout().descriptorSets[0], combineDescSet);

@@ -363,7 +363,7 @@ std::shared_ptr<GPUTexture> GPUTexture::generateColorAttachmentFP(const int32_t 
 	});
 }
 
-std::shared_ptr<GPUTexture> GPUTexture::generateColorAttachmentFPMultisampled(const int32_t width, const int32_t height, int32_t samples) {
+std::shared_ptr<GPUTexture> GPUTexture::generateColorAttachmentFPMultisampled(const int32_t width, const int32_t height, const int32_t samples) {
 	return std::make_shared<GPUTexture>(TextureConfig{
 		.target = TextureTarget::Texture2DMultisample,
 		.internalFormat = InternalFormat::RGBAFloat,

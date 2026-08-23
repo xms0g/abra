@@ -15,13 +15,8 @@ enum class DescriptorType : uint32_t {
 class GPUBuffer;
 
 struct Descriptor {
-	using ResourceRef = std::variant<std::monostate, std::reference_wrapper<const GPUTexture>, std::reference_wrapper<const GPUBuffer>>;
+	using ResourceRef = std::variant<std::reference_wrapper<const GPUTexture>, std::reference_wrapper<const GPUBuffer>>;
 	ResourceRef resource;
-
-	[[nodiscard]]
-	bool isValid() const {
-		return !std::holds_alternative<std::monostate>(resource);
-	}
 
 	template<typename T>
 	const T& resRef() const {
@@ -41,18 +36,17 @@ struct DescriptorSetLayout {
 
 class DescriptorSet {
 public:
-	DescriptorSet& write(const Descriptor& descriptor);
-
-	DescriptorSet& write(const GPUTexture& texture);
-
-	DescriptorSet& write(const GPUBuffer& buffer);
-
 	[[nodiscard]]
-	const Descriptor& descriptor(uint32_t index) const;
+	bool contains(uint32_t binding) const;
 
-	const Descriptor& operator[](uint32_t index) const;
+	DescriptorSet& write(uint32_t binding, const Descriptor& descriptor);
+
+	DescriptorSet& write(uint32_t binding, const GPUTexture& texture);
+
+	DescriptorSet& write(uint32_t binding, const GPUBuffer& buffer);
+
+	const Descriptor& operator[](uint32_t binding) const;
 
 private:
-	std::array<Descriptor, MAX_DESCRIPTOR_COUNT> mDescriptors{};
-	uint32_t mCount{0};
+	std::array<std::optional<Descriptor>, MAX_DESCRIPTOR_COUNT> mDescriptors{};
 };

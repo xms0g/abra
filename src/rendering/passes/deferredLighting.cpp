@@ -141,17 +141,28 @@ void DeferredLightingPass::configure(const RenderContext& ctx,
 	const auto& gBuffer = graph.getResource(mIndexes.gBuffer);
 
 	DescriptorSet frameSet{};
-	frameSet.write(*gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.index")))
-			.write(*gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")))
-			.write(*gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.albedo.index")))
-			.write(*gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.orm.index")))
-			.write(*graph.getResource(graph.getResourceID("ssaoBlur")).texture())
-			.write(*ctx.pbrBuffers->irradiance->texture())
-			.write(*ctx.pbrBuffers->prefilter->texture())
-			.write(*ctx.pbrBuffers->brdfLUT->texture())
-			.write(*graph.getResource(graph.getResourceID("directional")).texture())
-			.write(*graph.getResource(graph.getResourceID("point")).texture())
-			.write(*graph.getResource(graph.getResourceID("spot")).texture());
+	frameSet.write(CONFIG_MANAGER.get<int32_t>("gBuffer.position.slot"),
+	               *gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.position.index")))
+			.write(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.slot"),
+			       *gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.normal.index")))
+			.write(CONFIG_MANAGER.get<int32_t>("gBuffer.albedo.slot"),
+			       *gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.albedo.index")))
+			.write(CONFIG_MANAGER.get<int32_t>("gBuffer.orm.slot"),
+			       *gBuffer.texture(CONFIG_MANAGER.get<int32_t>("gBuffer.orm.index")))
+			.write(CONFIG_MANAGER.get<int32_t>("ssao.slot"),
+			       *graph.getResource(graph.getResourceID("ssaoBlur")).texture())
+			.write(CONFIG_MANAGER.get<int32_t>("PBR.irradianceMap.slot"),
+			       *ctx.pbrBuffers->irradiance->texture())
+			.write(CONFIG_MANAGER.get<int32_t>("PBR.prefilterMap.slot"),
+			       *ctx.pbrBuffers->prefilter->texture())
+			.write(CONFIG_MANAGER.get<int32_t>("PBR.brdfLUT.slot"),
+			       *ctx.pbrBuffers->brdfLUT->texture())
+			.write(CONFIG_MANAGER.get<int32_t>("shadow.map.slot"),
+			       *graph.getResource(graph.getResourceID("directional")).texture())
+			.write(CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 1,
+			       *graph.getResource(graph.getResourceID("point")).texture())
+			.write(CONFIG_MANAGER.get<int32_t>("shadow.map.slot") + 2,
+			       *graph.getResource(graph.getResourceID("spot")).texture());
 
 	encoder.bindDescriptorSet(passLayout, frameSet);
 }
