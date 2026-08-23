@@ -332,6 +332,7 @@ void Renderer::createFrameBuffers() {
 
 			sceneBuffer.attachColor(color)
 					.attachDepth(rbDepth)
+					.configureDrawBuffers()
 					.checkStatus();
 		} else {
 			auto color = GPUTexture::generateColorAttachment(sceneBuffer.width(), sceneBuffer.height());
@@ -407,7 +408,7 @@ void Renderer::createFrameBuffers() {
 
 	mEncoder.bindFrameBuffer(point);
 
-	auto depthPoint = GPUTexture::generateDepthAttachmentCubemapArray(point.width(), point.height(), CONFIG_MANAGER.get<int32_t>("light.max_point"));
+	auto depthPoint = GPUTexture::generateDepthAttachmentCubemapArray(point.width(), point.height(),CONFIG_MANAGER.get<int32_t>("light.max_point"));
 	point.attachDepth(depthPoint)
 			.configureDrawBuffers()
 			.checkStatus();
@@ -418,7 +419,7 @@ void Renderer::createFrameBuffers() {
 
 	mEncoder.bindFrameBuffer(spot);
 
-	auto depthSpot = GPUTexture::generateDepthAttachmentArray(spot.width(), spot.height(), CONFIG_MANAGER.get<int32_t>("light.max_spot"));
+	auto depthSpot = GPUTexture::generateDepthAttachmentArray(spot.width(), spot.height(),CONFIG_MANAGER.get<int32_t>("light.max_spot"));
 	spot.attachDepth(depthSpot)
 			.configureDrawBuffers()
 			.checkStatus();
