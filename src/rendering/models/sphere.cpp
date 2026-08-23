@@ -1,7 +1,7 @@
-#include "sphere.h"
-#include "../mesh/mesh.h"
+#include "sphere.hpp"
+#include "../mesh/mesh.hpp"
 #include "../mesh/vertex.hpp"
-#include "../texture.h"
+#include "../texture.hpp"
 #include "../material/material.hpp"
 
 Model::Sphere::Sphere(glm::vec3 color,

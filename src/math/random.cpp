@@ -1,4 +1,4 @@
-#include "random.h"
+#include "random.hpp"
 #include <random>
 #include "glm/ext/quaternion_common.hpp"
 

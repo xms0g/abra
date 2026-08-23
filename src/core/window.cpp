@@ -1,7 +1,7 @@
-#include "window.h"
+#include "window.hpp"
 #include <iostream>
 #include "glad/glad.h"
-#include "../config/configManager.h"
+#include "../config/configManager.hpp"
 
 Window::Window(const std::string& title, const int multisamples, const bool fullscreen) {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {

@@ -1,9 +1,9 @@
-#include "panels.h"
+#include "panels.hpp"
 #include <span>
 #include "glad/glad.h"
 #include "imgui/imgui.h"
-#include "ui.h"
-#include "../../ECS/registry.h"
+#include "ui.hpp"
+#include "../../ECS/registry.hpp"
 #include "../../ECS/components/transform.hpp"
 #include "../../ECS/components/debug.hpp"
 #include "../../ECS/components/directionalLight.hpp"

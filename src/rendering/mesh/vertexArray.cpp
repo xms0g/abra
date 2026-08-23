@@ -1,4 +1,4 @@
-#include "vertexArray.h"
+#include "vertexArray.hpp"
 #include "glad/glad.h"
 
 VertexArray::VertexArray() {

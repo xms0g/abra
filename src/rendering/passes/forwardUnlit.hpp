@@ -1,15 +1,17 @@
 #pragma once
 #include "IPass.hpp"
-#include "../graphicsPipeline.h"
+#include "../graphicsPipeline.hpp"
 #include "../context/renderQueue.hpp"
+#include "../pushConstants/materialPushConstants.hpp"
+#include "../pushConstants/transformPushConstants.hpp"
 
 struct DrawCommand;
 
-class SkyboxPass final : public IPass {
+class ForwardUnlitPass final : public IPass {
 public:
-	SkyboxPass();
+	ForwardUnlitPass();
 
-	~SkyboxPass() override;
+	~ForwardUnlitPass() override;
 
 	void configure(const RenderContext& ctx,
 	               const FrameGraph& graph,
@@ -21,6 +23,11 @@ public:
 private:
 	struct ResourceIndexes {
 		uint32_t sceneBuffer;
+	};
+
+	struct PushConstants {
+		MaterialPushConstants material;
+		TransformPushConstants transform;
 	};
 
 	ResourceIndexes mIndexes{};

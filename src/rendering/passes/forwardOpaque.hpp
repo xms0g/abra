@@ -1,18 +1,17 @@
 #pragma once
-#include <array>
 #include "IPass.hpp"
-#include "../graphicsPipeline.h"
+#include "../graphicsPipeline.hpp"
 #include "../context/renderQueue.hpp"
+#include "../pushConstants/materialPushConstants.hpp"
+#include "../pushConstants/transformPushConstants.hpp"
 
 struct DrawCommand;
-struct VisibleObject;
-class Shader;
 
-class DebugPass final : public IPass {
+class ForwardOpaquePass final : public IPass {
 public:
-	DebugPass();
+	ForwardOpaquePass();
 
-	~DebugPass() override;
+	~ForwardOpaquePass() override;
 
 	void configure(const RenderContext& ctx,
 	               const FrameGraph& graph,
@@ -26,7 +25,12 @@ private:
 		uint32_t sceneBuffer;
 	};
 
+	struct PushConstants {
+		MaterialPushConstants material;
+		TransformPushConstants transform;
+	};
+
 	ResourceIndexes mIndexes{};
-	std::array<GraphicsPipeline, 3> mPipelines{};
+	GraphicsPipeline mPipeline{};
 	RenderQueue<DrawCommand>* mCommands{nullptr};
 };

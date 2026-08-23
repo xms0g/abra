@@ -1,5 +1,5 @@
-#include "graphicsPipeline.h"
-#include "descriptorSet.h"
+#include "graphicsPipeline.hpp"
+#include "descriptorSet.hpp"
 
 GraphicsPipeline::GraphicsPipeline(const GraphicsPipelineCreateInfo& createInfo) {
 	mState.primitiveAssemblyState = createInfo.rendering.primitiveAssemblyState;

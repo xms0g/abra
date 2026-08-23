@@ -1,4 +1,4 @@
-#include "syncStateSystem.h"
+#include "syncStateSystem.hpp"
 #include "../context/renderData.hpp"
 #include "../context/renderContext.hpp"
 #include "../../event/eventBus.hpp"

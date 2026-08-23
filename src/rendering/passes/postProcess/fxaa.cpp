@@ -1,7 +1,7 @@
-#include "fxaa.h"
-#include "../../shader.h"
-#include "../../buffers/frameBuffer.h"
-#include "../../descriptorSet.h"
+#include "fxaa.hpp"
+#include "../../shader.hpp"
+#include "../../buffers/frameBuffer.hpp"
+#include "../../descriptorSet.hpp"
 #include "../../../event/events/guiPostProcessEvent.hpp"
 
 FXAA::FXAA(const std::string& name, const bool enabled)

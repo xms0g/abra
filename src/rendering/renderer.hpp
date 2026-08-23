@@ -2,12 +2,12 @@
 #include <memory>
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
-#include "frameGraph.h"
-#include "graphicsEncoder.h"
+#include "frameGraph.hpp"
+#include "graphicsEncoder.hpp"
 #include "context/renderContext.hpp"
 #include "context/renderData.hpp"
 #include "context/renderQueue.hpp"
-#include "buffers/uniformBuffer.h"
+#include "buffers/uniformBuffer.hpp"
 #include "../ECS/system.hpp"
 
 struct PBRBuffers {

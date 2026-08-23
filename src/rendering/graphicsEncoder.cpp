@@ -1,8 +1,8 @@
-#include "graphicsEncoder.h"
-#include "graphicsPipeline.h"
-#include "descriptorSet.h"
+#include "graphicsEncoder.hpp"
+#include "graphicsPipeline.hpp"
+#include "descriptorSet.hpp"
 #include "buffers/buffer.hpp"
-#include "buffers/frameBuffer.h"
+#include "buffers/frameBuffer.hpp"
 
 void GraphicsEncoder::beginRendering(const RenderingInfo& info) {
 	glBindFramebuffer(GL_FRAMEBUFFER, info.frameBuffer.handle());

@@ -1,16 +1,18 @@
 #pragma once
+#include <array>
 #include "IPass.hpp"
-#include "../graphicsPipeline.h"
+#include "../graphicsPipeline.hpp"
+#include "../context/renderQueue.hpp"
 
-class CubemapBuffer;
-class FrameBuffer;
+struct DrawCommand;
+struct VisibleObject;
 class Shader;
 
-class DeferredLightingPass final : public IPass {
+class DebugPass final : public IPass {
 public:
-	DeferredLightingPass();
+	DebugPass();
 
-	~DeferredLightingPass() override;
+	~DebugPass() override;
 
 	void configure(const RenderContext& ctx,
 	               const FrameGraph& graph,
@@ -21,10 +23,10 @@ public:
 
 private:
 	struct ResourceIndexes {
-		uint32_t gBuffer;
 		uint32_t sceneBuffer;
 	};
 
 	ResourceIndexes mIndexes{};
-	GraphicsPipeline mPipeline{};
+	std::array<GraphicsPipeline, 3> mPipelines{};
+	RenderQueue<DrawCommand>* mCommands{nullptr};
 };

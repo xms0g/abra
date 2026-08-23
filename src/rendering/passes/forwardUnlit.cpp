@@ -1,11 +1,11 @@
-#include "forwardUnlit.h"
-#include "../shader.h"
-#include "../frameGraph.h"
-#include "../descriptorSet.h"
-#include "../graphicsEncoder.h"
+#include "forwardUnlit.hpp"
+#include "../shader.hpp"
+#include "../frameGraph.hpp"
+#include "../descriptorSet.hpp"
+#include "../graphicsEncoder.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
-#include "../../config/configManager.h"
+#include "../../config/configManager.hpp"
 
 ForwardUnlitPass::ForwardUnlitPass() = default;
 

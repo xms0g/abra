@@ -1,7 +1,7 @@
-#include "cubemap.h"
-#include "../mesh/mesh.h"
+#include "cubemap.hpp"
+#include "../mesh/mesh.hpp"
 #include "../mesh/vertex.hpp"
-#include "../texture.h"
+#include "../texture.hpp"
 #include "../material/material.hpp"
 
 Model::Cubemap::Cubemap(std::vector<std::string>& faces) {

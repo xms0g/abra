@@ -1,14 +1,14 @@
-#include "engine.h"
+#include "engine.hpp"
 #include <iostream>
 #include "glm/glm.hpp"
-#include "input.h"
-#include "camera.h"
-#include "window.h"
-#include "gui/system.h"
+#include "input.hpp"
+#include "camera.hpp"
+#include "window.hpp"
+#include "gui/system.hpp"
 #include "../event/eventBus.hpp"
-#include "../ECS/registry.h"
-#include "../rendering/renderer.h"
-#include "../config/configManager.h"
+#include "../ECS/registry.hpp"
+#include "../rendering/renderer.hpp"
+#include "../config/configManager.hpp"
 
 Engine::Engine() = default;
 

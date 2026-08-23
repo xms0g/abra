@@ -1,13 +1,13 @@
-#include "terrain.h"
-#include "../frameGraph.h"
-#include "../shader.h"
-#include "../descriptorSet.h"
-#include "../graphicsEncoder.h"
+#include "terrain.hpp"
+#include "../frameGraph.hpp"
+#include "../shader.hpp"
+#include "../descriptorSet.hpp"
+#include "../graphicsEncoder.hpp"
 #include "../command.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../context/renderData.hpp"
-#include "../../config/configManager.h"
+#include "../../config/configManager.hpp"
 
 TerrainPass::TerrainPass() = default;
 

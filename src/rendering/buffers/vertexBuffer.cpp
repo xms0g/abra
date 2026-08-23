@@ -1,4 +1,4 @@
-#include "vertexBuffer.h"
+#include "vertexBuffer.hpp"
 #include "../glUtils.hpp"
 
 VertexBuffer::VertexBuffer(const int32_t size, const BufferUsage usage)

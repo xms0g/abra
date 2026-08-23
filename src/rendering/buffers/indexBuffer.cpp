@@ -1,4 +1,4 @@
-#include "indexBuffer.h"
+#include "indexBuffer.hpp"
 #include "../glUtils.hpp"
 
 IndexBuffer::IndexBuffer(const BufferUsage usage)

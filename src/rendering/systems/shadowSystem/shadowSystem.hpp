@@ -1,8 +1,8 @@
 #pragma once
 #include <memory>
 #include "glm/glm.hpp"
-#include "../../buffers/uniformBuffer.h"
-#include "../../graphicsPipeline.h"
+#include "../../buffers/uniformBuffer.hpp"
+#include "../../graphicsPipeline.hpp"
 
 class GraphicsEncoder;
 class FrameGraph;

@@ -1,7 +1,7 @@
-#include "plane.h"
-#include "../mesh/mesh.h"
+#include "plane.hpp"
+#include "../mesh/mesh.hpp"
 #include "../mesh/vertex.hpp"
-#include "../texture.h"
+#include "../texture.hpp"
 #include "../material/material.hpp"
 
 Model::Plane::Plane(glm::vec3 color,

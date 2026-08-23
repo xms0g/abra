@@ -1,4 +1,4 @@
-#include "threadPool.h"
+#include "threadPool.hpp"
 
 ThreadPool::ThreadPool(const size_t threadCount) {
 	for (size_t i = 0; i < threadCount; ++i) {

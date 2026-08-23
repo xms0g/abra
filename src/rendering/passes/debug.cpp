@@ -1,13 +1,13 @@
-#include "debug.h"
-#include "../shader.h"
-#include "../descriptorSet.h"
-#include "../frameGraph.h"
-#include "../graphicsEncoder.h"
+#include "debug.hpp"
+#include "../shader.hpp"
+#include "../descriptorSet.hpp"
+#include "../frameGraph.hpp"
+#include "../graphicsEncoder.hpp"
 #include "../command.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../../ECS/components/debug.hpp"
-#include "../../config/configManager.h"
+#include "../../config/configManager.hpp"
 
 DebugPass::DebugPass() = default;
 

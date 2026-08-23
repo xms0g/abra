@@ -1,6 +1,6 @@
-#include "toneMapping.h"
-#include "../../shader.h"
-#include "../../descriptorSet.h"
+#include "toneMapping.hpp"
+#include "../../shader.hpp"
+#include "../../descriptorSet.hpp"
 
 ToneMapping::ToneMapping(const std::string& name, const bool enabled)
 	: BasePostEffect(name, enabled) {

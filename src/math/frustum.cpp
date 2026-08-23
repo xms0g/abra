@@ -1,4 +1,4 @@
-#include "frustum.h"
+#include "frustum.hpp"
 
 math::Plane::Plane(const glm::vec3& p1, const glm::vec3& norm): normal(norm) {
 	normal = glm::normalize(normal);

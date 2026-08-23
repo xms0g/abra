@@ -1,14 +1,14 @@
-#include "culling.h"
-#include "../frameGraph.h"
+#include "culling.hpp"
+#include "../frameGraph.hpp"
 #include "../command.hpp"
-#include "../graphicsEncoder.h"
+#include "../graphicsEncoder.hpp"
 #include "../context/renderData.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderGroup.hpp"
 #include "../context/renderQueue.hpp"
-#include "../../ECS/registry.h"
-#include "../../math/boundingVolume.h"
-#include "../../core/camera.h"
+#include "../../ECS/registry.hpp"
+#include "../../math/boundingVolume.hpp"
+#include "../../core/camera.hpp"
 
 CullingPass::CullingPass() = default;
 

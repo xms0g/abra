@@ -1,8 +1,8 @@
-#include "quad.h"
+#include "quad.hpp"
 #include "glad/glad.h"
-#include "../mesh/vertexArray.h"
-#include "../buffers/vertexBuffer.h"
-#include "../../rendering/shader.h"
+#include "../mesh/vertexArray.hpp"
+#include "../buffers/vertexBuffer.hpp"
+#include "../../rendering/shader.hpp"
 
 Model::Quad::Quad() {
 	constexpr float vertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.

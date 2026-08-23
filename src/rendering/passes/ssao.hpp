@@ -1,8 +1,8 @@
 #pragma once
 #include "IPass.hpp"
-#include "../graphicsPipeline.h"
-#include "../buffers/uniformBuffer.h"
-#include "../texture.h"
+#include "../graphicsPipeline.hpp"
+#include "../buffers/uniformBuffer.hpp"
+#include "../texture.hpp"
 
 class FrameBuffer;
 class Shader;

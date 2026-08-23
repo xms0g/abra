@@ -1,11 +1,11 @@
-#include "terrain.h"
+#include "terrain.hpp"
 #include "image/stb_image.h"
-#include "../mesh/mesh.h"
+#include "../mesh/mesh.hpp"
 #include "../mesh/vertex.hpp"
-#include "../texture.h"
+#include "../texture.hpp"
 #include "../material/material.hpp"
 #include "../../io/filesystem.hpp"
-#include "../../config/configManager.h"
+#include "../../config/configManager.hpp"
 
 Model::Terrain::Terrain(glm::vec3 color,
                         bool unlit,

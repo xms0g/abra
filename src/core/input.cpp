@@ -1,4 +1,4 @@
-#include "input.h"
+#include "input.hpp"
 #include <SDL.h>
 #include "imgui/imgui_impl_sdl.h"
 #include "../event/eventBus.hpp"

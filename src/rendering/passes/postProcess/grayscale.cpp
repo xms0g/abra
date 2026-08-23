@@ -1,6 +1,6 @@
-#include "grayscale.h"
-#include "../../shader.h"
-#include "../../descriptorSet.h"
+#include "grayscale.hpp"
+#include "../../shader.hpp"
+#include "../../descriptorSet.hpp"
 
 Grayscale::Grayscale(const std::string& name, const bool enabled)
 	: BasePostEffect(name, enabled) {

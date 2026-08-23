@@ -1,17 +1,19 @@
 #pragma once
 #include "IPass.hpp"
-#include "../graphicsPipeline.h"
+#include "../graphicsPipeline.hpp"
 #include "../context/renderQueue.hpp"
 #include "../pushConstants/materialPushConstants.hpp"
 #include "../pushConstants/transformPushConstants.hpp"
 
 struct DrawCommand;
+class Shader;
+class FrameBuffer;
 
-class ForwardOpaquePass final : public IPass {
+class DeferredGeometryPass final : public IPass {
 public:
-	ForwardOpaquePass();
+	DeferredGeometryPass();
 
-	~ForwardOpaquePass() override;
+	~DeferredGeometryPass() override;
 
 	void configure(const RenderContext& ctx,
 	               const FrameGraph& graph,
@@ -22,7 +24,7 @@ public:
 
 private:
 	struct ResourceIndexes {
-		uint32_t sceneBuffer;
+		uint32_t gBuffer;
 	};
 
 	struct PushConstants {

@@ -1,4 +1,4 @@
-#include "uniformBuffer.h"
+#include "uniformBuffer.hpp"
 #include "../glUtils.hpp"
 
 UniformBuffer::UniformBuffer(const int32_t size, const BufferUsage usage)

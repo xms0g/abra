@@ -1,14 +1,14 @@
-#include "resourceManager.h"
+#include "resourceManager.hpp"
 #include <iostream>
 #include <assimp/GltfMaterial.h>
 #include <assimp/postprocess.h>
 #include "image/stb_image.h"
-#include "../config/configManager.h"
+#include "../config/configManager.hpp"
 #include "../io/filesystem.hpp"
 #include "../rendering/material/material.hpp"
-#include "../rendering/mesh/mesh.h"
+#include "../rendering/mesh/mesh.hpp"
 #include "../rendering/mesh/vertex.hpp"
-#include "../rendering/texture.h"
+#include "../rendering/texture.hpp"
 
 ResourceManager& ResourceManager::instance() {
 	static ResourceManager instance;

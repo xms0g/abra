@@ -1,4 +1,4 @@
-#include "configManager.h"
+#include "configManager.hpp"
 #include "toml++/toml.hpp"
 #include "../io/filesystem.hpp"
 

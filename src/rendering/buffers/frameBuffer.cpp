@@ -1,11 +1,11 @@
-#include "frameBuffer.h"
+#include "frameBuffer.hpp"
 #include <cassert>
 #include <iostream>
 #include <vector>
 #include "glad/glad.h"
-#include "renderBuffer.h"
+#include "renderBuffer.hpp"
 #include "../glUtils.hpp"
-#include "../texture.h"
+#include "../texture.hpp"
 
 FrameBuffer::FrameBuffer(const int32_t width, const int32_t height)
 	: mWidth(width),

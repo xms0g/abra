@@ -1,4 +1,4 @@
-#include "registry.h"
+#include "registry.hpp"
 
 Entity Registry::createEntity(const std::string& name) {
 	const size_t entityID = numEntities++;

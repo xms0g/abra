@@ -1,12 +1,12 @@
-#include "forwardOpaque.h"
-#include "../frameGraph.h"
-#include "../shader.h"
-#include "../graphicsEncoder.h"
-#include "../descriptorSet.h"
+#include "forwardOpaque.hpp"
+#include "../frameGraph.hpp"
+#include "../shader.hpp"
+#include "../graphicsEncoder.hpp"
+#include "../descriptorSet.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../context/renderData.hpp"
-#include "../../config/configManager.h"
+#include "../../config/configManager.hpp"
 
 ForwardOpaquePass::ForwardOpaquePass() = default;
 

@@ -1,6 +1,6 @@
-#include "gamma.h"
-#include "../../shader.h"
-#include "../../descriptorSet.h"
+#include "gamma.hpp"
+#include "../../shader.hpp"
+#include "../../descriptorSet.hpp"
 
 Gamma::Gamma(const std::string& name, const bool enabled)
 	: BasePostEffect(name, enabled) {

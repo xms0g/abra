@@ -4,7 +4,7 @@
 #include <span>
 #include "glm/glm.hpp"
 #include "IPass.hpp"
-#include "../graphicsPipeline.h"
+#include "../graphicsPipeline.hpp"
 
 class VertexBuffer;
 struct RenderInstanceGroup;

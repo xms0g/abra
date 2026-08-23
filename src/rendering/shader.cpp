@@ -1,4 +1,4 @@
-#include "shader.h"
+#include "shader.hpp"
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -6,8 +6,8 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glUtils.hpp"
 #include "../io/filesystem.hpp"
-#include "../config/configManager.h"
-#include "../rendering/graphicsPipeline.h"
+#include "../config/configManager.hpp"
+#include "../rendering/graphicsPipeline.hpp"
 
 ShaderStage::ShaderStage(const PipelineShaderStage& info) : type(info.stage) {
 	std::string processedSource;

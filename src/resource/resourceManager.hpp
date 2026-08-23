@@ -4,9 +4,9 @@
 #include <unordered_set>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
-#include "../job/threadPool.h"
+#include "../job/threadPool.hpp"
 #include "../rendering/types.hpp"
-#include "../rendering/texture.h"
+#include "../rendering/texture.hpp"
 
 #define RESOURCE_MANAGER ResourceManager::instance()
 

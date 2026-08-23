@@ -1,6 +1,6 @@
-#include "sepia.h"
-#include "../../shader.h"
-#include "../../descriptorSet.h"
+#include "sepia.hpp"
+#include "../../shader.hpp"
+#include "../../descriptorSet.hpp"
 
 Sepia::Sepia(const std::string& name, const bool enabled)
 	: BasePostEffect(name, enabled) {

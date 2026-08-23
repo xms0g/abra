@@ -1,19 +1,16 @@
 #pragma once
 #include "IPass.hpp"
-#include "../graphicsPipeline.h"
-#include "../context/renderQueue.hpp"
-#include "../pushConstants/materialPushConstants.hpp"
-#include "../pushConstants/transformPushConstants.hpp"
+#include "../graphicsPipeline.hpp"
 
-struct DrawCommand;
+class CubemapBuffer;
+class FrameBuffer;
 class Shader;
-struct RenderGroup;
 
-class TerrainPass final : public IPass {
+class DeferredLightingPass final : public IPass {
 public:
-	TerrainPass();
+	DeferredLightingPass();
 
-	~TerrainPass() override;
+	~DeferredLightingPass() override;
 
 	void configure(const RenderContext& ctx,
 	               const FrameGraph& graph,
@@ -24,15 +21,10 @@ public:
 
 private:
 	struct ResourceIndexes {
+		uint32_t gBuffer;
 		uint32_t sceneBuffer;
-	};
-
-	struct PushConstants {
-		MaterialPushConstants material;
-		TransformPushConstants transform;
 	};
 
 	ResourceIndexes mIndexes{};
 	GraphicsPipeline mPipeline{};
-	RenderQueue<DrawCommand>* mCommands{nullptr};
 };

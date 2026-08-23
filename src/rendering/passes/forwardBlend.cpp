@@ -1,11 +1,11 @@
-#include "forwardBlend.h"
-#include "../frameGraph.h"
-#include "../graphicsEncoder.h"
-#include "../descriptorSet.h"
+#include "forwardBlend.hpp"
+#include "../frameGraph.hpp"
+#include "../graphicsEncoder.hpp"
+#include "../descriptorSet.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../context/renderData.hpp"
-#include "../../config/configManager.h"
+#include "../../config/configManager.hpp"
 
 ForwardBlendPass::ForwardBlendPass() = default;
 

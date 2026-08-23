@@ -1,8 +1,8 @@
-#include "bloom.h"
-#include "../../shader.h"
-#include "../../frameGraph.h"
-#include "../../descriptorSet.h"
-#include "../../buffers/frameBuffer.h"
+#include "bloom.hpp"
+#include "../../shader.hpp"
+#include "../../frameGraph.hpp"
+#include "../../descriptorSet.hpp"
+#include "../../buffers/frameBuffer.hpp"
 
 Bloom::Bloom(const std::string& name, const bool enabled)
 	: BasePostEffect(name, enabled) {

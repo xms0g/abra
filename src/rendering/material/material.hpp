@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <vector>
 #include "glm/glm.hpp"
-#include "../texture.h"
+#include "../texture.hpp"
 
 enum MaterialFlag: uint32_t {
 	OPAQUE = 1 << 0,

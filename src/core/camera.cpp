@@ -1,6 +1,6 @@
-#include "camera.h"
+#include "camera.hpp"
 #include "glm/gtc/matrix_transform.hpp"
-#include "../config/configManager.h"
+#include "../config/configManager.hpp"
 #include "../event/eventBus.hpp"
 #include "../event/events/keyPressedEvent.hpp"
 #include "../event/events/mouseMovementEvent.hpp"

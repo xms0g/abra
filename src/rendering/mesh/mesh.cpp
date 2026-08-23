@@ -1,9 +1,9 @@
-#include "mesh.h"
+#include "mesh.hpp"
 #include "glad/glad.h"
-#include "vertexArray.h"
+#include "vertexArray.hpp"
 #include "vertex.hpp"
-#include "../buffers/vertexBuffer.h"
-#include "../buffers/indexBuffer.h"
+#include "../buffers/vertexBuffer.hpp"
+#include "../buffers/indexBuffer.hpp"
 
 Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
 	: mVertices(std::move(vertices)),

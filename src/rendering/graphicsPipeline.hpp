@@ -1,10 +1,10 @@
 #pragma once
 #include <vector>
 #include "glad/glad.h"
-#include "shader.h"
+#include "shader.hpp"
 #include "glUtils.hpp"
 #include "pushConstant.hpp"
-#include "descriptorSet.h"
+#include "descriptorSet.hpp"
 
 enum class CullMode: uint32_t {
 	None = GL_NONE,

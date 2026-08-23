@@ -1,11 +1,11 @@
-#include "deferredLighting.h"
-#include "../frameGraph.h"
-#include "../renderer.h"
-#include "../shader.h"
-#include "../graphicsEncoder.h"
-#include "../descriptorSet.h"
+#include "deferredLighting.hpp"
+#include "../frameGraph.hpp"
+#include "../renderer.hpp"
+#include "../shader.hpp"
+#include "../graphicsEncoder.hpp"
+#include "../descriptorSet.hpp"
 #include "../context/renderContext.hpp"
-#include "../../config/configManager.h"
+#include "../../config/configManager.hpp"
 
 DeferredLightingPass::DeferredLightingPass() = default;
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "glm/glm.hpp"
-#include "../buffers/uniformBuffer.h"
+#include "../buffers/uniformBuffer.hpp"
 #include "../../ECS/system.hpp"
 
 class GraphicsEncoder;

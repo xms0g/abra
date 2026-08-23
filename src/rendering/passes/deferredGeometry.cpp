@@ -1,13 +1,13 @@
-#include "deferredGeometry.h"
-#include "../shader.h"
+#include "deferredGeometry.hpp"
+#include "../shader.hpp"
 #include "../command.hpp"
-#include "../frameGraph.h"
-#include "../descriptorSet.h"
-#include "../graphicsEncoder.h"
+#include "../frameGraph.hpp"
+#include "../descriptorSet.hpp"
+#include "../graphicsEncoder.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderData.hpp"
 #include "../context/renderQueue.hpp"
-#include "../../config/configManager.h"
+#include "../../config/configManager.hpp"
 
 DeferredGeometryPass::DeferredGeometryPass() = default;
 

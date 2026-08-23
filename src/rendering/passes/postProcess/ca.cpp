@@ -1,5 +1,5 @@
-#include "ca.h"
-#include "../../descriptorSet.h"
+#include "ca.hpp"
+#include "../../descriptorSet.hpp"
 #include "../../../event/events/guiPostProcessEvent.hpp"
 
 CA::CA(const std::string& name, const bool enabled)

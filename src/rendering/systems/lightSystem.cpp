@@ -1,11 +1,11 @@
-#include "lightSystem.h"
+#include "lightSystem.hpp"
 #include <span>
 #include "glm/gtc/type_ptr.hpp"
-#include "../graphicsEncoder.h"
-#include "../buffers/uniformBuffer.h"
+#include "../graphicsEncoder.hpp"
+#include "../buffers/uniformBuffer.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderData.hpp"
-#include "../../ECS/registry.h"
+#include "../../ECS/registry.hpp"
 #include "../../ECS/components/directionalLight.hpp"
 #include "../../ECS/components/pointLight.hpp"
 #include "../../ECS/components/spotLight.hpp"
@@ -13,7 +13,7 @@
 #include "../../event/eventBus.hpp"
 #include "../../event/events/guiLightEvent.hpp"
 #include "../../event/events/updateShadowMapEvent.hpp"
-#include "../../config/configManager.h"
+#include "../../config/configManager.hpp"
 
 LightSystem::LightSystem() {
 	RequireComponent<DirectionalLightComponent>(true);

@@ -1,13 +1,13 @@
-#include "omnidirectionalShadow.h"
+#include "omnidirectionalShadow.hpp"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "../../shader.h"
+#include "../../shader.hpp"
 #include "../../context/renderGroup.hpp"
 #include "../../context/renderData.hpp"
 #include "../../context/renderContext.hpp"
 #include "../../context/renderQueue.hpp"
-#include "../../../config/configManager.h"
-#include "../../../rendering/graphicsEncoder.h"
+#include "../../../config/configManager.hpp"
+#include "../../../rendering/graphicsEncoder.hpp"
 
 OmnidirectionalShadow::OmnidirectionalShadow(const RenderContext& ctx) {
 	mWidth = CONFIG_MANAGER.get<int32_t>("shadow.map.width");

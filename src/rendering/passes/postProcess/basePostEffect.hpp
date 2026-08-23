@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
-#include "../../graphicsEncoder.h"
-#include "../../graphicsPipeline.h"
-#include "../../texture.h"
+#include "../../graphicsEncoder.hpp"
+#include "../../graphicsPipeline.hpp"
+#include "../../texture.hpp"
 #include "../../../event/events/guiPostProcessEvent.hpp"
 
 namespace Model {

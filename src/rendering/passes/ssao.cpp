@@ -1,12 +1,12 @@
-#include "ssao.h"
-#include "../shader.h"
-#include "../frameGraph.h"
-#include "../descriptorSet.h"
-#include "../graphicsEncoder.h"
-#include "../texture.h"
+#include "ssao.hpp"
+#include "../shader.hpp"
+#include "../frameGraph.hpp"
+#include "../descriptorSet.hpp"
+#include "../graphicsEncoder.hpp"
+#include "../texture.hpp"
 #include "../context/renderContext.hpp"
-#include "../../config/configManager.h"
-#include "../../math/random.h"
+#include "../../config/configManager.hpp"
+#include "../../math/random.hpp"
 
 SSAOPass::SSAOPass() = default;
 

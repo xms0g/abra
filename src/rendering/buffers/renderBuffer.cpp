@@ -1,4 +1,4 @@
-#include "renderBuffer.h"
+#include "renderBuffer.hpp"
 #include "glad/glad.h"
 #include "../glUtils.hpp"
 

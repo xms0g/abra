@@ -1,9 +1,9 @@
 #include <iostream>
-#include "core/engine.h"
-#include "ECS/registry.h"
-#include "config/configManager.h"
-#include "resource/sceneLoader.h"
-#include "resource/resourceManager.h"
+#include "core/engine.hpp"
+#include "ECS/registry.hpp"
+#include "config/configManager.hpp"
+#include "resource/sceneLoader.hpp"
+#include "resource/resourceManager.hpp"
 
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 1

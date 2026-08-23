@@ -1,6 +1,6 @@
 #pragma once
 #include "glm/glm.hpp"
-#include "../math/frustum.h"
+#include "../math/frustum.hpp"
 
 struct MouseMovementEvent;
 struct KeyPressedEvent;

@@ -2,8 +2,8 @@
 #include "glad/glad.h"
 #include "command.hpp"
 #include "glUtils.hpp"
-#include "graphicsPipeline.h"
-#include "buffers/frameBuffer.h"
+#include "graphicsPipeline.hpp"
+#include "buffers/frameBuffer.hpp"
 #include "material/material.hpp"
 
 class DescriptorSet;

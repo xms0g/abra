@@ -1,6 +1,6 @@
-#include "resolve.h"
-#include "../frameGraph.h"
-#include "../graphicsEncoder.h"
+#include "resolve.hpp"
+#include "../frameGraph.hpp"
+#include "../graphicsEncoder.hpp"
 
 ResolvePass::ResolvePass() = default;
 

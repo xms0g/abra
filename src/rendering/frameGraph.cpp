@@ -1,9 +1,9 @@
-#include "frameGraph.h"
+#include "frameGraph.hpp"
 #include <numeric>
 #include <queue>
 #include <utility>
-#include "graphicsEncoder.h"
-#include "buffers/frameBuffer.h"
+#include "graphicsEncoder.hpp"
+#include "buffers/frameBuffer.hpp"
 #include "passes/IPass.hpp"
 #include "../event/eventBus.hpp"
 

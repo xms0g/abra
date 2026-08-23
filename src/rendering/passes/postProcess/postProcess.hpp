@@ -3,8 +3,8 @@
 #include <vector>
 #include "basePostEffect.hpp"
 #include "../IPass.hpp"
-#include "../../graphicsPipeline.h"
-#include "../../descriptorSet.h"
+#include "../../graphicsPipeline.hpp"
+#include "../../descriptorSet.hpp"
 
 struct GuiPostProcessEvent;
 class EventBus;

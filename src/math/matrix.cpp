@@ -1,4 +1,4 @@
-#include "matrix.h"
+#include "matrix.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtx/quaternion.hpp"
 

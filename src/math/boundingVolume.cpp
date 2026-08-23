@@ -1,7 +1,7 @@
-#include "boundingVolume.h"
+#include "boundingVolume.hpp"
 #include <algorithm>
-#include "frustum.h"
-#include "../rendering/mesh/mesh.h"
+#include "frustum.hpp"
+#include "../rendering/mesh/mesh.hpp"
 #include "../rendering/mesh/vertex.hpp"
 
 bool math::Sphere::isOnFrustum(const Frustum& camFrustum, const glm::mat4& model) const {
