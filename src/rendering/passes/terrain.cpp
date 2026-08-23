@@ -4,7 +4,6 @@
 #include "../descriptorSet.h"
 #include "../graphicsEncoder.h"
 #include "../command.hpp"
-#include "../material/pushConstants.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../context/renderData.hpp"
@@ -73,10 +72,17 @@ void TerrainPass::configure(const RenderContext& ctx,
 		}
 	};
 
-	PipelineLayout layout = {.
-		descriptorSets = {materialLayout, bufferLayout},
-		.pushConstants = MaterialPushConstants::layout
+	auto materialPushConstantsLayout = MaterialPushConstants::layout;
+	materialPushConstantsLayout.baseOffset = offsetof(PushConstants, material);
+
+	auto transformPushConstantsLayout = TransformPushConstants::layout;
+	transformPushConstantsLayout.baseOffset = offsetof(PushConstants, transform);
+
+	PipelineLayout layout = {
+		.descriptorSets = {materialLayout, bufferLayout},
+		.pushConstants = {materialPushConstantsLayout, transformPushConstantsLayout}
 	};
+
 	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
 	mPipeline = GraphicsPipeline{createInfo};
 
@@ -86,22 +92,26 @@ void TerrainPass::configure(const RenderContext& ctx,
 
 void TerrainPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
 	const auto& cmd = mCommands->front();
+	const auto& materialLayout = mPipeline.layout().descriptorSets[0];
 
 	encoder.bindFrameBuffer(graph.getResource(mIndexes.sceneBuffer));
 	encoder.bindPipeline(mPipeline);
-
-	const auto& materialLayout = mPipeline.layout().descriptorSets[0];
 	encoder.bindDescriptorSet(materialLayout, ctx.renderData->material.descriptorSets[cmd.material.idx]);
 
-	const MaterialPushConstants pushConstants = {
-		.flags = cmd.material.flags,
-		.heightScale = cmd.material.heightScale,
-		.alphaCutoff = cmd.material.alphaCutoff,
-		.color = cmd.material.color
+	const PushConstants pushConstants = {
+		.material = {
+			.flags = cmd.material.flags,
+			.heightScale = cmd.material.heightScale,
+			.alphaCutoff = cmd.material.alphaCutoff,
+			.color = cmd.material.color
+		},
+		.transform = {
+			.model = cmd.transform.model,
+			.normal = cmd.transform.normal,
+		}
 	};
+
 	encoder.pushConstants(&pushConstants);
-	encoder.setUniform("model", cmd.transform.model);
-	encoder.setUniform("normalMatrix", cmd.transform.normal);
 	encoder.bindVertexArray(cmd.mesh.vao);
 	encoder.draw(cmd.mesh.vertexCount);
 }

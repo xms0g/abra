@@ -4,7 +4,6 @@
 #include "../frameGraph.h"
 #include "../descriptorSet.h"
 #include "../graphicsEncoder.h"
-#include "../material/pushConstants.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderData.hpp"
 #include "../context/renderQueue.hpp"
@@ -95,9 +94,15 @@ void DeferredGeometryPass::configure(const RenderContext& ctx,
 		}
 	};
 
+	auto materialPushConstantsLayout = MaterialPushConstants::layout;
+	materialPushConstantsLayout.baseOffset = offsetof(PushConstants, material);
+
+	auto transformPushConstantsLayout = TransformPushConstants::layout;
+	transformPushConstantsLayout.baseOffset = offsetof(PushConstants, transform);
+
 	PipelineLayout layout = {
 		.descriptorSets = {materialLayout, bufferLayout},
-		.pushConstants =  MaterialPushConstants::layout
+		.pushConstants = {materialPushConstantsLayout, transformPushConstantsLayout}
 	};
 
 	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
@@ -114,21 +119,26 @@ void DeferredGeometryPass::execute(const RenderContext& ctx, const FrameGraph& g
 	encoder.bindPipeline(mPipeline);
 
 	const auto pipelineCullMode = mPipeline.rasterizationState().cullMode;
+	const auto& materialLayout = mPipeline.layout().descriptorSets[0];
 
 	for (const auto& cmd: *mCommands) {
-		const auto& materialLayout = mPipeline.layout().descriptorSets[0];
 		encoder.bindDescriptorSet(materialLayout, ctx.renderData->material.descriptorSets[cmd.material.idx]);
 
-		const MaterialPushConstants pushConstants = {
-			.flags = cmd.material.flags,
-			.heightScale = cmd.material.heightScale,
-			.alphaCutoff = cmd.material.alphaCutoff,
-			.color = cmd.material.color
+		const PushConstants pushConstants = {
+			.material = {
+				.flags = cmd.material.flags,
+				.heightScale = cmd.material.heightScale,
+				.alphaCutoff = cmd.material.alphaCutoff,
+				.color = cmd.material.color
+			},
+			.transform = {
+				.model = cmd.transform.model,
+				.normal = cmd.transform.normal,
+			}
 		};
+
 		encoder.pushConstants(&pushConstants);
 		encoder.setCullMode(cmd.material.flags & TWOSIDED ? CullMode::None : pipelineCullMode);
-		encoder.setUniform("model", cmd.transform.model);
-		encoder.setUniform("normalMatrix", cmd.transform.normal);
 		encoder.bindVertexArray(cmd.mesh.vao);
 		encoder.drawIndexed(cmd.mesh.indexCount);
 	}

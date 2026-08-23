@@ -139,9 +139,10 @@ void GraphicsEncoder::bindPipeline(GraphicsPipeline& pipeline) {
 }
 
 void GraphicsEncoder::pushConstants(const void* data) const {
-	for (int i = 0; i < mState.pipeline->layout().pushConstants.count; ++i) {
-		auto& [name, offset, type] = mState.pipeline->layout().pushConstants.constants[i];
-		pushConstant(name, static_cast<const std::byte*>(data) + offset, type);
+	for (const auto& [constants, count, baseOffset]: mState.pipeline->layout().pushConstants) {
+		for (int i = 0; i < count; ++i) {
+			pushConstant(constants[i].name, static_cast<const std::byte*>(data) + baseOffset + constants[i].offset, constants[i].type);
+		}
 	}
 }
 
@@ -287,6 +288,12 @@ void GraphicsEncoder::pushConstant(const std::string_view name, const void* data
 			break;
 		case PushConstantType::Vec3:
 			mState.pipeline->setValue(name, *static_cast<const glm::vec3*>(data));
+			break;
+		case PushConstantType::Mat3:
+			mState.pipeline->setValue(name, *static_cast<const glm::mat3*>(data));
+			break;
+		case PushConstantType::Mat4:
+			mState.pipeline->setValue(name, *static_cast<const glm::mat4*>(data));
 			break;
 	}
 }

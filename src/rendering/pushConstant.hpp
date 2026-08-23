@@ -11,6 +11,8 @@ enum class PushConstantType: uint32_t {
 	UInt,
 	Float,
 	Vec3,
+	Mat3,
+	Mat4
 };
 
 struct PushConstant {
@@ -22,4 +24,5 @@ struct PushConstant {
 struct PushConstantLayout {
 	std::array<PushConstant, MAX_PUSH_CONSTANT_COUNT> constants;
 	uint32_t count{};
+	size_t baseOffset{};
 };

@@ -8,7 +8,7 @@
 #include "../context/renderData.hpp"
 #include "../context/renderQueue.hpp"
 #include "../material/material.hpp"
-#include "../material/pushConstants.hpp"
+#include "../pushConstants/materialPushConstants.hpp"
 #include "../buffers/vertexBuffer.h"
 #include "../mesh/mesh.h"
 #include "../../math/matrix.h"
@@ -109,10 +109,14 @@ void InstancedBlendPass::configure(const RenderContext& ctx,
 		}
 	};
 
+	auto materialPushConstantsLayout = MaterialPushConstants::layout;
+	materialPushConstantsLayout.baseOffset = 0;
+
 	PipelineLayout layout = {
 		.descriptorSets = {materialLayout, bufferLayout, passLayout},
-		.pushConstants = MaterialPushConstants::layout
+		.pushConstants = {materialPushConstantsLayout}
 	};
+
 	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
 	mPipeline = GraphicsPipeline{createInfo};
 

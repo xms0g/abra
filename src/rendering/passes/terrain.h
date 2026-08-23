@@ -2,6 +2,8 @@
 #include "IPass.hpp"
 #include "../graphicsPipeline.h"
 #include "../context/renderQueue.hpp"
+#include "../pushConstants/materialPushConstants.hpp"
+#include "../pushConstants/transformPushConstants.hpp"
 
 struct DrawCommand;
 class Shader;
@@ -23,6 +25,11 @@ public:
 private:
 	struct ResourceIndexes {
 		uint32_t sceneBuffer;
+	};
+
+	struct PushConstants {
+		MaterialPushConstants material;
+		TransformPushConstants transform;
 	};
 
 	ResourceIndexes mIndexes{};

@@ -6,6 +6,7 @@
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../context/renderData.hpp"
+#include "../pushConstants/transformPushConstants.hpp"
 
 SkyboxPass::SkyboxPass() = default;
 
@@ -53,7 +54,14 @@ void SkyboxPass::configure(const RenderContext& ctx,
 		}
 	};
 
-	PipelineLayout layout = {.descriptorSets = {passLayout}};
+	auto transformPushConstantLayout = TransformPushConstants::layout;
+	transformPushConstantLayout.baseOffset = 0;
+
+	PipelineLayout layout = {
+		.descriptorSets = {passLayout},
+		.pushConstants = {transformPushConstantLayout}
+	};
+
 	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
 	mPipeline = GraphicsPipeline{createInfo};
 
@@ -64,16 +72,19 @@ void SkyboxPass::configure(const RenderContext& ctx,
 void SkyboxPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
 	const auto& cmd = mCommands->front();
 	const auto pipelineCullMode = mPipeline.rasterizationState().cullMode;
+	const auto& materialLayout = mPipeline.layout().descriptorSets[0];
 
 	encoder.bindFrameBuffer(graph.getResource(mIndexes.sceneBuffer));
 	encoder.bindPipeline(mPipeline);
-
-	const auto& materialLayout = mPipeline.layout().descriptorSets[0];
 	encoder.bindDescriptorSet(materialLayout, ctx.renderData->material.descriptorSets[cmd.material.idx]);
 
+	const TransformPushConstants pushConstants = {
+		.model = cmd.transform.model,
+		.normal = cmd.transform.normal
+	};
+
+	encoder.pushConstants(&pushConstants);
 	encoder.setCullMode(cmd.material.flags & TWOSIDED ? CullMode::None : pipelineCullMode);
-	encoder.setUniform("model", cmd.transform.model);
-	encoder.setUniform("normalMatrix", cmd.transform.normal);
 	encoder.bindVertexArray(cmd.mesh.vao);
 	encoder.draw(cmd.mesh.vertexCount);
 }

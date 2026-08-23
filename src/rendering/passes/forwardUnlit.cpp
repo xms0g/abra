@@ -3,7 +3,7 @@
 #include "../frameGraph.h"
 #include "../descriptorSet.h"
 #include "../graphicsEncoder.h"
-#include "../material/pushConstants.hpp"
+#include "../pushConstants/materialPushConstants.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../../config/configManager.h"
@@ -58,10 +58,17 @@ void ForwardUnlitPass::configure(const RenderContext& ctx,
 		}
 	};
 
+	auto materialPushConstantsLayout = MaterialPushConstants::layout;
+	materialPushConstantsLayout.baseOffset = offsetof(PushConstants, material);
+
+	auto transformPushConstantsLayout = TransformPushConstants::layout;
+	transformPushConstantsLayout.baseOffset = offsetof(PushConstants, transform);
+
 	PipelineLayout layout = {
 		.descriptorSets = {bufferLayout},
-		.pushConstants = MaterialPushConstants::layout
+		.pushConstants = {materialPushConstantsLayout, transformPushConstantsLayout}
 	};
+
 	GraphicsPipelineCreateInfo createInfo = {.rendering = info, .layout = layout};
 	mPipeline = GraphicsPipeline{createInfo};
 
@@ -74,15 +81,20 @@ void ForwardUnlitPass::execute(const RenderContext& ctx, const FrameGraph& graph
 		encoder.bindFrameBuffer(graph.getResource(mIndexes.sceneBuffer));
 		encoder.bindPipeline(mPipeline);
 
-		const MaterialPushConstants pushConstants = {
-			.flags = cmd.material.flags,
-			.heightScale = cmd.material.heightScale,
-			.alphaCutoff = cmd.material.alphaCutoff,
-			.color = cmd.material.color
+		const PushConstants pushConstants = {
+			.material = {
+				.flags = cmd.material.flags,
+				.heightScale = cmd.material.heightScale,
+				.alphaCutoff = cmd.material.alphaCutoff,
+				.color = cmd.material.color
+			},
+			.transform = {
+				.model = cmd.transform.model,
+				.normal = cmd.transform.normal,
+			}
 		};
+
 		encoder.pushConstants(&pushConstants);
-		encoder.setUniform("model", cmd.transform.model);
-		encoder.setUniform("normalMatrix", cmd.transform.normal);
 		encoder.bindVertexArray(cmd.mesh.vao);
 		encoder.drawIndexed(cmd.mesh.indexCount);
 	}

@@ -138,7 +138,7 @@ struct PipelineShaderStage {
 
 struct PipelineLayout {
 	std::vector<DescriptorSetLayout> descriptorSets;
-	PushConstantLayout pushConstants;
+	std::vector<PushConstantLayout> pushConstants;
 };
 
 struct PipelineRenderingInfo {
