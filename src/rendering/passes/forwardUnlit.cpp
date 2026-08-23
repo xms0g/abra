@@ -3,7 +3,6 @@
 #include "../frameGraph.h"
 #include "../descriptorSet.h"
 #include "../graphicsEncoder.h"
-#include "../pushConstants/materialPushConstants.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
 #include "../../config/configManager.h"
