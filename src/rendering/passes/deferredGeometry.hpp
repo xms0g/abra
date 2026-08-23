@@ -6,8 +6,6 @@
 #include "../pushConstants/transformPushConstants.hpp"
 
 struct DrawCommand;
-class Shader;
-class FrameBuffer;
 
 class DeferredGeometryPass final : public IPass {
 public:

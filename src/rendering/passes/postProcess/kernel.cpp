@@ -1,6 +1,9 @@
 #include "kernel.hpp"
 #include "../../shader.hpp"
 #include "../../descriptorSet.hpp"
+#include "../../graphicsEncoder.hpp"
+#include "../../frameGraph.hpp"
+#include "../../buffers/frameBuffer.hpp"
 
 Kernel::Kernel(const std::string& name, const float* kernel, const bool enabled)
 	: BasePostEffect(name, enabled),

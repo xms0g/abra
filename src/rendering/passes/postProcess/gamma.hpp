@@ -1,8 +1,6 @@
 #pragma once
 #include "basePostEffect.hpp"
 
-class FrameBuffer;
-
 class Gamma final : public BasePostEffect {
 public:
 	explicit Gamma(const std::string& name, bool enabled = false);

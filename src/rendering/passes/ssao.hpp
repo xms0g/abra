@@ -4,9 +4,6 @@
 #include "../buffers/uniformBuffer.hpp"
 #include "../texture.hpp"
 
-class FrameBuffer;
-class Shader;
-
 class SSAOPass final : public IPass {
 public:
 	SSAOPass();

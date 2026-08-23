@@ -1,8 +1,6 @@
 #pragma once
 #include "basePostEffect.hpp"
 
-class FrameBuffer;
-
 class Grayscale final : public BasePostEffect {
 public:
 	explicit Grayscale(const std::string& name, bool enabled = false);

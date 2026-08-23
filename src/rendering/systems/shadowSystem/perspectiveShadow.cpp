@@ -1,7 +1,6 @@
 #include "perspectiveShadow.hpp"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "../../shader.hpp"
 #include "../../context/renderGroup.hpp"
 #include "../../context/renderContext.hpp"
 #include "../../context/renderData.hpp"

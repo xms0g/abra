@@ -1,6 +1,5 @@
 #include "forwardOpaque.hpp"
 #include "../frameGraph.hpp"
-#include "../shader.hpp"
 #include "../graphicsEncoder.hpp"
 #include "../descriptorSet.hpp"
 #include "../context/renderContext.hpp"

@@ -1,8 +1,6 @@
 #pragma once
 #include "basePostEffect.hpp"
 
-class FrameBuffer;
-
 class FXAA final : public BasePostEffect {
 public:
 	explicit FXAA(const std::string& name, bool enabled = false);

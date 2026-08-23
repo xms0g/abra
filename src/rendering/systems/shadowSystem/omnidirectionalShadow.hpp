@@ -7,7 +7,6 @@ class GraphicsEncoder;
 class GraphicsPipeline;
 struct RenderGroup;
 struct RenderContext;
-class FrameBuffer;
 
 class OmnidirectionalShadow {
 public:

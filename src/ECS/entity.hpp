@@ -11,6 +11,7 @@ public:
 	explicit Entity(const size_t id, std::string name): mID(id), mName(std::move(name)) {}
 
 	Entity(const Entity& other) = default;
+	Entity& operator=(const Entity& other) = default;
 
 	[[nodiscard]]
 	size_t id() const { return mID; }
@@ -33,13 +34,6 @@ public:
 	template<typename T>
 	T* tryGetComponent() const;
 
-private:
-	size_t mID{};
-	std::string mName;
-
-public:
-	Entity& operator=(const Entity& other) = default;
-
 	bool operator==(const Entity& other) const {
 		return mID == other.mID;
 	}
@@ -55,4 +49,8 @@ public:
 	bool operator>(const Entity& other) const {
 		return mID > other.mID;
 	}
+
+private:
+	size_t mID{};
+	std::string mName;
 };

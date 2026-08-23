@@ -1,5 +1,4 @@
 #include "debug.hpp"
-#include "../shader.hpp"
 #include "../descriptorSet.hpp"
 #include "../frameGraph.hpp"
 #include "../graphicsEncoder.hpp"

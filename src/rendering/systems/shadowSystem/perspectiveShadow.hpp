@@ -6,7 +6,6 @@ class GraphicsEncoder;
 class GraphicsPipeline;
 struct RenderGroup;
 struct RenderContext;
-class Shader;
 class FrameBuffer;
 
 class PerspectiveShadow {

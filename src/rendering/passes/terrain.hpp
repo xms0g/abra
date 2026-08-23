@@ -6,8 +6,6 @@
 #include "../pushConstants/transformPushConstants.hpp"
 
 struct DrawCommand;
-class Shader;
-struct RenderGroup;
 
 class TerrainPass final : public IPass {
 public:

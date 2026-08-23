@@ -1,5 +1,7 @@
 #include "gamma.hpp"
 #include "../../shader.hpp"
+#include "../../graphicsEncoder.hpp"
+#include "../../frameGraph.hpp"
 #include "../../descriptorSet.hpp"
 
 Gamma::Gamma(const std::string& name, const bool enabled)

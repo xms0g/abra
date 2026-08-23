@@ -10,13 +10,6 @@
 #include "buffers/uniformBuffer.hpp"
 #include "../ECS/system.hpp"
 
-struct PBRBuffers {
-	std::unique_ptr<FrameBuffer> environment;
-	std::unique_ptr<FrameBuffer> irradiance;
-	std::unique_ptr<FrameBuffer> prefilter;
-	std::unique_ptr<FrameBuffer> brdfLUT;
-};
-
 class Window;
 class SyncStateSystem;
 class EventBus;

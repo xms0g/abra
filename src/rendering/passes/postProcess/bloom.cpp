@@ -1,5 +1,6 @@
 #include "bloom.hpp"
 #include "../../shader.hpp"
+#include "../../graphicsEncoder.hpp"
 #include "../../frameGraph.hpp"
 #include "../../descriptorSet.hpp"
 #include "../../buffers/frameBuffer.hpp"

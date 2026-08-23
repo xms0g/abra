@@ -5,8 +5,6 @@
 #include "../context/renderQueue.hpp"
 
 struct DrawCommand;
-struct VisibleObject;
-class Shader;
 
 class DebugPass final : public IPass {
 public:

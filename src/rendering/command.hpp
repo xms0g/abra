@@ -1,7 +1,6 @@
 #pragma once
 #include <span>
 #include "glm/glm.hpp"
-#include "texture.hpp"
 
 struct MaterialView {
 	uint32_t idx;

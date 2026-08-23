@@ -1,5 +1,4 @@
 #include "skybox.hpp"
-#include "../shader.hpp"
 #include "../frameGraph.hpp"
 #include "../descriptorSet.hpp"
 #include "../graphicsEncoder.hpp"

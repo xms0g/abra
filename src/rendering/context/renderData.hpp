@@ -4,6 +4,14 @@
 #include "../descriptorSet.hpp"
 #include "../../math/matrix.hpp"
 
+class FrameBuffer;
+
+struct PBRBuffers {
+	std::unique_ptr<FrameBuffer> environment;
+	std::unique_ptr<FrameBuffer> irradiance;
+	std::unique_ptr<FrameBuffer> prefilter;
+	std::unique_ptr<FrameBuffer> brdfLUT;
+};
 
 struct RenderData {
 	struct {

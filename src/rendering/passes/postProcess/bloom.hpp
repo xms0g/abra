@@ -1,11 +1,5 @@
 #pragma once
 #include "basePostEffect.hpp"
-#include "../../descriptorSet.hpp"
-
-class FrameGraph;
-struct RenderContext;
-class Shader;
-class FrameBuffer;
 
 class Bloom final : public BasePostEffect {
 public:

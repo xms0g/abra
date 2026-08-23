@@ -16,67 +16,26 @@ public:
 	void update();
 
 	template<typename T, typename... Args>
-	void addComponent(const Entity& e, Args&& ... args) {
-		const auto componentID = Component<T>::getID();
-
-		if (!componentPools[componentID]) {
-			componentPools[componentID] = std::make_unique<Pool<T>>();
-		}
-
-		auto& pool = componentPools[componentID];
-
-		T newComponent(std::forward<Args>(args)...);
-
-		static_cast<Pool<T>*>(pool.get())->data[e.id()] = newComponent;
-		entityComponentSignatures[e.id()].set(componentID);
-	}
+	void addComponent(const Entity& e, Args&& ... args);
 
 	template<typename T>
-	T& getComponent(const Entity& e) {
-		auto* component = tryGetComponent<T>(e);
-		assert(component && "Component does not exist");
-
-		return *component;
-	}
+	T& getComponent(const Entity& e);
 
 	template<typename T>
-	bool hasComponent(const Entity& e) {
-		const auto componentID = Component<T>::getID();
-		return entityComponentSignatures[e.id()].test(componentID);
-	}
+	bool hasComponent(const Entity& e);
 
 	template<typename T>
-	T* tryGetComponent(const Entity& e) const {
-		const auto componentID = Component<T>::getID();
-
-		const auto& poolIt = componentPools.find(componentID);
-		if (poolIt == componentPools.end()) {
-			return nullptr;
-		}
-
-		auto& pool = static_cast<Pool<T>*>(poolIt->second.get())->data;
-
-		const auto& compIt = pool.find(e.id());
-		return compIt != pool.end() ? &compIt->second : nullptr;
-	}
+	T* tryGetComponent(const Entity& e) const;
 
 	template<typename T, typename ...Args>
-	T& addSystem(Args&& ...args) {
-		systems.insert({std::type_index{typeid(T)}, std::make_shared<T>(std::forward<Args>(args)...)});
-		return getSystem<T>();
-
-	}
+	T& addSystem(Args&& ...args);
 
 	template<typename T>
-	T& getSystem() const {
-		return *std::static_pointer_cast<T>(systems.at(std::type_index{typeid(T)}));
-	}
+	T& getSystem() const;
 
 	template<typename T>
 	[[nodiscard]]
-	bool hasSystem() const {
-		return systems.contains(std::type_index{typeid(T)});
-	}
+	bool hasSystem() const;
 
 private:
 	void addEntityToSystems(const Entity& entity);
@@ -97,25 +56,5 @@ private:
 	std::unordered_map<std::type_index, std::shared_ptr<System>> systems;
 };
 
-template<typename T, typename ...Args>
-void Entity::addComponent(Args&& ...args) {
-	registry->addComponent<T>(*this, std::forward<Args>(args)...);
-}
-
-template<typename T>
-T& Entity::getComponent() const {
-	return registry->getComponent<T>(*this);
-}
-
-template<typename T>
-[[nodiscard]]
-bool Entity::hasComponent() const {
-	return registry->hasComponent<T>(*this);
-}
-
-template<typename T>
-T* Entity::tryGetComponent() const {
-	return registry->tryGetComponent<T>(*this);
-}
-
-
+#include "registry.tpp"
+#include "entity.tpp"

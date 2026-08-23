@@ -4,11 +4,8 @@
 
 class GraphicsPipeline;
 class GraphicsEncoder;
-class FrameGraph;
 struct RenderGroup;
 struct RenderContext;
-class Shader;
-class FrameBuffer;
 
 class DirectionalShadow {
 public:

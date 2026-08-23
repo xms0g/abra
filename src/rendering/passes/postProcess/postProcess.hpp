@@ -3,14 +3,10 @@
 #include <vector>
 #include "basePostEffect.hpp"
 #include "../IPass.hpp"
-#include "../../graphicsPipeline.hpp"
 #include "../../descriptorSet.hpp"
 
-struct GuiPostProcessEvent;
 class EventBus;
 struct RenderContext;
-
-class Shader;
 
 class PostProcessPass final : public IPass {
 public:

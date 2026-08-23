@@ -1,8 +1,6 @@
 #pragma once
 #include <string>
-#include "../../graphicsEncoder.hpp"
 #include "../../graphicsPipeline.hpp"
-#include "../../texture.hpp"
 #include "../../../event/events/guiPostProcessEvent.hpp"
 
 namespace Model {
@@ -12,6 +10,7 @@ class Quad;
 class FrameGraph;
 class FrameBuffer;
 class DescriptorSet;
+class GraphicsEncoder;
 
 class BasePostEffect {
 public:

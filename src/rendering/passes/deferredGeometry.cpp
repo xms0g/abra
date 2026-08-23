@@ -1,5 +1,4 @@
 #include "deferredGeometry.hpp"
-#include "../shader.hpp"
 #include "../command.hpp"
 #include "../frameGraph.hpp"
 #include "../descriptorSet.hpp"

@@ -2,10 +2,6 @@
 #include "IPass.hpp"
 #include "../graphicsPipeline.hpp"
 
-class CubemapBuffer;
-class FrameBuffer;
-class Shader;
-
 class DeferredLightingPass final : public IPass {
 public:
 	DeferredLightingPass();

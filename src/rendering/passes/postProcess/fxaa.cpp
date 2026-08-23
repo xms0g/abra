@@ -1,5 +1,7 @@
 #include "fxaa.hpp"
 #include "../../shader.hpp"
+#include "../../graphicsEncoder.hpp"
+#include "../../frameGraph.hpp"
 #include "../../buffers/frameBuffer.hpp"
 #include "../../descriptorSet.hpp"
 #include "../../../event/events/guiPostProcessEvent.hpp"
