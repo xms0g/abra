@@ -9,16 +9,24 @@ public:
 
 	virtual ~System() = default;
 
-	void addEntityToSystem(const Entity& entity) { entities.emplace_back(entity); }
+	void addEntityToSystem(const Entity& entity) {
+		entities.emplace_back(entity);
+	}
 
 	[[nodiscard]]
-	const std::vector<Entity>& getSystemEntities() const { return entities; }
+	const std::vector<Entity>& getSystemEntities() const {
+		return entities;
+	}
 
 	[[nodiscard]]
-	const Signature& getComponentSignature() const { return componentSignature; }
+	const Signature& getComponentSignature() const {
+		return componentSignature;
+	}
 
 	[[nodiscard]]
-	bool useOrLogic() const { return mUseOrLogic; }
+	bool useOrLogic() const {
+		return mUseOrLogic;
+	}
 
 	template<typename T>
 	void RequireComponent(bool orLogic = false);

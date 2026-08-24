@@ -8,21 +8,29 @@ class Entity {
 public:
 	Entity() = default;
 
-	explicit Entity(const size_t id, std::string name): mID(id), mName(std::move(name)) {}
+	explicit Entity(const size_t id, std::string name)
+		: mID(id),
+		  mName(std::move(name)) {
+	}
 
 	Entity(const Entity& other) = default;
+
 	Entity& operator=(const Entity& other) = default;
 
 	[[nodiscard]]
-	size_t id() const { return mID; }
+	size_t id() const {
+		return mID;
+	}
 
 	[[nodiscard]]
-	const std::string& name() const { return mName; }
+	const std::string& name() const {
+		return mName;
+	}
 
 	class Registry* registry{};
 
-	template<typename T, typename ...Args>
-	void addComponent(Args&& ...args);
+	template<typename T, typename... Args>
+	void addComponent(Args&&... args);
 
 	template<typename T>
 	T& getComponent() const;
