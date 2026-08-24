@@ -8,7 +8,7 @@ ThreadPool::ThreadPool(const size_t threadCount) {
 
 ThreadPool::~ThreadPool() {
 	{
-		std::lock_guard<std::mutex> lock(mMutex);
+		std::lock_guard lock(mMutex);
 		mStop = true;
 		mHasJob.notify_all();
 	}
@@ -21,7 +21,7 @@ ThreadPool::~ThreadPool() {
 
 void ThreadPool::enqueue(std::function<void()> job) {
 	{
-		std::lock_guard<std::mutex> lock(mMutex);
+		std::lock_guard lock(mMutex);
 		mJobs.emplace(std::move(job));
 	}
 
@@ -40,7 +40,7 @@ void ThreadPool::workerLoop() {
 		std::function<void()> job;
 
 		{
-			std::unique_lock<std::mutex> lock(mMutex);
+			std::unique_lock lock(mMutex);
 			mHasJob.wait(lock, [&]() {
 				return mStop || !mJobs.empty();
 			});
