@@ -112,7 +112,7 @@ Model::Sphere::Sphere(glm::vec3 color,
 
 	mMeshes[0].emplace_back(vertices, indices);
 
-	uint32_t flags{0};
+	MaterialFlag flags{0};
 	std::vector<MaterialTexture> textures;
 	if (!albedo.empty()) {
 		textures.emplace_back(albedo, TextureType::Albedo, nullptr);
@@ -124,18 +124,18 @@ Model::Sphere::Sphere(glm::vec3 color,
 
 	if (!orm.empty()) {
 		textures.emplace_back(orm, TextureType::Roughness_Metallic, nullptr);
-		flags |= PBR;
-		flags |= HAS_ORM;
+		flags |= MaterialFlag::Pbr;
+		flags |= MaterialFlag::HasOrm;
 	}
 
 	if (unlit) {
-		flags |= UNLIT;
+		flags |= MaterialFlag::Unlit;
 	} else {
-		flags |= CASTSHADOW;
+		flags |= MaterialFlag::Castshadow;
 	}
 
 	if (color != glm::vec3(0.0f)) {
-		flags |= HAS_SOLID_COLOR;
+		flags |= MaterialFlag::HasSolidColor;
 	}
 
 	Material material;

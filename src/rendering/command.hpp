@@ -1,10 +1,11 @@
 #pragma once
 #include <span>
 #include "glm/glm.hpp"
+#include "material/material.hpp"
 
 struct MaterialView {
 	uint32_t idx;
-	uint32_t flags;
+	MaterialFlag flags;
 	glm::vec3 color;
 	float alphaCutoff;
 	float heightScale;

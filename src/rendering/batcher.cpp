@@ -101,7 +101,7 @@ void Batcher::enqueueRenderGroup(const Entity& entity, QueueRegistry& queueRegis
 		RenderInstanceGroup group{entity.id(), matBatch, instComponent.transforms};
 
 		for (const auto& rule: rules) {
-			if (matBatch.materialFlags & rule.flags) {
+			if ((matBatch.materialFlags & rule.flags) != MaterialFlag::None) {
 				queueRegistry.emplace(rule.instancedQueue, group);
 			}
 		}
@@ -119,7 +119,7 @@ void Batcher::enqueueRenderGroup(const Entity& entity, QueueRegistry& queueRegis
 		}
 
 		for (const auto& rule: rules) {
-			if (matBatch.materialFlags & rule.flags) {
+			if ((matBatch.materialFlags & rule.flags) != MaterialFlag::None) {
 				queueRegistry.emplace(rule.queue, group);
 			}
 		}

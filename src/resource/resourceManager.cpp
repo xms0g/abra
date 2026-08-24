@@ -123,8 +123,8 @@ void ResourceManager::uploadMaterialsToGPU() {
 					.parameters = {
 						.minFilter = TextureFilter::Linear,
 						.magFilter = TextureFilter::Linear,
-						.wrapS = material.flags & BLEND ? TextureWrap::ClampToEdge : TextureWrap::Repeat,
-						.wrapT = material.flags & BLEND ? TextureWrap::ClampToEdge : TextureWrap::Repeat,
+						.wrapS = (material.flags & MaterialFlag::Blend) != MaterialFlag::None ? TextureWrap::ClampToEdge : TextureWrap::Repeat,
+						.wrapT = (material.flags & MaterialFlag::Blend) != MaterialFlag::None ? TextureWrap::ClampToEdge : TextureWrap::Repeat,
 					},
 					.dataType = DataType::UnsignedByte,
 					.width = 0,
@@ -270,18 +270,24 @@ void ResourceManager::processMaterials(const aiScene* scene, MaterialLoadContext
 
 void ResourceManager::loadMaterialTextures(const aiMaterial* mat, const TextureLoadRequest& req, MaterialLoadContext& materialLoadCtx) {
 	if (!materialLoadCtx.materials.contains(req.materialID)) {
-		uint32_t flags{0};
-		flags |= CASTSHADOW;
+		auto flags{MaterialFlag::None};
+		flags |= MaterialFlag::Castshadow;
 
 		if (int twoSided{0};
 			mat->Get(AI_MATKEY_TWOSIDED, twoSided) == AI_SUCCESS) {
-			flags |= twoSided != 0 ? TWOSIDED : 0;
+
+			if (twoSided != 0) {
+				flags |= MaterialFlag::Twosided;
+			}
 		}
 
 		if (float matPBR{0.0f};
 			mat->Get(AI_MATKEY_METALLIC_FACTOR, matPBR) == AI_SUCCESS ||
 			mat->Get(AI_MATKEY_ROUGHNESS_FACTOR, matPBR) == AI_SUCCESS) {
-			flags |= (matPBR > 0.0f) ? PBR : 0;
+
+			if (matPBR > 0.0f) {
+				flags |= MaterialFlag::Pbr;
+			}
 		}
 
 		// Only supports glTF
@@ -290,18 +296,18 @@ void ResourceManager::loadMaterialTextures(const aiMaterial* mat, const TextureL
 		if (aiString alphaMode;
 			mat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode) == AI_SUCCESS) {
 			if (std::strcmp(alphaMode.C_Str(), "OPAQUE") == 0) {
-				if (!(flags & PBR)) {
-					flags |= OPAQUE;
+				if ((flags & MaterialFlag::Pbr) == MaterialFlag::None) {
+					flags |= MaterialFlag::Opaque;
 				}
 			} else if (std::strcmp(alphaMode.C_Str(), "MASK") == 0) {
-				if (flags & PBR) {
-					flags |= ALPHACUTOFF;
+				if ((flags & MaterialFlag::Pbr) != MaterialFlag::None) {
+					flags |= MaterialFlag::Alphacutoff;
 				} else {
-					flags |= OPAQUE | ALPHACUTOFF;
+					flags |= MaterialFlag::Opaque | MaterialFlag::Alphacutoff;
 				}
 				mat->Get(AI_MATKEY_GLTF_ALPHACUTOFF, alphaCutoff);
 			} else if (std::strcmp(alphaMode.C_Str(), "BLEND") == 0) {
-				flags |= BLEND;
+				flags |= MaterialFlag::Blend;
 			}
 		}
 
@@ -323,20 +329,20 @@ void ResourceManager::loadMaterialTextures(const aiMaterial* mat, const TextureL
 
 		switch (reqType) {
 			case aiTextureType_HEIGHT:
-				material.flags |= HAS_HEIGHT_MAP;
+				material.flags |= MaterialFlag::HasHeightMap;
 				break;
 			case aiTextureType_EMISSIVE:
-				material.flags |= HAS_EMISSIVE_MAP;
+				material.flags |= MaterialFlag::HasEmissiveMap;
 				break;
 			case aiTextureType_UNKNOWN:
 				materialLoadCtx.roughMetalPath = path;
 				break;
 			case aiTextureType_LIGHTMAP: {
 				if (materialLoadCtx.roughMetalPath == path) {
-					material.flags |= HAS_ORM;
+					material.flags |= MaterialFlag::HasOrm;
 					return;
 				}
-				material.flags |= HAS_AO_MAP;
+				material.flags |= MaterialFlag::HasAoMap;
 				break;
 			}
 		}

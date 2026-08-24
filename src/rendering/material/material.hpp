@@ -3,25 +3,40 @@
 #include <vector>
 #include "glm/glm.hpp"
 #include "../texture.hpp"
+#include "../glUtils.hpp"
 
-enum MaterialFlag: uint32_t {
-	OPAQUE = 1 << 0,
-	BLEND = 1 << 1,
-	CASTSHADOW = 1 << 2,
-	TWOSIDED = 1 << 3,
-	UNLIT = 1 << 4,
-	PBR = 1 << 5,
-	HAS_HEIGHT_MAP = 1 << 6,
-	HAS_EMISSIVE_MAP = 1 << 7,
-	HAS_AO_MAP = 1 << 8,
-	HAS_ORM = 1 << 9,
-	ALPHACUTOFF = 1 << 10,
-	HAS_SOLID_COLOR = 1 << 11,
+enum class MaterialFlag: uint32_t {
+	None,
+	Opaque = 1 << 0,
+	Blend = 1 << 1,
+	Castshadow = 1 << 2,
+	Twosided = 1 << 3,
+	Unlit = 1 << 4,
+	Pbr = 1 << 5,
+	HasHeightMap = 1 << 6,
+	HasEmissiveMap = 1 << 7,
+	HasAoMap = 1 << 8,
+	HasOrm = 1 << 9,
+	Alphacutoff = 1 << 10,
+	HasSolidColor = 1 << 11,
 };
+
+constexpr MaterialFlag operator|(const MaterialFlag lhs, const MaterialFlag rhs) {
+	return static_cast<MaterialFlag>(toUnderlying(lhs) | toUnderlying(rhs));
+}
+
+constexpr MaterialFlag& operator|=(MaterialFlag& lhs, const MaterialFlag rhs) {
+	lhs = static_cast<MaterialFlag>(toUnderlying(lhs) | toUnderlying(rhs));
+	return lhs;
+}
+
+constexpr MaterialFlag operator&(const MaterialFlag lhs, const MaterialFlag rhs) {
+	return static_cast<MaterialFlag>(toUnderlying(lhs) & toUnderlying(rhs));
+}
 
 struct Material {
 	uint32_t idx{0};
-	uint32_t flags{0};
+	MaterialFlag flags{};
 	TextureTarget textureTarget{};
 	glm::vec3 color{0.0f};
 	float alphaCutoff{0.0f};
@@ -35,7 +50,7 @@ struct Material {
 
 	Material(Material&& other) noexcept
 		: idx(std::exchange(other.idx, 0)),
-		  flags(std::exchange(other.flags, 0)),
+		  flags(std::exchange(other.flags, {})),
 		  textureTarget(std::exchange(other.textureTarget, {})),
 		  color(other.color),
 		  alphaCutoff(std::exchange(other.alphaCutoff, 0.0f)),
@@ -45,7 +60,7 @@ struct Material {
 	Material& operator=(Material&& other) noexcept {
 		if (this != &other) {
 			idx = std::exchange(other.idx, 0);
-			flags = std::exchange(other.flags, 0);
+			flags = std::exchange(other.flags, {});
 			textureTarget = std::exchange(other.textureTarget, {});
 			color = other.color;
 			alphaCutoff = std::exchange(other.alphaCutoff, 0.0f);
@@ -57,7 +72,7 @@ struct Material {
 
 struct MaterialBatch {
 	uint32_t materialIndex{};
-	uint32_t materialFlags{};
+	MaterialFlag materialFlags{};
 	uint32_t renderFlag{};
 	uint32_t textureOffset{};
 	size_t textureCount{};

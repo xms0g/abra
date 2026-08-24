@@ -147,7 +147,7 @@ void ForwardOpaquePass::execute(const RenderContext& ctx, const FrameGraph& grap
 		};
 
 		encoder.pushConstants(&pushConstants);
-		encoder.setCullMode(cmd.material.flags & TWOSIDED ? CullMode::None : pipelineCullMode);
+		encoder.setCullMode((cmd.material.flags & MaterialFlag::Twosided) != MaterialFlag::None ? CullMode::None : pipelineCullMode);
 		encoder.bindVertexArray(cmd.mesh.vao);
 		encoder.drawIndexed(cmd.mesh.indexCount);
 	}

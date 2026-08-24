@@ -160,7 +160,7 @@ void InstancedBlendPass::execute(const RenderContext& ctx, const FrameGraph& gra
 			.color = ctx.renderData->material.colors[object.matBatch.materialIndex]
 		};
 		encoder.pushConstants(&pushConstants);
-		encoder.setCullMode(object.matBatch.materialFlags & TWOSIDED ? CullMode::None : pipelineCullMode);
+		encoder.setCullMode((object.matBatch.materialFlags & MaterialFlag::Twosided) != MaterialFlag::None ? CullMode::None : pipelineCullMode);
 
 		for (const auto& meshIdx: object.matBatch.meshIndices) {
 			encoder.bindVertexArray(ctx.renderData->mesh.vaos[meshIdx]);

@@ -90,18 +90,18 @@ Model::Plane::Plane(glm::vec3 color,
 		textures.emplace_back(heightTexture, TextureType::Height, nullptr);
 	}
 
-	uint32_t flags{0};
+	MaterialFlag flags{0};
 	if (unlit) {
-		flags |= UNLIT;
+		flags |= MaterialFlag::Unlit;
 	} else {
-		flags |= OPAQUE;
-		flags |= CASTSHADOW;
+		flags |= MaterialFlag::Opaque;
+		flags |= MaterialFlag::Castshadow;
 	}
 
-	flags |= TWOSIDED;
+	flags |= MaterialFlag::Twosided;
 
 	if (color != glm::vec3(0.0f)) {
-		flags |= HAS_SOLID_COLOR;
+		flags |= MaterialFlag::HasSolidColor;
 	}
 
 	Material material;

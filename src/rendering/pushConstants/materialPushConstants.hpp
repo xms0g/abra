@@ -1,8 +1,9 @@
 #pragma once
 #include "../pushConstant.hpp"
+#include "../material/material.hpp"
 
 struct MaterialPushConstants {
-	uint32_t flags;
+	MaterialFlag flags;
 	float heightScale;
 	float alphaCutoff;
 	glm::vec3 color;

@@ -36,14 +36,14 @@ private:
 	} buildState{};
 
 	struct PassRule {
-		uint32_t flags;
+		MaterialFlag flags;
 		std::string queue;
 		std::string instancedQueue;
 	} rules[5] = {
-		{.flags = CASTSHADOW, .queue = "shadow", .instancedQueue = ""},
-		{.flags = PBR, .queue = "deferred", .instancedQueue = ""},
-		{.flags = UNLIT, .queue = "unlit", .instancedQueue = ""},
-		{.flags = OPAQUE, .queue = "opaque", .instancedQueue = "opaqueInstanced"},
-		{.flags = BLEND, .queue = "blend", .instancedQueue = "blendInstanced"},
+		{.flags = MaterialFlag::Castshadow, .queue = "shadow", .instancedQueue = ""},
+		{.flags = MaterialFlag::Pbr, .queue = "deferred", .instancedQueue = ""},
+		{.flags = MaterialFlag::Unlit, .queue = "unlit", .instancedQueue = ""},
+		{.flags = MaterialFlag::Opaque, .queue = "opaque", .instancedQueue = "opaqueInstanced"},
+		{.flags = MaterialFlag::Blend, .queue = "blend", .instancedQueue = "blendInstanced"},
 	};
 };

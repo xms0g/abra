@@ -62,10 +62,10 @@ Model::Terrain::Terrain(glm::vec3 color,
 
 	mMeshes[0].emplace_back(vertices, indices);
 
-	uint32_t flags{0};
+	MaterialFlag flags{0};
 	std::vector<MaterialTexture> textures;
 	if (!heightTexture.empty()) {
-		flags |= HAS_HEIGHT_MAP;
+		flags |= MaterialFlag::HasHeightMap;
 		textures.emplace_back(heightTexture, TextureType::Height, nullptr);
 	}
 

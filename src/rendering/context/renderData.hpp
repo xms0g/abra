@@ -2,6 +2,7 @@
 #include <vector>
 #include "glm/glm.hpp"
 #include "../descriptorSet.hpp"
+#include "../material/material.hpp"
 #include "../../math/matrix.hpp"
 
 class FrameBuffer;
@@ -28,7 +29,7 @@ struct RenderData {
 
 	struct {
 		std::vector<float> alphaCutoffs;
-		std::vector<uint32_t> flags;
+		std::vector<MaterialFlag> flags;
 		std::vector<DescriptorSet> descriptorSets;
 		std::vector<glm::vec3> colors;
 	} material;
@@ -63,7 +64,7 @@ struct RenderData {
 		mesh.indexCounts.push_back(indexCount);
 	}
 
-	void emplaceMaterial(const uint32_t flags, const glm::vec3& color, const float alphaCutoff) {
+	void emplaceMaterial(const MaterialFlag flags, const glm::vec3& color, const float alphaCutoff) {
 		material.flags.push_back(flags);
 		material.colors.push_back(color);
 		material.alphaCutoffs.push_back(alphaCutoff);
