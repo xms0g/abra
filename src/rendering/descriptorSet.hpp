@@ -1,7 +1,6 @@
 #pragma once
 #include <variant>
 #include <vector>
-#include <cstdint>
 #include <span>
 #include "texture.hpp"
 
