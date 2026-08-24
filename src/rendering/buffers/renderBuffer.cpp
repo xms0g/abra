@@ -34,6 +34,7 @@ RenderBuffer& RenderBuffer::operator=(RenderBuffer&& other) noexcept {
 	if (this != &other) {
 		if (mHandle)
 			glDeleteRenderbuffers(1, &mHandle);
+
 		mHandle = std::exchange(other.mHandle, 0);
 		mFormat = std::exchange(other.mFormat, {});
 	}

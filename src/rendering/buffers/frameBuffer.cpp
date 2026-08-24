@@ -1,5 +1,4 @@
 #include "frameBuffer.hpp"
-#include <cassert>
 #include <iostream>
 #include <vector>
 #include "glad/glad.h"

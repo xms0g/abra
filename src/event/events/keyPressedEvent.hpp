@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdint>
 #include "event.hpp"
 
 enum class Key : uint8_t {

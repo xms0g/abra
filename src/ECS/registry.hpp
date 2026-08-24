@@ -1,5 +1,4 @@
 #pragma once
-#include <cassert>
 #include <typeindex>
 #include <unordered_map>
 #include <vector>
