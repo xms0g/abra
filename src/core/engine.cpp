@@ -39,7 +39,7 @@ void Engine::run() {
 		mDeltaTime = static_cast<float>(SDL_GetTicks() - mMillisecsPreviousFrame) / 1000.0f;
 		mMillisecsPreviousFrame = SDL_GetTicks();
 
-		Input::process(*mEventBus, &**mWindow, mDeltaTime, isRunning);
+		isRunning = Input::process(*mEventBus, &**mWindow, mDeltaTime);
 		mCamera->update();
 		mGuiSystem->update(mDeltaTime);
 

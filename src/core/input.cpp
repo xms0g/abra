@@ -5,8 +5,9 @@
 #include "../event/events/keyPressedEvent.hpp"
 #include "../event/events/mouseMovementEvent.hpp"
 
-void Input::process(EventBus& eventBus, SDL_Window* window, const float dt, bool& isRunning) {
+bool Input::process(EventBus& eventBus, SDL_Window* window, const float dt) {
 	SDL_Event event;
+	bool isRunning{true};
 	static bool freeLook{false};
 	const ImGuiIO& io = ImGui::GetIO();
 
@@ -48,4 +49,6 @@ void Input::process(EventBus& eventBus, SDL_Window* window, const float dt, bool
 	if (keyState[SDL_SCANCODE_S]) eventBus.emitEvent<KeyPressedEvent>(Key::S, dt);
 	if (keyState[SDL_SCANCODE_A]) eventBus.emitEvent<KeyPressedEvent>(Key::A, dt);
 	if (keyState[SDL_SCANCODE_D]) eventBus.emitEvent<KeyPressedEvent>(Key::D, dt);
+
+	return isRunning;
 }
