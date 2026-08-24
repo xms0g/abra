@@ -1,5 +1,6 @@
 #include "skybox.hpp"
 #include "../frameGraph.hpp"
+#include "../command.hpp"
 #include "../descriptorSet.hpp"
 #include "../graphicsEncoder.hpp"
 #include "../context/renderContext.hpp"

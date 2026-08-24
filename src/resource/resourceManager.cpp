@@ -1,5 +1,4 @@
 #include "resourceManager.hpp"
-#include <iostream>
 #include <assimp/GltfMaterial.h>
 #include <assimp/postprocess.h>
 #include "image/stb_image.h"
@@ -156,8 +155,7 @@ void ResourceManager::loadModel(const size_t entityID, const std::string_view mo
 		aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 	// check for errors
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-		std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << std::endl;
-		return;
+		throw std::runtime_error(std::format("ERROR::ASSIMP::{}", importer.GetErrorString()));
 	}
 
 	// process ASSIMP's root node recursively

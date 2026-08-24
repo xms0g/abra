@@ -1,10 +1,8 @@
 #pragma once
 #include <utility>
 #include "glad/glad.h"
-#include "command.hpp"
 #include "graphicsPipeline.hpp"
 #include "buffers/frameBuffer.hpp"
-#include "material/material.hpp"
 
 class DescriptorSet;
 
@@ -15,10 +13,10 @@ enum class BlitMask : uint32_t {
 };
 
 enum class ClearMask : uint32_t {
+	None = 0,
 	Color = GL_COLOR_BUFFER_BIT,
 	Depth = GL_DEPTH_BUFFER_BIT,
-	Stencil = GL_STENCIL_BUFFER_BIT,
-	None = 0
+	Stencil = GL_STENCIL_BUFFER_BIT
 };
 
 constexpr ClearMask operator|(const ClearMask lhs, const ClearMask rhs) {
