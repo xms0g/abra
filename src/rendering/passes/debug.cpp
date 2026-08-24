@@ -5,6 +5,7 @@
 #include "../command.hpp"
 #include "../context/renderContext.hpp"
 #include "../context/renderQueue.hpp"
+#include "../pushConstants/transformPushConstants.hpp"
 #include "../../ECS/components/debug.hpp"
 #include "../../config/configManager.hpp"
 
@@ -71,7 +72,10 @@ void DebugPass::configure(const RenderContext& ctx,
 		}
 	};
 
-	PipelineLayout layout = {.descriptorSets = {bufferLayout}};
+	PipelineLayout layout = {
+		.descriptorSets = {bufferLayout},
+		.pushConstants = {TransformPushConstants::layout}
+	};
 	GraphicsPipelineCreateInfo normalCreateInfo = {.rendering = normalInfo, .layout = layout};
 	GraphicsPipelineCreateInfo wireframeCreateInfo = {.rendering = wireframeInfo, .layout = layout};
 
@@ -93,8 +97,13 @@ void DebugPass::execute(const RenderContext& ctx, const FrameGraph& graph, Graph
 			continue;
 
 		encoder.bindPipeline(mPipelines[cmd.debugMode]);
-		encoder.setUniform("model", cmd.transform.model);
-		encoder.setUniform("normalMatrix", cmd.transform.normal);
+
+		const TransformPushConstants pushConstants = {
+			.model = cmd.transform.model,
+			.normal = cmd.transform.normal,
+		};
+
+		encoder.pushConstants(&pushConstants);
 		encoder.bindVertexArray(cmd.mesh.vao);
 		encoder.drawIndexed(cmd.mesh.indexCount);
 	}
