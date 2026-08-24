@@ -4,7 +4,6 @@
 #include <utility>
 #include "glad/glad.h"
 #include "image/stb_image.h"
-#include "glUtils.hpp"
 
 MaterialTexture::MaterialTexture(std::string path, const TextureType type, std::shared_ptr<GPUTexture> texture)
 	: path(std::move(path)),
@@ -102,10 +101,10 @@ GPUTexture::GPUTexture(const TextureConfig& config)
 	  mHeight(config.height),
 	  mFormat(config.format),
 	  mDataType(config.dataType) {
-	const auto target = toUnderlying(config.target);
-	const auto format = toUnderlying(config.format);
-	const auto internalFormat = toUnderlying(config.internalFormat);
-	const auto dataType = toUnderlying(config.dataType);
+	const auto target = std::to_underlying(config.target);
+	const auto format = std::to_underlying(config.format);
+	const auto internalFormat = std::to_underlying(config.internalFormat);
+	const auto dataType = std::to_underlying(config.dataType);
 
 	glGenTextures(1, &mID);
 	glBindTexture(target, mID);
@@ -231,14 +230,14 @@ void GPUTexture::copyToMemory(const void* pixels, const uint32_t face) const {
 		case TextureTarget::Texture2D: {
 			glBindTexture(GL_TEXTURE_2D, mID);
 			glTexSubImage2D(
-				toUnderlying(mTarget),
+				std::to_underlying(mTarget),
 				0,
 				0,
 				0,
 				mWidth,
 				mHeight,
-				toUnderlying(mFormat),
-				toUnderlying(mDataType),
+				std::to_underlying(mFormat),
+				std::to_underlying(mDataType),
 				pixels);
 			break;
 		}
@@ -253,8 +252,8 @@ void GPUTexture::copyToMemory(const void* pixels, const uint32_t face) const {
 				0,
 				mWidth,
 				mHeight,
-				toUnderlying(mFormat),
-				toUnderlying(mDataType),
+				std::to_underlying(mFormat),
+				std::to_underlying(mDataType),
 				pixels
 			);
 			break;
@@ -264,10 +263,10 @@ void GPUTexture::copyToMemory(const void* pixels, const uint32_t face) const {
 }
 
 void GPUTexture::generateMipmaps() const {
-	glBindTexture(toUnderlying(mTarget), mID);
-	glGenerateMipmap(toUnderlying(mTarget));
-	glTexParameteri(toUnderlying(mTarget), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glBindTexture(toUnderlying(mTarget), 0);
+	glBindTexture(std::to_underlying(mTarget), mID);
+	glGenerateMipmap(std::to_underlying(mTarget));
+	glTexParameteri(std::to_underlying(mTarget), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glBindTexture(std::to_underlying(mTarget), 0);
 }
 
 void GPUTexture::configureParameters(const TextureConfig& config) {
@@ -275,21 +274,21 @@ void GPUTexture::configureParameters(const TextureConfig& config) {
 		return;
 	}
 
-	glTexParameteri(toUnderlying(config.target), GL_TEXTURE_WRAP_S, toUnderlying(config.parameters.wrapS));
-	glTexParameteri(toUnderlying(config.target), GL_TEXTURE_WRAP_T, toUnderlying(config.parameters.wrapT));
+	glTexParameteri(std::to_underlying(config.target), GL_TEXTURE_WRAP_S, std::to_underlying(config.parameters.wrapS));
+	glTexParameteri(std::to_underlying(config.target), GL_TEXTURE_WRAP_T, std::to_underlying(config.parameters.wrapT));
 
 	if (config.target == TextureTarget::TextureCubeMap || config.target == TextureTarget::TextureCubeMapArray) {
-		glTexParameteri(toUnderlying(config.target), GL_TEXTURE_WRAP_R, toUnderlying(config.parameters.wrapR));
+		glTexParameteri(std::to_underlying(config.target), GL_TEXTURE_WRAP_R, std::to_underlying(config.parameters.wrapR));
 	}
 
-	glTexParameteri(toUnderlying(config.target), GL_TEXTURE_MIN_FILTER, toUnderlying(config.parameters.minFilter));
-	glTexParameteri(toUnderlying(config.target), GL_TEXTURE_MAG_FILTER, toUnderlying(config.parameters.magFilter));
+	glTexParameteri(std::to_underlying(config.target), GL_TEXTURE_MIN_FILTER, std::to_underlying(config.parameters.minFilter));
+	glTexParameteri(std::to_underlying(config.target), GL_TEXTURE_MAG_FILTER, std::to_underlying(config.parameters.magFilter));
 
 	if (config.parameters.wrapS == TextureWrap::ClampToBorder ||
 	    config.parameters.wrapR == TextureWrap::ClampToBorder ||
 	    config.parameters.wrapT == TextureWrap::ClampToBorder) {
 		constexpr float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
-		glTexParameterfv(toUnderlying(config.target), GL_TEXTURE_BORDER_COLOR, borderColor);
+		glTexParameterfv(std::to_underlying(config.target), GL_TEXTURE_BORDER_COLOR, borderColor);
 	}
 }
 

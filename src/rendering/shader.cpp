@@ -4,7 +4,6 @@
 #include <stdexcept>
 #include "glad/glad.h"
 #include "glm/gtc/type_ptr.hpp"
-#include "glUtils.hpp"
 #include "../io/filesystem.hpp"
 #include "../config/configManager.hpp"
 #include "../rendering/graphicsPipeline.hpp"
@@ -13,7 +12,7 @@ ShaderStage::ShaderStage(const PipelineShaderStage& info) : type(info.stage) {
 	std::string processedSource;
 	preprocess(info.code, processedSource);
 
-	mHandle = glCreateShader(toUnderlying(info.stage));
+	mHandle = glCreateShader(std::to_underlying(info.stage));
 
 	const char* ptr = processedSource.data();
 

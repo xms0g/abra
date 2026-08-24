@@ -1,5 +1,4 @@
 #include "indexBuffer.hpp"
-#include "../glUtils.hpp"
 
 IndexBuffer::IndexBuffer(const BufferUsage usage)
 	: GPUBuffer(BufferType::Index, 0, usage) {
@@ -7,5 +6,5 @@ IndexBuffer::IndexBuffer(const BufferUsage usage)
 
 void IndexBuffer::copyToMemory(const void* data, const uint32_t size) const {
 	bind();
-	glBufferData(toUnderlying(mTarget), size, data, toUnderlying(mUsage));
+	glBufferData(std::to_underlying(mTarget), size, data, std::to_underlying(mUsage));
 }

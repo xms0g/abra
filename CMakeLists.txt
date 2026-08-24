@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.23.0)
 project(abra VERSION 0.1.0)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 
 if (APPLE)
     add_compile_options(-gdwarf-4)

@@ -3,7 +3,6 @@
 #include <vector>
 #include "glad/glad.h"
 #include "renderBuffer.hpp"
-#include "../glUtils.hpp"
 #include "../texture.hpp"
 
 FrameBuffer::FrameBuffer(const int32_t width, const int32_t height)
@@ -58,8 +57,8 @@ RenderBuffer& FrameBuffer::renderBuffer(const uint32_t index) {
 }
 
 FrameBuffer& FrameBuffer::attachColor(std::shared_ptr<GPUTexture>& texture) {
-	const GLenum attachment = toUnderlying(Attachment::Color0) + mColorAttachmentCount++;
-	glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, toUnderlying(texture->target()), texture->id(), 0);
+	const GLenum attachment = std::to_underlying(Attachment::Color0) + mColorAttachmentCount++;
+	glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, std::to_underlying(texture->target()), texture->id(), 0);
 
 	mTextures.emplace_back(std::move(texture));
 	return *this;
@@ -67,9 +66,9 @@ FrameBuffer& FrameBuffer::attachColor(std::shared_ptr<GPUTexture>& texture) {
 
 FrameBuffer& FrameBuffer::attachDepth(std::shared_ptr<GPUTexture>& texture) {
 	if (texture->target() == TextureTarget::Texture2D) {
-		glFramebufferTexture2D(GL_FRAMEBUFFER, toUnderlying(Attachment::Depth), toUnderlying(texture->target()), texture->id(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, std::to_underlying(Attachment::Depth), std::to_underlying(texture->target()), texture->id(), 0);
 	} else {
-		glFramebufferTexture(GL_FRAMEBUFFER, toUnderlying(Attachment::Depth), texture->id(), 0);
+		glFramebufferTexture(GL_FRAMEBUFFER, std::to_underlying(Attachment::Depth), texture->id(), 0);
 	}
 
 	mTextures.emplace_back(std::move(texture));
@@ -77,7 +76,7 @@ FrameBuffer& FrameBuffer::attachDepth(std::shared_ptr<GPUTexture>& texture) {
 }
 
 FrameBuffer& FrameBuffer::attachDepth(RenderBuffer& renderBuffer) {
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, toUnderlying(Attachment::Depth), GL_RENDERBUFFER, renderBuffer.handle());
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, std::to_underlying(Attachment::Depth), GL_RENDERBUFFER, renderBuffer.handle());
 
 	mRenderBuffers.emplace_back(std::move(renderBuffer));
 	return *this;

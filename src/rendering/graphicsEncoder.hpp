@@ -1,7 +1,7 @@
 #pragma once
+#include <utility>
 #include "glad/glad.h"
 #include "command.hpp"
-#include "glUtils.hpp"
 #include "graphicsPipeline.hpp"
 #include "buffers/frameBuffer.hpp"
 #include "material/material.hpp"
@@ -22,11 +22,11 @@ enum class ClearMask : uint32_t {
 };
 
 constexpr ClearMask operator|(const ClearMask lhs, const ClearMask rhs) {
-	return static_cast<ClearMask>(toUnderlying(lhs) | toUnderlying(rhs));
+	return static_cast<ClearMask>(std::to_underlying(lhs) | std::to_underlying(rhs));
 }
 
 constexpr ClearMask& operator|=(ClearMask& lhs, const ClearMask rhs) {
-	lhs = static_cast<ClearMask>(toUnderlying(lhs) | toUnderlying(rhs));
+	lhs = static_cast<ClearMask>(std::to_underlying(lhs) | std::to_underlying(rhs));
 	return lhs;
 }
 

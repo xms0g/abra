@@ -1,9 +1,9 @@
 #pragma once
 #include <cstdint>
 #include <vector>
+#include <utility>
 #include "glm/glm.hpp"
 #include "../texture.hpp"
-#include "../glUtils.hpp"
 
 enum class MaterialFlag: uint32_t {
 	None,
@@ -22,16 +22,16 @@ enum class MaterialFlag: uint32_t {
 };
 
 constexpr MaterialFlag operator|(const MaterialFlag lhs, const MaterialFlag rhs) {
-	return static_cast<MaterialFlag>(toUnderlying(lhs) | toUnderlying(rhs));
+	return static_cast<MaterialFlag>(std::to_underlying(lhs) | std::to_underlying(rhs));
 }
 
 constexpr MaterialFlag& operator|=(MaterialFlag& lhs, const MaterialFlag rhs) {
-	lhs = static_cast<MaterialFlag>(toUnderlying(lhs) | toUnderlying(rhs));
+	lhs = static_cast<MaterialFlag>(std::to_underlying(lhs) | std::to_underlying(rhs));
 	return lhs;
 }
 
 constexpr MaterialFlag operator&(const MaterialFlag lhs, const MaterialFlag rhs) {
-	return static_cast<MaterialFlag>(toUnderlying(lhs) & toUnderlying(rhs));
+	return static_cast<MaterialFlag>(std::to_underlying(lhs) & std::to_underlying(rhs));
 }
 
 struct Material {

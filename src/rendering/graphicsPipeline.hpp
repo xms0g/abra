@@ -1,8 +1,8 @@
 #pragma once
+#include <utility>
 #include <vector>
 #include "glad/glad.h"
 #include "shader.hpp"
-#include "glUtils.hpp"
 #include "pushConstant.hpp"
 #include "descriptorSet.hpp"
 
@@ -157,11 +157,11 @@ struct GraphicsPipelineCreateInfo {
 };
 
 constexpr ColorComponent operator|(const ColorComponent lhs, const ColorComponent rhs) {
-	return static_cast<ColorComponent>(toUnderlying(lhs) | toUnderlying(rhs));
+	return static_cast<ColorComponent>(std::to_underlying(lhs) | std::to_underlying(rhs));
 }
 
 constexpr ColorComponent operator&(const ColorComponent lhs, const ColorComponent rhs) {
-	return static_cast<ColorComponent>(toUnderlying(lhs) & toUnderlying(rhs));
+	return static_cast<ColorComponent>(std::to_underlying(lhs) & std::to_underlying(rhs));
 }
 
 class GraphicsPipeline {

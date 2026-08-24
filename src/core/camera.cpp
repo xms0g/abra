@@ -1,4 +1,7 @@
 #include "camera.hpp"
+
+#include <algorithm>
+
 #include "glm/gtc/matrix_transform.hpp"
 #include "../config/configManager.hpp"
 #include "../event/eventBus.hpp"

@@ -1,4 +1,5 @@
 #include "lightSystem.hpp"
+#include <algorithm>
 #include <span>
 #include "glm/gtc/type_ptr.hpp"
 #include "../graphicsEncoder.hpp"

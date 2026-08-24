@@ -1,4 +1,5 @@
 #include "renderer.hpp"
+#include <algorithm>
 #include <SDL.h>
 #include "glad/glad.h"
 #include "glm/glm.hpp"

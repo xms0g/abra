@@ -1,4 +1,5 @@
 #include "culling.hpp"
+#include <algorithm>
 #include "../frameGraph.hpp"
 #include "../command.hpp"
 #include "../graphicsEncoder.hpp"

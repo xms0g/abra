@@ -38,6 +38,20 @@ private:
 		std::vector<std::string> inputs;
 		std::vector<std::string> outputs;
 		bool isActive{true};
+
+		PassNode();
+
+		PassNode(std::string name,
+		         std::unique_ptr<IPass> pass,
+		         std::vector<std::string> inputs,
+		         std::vector<std::string> outputs,
+		         bool isActive
+		);
+
+		PassNode(PassNode&&) noexcept = default;
+		PassNode& operator=(PassNode&&) noexcept = default;
+
+		~PassNode();
 	};
 
 	struct StringHash {
@@ -57,7 +71,7 @@ private:
 	};
 
 	std::unordered_map<std::string, uint32_t, StringHash, StringEqual> mResourcesIDs;
-	std::vector<std::unique_ptr<FrameBuffer>> mResources;
+	std::vector<std::unique_ptr<FrameBuffer> > mResources;
 	std::vector<PassNode> mPasses;
 	std::vector<size_t> mExecutionOrder;
 };

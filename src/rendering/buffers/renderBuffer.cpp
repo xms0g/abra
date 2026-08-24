@@ -1,13 +1,13 @@
 #include "renderBuffer.hpp"
+#include <utility>
 #include "glad/glad.h"
-#include "../glUtils.hpp"
 
 RenderBuffer::RenderBuffer(const InternalFormat format, const int32_t width, const int32_t height)
 	: mFormat(format) {
 	glGenRenderbuffers(1, &mHandle);
 	glBindRenderbuffer(GL_RENDERBUFFER, mHandle);
 
-	glRenderbufferStorage(GL_RENDERBUFFER, toUnderlying(format), width, height);
+	glRenderbufferStorage(GL_RENDERBUFFER, std::to_underlying(format), width, height);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
@@ -16,7 +16,7 @@ RenderBuffer::RenderBuffer(const InternalFormat format, const int32_t width, con
 	glGenRenderbuffers(1, &mHandle);
 	glBindRenderbuffer(GL_RENDERBUFFER, mHandle);
 
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, toUnderlying(format), width, height);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, std::to_underlying(format), width, height);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
@@ -48,5 +48,5 @@ uint32_t RenderBuffer::handle() const {
 
 void RenderBuffer::resize(const int32_t width, const int32_t height) const {
 	glBindRenderbuffer(GL_RENDERBUFFER, mHandle);
-	glRenderbufferStorage(GL_RENDERBUFFER, toUnderlying(mFormat), width, height);
+	glRenderbufferStorage(GL_RENDERBUFFER, std::to_underlying(mFormat), width, height);
 }

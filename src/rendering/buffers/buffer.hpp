@@ -1,7 +1,6 @@
 #pragma once
 #include <utility>
 #include "glad/glad.h"
-#include "../glUtils.hpp"
 
 enum class BufferUsage: uint32_t {
 	Static = GL_STATIC_DRAW,
@@ -73,11 +72,11 @@ public:
 	}
 
 	void bind() const {
-		glBindBuffer(toUnderlying(mTarget), mHandle);
+		glBindBuffer(std::to_underlying(mTarget), mHandle);
 	}
 
 	void unbind() const {
-		glBindBuffer(toUnderlying(mTarget), 0);
+		glBindBuffer(std::to_underlying(mTarget), 0);
 	}
 
 protected:

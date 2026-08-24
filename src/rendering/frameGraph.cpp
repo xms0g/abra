@@ -115,3 +115,19 @@ void FrameGraph::execute(const RenderContext& ctx, GraphicsEncoder& encoder) con
 		mPasses[index].pass->execute(ctx, *this, encoder);
 	}
 }
+
+FrameGraph::PassNode::PassNode() = default;
+
+FrameGraph::PassNode::PassNode(std::string name,
+                               std::unique_ptr<IPass> pass,
+                               std::vector<std::string> inputs,
+                               std::vector<std::string> outputs,
+                               const bool isActive)
+	: name(std::move(name)),
+	  pass(std::move(pass)),
+	  inputs(std::move(inputs)),
+	  outputs(std::move(outputs)),
+	  isActive(isActive) {
+}
+
+FrameGraph::PassNode::~PassNode() = default;
