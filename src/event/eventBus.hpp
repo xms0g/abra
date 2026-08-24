@@ -40,27 +40,14 @@ private:
 class EventBus {
 public:
 	template<typename TOwner, typename TEvent>
-	void subscribeToEvent(TOwner* ownerInstance, void (TOwner::* CallBackFunction)(const TEvent&)) {
-		if (!subscribers[typeid(TEvent)].get()) {
-			subscribers[typeid(TEvent)] = std::make_unique<HandlerList>();
-		}
-
-		subscribers[typeid(TEvent)]->emplace_back(
-			std::make_unique<EventCallBack<TOwner, TEvent> >(ownerInstance, CallBackFunction));
-	}
+	void subscribeToEvent(TOwner* ownerInstance, void (TOwner::* CallBackFunction)(const TEvent&));
 
 	template<typename TEvent, typename... Args>
-	void emitEvent(Args&&... args) {
-		auto handlers = subscribers[typeid(TEvent)].get();
-		if (handlers) {
-			TEvent event{std::forward<Args>(args)...};
-			for (auto& handler: *handlers) {
-				handler->execute(event);
-			}
-		}
-	}
+	void emitEvent(Args&&... args);
 
 private:
 	using HandlerList = std::list<std::unique_ptr<IEventCallBack> >;
 	std::unordered_map<std::type_index, std::unique_ptr<HandlerList> > subscribers;
 };
+
+#include "eventBus.tpp"
