@@ -22,6 +22,9 @@ private:
 
 	void onGuiUpdate(const GuiLightEvent& event);
 
+	template<typename T>
+	void processLight(const Entity& entity, const GuiLightEvent& e, std::vector<T*>& lightList);
+
 	EventBus* mEventBus{};
 	RenderContext* mCtx{};
 	UniformBuffer mUBO;
@@ -64,3 +67,5 @@ private:
 		glm::ivec4 lightCount{};
 	};
 };
+
+#include "lightSystem.tpp"

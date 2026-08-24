@@ -18,7 +18,9 @@ public:
 	RenderQueue() = default;
 
 	[[nodiscard]]
-	bool isEmpty() const override { return this->empty(); }
+	bool isEmpty() const override {
+		return this->empty();
+	}
 };
 
 class QueueRegistry {

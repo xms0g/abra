@@ -2,7 +2,6 @@
 #include "glm/glm.hpp"
 #include "../types.hpp"
 
-
 namespace Model {
 class Terrain {
 public:

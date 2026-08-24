@@ -112,25 +112,13 @@ void LightSystem::updateLightUBO() const {
 }
 
 void LightSystem::onGuiUpdate(const GuiLightEvent& event) {
-	auto tryProcessLight = [this]<typename TLightComponent>(
-		const Entity& entity,
-		const GuiLightEvent& e,
-		std::vector<TLightComponent*>& lightList) {
-		if (const auto& light = entity.tryGetComponent<TLightComponent>()) {
-			mCtx->renderData->material.colors[e.matIdx] = light->diffuse;
-			auto& transform = entity.getComponent<TransformComponent>();
-			light->position = transform.position;
-			lightList[e.lightIdx] = light;
-		}
-	};
-
 	const auto entityIt = std::ranges::find_if(getSystemEntities(), [event](const Entity& e) {
 		return e.id() == event.entityID;
 	});
 
-	tryProcessLight.operator()<DirectionalLightComponent>(*entityIt, event, mDirLights);
-	tryProcessLight.operator()<PointLightComponent>(*entityIt, event, mPointLights);
-	tryProcessLight.operator()<SpotLightComponent>(*entityIt, event, mSpotLights);
+	processLight<DirectionalLightComponent>(*entityIt, event, mDirLights);
+	processLight<PointLightComponent>(*entityIt, event, mPointLights);
+	processLight<SpotLightComponent>(*entityIt, event, mSpotLights);
 
 	updateLightUBO();
 	mEventBus->emitEvent<UpdateShadowMapEvent>();
