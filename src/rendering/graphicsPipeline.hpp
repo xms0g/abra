@@ -171,12 +171,10 @@ public:
 	explicit GraphicsPipeline(const GraphicsPipelineCreateInfo& createInfo);
 
 	GraphicsPipeline(const GraphicsPipeline& other) = delete;
-
 	GraphicsPipeline& operator=(const GraphicsPipeline& other) = delete;
 
-	GraphicsPipeline(GraphicsPipeline&& other) noexcept;
-
-	GraphicsPipeline& operator=(GraphicsPipeline&& other) noexcept;
+	GraphicsPipeline(GraphicsPipeline&& other) noexcept = default;
+	GraphicsPipeline& operator=(GraphicsPipeline&& other) noexcept = default;
 
 	PipelinePrimitiveAssemblyState& primitiveAssemblyState();
 

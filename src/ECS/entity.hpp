@@ -14,8 +14,10 @@ public:
 	}
 
 	Entity(const Entity& other) = default;
-
 	Entity& operator=(const Entity& other) = default;
+
+	Entity(Entity&& other) noexcept = default;
+	Entity& operator=(Entity&& other) noexcept = default;
 
 	[[nodiscard]]
 	size_t id() const {

@@ -11,22 +11,6 @@ MaterialTexture::MaterialTexture(std::string path, const TextureType type, std::
 	  texture(std::move(texture)) {
 }
 
-MaterialTexture::MaterialTexture(MaterialTexture&& other) noexcept
-	: path(std::move(other.path)),
-	  type(std::exchange(other.type, {})),
-	  texture(std::move(other.texture)) {
-}
-
-MaterialTexture& MaterialTexture::operator=(MaterialTexture&& other) noexcept {
-	if (this != &other) {
-		path = std::move(other.path);
-		type = std::exchange(other.type, {});
-		texture = std::move(other.texture);
-	}
-
-	return *this;
-}
-
 void MaterialTexture::info(const std::string_view path, int32_t& width, int32_t& height) {
 	int32_t channel;
 	stbi_info(path.data(), &width, &height, &channel);
@@ -95,12 +79,12 @@ MaterialTexture MaterialTexture::load(const std::span<const std::string> paths, 
 	return {};
 }
 
-GPUTexture::GPUTexture(const TextureConfig& config)
-	: mTarget(config.target),
-	  mWidth(config.width),
-	  mHeight(config.height),
-	  mFormat(config.format),
-	  mDataType(config.dataType) {
+GPUTexture::GPUTexture(const TextureConfig& config) {
+	mInfo.target = config.target;
+	mInfo.width = config.width;
+	mInfo.height = config.height;
+	mInfo.format = config.format;
+	mInfo.dataType = config.dataType;
 	const auto target = std::to_underlying(config.target);
 	const auto format = std::to_underlying(config.format);
 	const auto internalFormat = std::to_underlying(config.internalFormat);
@@ -194,11 +178,7 @@ GPUTexture::~GPUTexture() {
 
 GPUTexture::GPUTexture(GPUTexture&& other) noexcept
 	: mID(std::exchange(other.mID, 0)),
-	  mTarget(std::exchange(other.mTarget, {})),
-	  mWidth(std::exchange(other.mWidth, 0)),
-	  mHeight(std::exchange(other.mHeight, 0)),
-	  mFormat(std::exchange(other.mFormat, {})),
-	  mDataType(std::exchange(other.mDataType, {})) {
+	  mInfo(std::exchange(other.mInfo, {})) {
 }
 
 GPUTexture& GPUTexture::operator=(GPUTexture&& other) noexcept {
@@ -207,11 +187,7 @@ GPUTexture& GPUTexture::operator=(GPUTexture&& other) noexcept {
 			glDeleteTextures(1, &mID);
 
 		mID = std::exchange(other.mID, 0);
-		mTarget = std::exchange(other.mTarget, {});
-		mWidth = std::exchange(other.mWidth, 0);
-		mHeight = std::exchange(other.mHeight, 0);
-		mFormat = std::exchange(other.mFormat, {});
-		mDataType = std::exchange(other.mDataType, {});
+		mInfo = std::exchange(other.mInfo, {});
 	}
 
 	return *this;
@@ -222,22 +198,22 @@ uint32_t GPUTexture::id() const {
 }
 
 TextureTarget GPUTexture::target() const {
-	return mTarget;
+	return mInfo.target;
 }
 
 void GPUTexture::copyToMemory(const void* pixels, const uint32_t face) const {
-	switch (mTarget) {
+	switch (mInfo.target) {
 		case TextureTarget::Texture2D: {
 			glBindTexture(GL_TEXTURE_2D, mID);
 			glTexSubImage2D(
-				std::to_underlying(mTarget),
+				std::to_underlying(mInfo.target),
 				0,
 				0,
 				0,
-				mWidth,
-				mHeight,
-				std::to_underlying(mFormat),
-				std::to_underlying(mDataType),
+				mInfo.width,
+				mInfo.height,
+				std::to_underlying(mInfo.format),
+				std::to_underlying(mInfo.dataType),
 				pixels);
 			break;
 		}
@@ -250,10 +226,10 @@ void GPUTexture::copyToMemory(const void* pixels, const uint32_t face) const {
 				0,
 				0,
 				0,
-				mWidth,
-				mHeight,
-				std::to_underlying(mFormat),
-				std::to_underlying(mDataType),
+				mInfo.width,
+				mInfo.height,
+				std::to_underlying(mInfo.format),
+				std::to_underlying(mInfo.dataType),
 				pixels
 			);
 			break;
@@ -263,10 +239,10 @@ void GPUTexture::copyToMemory(const void* pixels, const uint32_t face) const {
 }
 
 void GPUTexture::generateMipmaps() const {
-	glBindTexture(std::to_underlying(mTarget), mID);
-	glGenerateMipmap(std::to_underlying(mTarget));
-	glTexParameteri(std::to_underlying(mTarget), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glBindTexture(std::to_underlying(mTarget), 0);
+	glBindTexture(std::to_underlying(mInfo.target), mID);
+	glGenerateMipmap(std::to_underlying(mInfo.target));
+	glTexParameteri(std::to_underlying(mInfo.target), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glBindTexture(std::to_underlying(mInfo.target), 0);
 }
 
 void GPUTexture::configureParameters(const TextureConfig& config) {

@@ -15,7 +15,7 @@ FrameBuffer::FrameBuffer(FrameBuffer&& other) noexcept
 	: mHandle(std::exchange(other.mHandle, 0)),
 	  mWidth(std::exchange(other.mWidth, 0)),
 	  mHeight(std::exchange(other.mHeight, 0)),
-	  mTextures(std::move(other.mTextures)) {
+	  mAttachments(std::move(other.mAttachments)) {
 }
 
 FrameBuffer& FrameBuffer::operator=(FrameBuffer&& other) noexcept {
@@ -27,7 +27,7 @@ FrameBuffer& FrameBuffer::operator=(FrameBuffer&& other) noexcept {
 		mHandle = std::exchange(other.mHandle, 0);
 		mWidth = std::exchange(other.mWidth, 0);
 		mHeight = std::exchange(other.mHeight, 0);
-		mTextures = std::move(other.mTextures);
+		mAttachments = std::move(other.mAttachments);
 	}
 	return *this;
 }
@@ -49,18 +49,18 @@ int32_t FrameBuffer::height() const {
 }
 
 const std::shared_ptr<GPUTexture>& FrameBuffer::texture(const uint32_t index) const {
-	return mTextures[index];
+	return mAttachments.textures[index];
 }
 
 RenderBuffer& FrameBuffer::renderBuffer(const uint32_t index) {
-	return mRenderBuffers[index];
+	return mAttachments.renderBuffers[index];
 }
 
 FrameBuffer& FrameBuffer::attachColor(std::shared_ptr<GPUTexture>& texture) {
-	const GLenum attachment = std::to_underlying(Attachment::Color0) + mColorAttachmentCount++;
+	const GLenum attachment = std::to_underlying(Attachment::Color0) + mAttachments.colorAttachmentCount++;
 	glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, std::to_underlying(texture->target()), texture->id(), 0);
 
-	mTextures.emplace_back(std::move(texture));
+	mAttachments.textures.emplace_back(std::move(texture));
 	return *this;
 }
 
@@ -71,29 +71,29 @@ FrameBuffer& FrameBuffer::attachDepth(std::shared_ptr<GPUTexture>& texture) {
 		glFramebufferTexture(GL_FRAMEBUFFER, std::to_underlying(Attachment::Depth), texture->id(), 0);
 	}
 
-	mTextures.emplace_back(std::move(texture));
+	mAttachments.textures.emplace_back(std::move(texture));
 	return *this;
 }
 
 FrameBuffer& FrameBuffer::attachDepth(RenderBuffer& renderBuffer) {
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, std::to_underlying(Attachment::Depth), GL_RENDERBUFFER, renderBuffer.handle());
 
-	mRenderBuffers.emplace_back(std::move(renderBuffer));
+	mAttachments.renderBuffers.emplace_back(std::move(renderBuffer));
 	return *this;
 }
 
 FrameBuffer& FrameBuffer::attachDepthStencil(RenderBuffer& renderBuffer) {
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, renderBuffer.handle());
 
-	mRenderBuffers.emplace_back(std::move(renderBuffer));
+	mAttachments.renderBuffers.emplace_back(std::move(renderBuffer));
 	return *this;
 }
 
 FrameBuffer& FrameBuffer::configureDrawBuffers() {
 	std::vector<GLenum> buffers;
-	buffers.reserve(mColorAttachmentCount);
+	buffers.reserve(mAttachments.colorAttachmentCount);
 
-	for (uint32_t i = 0; i < mColorAttachmentCount; ++i)
+	for (uint32_t i = 0; i < mAttachments.colorAttachmentCount; ++i)
 		buffers.push_back(GL_COLOR_ATTACHMENT0 + i);
 
 	if (buffers.empty()) {

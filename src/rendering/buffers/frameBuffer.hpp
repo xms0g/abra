@@ -50,11 +50,16 @@ public:
 	void checkStatus();
 
 private:
-
 	uint32_t mHandle{0};
+
 	int32_t mWidth{0};
 	int32_t mHeight{0};
-	uint32_t mColorAttachmentCount{0};
-	std::vector<std::shared_ptr<GPUTexture>> mTextures;
-	std::vector<RenderBuffer> mRenderBuffers;
+
+	struct Attachments {
+		uint32_t colorAttachmentCount{0};
+		std::vector<std::shared_ptr<GPUTexture>> textures;
+		std::vector<RenderBuffer> renderBuffers;
+	};
+	Attachments mAttachments;
 };
+

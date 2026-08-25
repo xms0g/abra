@@ -99,12 +99,10 @@ struct MaterialTexture {
 	MaterialTexture(std::string path, TextureType type, std::shared_ptr<GPUTexture> texture);
 
 	MaterialTexture(const MaterialTexture& other) = delete;
-
 	MaterialTexture& operator=(const MaterialTexture& other) = delete;
 
-	MaterialTexture(MaterialTexture&& other) noexcept;
-
-	MaterialTexture& operator=(MaterialTexture&& other) noexcept;
+	MaterialTexture(MaterialTexture&& other) noexcept = default;
+	MaterialTexture& operator=(MaterialTexture&& other) noexcept = default;
 
 	static void info(std::string_view path, int32_t& width, int32_t& height);
 
@@ -120,11 +118,9 @@ public:
 	~GPUTexture();
 
 	GPUTexture(const GPUTexture& other) = delete;
-
 	GPUTexture& operator=(const GPUTexture& other) = delete;
 
 	GPUTexture(GPUTexture&& other) noexcept;
-
 	GPUTexture& operator=(GPUTexture&& other) noexcept;
 
 	[[nodiscard]]
@@ -159,9 +155,13 @@ public:
 
 private:
 	uint32_t mID{};
-	TextureTarget mTarget{};
-	int32_t mWidth{};
-	int32_t mHeight{};
-	BaseFormat mFormat{};
-	DataType mDataType{};
+
+	struct TextureDesc {
+		TextureTarget target{};
+		int32_t width{};
+		int32_t height{};
+		BaseFormat format{};
+		DataType dataType{};
+	};
+	TextureDesc mInfo{};
 };

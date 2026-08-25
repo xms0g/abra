@@ -1,4 +1,7 @@
 #include "vertexArray.hpp"
+
+#include <utility>
+
 #include "glad/glad.h"
 
 VertexArray::VertexArray() {
@@ -7,6 +10,20 @@ VertexArray::VertexArray() {
 
 VertexArray::~VertexArray() {
 	glDeleteVertexArrays(1, &mID);
+}
+
+VertexArray::VertexArray(VertexArray&& other) noexcept
+	: mID(std::exchange(other.mID, 0)) {
+}
+
+VertexArray& VertexArray::operator=(VertexArray&& other) noexcept {
+	if (this != &other) {
+		if (mID)
+			glDeleteVertexArrays(1, &mID);
+		mID = std::exchange(other.mID, 0);
+	}
+
+	return *this;
 }
 
 uint32_t VertexArray::id() const {

@@ -33,18 +33,6 @@ GraphicsPipeline::GraphicsPipeline(const GraphicsPipelineCreateInfo& createInfo)
 	}
 }
 
-GraphicsPipeline::GraphicsPipeline(GraphicsPipeline&& other) noexcept
-	: mState(std::move(other.mState)) {
-}
-
-GraphicsPipeline& GraphicsPipeline::operator=(GraphicsPipeline&& other) noexcept {
-	if (this != &other) {
-		mState = std::move(other.mState);
-	}
-
-	return *this;
-}
-
 PipelinePrimitiveAssemblyState& GraphicsPipeline::primitiveAssemblyState() {
 	return mState.primitiveAssemblyState;
 }

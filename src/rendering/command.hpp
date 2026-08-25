@@ -1,5 +1,4 @@
 #pragma once
-#include <span>
 #include "glm/glm.hpp"
 #include "material/material.hpp"
 

@@ -120,13 +120,13 @@ Shader::Shader(Shader&& other) noexcept
 }
 
 Shader& Shader::operator=(Shader&& other) noexcept {
-	if (this == &other)
-		return *this;
+	if (this != &other) {
+		if (mHandle)
+			glDeleteProgram(mHandle);
 
-	if (mHandle)
-		glDeleteProgram(mHandle);
+		mHandle = std::exchange(other.mHandle, 0);
+	}
 
-	mHandle = std::exchange(other.mHandle, 0);
 	return *this;
 }
 
