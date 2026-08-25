@@ -20,30 +20,6 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
 
 Mesh::~Mesh() = default;
 
-Mesh::Mesh(Mesh&& other) noexcept
-	: mVertices(std::move(other.mVertices)),
-	  mIndices(std::move(other.mIndices)),
-	  mVAO(std::move(other.mVAO)),
-	  mVBO(std::move(other.mVBO)),
-	  mIBO(std::move(other.mIBO)),
-	  mMin(std::exchange(other.mMin, glm::vec3(0))),
-	  mMax(std::exchange(other.mMax, glm::vec3(0))) {
-}
-
-Mesh& Mesh::operator=(Mesh&& other) noexcept {
-	if (this != &other) {
-		mVertices = std::move(other.mVertices);
-		mIndices = std::move(other.mIndices);
-		mVAO = std::move(other.mVAO);
-		mIBO = std::move(other.mIBO);
-		mVBO = std::move(other.mVBO);
-		mMin = std::exchange(other.mMin, glm::vec3(0));
-		mMax = std::exchange(other.mMax, glm::vec3(0));
-	}
-
-	return *this;
-}
-
 const VertexArray& Mesh::vao() const {
 	return *mVAO;
 }
