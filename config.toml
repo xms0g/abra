@@ -64,7 +64,7 @@ near = 1.0
 far = 25.0
 
 [ssao]
-kernel_size = 16
+kernel_size = 32
 radius = 0.5
 bias = 0.025
 intensity = 3.0

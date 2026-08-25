@@ -12,7 +12,7 @@ uniform sampler2D texNoise;
 
 layout (std140) uniform SSAOBlock
 {
-    vec4 samples[16];
+    vec4 samples[32];
     vec4 settings;
     vec4 resolution;
 };

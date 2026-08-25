@@ -159,7 +159,7 @@ void SSAOPass::blur(const FrameGraph& graph, GraphicsEncoder& encoder) {
 
 void SSAOPass::createKernel(GraphicsEncoder& encoder) {
 	struct alignas(16) UniformBufferObject {
-		glm::vec4 samples[16];
+		glm::vec4 samples[32];
 		glm::vec4 settings;
 		glm::vec4 resolution;
 	};
@@ -186,6 +186,7 @@ void SSAOPass::createKernel(GraphicsEncoder& encoder) {
 
 	std::vector<glm::vec4> kernel;
 	kernel.resize(kernelSize);
+
 	kernel = math::random::generateKernel(kernelSize);
 
 	for (size_t i = 0; i < kernel.size(); ++i) {
