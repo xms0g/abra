@@ -1,6 +1,7 @@
 #include "directionalShadow.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "../../mesh/mesh.hpp"
+#include "../../buffers/uniformBuffer.hpp"
 #include "../../context/renderContext.hpp"
 #include "../../context/renderGroup.hpp"
 #include "../../context/renderData.hpp"
@@ -25,22 +26,19 @@ DirectionalShadow::DirectionalShadow(const RenderContext& ctx) {
 
 DirectionalShadow::~DirectionalShadow() = default;
 
-glm::mat4 DirectionalShadow::lightSpaceMatrix() const {
-	return mLightSpaceMatrix;
-}
-
 void DirectionalShadow::render(const RenderContext& ctx,
                                GraphicsEncoder& encoder,
                                GraphicsPipeline& pipeline,
+                               const UniformBuffer& ubo,
                                const glm::vec3& direction) {
 	const glm::vec3 lightPos = -direction * mHeight;
 	const glm::mat4 lightProjection = glm::ortho(mLeft, mRight, mBottom, mTop, mNear, mFar);
 	const glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 
-	mLightSpaceMatrix = lightProjection * lightView;
+	mData.lightSpaceMatrix = lightProjection * lightView;
+	ubo.copyToMemory(&mData, offsetof(ShadowData, dirShadowData), sizeof(DirectionalShadowData));
 
 	encoder.bindPipeline(pipeline);
-	encoder.setUniform("lightSpaceMatrix", mLightSpaceMatrix);
 
 	for (const auto& [entityID, matBatch]: mObjects) {
 		TransformPushConstants transformPushConstants = {

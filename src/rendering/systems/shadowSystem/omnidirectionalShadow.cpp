@@ -2,6 +2,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "../../pushConstants/transformPushConstants.hpp"
+#include "../../buffers/uniformBuffer.hpp"
 #include "../../context/renderGroup.hpp"
 #include "../../context/renderData.hpp"
 #include "../../context/renderContext.hpp"
@@ -28,6 +29,7 @@ OmnidirectionalShadow::~OmnidirectionalShadow() = default;
 void OmnidirectionalShadow::render(const RenderContext& ctx,
                                    GraphicsEncoder& encoder,
                                    GraphicsPipeline& pipeline,
+                                   const UniformBuffer& ubo,
                                    const glm::vec3& position,
                                    const int32_t layer) {
 	mShadowTransforms.clear();
@@ -35,6 +37,9 @@ void OmnidirectionalShadow::render(const RenderContext& ctx,
 	for (const auto& [dir, up]: mDirUps) {
 		mShadowTransforms.push_back(mShadowProj * glm::lookAt(position, position + dir, up));
 	}
+
+	mData.omniFarPlane = glm::vec4(mFar, 0.0f, 0.0f, 0.0f);
+	ubo.copyToMemory(&mData, offsetof(ShadowData, omniShadowData), sizeof(OmnidirectionalShadowData));
 
 	encoder.bindPipeline(pipeline);
 	encoder.setUniform("shadowMatrices", mShadowTransforms.data(), mShadowTransforms.size());

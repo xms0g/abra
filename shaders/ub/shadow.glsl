@@ -3,11 +3,23 @@
 
 #include "common/constants.glsl"
 
+struct DirectionalShadowData {
+    mat4 lightSpaceMatrix;
+};
+
+struct OmnidirectionalShadowData {
+    vec4 omniFarPlane;
+};
+
+struct PerspectiveShadowData {
+    mat4 lightSpaceMatrix[MAX_SPOT_LIGHTS];
+};
+
 layout (std140) uniform ShadowBlock
 {
-    mat4 lightSpaceMatrix;
-    mat4 persLightSpaceMatrix[MAX_SPOT_LIGHTS];
-    vec4 omniFarPlane;
+    DirectionalShadowData dirShadowData;
+    OmnidirectionalShadowData omniShadowData;
+    PerspectiveShadowData perShadowData;
 };
 
 #endif

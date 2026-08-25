@@ -5,7 +5,8 @@ layout (location = 0) in vec3 aPos;
 #include "ub/shadow.glsl"
 
 uniform mat4 model;
+uniform int shadowIndex;
 
 void main() {
-    gl_Position = dirShadowData.lightSpaceMatrix * model * vec4(aPos, 1.0);
+    gl_Position = perShadowData.lightSpaceMatrix[shadowIndex] * model * vec4(aPos, 1.0);
 }

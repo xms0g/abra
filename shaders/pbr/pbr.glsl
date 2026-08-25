@@ -2,6 +2,7 @@
 #define PBR_GLSL
 
 #include "ub/light.glsl"
+#include "ub/shadow.glsl"
 #include "pbr/brdf.glsl"
 
 #define ENVIROMENT_INTENSITY 0.5
@@ -28,7 +29,7 @@ float calculateDirectionalShadow(vec4 fragPosLightSpace, vec3 normal, vec3 light
 float calculateOmnidirectionalShadow(vec3 fragWorldPos, vec3 normal, vec3 lightPos, vec3 cameraPos, int lightIndex);
 float calculatePerspectiveShadow(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir, int lightIndex);
 
-vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 fragWorldPos, vec4 fragPosLightSpace, vec3 albedo, float metallic, float roughness, float ao) {
+vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 fragWorldPos, vec3 albedo, float metallic, float roughness, float ao) {
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo, metallic);
 
@@ -39,6 +40,7 @@ vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 fragWorldPos, vec4 fragPosLigh
         vec3 lightPos = lightDir * 5.0;
         vec3 radiance = light.diffuse.rgb * light.intensity.x;
 
+        vec4 fragPosLightSpace = dirShadowData.lightSpaceMatrix * vec4(fragWorldPos, 1.0);
         float shadow = calculateDirectionalShadow(fragPosLightSpace, N, lightDir);
 
         Lo += brdf(lightPos, N, V, F0, fragWorldPos, radiance, albedo, metallic, roughness, ao) * (1.0 - shadow);
@@ -69,7 +71,7 @@ vec3 calculateLights(vec3 N, vec3 V, vec3 R, vec3 fragWorldPos, vec4 fragPosLigh
 
         vec3 radiance = light.diffuse.rgb * light.cutOff.z * intensity * attenuation;
 
-        vec4 fragPosPersLightSpace = persLightSpaceMatrix[i] * vec4(fragWorldPos, 1.0);
+        vec4 fragPosPersLightSpace = perShadowData.lightSpaceMatrix[i] * vec4(fragWorldPos, 1.0);
 
         float shadow = light.attenuation.w == 1.0 ? calculatePerspectiveShadow(fragPosPersLightSpace, N, lightDir, i) : 0.0;
 
@@ -131,14 +133,14 @@ float calculateOmnidirectionalShadow(vec3 fragWorldPos, vec3 normal, vec3 lightP
     vec3 lightDir = normalize(lightPos - fragWorldPos);
     float bias = max(0.1 * (1.0 - dot(normal, lightDir)), 0.01);
     float viewDistance = length(cameraPos - fragWorldPos);
-    float diskRadius = (1.0 + (viewDistance / omniFarPlane.x)) * 0.005;
+    float diskRadius = (1.0 + (viewDistance / omniShadowData.omniFarPlane.x)) * 0.005;
     float shadow = 0.0;
     int samples = 20;
 
     for (int i = 0; i < samples; ++i) {
         vec3 sampleDir = normalize(lightToFrag + gridSamplingDisk[i] * diskRadius);
         float closestDepth = texture(shadowCubemap, vec4(sampleDir, float(lightIndex))).r;
-        closestDepth *= omniFarPlane.x;// undo mapping [0;1]
+        closestDepth *= omniShadowData.omniFarPlane.x;// undo mapping [0;1]
 
         if (currentDepth - bias > closestDepth) {
             shadow += 1.0;

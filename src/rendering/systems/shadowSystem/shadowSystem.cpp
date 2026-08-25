@@ -62,14 +62,15 @@ void ShadowSystem::configure(const RenderContext& ctx,
 		}
 	};
 
-	DescriptorSetLayout bufferLayout = {
-		.bindings = {
-			{
-				.name = CONFIG_MANAGER.get<std::string>("camera.ubo.blockName"),
-				.type = DescriptorType::UniformBuffer,
-				.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo.binding"),
-			},
-		}
+	PipelineRenderingInfo perDepthInfo = {
+		.primitiveAssemblyState = primitiveAssemblyState,
+		.rasterizationState = rasterizationState,
+		.depthStencilState = depthStencilState,
+		.colorBlendState = colorBlendState,
+		.stages = {
+				{.code = ShaderLoader::load("depth/perDepth.vert"), .stage = ShaderStageType::Vertex},
+				{.code = ShaderLoader::load("depth/depth.frag"), .stage = ShaderStageType::Fragment},
+			}
 	};
 
 	PipelineRenderingInfo cubeDepthInfo = {
@@ -84,6 +85,20 @@ void ShadowSystem::configure(const RenderContext& ctx,
 		},
 	};
 
+	DescriptorSetLayout bufferLayout = {
+		.bindings = {
+				{
+					.name = CONFIG_MANAGER.get<std::string>("camera.ubo.blockName"),
+					.type = DescriptorType::UniformBuffer,
+					.binding = CONFIG_MANAGER.get<int32_t>("camera.ubo.binding"),
+				},
+				{.name = CONFIG_MANAGER.get<std::string>("shadow.ubo.blockName"),
+					.type = DescriptorType::UniformBuffer,
+					.binding = CONFIG_MANAGER.get<int32_t>("shadow.ubo.binding"),
+				}
+		}
+	};
+
 	PushConstantLayout transformPushConstantsLayout = {
 		.constants = TransformPushConstants::layout.constants,
 		.count = TransformPushConstants::layout.count,
@@ -94,17 +109,25 @@ void ShadowSystem::configure(const RenderContext& ctx,
 		.descriptorSets = {bufferLayout},
 		.pushConstants = {transformPushConstantsLayout}
 	};
+
 	GraphicsPipelineCreateInfo depthCreateInfo = {.rendering = depthInfo, .layout = pipelineLayout};
 	GraphicsPipelineCreateInfo cubeDepthCreateInfo = {.rendering = cubeDepthInfo, .layout = pipelineLayout};
+	GraphicsPipelineCreateInfo perDepthCreateInfo = {.rendering = perDepthInfo, .layout = pipelineLayout};
 
 	mPipelines[0] = GraphicsPipeline{depthCreateInfo};
 	mPipelines[1] = GraphicsPipeline{cubeDepthCreateInfo};
+	mPipelines[2] = GraphicsPipeline{perDepthCreateInfo};
 
 	mDirShadow = std::make_unique<DirectionalShadow>(ctx);
 	mOmnidirShadow = std::make_unique<OmnidirectionalShadow>(ctx);
 	mPersShadow = std::make_unique<PerspectiveShadow>(ctx);
 
-	mUBO = UniformBuffer{sizeof(UniformBufferObject), BufferUsage::Dynamic};
+	mUBO = UniformBuffer{
+		sizeof(DirectionalShadowData)
+		+ sizeof(OmnidirectionalShadowData)
+		+ sizeof(PerspectiveShadowData),
+		BufferUsage::Dynamic
+	};
 
 	const DescriptorSetLayout layout = {
 		.bindings = {
@@ -127,7 +150,7 @@ void ShadowSystem::configure(const RenderContext& ctx,
 	onGuiUpdate(event);
 }
 
-void ShadowSystem::directionalShadowPass(UniformBufferObject& ubo) {
+void ShadowSystem::directionalShadowPass() {
 	const auto lights = mCtx->light.dirLights;
 
 	if (lights.empty())
@@ -138,8 +161,7 @@ void ShadowSystem::directionalShadowPass(UniformBufferObject& ubo) {
 	mEncoder->setViewport({.x = 0, .y = 0, .width = frameBuffer.width(), .height = frameBuffer.height()});
 	mEncoder->clearFrameBuffer(ClearMask::Depth);
 
-	mDirShadow->render(*mCtx, *mEncoder, mPipelines[0], lights[0]->direction);
-	ubo.lightSpaceMatrix = mDirShadow->lightSpaceMatrix();
+	mDirShadow->render(*mCtx, *mEncoder, mPipelines[0], mUBO, lights[0]->direction);
 }
 
 void ShadowSystem::omnidirectionalShadowPass() {
@@ -159,12 +181,12 @@ void ShadowSystem::omnidirectionalShadowPass() {
 		if (!light || !light->castShadow)
 			continue;
 
-		mOmnidirShadow->render(*mCtx, *mEncoder, mPipelines[1], light->position, i);
+		mOmnidirShadow->render(*mCtx, *mEncoder, mPipelines[1], mUBO, light->position, i);
 	}
 	mEncoder->unbindFrameBuffer();
 }
 
-void ShadowSystem::perspectiveShadowPass(UniformBufferObject& ubo) {
+void ShadowSystem::perspectiveShadowPass() {
 	const auto lights = mCtx->light.spotLights;
 	if (lights.empty())
 		return;
@@ -182,28 +204,22 @@ void ShadowSystem::perspectiveShadowPass(UniformBufferObject& ubo) {
 		mPersShadow->render(
 			*mCtx,
 			*mEncoder,
-			mPipelines[0],
+			mPipelines[2],
 			frameBuffer,
+			mUBO,
 			light->direction,
 			light->position,
 			light->outerCutOff,
 			i);
-
-		ubo.persLightSpaceMatrix[i] = mPersShadow->lightSpaceMatrix(i);
 	}
 
 	mEncoder->unbindFrameBuffer();
 }
 
 void ShadowSystem::onGuiUpdate(const UpdateShadowMapEvent& event) {
-	UniformBufferObject ubo{};
-	ubo.omniFarPlane = glm::vec4(CONFIG_MANAGER.get<float>("shadow.omnidirectional.farPlane"), 0.0f, 0.0f, 0.0f);
-
-	directionalShadowPass(ubo);
+	directionalShadowPass();
 	omnidirectionalShadowPass();
-	perspectiveShadowPass(ubo);
+	perspectiveShadowPass();
 
 	mEncoder->setCullFace(CullMode::Back);
-
-	mUBO.copyToMemory(&ubo, 0, sizeof(UniformBufferObject));
 }

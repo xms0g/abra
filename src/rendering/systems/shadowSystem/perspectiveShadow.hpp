@@ -1,7 +1,9 @@
 #pragma once
 #include <span>
 #include "glm/glm.hpp"
+#include "data.hpp"
 
+class UniformBuffer;
 class GraphicsEncoder;
 class GraphicsPipeline;
 struct RenderGroup;
@@ -14,13 +16,11 @@ public:
 
 	~PerspectiveShadow();
 
-	[[nodiscard]]
-	glm::mat4 lightSpaceMatrix(int layer) const;
-
 	void render(const RenderContext& ctx,
 	            GraphicsEncoder& encoder,
 	            GraphicsPipeline& pipeline,
 	            const FrameBuffer& frameBuffer,
+	            const UniformBuffer& ubo,
 	            const glm::vec3& direction,
 	            const glm::vec3& position,
 	            float fovy,
@@ -32,6 +32,6 @@ private:
 	float mAspect{0.0f};
 	float mFar{0.0f};
 	float mNear{0.0f};
-	glm::mat4 mLightSpaceMatrix[4]{};
+	PerspectiveShadowData mData{};
 	std::span<RenderGroup> mObjects;
 };

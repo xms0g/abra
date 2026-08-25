@@ -8,7 +8,7 @@ void main() {
     vec3 N = normal(fs_in.TBN, fs_in.TexCoord, false);
     vec3 diffuse = texture(material.texture_albedo, fs_in.TexCoord).rgb;
     float specular = texture(material.texture_specular, fs_in.TexCoord).r;
-    vec3 result = calculateLights(N, fs_in.WorldPos, cameraPos.xyz, fs_in.ViewDir, fs_in.FragPosLightSpace, diffuse, specular, 32.0, 1.0);
+    vec3 result = calculateLights(N, fs_in.WorldPos, cameraPos.xyz, fs_in.ViewDir, diffuse, specular, 32.0, 1.0);
 
     fragColor = vec4(result, 1.0);
 }

@@ -1,7 +1,9 @@
 #pragma once
 #include <span>
 #include "glm/glm.hpp"
+#include "data.hpp"
 
+class UniformBuffer;
 class GraphicsPipeline;
 class GraphicsEncoder;
 struct RenderGroup;
@@ -13,12 +15,10 @@ public:
 
 	~DirectionalShadow();
 
-	[[nodiscard]]
-	glm::mat4 lightSpaceMatrix() const;
-
 	void render(const RenderContext& ctx,
 	            GraphicsEncoder& encoder,
 	            GraphicsPipeline& pipeline,
+	            const UniformBuffer& ubo,
 	            const glm::vec3& direction);
 
 private:
@@ -29,6 +29,6 @@ private:
 	float mTop;
 	float mNear;
 	float mFar;
-	glm::mat4 mLightSpaceMatrix{};
+	DirectionalShadowData mData{};
 	std::span<RenderGroup> mObjects;
 };

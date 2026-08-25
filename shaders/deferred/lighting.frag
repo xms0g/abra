@@ -5,7 +5,6 @@ in VS_OUT
 } fs_in;
 
 #include "ub/camera.glsl"
-#include "ub/shadow.glsl"
 #include "pbr/pbr.glsl"
 
 uniform sampler2D gPosition;
@@ -36,9 +35,7 @@ void main() {
 
     vec3 emissive = vec3(positionSample.w, normalSample.w, albedoSample.a);
 
-    vec4 fragPosLightSpace = lightSpaceMatrix * vec4(fragWorldPos, 1.0);
-
-    vec3 result = calculateLights(N, V, R, fragWorldPos, fragPosLightSpace, albedo, metallic, roughness, finalAO) + emissive;
+    vec3 result = calculateLights(N, V, R, fragWorldPos, albedo, metallic, roughness, finalAO) + emissive;
 
     fragColor = vec4(result, 1.0);
 }

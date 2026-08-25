@@ -19,17 +19,18 @@ vec3 calculateDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir
 vec3 calculatePointLight(PointLight light, vec3 normal, vec3 worldPos, vec3 cameraPos,vec3 viewDir, vec3 albedo, float specular, float shininess, float ao, int layer);
 vec3 calculateSpotLight(SpotLight light, vec3 normal, vec3 worldPos, vec3 viewDir, vec4 fragPosLightSpace, vec3 albedo, float specular, float shininess, float ao, int layer);
 
-vec3 calculateLights(vec3 normal, vec3 worldPos, vec3 cameraPos, vec3 viewDir, vec4 fragPosLightSpace, vec3 albedo, float specular, float shininess, float ao) {
+vec3 calculateLights(vec3 normal, vec3 worldPos, vec3 cameraPos, vec3 viewDir, vec3 albedo, float specular, float shininess, float ao) {
     vec3 result = vec3(0.0);
 
     for (int i = 0; i < lightCount.x; i++) {
+        vec4 fragPosLightSpace = dirShadowData.lightSpaceMatrix * vec4(worldPos, 1.0);
         result += calculateDirectionalLight(dirLights[i], normal, viewDir, fragPosLightSpace, albedo, specular, shininess, ao);
     }
     for (int i = 0; i < lightCount.y; i++) {
         result += calculatePointLight(pointLights[i], normal, worldPos, cameraPos, viewDir, albedo, specular, shininess, ao, i);
     }
     for (int i = 0; i < lightCount.z; i++) {
-        vec4 fragPosPersLightSpace = persLightSpaceMatrix[i] * vec4(worldPos, 1.0);
+        vec4 fragPosPersLightSpace = perShadowData.lightSpaceMatrix[i] * vec4(worldPos, 1.0);
         result += calculateSpotLight(spotLights[i], normal, worldPos, viewDir, fragPosPersLightSpace, albedo, specular, shininess, ao, i);
     }
 
@@ -72,12 +73,12 @@ float calculateOmnidirectionalShadow(vec3 worldPos, vec4 lightPos, vec3 cameraPo
     float bias = 0.15;
     int samples = 20;
     float viewDistance = length(cameraPos - worldPos);
-    float diskRadius = (1.0 + (viewDistance / omniFarPlane.x)) / 25.0;
+    float diskRadius = (1.0 + (viewDistance / omniShadowData.omniFarPlane.x)) / 25.0;
 
     for (int i = 0; i < samples; ++i) {
         vec3 sampleDir = normalize(fragToLight + gridSamplingDisk[i] * diskRadius);
         float closestDepth = texture(shadowCubemap, vec4(sampleDir, float(layer))).r;
-        closestDepth *= omniFarPlane.x;   // undo mapping [0;1]
+        closestDepth *= omniShadowData.omniFarPlane.x;   // undo mapping [0;1]
 
         if (currentDepth - bias > closestDepth)
         shadow += 1.0;

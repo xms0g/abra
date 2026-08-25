@@ -2,6 +2,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "../../pushConstants/transformPushConstants.hpp"
+#include "../../buffers/uniformBuffer.hpp"
 #include "../../context/renderGroup.hpp"
 #include "../../context/renderContext.hpp"
 #include "../../context/renderData.hpp"
@@ -23,14 +24,11 @@ PerspectiveShadow::PerspectiveShadow(const RenderContext& ctx) {
 
 PerspectiveShadow::~PerspectiveShadow() = default;
 
-glm::mat4 PerspectiveShadow::lightSpaceMatrix(const int layer) const {
-	return mLightSpaceMatrix[layer];
-}
-
 void PerspectiveShadow::render(const RenderContext& ctx,
                                GraphicsEncoder& encoder,
                                GraphicsPipeline& pipeline,
                                const FrameBuffer& frameBuffer,
+                               const UniformBuffer& ubo,
                                const glm::vec3& direction,
                                const glm::vec3& position,
                                const float fovy,
@@ -40,10 +38,12 @@ void PerspectiveShadow::render(const RenderContext& ctx,
 
 	const glm::mat4 lightProjection = glm::perspective(fovy, mAspect, mNear, mFar);
 	const glm::mat4 lightView = glm::lookAt(position, position + direction, glm::vec3(0.0, 1.0, 0.0));
-	mLightSpaceMatrix[layer] = lightProjection * lightView;
+
+	mData.lightSpaceMatrix[layer] = lightProjection * lightView;
+	ubo.copyToMemory(&mData, offsetof(ShadowData, perShadowData), sizeof(PerspectiveShadowData));
 
 	encoder.bindPipeline(pipeline);
-	encoder.setUniform("lightSpaceMatrix", mLightSpaceMatrix[layer]);
+	encoder.setUniform("shadowIndex", layer);
 
 	for (const auto& [entityID, matBatch]: mObjects) {
 		TransformPushConstants transformPushConstants = {

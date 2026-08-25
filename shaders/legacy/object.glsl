@@ -6,7 +6,6 @@ in VS_OUT
     vec2 TexCoord;
     mat3 TBN;
     vec3 WorldPos;
-    vec4 FragPosLightSpace;
     vec3 ViewDir;
     vec3 TangentViewDir;
 } fs_in;

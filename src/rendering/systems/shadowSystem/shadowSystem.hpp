@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include "glm/glm.hpp"
+#include "data.hpp"
 #include "../../buffers/uniformBuffer.hpp"
 #include "../../graphicsPipeline.hpp"
 
@@ -22,17 +23,11 @@ public:
 	void configure(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder, EventBus& eventBus);
 
 private:
-	struct alignas(16) UniformBufferObject {
-		glm::mat4 lightSpaceMatrix{};
-		glm::mat4 persLightSpaceMatrix[4]{};
-		glm::vec4 omniFarPlane{};
-	};
-
-	void directionalShadowPass(UniformBufferObject& ubo);
+	void directionalShadowPass();
 
 	void omnidirectionalShadowPass();
 
-	void perspectiveShadowPass(UniformBufferObject& ubo);
+	void perspectiveShadowPass();
 
 	void onGuiUpdate(const UpdateShadowMapEvent& event);
 
@@ -47,7 +42,7 @@ private:
 	const FrameGraph* mGraph{nullptr};
 	GraphicsEncoder* mEncoder{nullptr};
 	UniformBuffer mUBO;
-	std::array<GraphicsPipeline, 2> mPipelines;
+	std::array<GraphicsPipeline, 3> mPipelines;
 	std::unique_ptr<DirectionalShadow> mDirShadow;
 	std::unique_ptr<OmnidirectionalShadow> mOmnidirShadow;
 	std::unique_ptr<PerspectiveShadow> mPersShadow;
