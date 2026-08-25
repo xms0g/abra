@@ -11,9 +11,9 @@
 #include "../../../rendering/graphicsEncoder.hpp"
 
 PerspectiveShadow::PerspectiveShadow(const RenderContext& ctx) {
-	mWidth = CONFIG_MANAGER.get<int32_t>("shadow.map.width");
-	mHeight = CONFIG_MANAGER.get<int32_t>("shadow.map.height");
-	mAspect = static_cast<float>(mWidth) / static_cast<float>(mHeight);
+	const int32_t width = CONFIG_MANAGER.get<int32_t>("shadow.map.width");
+	const int32_t height = CONFIG_MANAGER.get<int32_t>("shadow.map.height");
+	mAspect = static_cast<float>(width) / static_cast<float>(height);
 	mNear = CONFIG_MANAGER.get<float>("shadow.perspective.nearPlane");
 	mFar = CONFIG_MANAGER.get<float>("shadow.perspective.farPlane");
 

@@ -27,8 +27,6 @@ public:
 	            int32_t layer);
 
 private:
-	int32_t mWidth{0};
-	int32_t mHeight{0};
 	float mAspect{0.0f};
 	float mFar{0.0f};
 	float mNear{0.0f};

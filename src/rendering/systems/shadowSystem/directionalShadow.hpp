@@ -23,12 +23,8 @@ public:
 
 private:
 	float mHeight;
-	float mLeft;
-	float mRight;
-	float mBottom;
-	float mTop;
-	float mNear;
-	float mFar;
+
+	glm::mat4 mLightProjection{};
 	DirectionalShadowData mData{};
 	std::span<RenderGroup> mObjects;
 };

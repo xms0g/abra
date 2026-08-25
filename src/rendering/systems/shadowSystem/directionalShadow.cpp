@@ -12,12 +12,14 @@
 
 DirectionalShadow::DirectionalShadow(const RenderContext& ctx) {
 	mHeight = CONFIG_MANAGER.get<float>("shadow.directional.height");
-	mRight = CONFIG_MANAGER.get<float>("shadow.directional.right");
-	mLeft = CONFIG_MANAGER.get<float>("shadow.directional.left");
-	mTop = CONFIG_MANAGER.get<float>("shadow.directional.top");
-	mBottom = CONFIG_MANAGER.get<float>("shadow.directional.bottom");
-	mNear = CONFIG_MANAGER.get<float>("shadow.directional.nearPlane");
-	mFar = CONFIG_MANAGER.get<float>("shadow.directional.farPlane");
+	const float right = CONFIG_MANAGER.get<float>("shadow.directional.right");
+	const float left = CONFIG_MANAGER.get<float>("shadow.directional.left");
+	const float top = CONFIG_MANAGER.get<float>("shadow.directional.top");
+	const float bottom = CONFIG_MANAGER.get<float>("shadow.directional.bottom");
+	const float near = CONFIG_MANAGER.get<float>("shadow.directional.nearPlane");
+	const float far = CONFIG_MANAGER.get<float>("shadow.directional.farPlane");
+
+	mLightProjection = glm::ortho(left, right, bottom, top, near, far);
 
 	mObjects = std::span(
 		ctx.queueRegistry->get<RenderGroup>("shadow").data(),
@@ -32,10 +34,9 @@ void DirectionalShadow::render(const RenderContext& ctx,
                                const UniformBuffer& ubo,
                                const glm::vec3& direction) {
 	const glm::vec3 lightPos = -direction * mHeight;
-	const glm::mat4 lightProjection = glm::ortho(mLeft, mRight, mBottom, mTop, mNear, mFar);
 	const glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 
-	mData.lightSpaceMatrix = lightProjection * lightView;
+	mData.lightSpaceMatrix = mLightProjection * lightView;
 	ubo.copyToMemory(&mData, offsetof(ShadowData, dirShadowData), sizeof(DirectionalShadowData));
 
 	encoder.bindPipeline(pipeline);
