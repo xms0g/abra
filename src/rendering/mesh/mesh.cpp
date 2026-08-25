@@ -20,6 +20,9 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
 
 Mesh::~Mesh() = default;
 
+Mesh::Mesh(Mesh&& other) noexcept = default;
+Mesh& Mesh::operator=(Mesh&& other) noexcept = default;
+
 const VertexArray& Mesh::vao() const {
 	return *mVAO;
 }

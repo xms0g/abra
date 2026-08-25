@@ -17,8 +17,8 @@ public:
 	Mesh(const Mesh&) = delete;
 	Mesh& operator=(const Mesh&) = delete;
 
-	Mesh(Mesh&& other) noexcept = default;
-	Mesh& operator=(Mesh&& other) noexcept = default;
+	Mesh(Mesh&& other) noexcept;
+	Mesh& operator=(Mesh&& other) noexcept;
 
 	[[nodiscard]]
 	const VertexArray& vao() const;
