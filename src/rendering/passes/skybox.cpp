@@ -54,8 +54,11 @@ void SkyboxPass::configure(const RenderContext& ctx,
 		}
 	};
 
-	auto transformPushConstantsLayout = TransformPushConstants::layout;
-	transformPushConstantsLayout.baseOffset = 0;
+	PushConstantLayout transformPushConstantsLayout = {
+		.constants = TransformPushConstants::layout.constants,
+		.count = TransformPushConstants::layout.count,
+		.baseOffset = 0
+	};
 
 	PipelineLayout layout = {
 		.descriptorSets = {passLayout},

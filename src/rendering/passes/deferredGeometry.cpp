@@ -93,11 +93,17 @@ void DeferredGeometryPass::configure(const RenderContext& ctx,
 		}
 	};
 
-	auto materialPushConstantsLayout = MaterialPushConstants::layout;
-	materialPushConstantsLayout.baseOffset = offsetof(PushConstants, material);
+	PushConstantLayout materialPushConstantsLayout = {
+		.constants = MaterialPushConstants::layout.constants,
+		.count = MaterialPushConstants::layout.count,
+		.baseOffset = offsetof(PushConstants, material)
+	};
 
-	auto transformPushConstantsLayout = TransformPushConstants::layout;
-	transformPushConstantsLayout.baseOffset = offsetof(PushConstants, transform);
+	PushConstantLayout transformPushConstantsLayout = {
+		.constants = TransformPushConstants::layout.constants,
+		.count = TransformPushConstants::layout.count,
+		.baseOffset = offsetof(PushConstants, transform)
+	};
 
 	PipelineLayout layout = {
 		.descriptorSets = {materialLayout, bufferLayout},
@@ -137,7 +143,9 @@ void DeferredGeometryPass::execute(const RenderContext& ctx, const FrameGraph& g
 		};
 
 		encoder.pushConstants(&pushConstants);
-		encoder.setCullMode((cmd.material.flags & MaterialFlag::Twosided) != MaterialFlag::None ? CullMode::None : pipelineCullMode);
+		encoder.setCullMode((cmd.material.flags & MaterialFlag::Twosided) != MaterialFlag::None
+			                    ? CullMode::None
+			                    : pipelineCullMode);
 		encoder.bindVertexArray(cmd.mesh.vao);
 		encoder.drawIndexed(cmd.mesh.indexCount);
 	}

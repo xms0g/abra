@@ -72,10 +72,17 @@ void DebugPass::configure(const RenderContext& ctx,
 		}
 	};
 
+	PushConstantLayout transformPushConstantsLayout = {
+		.constants = TransformPushConstants::layout.constants,
+		.count = TransformPushConstants::layout.count,
+		.baseOffset = 0
+	};
+
 	PipelineLayout layout = {
 		.descriptorSets = {bufferLayout},
-		.pushConstants = {TransformPushConstants::layout}
+		.pushConstants = {transformPushConstantsLayout}
 	};
+
 	GraphicsPipelineCreateInfo normalCreateInfo = {.rendering = normalInfo, .layout = layout};
 	GraphicsPipelineCreateInfo wireframeCreateInfo = {.rendering = wireframeInfo, .layout = layout};
 

@@ -7,6 +7,7 @@
 #include "../../context/renderQueue.hpp"
 #include "../../../config/configManager.hpp"
 #include "../../../rendering/graphicsEncoder.hpp"
+#include "../../pushConstants/transformPushConstants.hpp"
 
 DirectionalShadow::DirectionalShadow(const RenderContext& ctx) {
 	mHeight = CONFIG_MANAGER.get<float>("shadow.directional.height");
@@ -42,8 +43,12 @@ void DirectionalShadow::render(const RenderContext& ctx,
 	encoder.setUniform("lightSpaceMatrix", mLightSpaceMatrix);
 
 	for (const auto& [entityID, matBatch]: mObjects) {
-		encoder.setUniform("model", ctx.renderData->entity.models[entityID]);
-		encoder.setUniform("normalMatrix", ctx.renderData->entity.normals[entityID]);
+		TransformPushConstants transformPushConstants = {
+			.model = ctx.renderData->entity.models[entityID],
+			.normal = ctx.renderData->entity.normals[entityID]
+		};
+
+		encoder.pushConstants(&transformPushConstants);
 
 		for (const auto& meshIdx: matBatch.meshIndices) {
 			encoder.bindVertexArray(ctx.renderData->mesh.vaos[meshIdx]);

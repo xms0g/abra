@@ -7,6 +7,7 @@
 #include "../../graphicsEncoder.hpp"
 #include "../../context/renderContext.hpp"
 #include "../../buffers/uniformBuffer.hpp"
+#include "../../pushConstants/transformPushConstants.hpp"
 #include "../../../ECS/components/directionalLight.hpp"
 #include "../../../ECS/components/pointLight.hpp"
 #include "../../../ECS/components/spotLight.hpp"
@@ -83,7 +84,16 @@ void ShadowSystem::configure(const RenderContext& ctx,
 		},
 	};
 
-	PipelineLayout pipelineLayout = {.descriptorSets = {bufferLayout}};
+	PushConstantLayout transformPushConstantsLayout = {
+		.constants = TransformPushConstants::layout.constants,
+		.count = TransformPushConstants::layout.count,
+		.baseOffset = 0
+	};
+
+	PipelineLayout pipelineLayout = {
+		.descriptorSets = {bufferLayout},
+		.pushConstants = {transformPushConstantsLayout}
+	};
 	GraphicsPipelineCreateInfo depthCreateInfo = {.rendering = depthInfo, .layout = pipelineLayout};
 	GraphicsPipelineCreateInfo cubeDepthCreateInfo = {.rendering = cubeDepthInfo, .layout = pipelineLayout};
 

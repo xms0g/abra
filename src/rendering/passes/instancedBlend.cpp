@@ -108,8 +108,11 @@ void InstancedBlendPass::configure(const RenderContext& ctx,
 		}
 	};
 
-	auto materialPushConstantsLayout = MaterialPushConstants::layout;
-	materialPushConstantsLayout.baseOffset = 0;
+	PushConstantLayout materialPushConstantsLayout = {
+		.constants = MaterialPushConstants::layout.constants,
+		.count = MaterialPushConstants::layout.count,
+		.baseOffset = 0
+	};
 
 	PipelineLayout layout = {
 		.descriptorSets = {materialLayout, bufferLayout, passLayout},

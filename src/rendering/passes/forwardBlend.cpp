@@ -102,11 +102,17 @@ void ForwardBlendPass::configure(const RenderContext& ctx,
 		}
 	};
 
-	auto materialPushConstantsLayout = MaterialPushConstants::layout;
-	materialPushConstantsLayout.baseOffset = offsetof(PushConstants, material);
+	PushConstantLayout materialPushConstantsLayout = {
+		.constants = MaterialPushConstants::layout.constants,
+		.count = MaterialPushConstants::layout.count,
+		.baseOffset = offsetof(PushConstants, material)
+	};
 
-	auto transformPushConstantsLayout = TransformPushConstants::layout;
-	transformPushConstantsLayout.baseOffset = offsetof(PushConstants, transform);
+	PushConstantLayout transformPushConstantsLayout = {
+		.constants = TransformPushConstants::layout.constants,
+		.count = TransformPushConstants::layout.count,
+		.baseOffset = offsetof(PushConstants, transform)
+	};
 
 	PipelineLayout layout = {
 		.descriptorSets = {materialLayout, bufferLayout, passLayout},

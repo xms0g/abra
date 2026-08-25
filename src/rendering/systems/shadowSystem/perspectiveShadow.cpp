@@ -1,6 +1,7 @@
 #include "perspectiveShadow.hpp"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "../../pushConstants/transformPushConstants.hpp"
 #include "../../context/renderGroup.hpp"
 #include "../../context/renderContext.hpp"
 #include "../../context/renderData.hpp"
@@ -45,8 +46,12 @@ void PerspectiveShadow::render(const RenderContext& ctx,
 	encoder.setUniform("lightSpaceMatrix", mLightSpaceMatrix[layer]);
 
 	for (const auto& [entityID, matBatch]: mObjects) {
-		encoder.setUniform("model", ctx.renderData->entity.models[entityID]);
-		encoder.setUniform("normalMatrix", ctx.renderData->entity.normals[entityID]);
+		TransformPushConstants transformPushConstants = {
+			.model = ctx.renderData->entity.models[entityID],
+			.normal = ctx.renderData->entity.normals[entityID]
+		};
+
+		encoder.pushConstants(&transformPushConstants);
 
 		for (const auto& meshIdx: matBatch.meshIndices) {
 			encoder.bindVertexArray(ctx.renderData->mesh.vaos[meshIdx]);
