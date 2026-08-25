@@ -2,6 +2,7 @@
 #include "glad/glad.h"
 #include "vertexArray.hpp"
 #include "vertex.hpp"
+#include "vertexLayout.hpp"
 #include "../buffers/vertexBuffer.hpp"
 #include "../buffers/indexBuffer.hpp"
 

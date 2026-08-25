@@ -23,15 +23,3 @@ void VertexBuffer::copyToMemory(const void* data, const uint32_t offset, const u
 		default: break;
 	}
 }
-
-const std::vector<VertexAttribute>& VertexLayout::attributes() const {
-	return mAttributes;
-}
-
-int32_t VertexLayout::stride() const {
-	return mStride;
-}
-
-void VertexLayout::addPadding(const int32_t bytes) {
-	mStride += bytes;
-}

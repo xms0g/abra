@@ -1,7 +1,5 @@
 #include "vertexArray.hpp"
-
 #include <utility>
-
 #include "glad/glad.h"
 
 VertexArray::VertexArray() {

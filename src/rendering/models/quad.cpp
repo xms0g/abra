@@ -1,6 +1,7 @@
 #include "quad.hpp"
 #include "glad/glad.h"
 #include "../mesh/vertexArray.hpp"
+#include "../mesh/vertexLayout.hpp"
 #include "../buffers/vertexBuffer.hpp"
 #include "../../rendering/shader.hpp"
 
