@@ -73,12 +73,12 @@ float calculateOmnidirectionalShadow(vec3 worldPos, vec4 lightPos, vec3 cameraPo
     float bias = 0.15;
     int samples = 20;
     float viewDistance = length(cameraPos - worldPos);
-    float diskRadius = (1.0 + (viewDistance / omniShadowData.omniFarPlane.x)) / 25.0;
+    float diskRadius = (1.0 + (viewDistance / omniShadowData.posFarPlane.w)) / 25.0;
 
     for (int i = 0; i < samples; ++i) {
         vec3 sampleDir = normalize(fragToLight + gridSamplingDisk[i] * diskRadius);
         float closestDepth = texture(shadowCubemap, vec4(sampleDir, float(layer))).r;
-        closestDepth *= omniShadowData.omniFarPlane.x;   // undo mapping [0;1]
+        closestDepth *= omniShadowData.posFarPlane.w;   // undo mapping [0;1]
 
         if (currentDepth - bias > closestDepth)
         shadow += 1.0;

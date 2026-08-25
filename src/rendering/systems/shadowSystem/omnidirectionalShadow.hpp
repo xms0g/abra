@@ -30,8 +30,8 @@ private:
 	float mFar{0.0f};
 	float mNear{0.0f};
 	float mFovy{0.0f};
+
 	OmnidirectionalShadowData mData{};
-	std::vector<glm::mat4> mShadowTransforms;
 	std::span<RenderGroup> mObjects;
 	glm::mat4 mShadowProj{};
 

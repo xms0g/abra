@@ -18,7 +18,6 @@ OmnidirectionalShadow::OmnidirectionalShadow(const RenderContext& ctx) {
 	mFar = CONFIG_MANAGER.get<float>("shadow.omnidirectional.farPlane");
 	mFovy = glm::radians(CONFIG_MANAGER.get<float>("shadow.omnidirectional.fovy"));
 	mShadowProj = glm::perspective(mFovy, mAspect, mNear, mFar);
-	mShadowTransforms.resize(faces);
 	mObjects = std::span(
 		ctx.queueRegistry->get<RenderGroup>("shadow").data(),
 		ctx.queueRegistry->get<RenderGroup>("shadow").size());
@@ -32,19 +31,16 @@ void OmnidirectionalShadow::render(const RenderContext& ctx,
                                    const UniformBuffer& ubo,
                                    const glm::vec3& position,
                                    const int32_t layer) {
-	mShadowTransforms.clear();
-
-	for (const auto& [dir, up]: mDirUps) {
-		mShadowTransforms.push_back(mShadowProj * glm::lookAt(position, position + dir, up));
+	for (int32_t i = 0; i < faces; ++i) {
+		const auto& [dir, up] = mDirUps[i];
+		mData.shadowMatrices[i] = mShadowProj * glm::lookAt(position, position + dir, up);
 	}
 
-	mData.omniFarPlane = glm::vec4(mFar, 0.0f, 0.0f, 0.0f);
+	mData.posFarPlane = glm::vec4(position, mFar);
+
 	ubo.copyToMemory(&mData, offsetof(ShadowData, omniShadowData), sizeof(OmnidirectionalShadowData));
 
 	encoder.bindPipeline(pipeline);
-	encoder.setUniform("shadowMatrices", mShadowTransforms.data(), mShadowTransforms.size());
-	encoder.setUniform("omniFarPlane", mFar);
-	encoder.setUniform("lightPos", position);
 	encoder.setUniform("cubeIndex", layer);
 
 	for (const auto& [entityID, matBatch]: mObjects) {

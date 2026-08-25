@@ -2,7 +2,8 @@
 layout (triangles) in;
 layout (triangle_strip, max_vertices=18) out;
 
-uniform mat4 shadowMatrices[6];
+#include "ub/shadow.glsl"
+
 uniform int cubeIndex;
 
 out vec4 FragPos; // FragPos from GS (output per emitvertex)
@@ -13,7 +14,7 @@ void main() {
 
         for (int i = 0; i < 3; ++i) {
             FragPos = gl_in[i].gl_Position;
-            gl_Position = shadowMatrices[face] * FragPos;
+            gl_Position = omniShadowData.shadowMatrices[face] * FragPos;
             EmitVertex();
         }
         EndPrimitive();

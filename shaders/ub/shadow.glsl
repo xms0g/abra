@@ -8,7 +8,8 @@ struct DirectionalShadowData {
 };
 
 struct OmnidirectionalShadowData {
-    vec4 omniFarPlane;
+    mat4 shadowMatrices[6];
+    vec4 posFarPlane;
 };
 
 struct PerspectiveShadowData {

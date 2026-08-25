@@ -6,7 +6,8 @@ struct alignas(16) DirectionalShadowData {
 };
 
 struct alignas(16) OmnidirectionalShadowData {
-	glm::vec4 omniFarPlane{};
+	glm::mat4 shadowMatrices[6];
+	glm::vec4 posFarPlane;
 };
 
 struct alignas(16) PerspectiveShadowData {
