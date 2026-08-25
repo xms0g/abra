@@ -11,16 +11,20 @@
 #include "../../../rendering/graphicsEncoder.hpp"
 
 OmnidirectionalShadow::OmnidirectionalShadow(const RenderContext& ctx) {
-	mWidth = CONFIG_MANAGER.get<int32_t>("shadow.map.width");
-	mHeight = CONFIG_MANAGER.get<int32_t>("shadow.map.height");
-	mAspect = static_cast<float>(mWidth) / static_cast<float>(mHeight);
-	mNear = CONFIG_MANAGER.get<float>("shadow.omnidirectional.nearPlane");
-	mFar = CONFIG_MANAGER.get<float>("shadow.omnidirectional.farPlane");
-	mFovy = glm::radians(CONFIG_MANAGER.get<float>("shadow.omnidirectional.fovy"));
-	mShadowProj = glm::perspective(mFovy, mAspect, mNear, mFar);
+	const int32_t width = CONFIG_MANAGER.get<int32_t>("shadow.map.width");
+	const int32_t height = CONFIG_MANAGER.get<int32_t>("shadow.map.height");
+	const float aspect = static_cast<float>(width) / static_cast<float>(height);
+	const float near = CONFIG_MANAGER.get<float>("shadow.omnidirectional.nearPlane");
+	const float far = CONFIG_MANAGER.get<float>("shadow.omnidirectional.farPlane");
+	const float fovy = glm::radians(CONFIG_MANAGER.get<float>("shadow.omnidirectional.fovy"));
+
+	mShadowProj = glm::perspective(fovy, aspect, near, far);
+
 	mObjects = std::span(
 		ctx.queueRegistry->get<RenderGroup>("shadow").data(),
 		ctx.queueRegistry->get<RenderGroup>("shadow").size());
+
+	mData.posFarPlane.w = far;
 }
 
 OmnidirectionalShadow::~OmnidirectionalShadow() = default;
@@ -36,7 +40,9 @@ void OmnidirectionalShadow::render(const RenderContext& ctx,
 		mData.shadowMatrices[i] = mShadowProj * glm::lookAt(position, position + dir, up);
 	}
 
-	mData.posFarPlane = glm::vec4(position, mFar);
+	mData.posFarPlane.x = position.x;
+	mData.posFarPlane.y = position.y;
+	mData.posFarPlane.z = position.z;
 
 	ubo.copyToMemory(&mData, offsetof(ShadowData, omniShadowData), sizeof(OmnidirectionalShadowData));
 

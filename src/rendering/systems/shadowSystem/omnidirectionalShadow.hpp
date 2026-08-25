@@ -24,13 +24,6 @@ public:
 	            int32_t layer);
 
 private:
-	int32_t mWidth{0};
-	int16_t mHeight{0};
-	float mAspect{0.0f};
-	float mFar{0.0f};
-	float mNear{0.0f};
-	float mFovy{0.0f};
-
 	OmnidirectionalShadowData mData{};
 	std::span<RenderGroup> mObjects;
 	glm::mat4 mShadowProj{};
