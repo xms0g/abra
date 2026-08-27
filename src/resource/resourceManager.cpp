@@ -31,7 +31,7 @@ void ResourceManager::uploadMeshesToGPU() {
 }
 
 void ResourceManager::uploadMaterialsToGPU() {
-	std::unordered_map<std::string, std::shared_ptr<GPUTexture>> idByPath;
+	std::unordered_map<std::string, std::shared_ptr<GPUTexture>> textureByPath;
 	static std::filesystem::path assetRoot = CONFIG_MANAGER.get<std::string>("path.asset");
 
 	for (auto& [entityID, materials]: mMaterialsByEntity) {
@@ -103,8 +103,8 @@ void ResourceManager::uploadMaterialsToGPU() {
 			}
 
 			for (auto& matTexture: material.textures) {
-				if (idByPath.contains(matTexture.path)) {
-					matTexture.texture = idByPath.at(matTexture.path);
+				if (textureByPath.contains(matTexture.path)) {
+					matTexture.texture = textureByPath.at(matTexture.path);
 					continue;
 				}
 
@@ -134,7 +134,7 @@ void ResourceManager::uploadMaterialsToGPU() {
 
 				matTexture.texture->generateMipmaps();
 
-				idByPath.emplace(matTexture.path, matTexture.texture);
+				textureByPath.emplace(matTexture.path, matTexture.texture);
 			}
 		}
 	}
