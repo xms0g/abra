@@ -1,11 +1,12 @@
 #pragma once
 #include "../../ECS/system.hpp"
 
+class Window;
 class EventBus;
 
 class GuiSystem final : public System {
 public:
-	GuiSystem();
+	GuiSystem(Window& window);
 
 	~GuiSystem() override;
 

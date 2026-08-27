@@ -34,18 +34,16 @@
 #include "passes/forwardBlend.hpp"
 #include "passes/instancedBlend.hpp"
 #include "passes/postProcess/postProcess.hpp"
-#include "gui/backend.hpp"
 #include "material/material.hpp"
 #include "../config/configManager.hpp"
 #include "../core/camera.hpp"
-#include "../core/window.hpp"
 #include "../ECS/registry.hpp"
 #include "../ECS/components/transform.hpp"
 #include "../ECS/components/mesh.hpp"
 #include "../ECS/components/material.hpp"
 #include "../event/eventBus.hpp"
 
-Renderer::Renderer(Registry& registry, const Camera& camera, Window& window) {
+Renderer::Renderer(Registry& registry, const Camera& camera) {
 	RequireComponent<MeshComponent>();
 	RequireComponent<TransformComponent>();
 	// glad: load all OpenGL function pointers
@@ -65,12 +63,9 @@ Renderer::Renderer(Registry& registry, const Camera& camera, Window& window) {
 	mRenderCtx.camera = &camera;
 
 	mEncoder = GraphicsEncoder{};
-	GuiBackend::init(&*window, window.glContext(), "#version 410");
 }
 
-Renderer::~Renderer() {
-	GuiBackend::shutdown();
-}
+Renderer::~Renderer() = default;
 
 void Renderer::configure(EventBus& eventBus) {
 	createPBRBuffers();
@@ -84,7 +79,6 @@ void Renderer::configure(EventBus& eventBus) {
 }
 
 void Renderer::render() {
-	GuiBackend::newFrame();
 	updateUniformBuffers();
 	sortEntities();
 
@@ -99,10 +93,6 @@ void Renderer::render() {
 	});
 
 	mGraph.execute(mRenderCtx, mEncoder);
-}
-
-void Renderer::drawGui() {
-	GuiBackend::renderFrame();
 }
 
 void Renderer::createSystems(Registry& registry) {

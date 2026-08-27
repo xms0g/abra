@@ -1,6 +1,8 @@
 #include "system.hpp"
+#include "backend.hpp"
 #include "panels.hpp"
 #include "ui.hpp"
+#include "../window.hpp"
 #include "../../ECS/registry.hpp"
 #include "../../ECS/components/debug.hpp"
 #include "../../ECS/components/directionalLight.hpp"
@@ -13,18 +15,23 @@
 #include "../../event/events/guiLightEvent.hpp"
 #include "../../event/events/guiTransformEvent.hpp"
 
-GuiSystem::GuiSystem() {
+GuiSystem::GuiSystem(Window& window) {
 	RequireComponent<TransformComponent>(true);
 	RequireComponent<PointLightComponent>(true);
 	RequireComponent<SpotLightComponent>(true);
 	RequireComponent<DirectionalLightComponent>(true);
 	RequireComponent<DebugComponent>(true);
+
+	GuiBackend::init(&*window, window.glContext(), "#version 410");
 }
 
-GuiSystem::~GuiSystem() = default;
+GuiSystem::~GuiSystem() {
+	GuiBackend::shutdown();
+}
 
 void GuiSystem::update(const float dt) {
 	updateFpsCounter(dt);
+	GuiBackend::newFrame();
 }
 
 void GuiSystem::render(EventBus& eventBus) const {
@@ -56,6 +63,8 @@ void GuiSystem::render(EventBus& eventBus) const {
 			eventBus.emitEvent<GuiLightEvent>(entity.id(), matIdx, lightIdx);
 		}
 	}
+
+	GuiBackend::renderFrame();
 }
 
 void GuiSystem::updateFpsCounter(const float dt) {

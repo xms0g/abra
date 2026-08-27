@@ -20,15 +20,13 @@ class LightSystem;
 
 class Renderer final : public System {
 public:
-	explicit Renderer(Registry& registry, const Camera& camera, Window& window);
+	explicit Renderer(Registry& registry, const Camera& camera);
 
 	~Renderer() override;
 
 	void configure(EventBus& eventBus);
 
 	void render();
-
-	static void drawGui();
 
 private:
 	void createSystems(Registry& registry);

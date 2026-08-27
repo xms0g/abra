@@ -23,8 +23,8 @@ void Engine::init(Registry& registry) {
 		CONFIG_MANAGER.get<int32_t>("msaa.samples"),
 		CONFIG_MANAGER.get<bool>("window.fullscreen"));
 
-	mGuiSystem = &registry.addSystem<GuiSystem>();
-	mRenderer = &registry.addSystem<Renderer>(registry, *mCamera, *mWindow);
+	mGuiSystem = &registry.addSystem<GuiSystem>(*mWindow);
+	mRenderer = &registry.addSystem<Renderer>(registry, *mCamera);
 }
 
 void Engine::configure() const {
@@ -45,7 +45,6 @@ void Engine::run() {
 
 		mRenderer->render();
 		mGuiSystem->render(*mEventBus);
-		Renderer::drawGui();
 
 		// SDL swap buffers
 		mWindow->swapBuffer();
