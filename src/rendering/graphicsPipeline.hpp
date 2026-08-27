@@ -171,9 +171,11 @@ public:
 	explicit GraphicsPipeline(const GraphicsPipelineCreateInfo& createInfo);
 
 	GraphicsPipeline(const GraphicsPipeline& other) = delete;
+
 	GraphicsPipeline& operator=(const GraphicsPipeline& other) = delete;
 
 	GraphicsPipeline(GraphicsPipeline&& other) noexcept = default;
+
 	GraphicsPipeline& operator=(GraphicsPipeline&& other) noexcept = default;
 
 	PipelinePrimitiveAssemblyState& primitiveAssemblyState();
@@ -201,9 +203,8 @@ public:
 	template<typename T>
 	void setValue(std::string_view name, const T* value, uint32_t count);
 
-	static GraphicsPipeline createFullscreenQuadPipeline(
-		std::vector<PipelineShaderStage> stages,
-		const DescriptorSetLayout& layout);
+	static GraphicsPipeline createFullscreenQuadPipeline(std::vector<PipelineShaderStage> stages,
+	                                                     const DescriptorSetLayout& layout);
 
 private:
 	struct PipelineState {
