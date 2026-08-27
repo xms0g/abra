@@ -1,4 +1,5 @@
 #pragma once
+#include "../../rendering/context/renderFlags.hpp"
 
 struct Material;
 class GPUTexture;
@@ -8,13 +9,13 @@ struct MaterialComponent {
 	MaterialMap* materials;
 
 	float heightScale;
-	uint32_t renderFlag;
+	RenderFlag renderFlag;
 
 	MaterialComponent() = default;
 
 	explicit MaterialComponent(MaterialMap* mat,
 	                           const float h = 1.0f,
-	                           const uint32_t f = 1 << 1)
+	                           const RenderFlag f = RenderFlag::DEFERRED_PASS)
 		: materials(mat),
 		  heightScale(h),
 		  renderFlag(f) {

@@ -24,7 +24,7 @@
 #include "../rendering/models/cubemap.hpp"
 #include "../rendering/models/sphere.hpp"
 #include "../rendering/models/terrain.hpp"
-#include "../rendering/context/renderFlags.hpp"
+#include "../rendering/context/renderFlag.hpp"
 
 using json = nlohmann::json;
 
@@ -209,9 +209,9 @@ void SceneLoader::loadScene(Registry& registry, const std::string_view filePath)
 				heightScale = comps["MaterialComponent"]["height_scale"].get<float>();
 			}
 
-			uint32_t flags = entity.hasComponent<InstanceComponent>() ? INSTANCED_PASS :
-							primType == "Terrain" ? TERRAIN_PASS :
-							primType == "Cubemap" ? SKYBOX_PASS : 0;
+			RenderFlag flags = entity.hasComponent<InstanceComponent>() ? RenderFlag::InstancedPass :
+							primType == "Terrain" ? RenderFlag::TerrainPass :
+							primType == "Cubemap" ? RenderFlag::SkyboxPass : RenderFlag::None;
 
 			entity.addComponent<MaterialComponent>(
 				RESOURCE_MANAGER.get<MaterialMap>(entity.id()),

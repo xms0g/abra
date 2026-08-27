@@ -4,6 +4,7 @@
 #include <utility>
 #include "glm/glm.hpp"
 #include "../texture.hpp"
+#include "../context//renderFlag.hpp"
 
 enum class MaterialFlag: uint32_t {
 	None,
@@ -73,7 +74,7 @@ struct Material {
 struct MaterialBatch {
 	uint32_t materialIndex{};
 	MaterialFlag materialFlags{};
-	uint32_t renderFlag{};
+	RenderFlag renderFlag{};
 	uint32_t textureOffset{};
 	size_t textureCount{};
 	std::vector<uint32_t> meshIndices;

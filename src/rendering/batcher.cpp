@@ -1,7 +1,7 @@
 #include "batcher.hpp"
 #include "context/renderData.hpp"
 #include "context/renderGroup.hpp"
-#include "context/renderFlags.hpp"
+#include "context/renderFlag.hpp"
 #include "context/renderQueue.hpp"
 #include "mesh/mesh.hpp"
 #include "mesh/vertex.hpp"
@@ -96,7 +96,7 @@ MaterialBatch Batcher::batchMaterial(const uint32_t matID,
 }
 
 void Batcher::enqueueRenderGroup(const Entity& entity, QueueRegistry& queueRegistry, const MaterialBatch& matBatch) {
-	if (matBatch.renderFlag == INSTANCED_PASS) {
+	if (matBatch.renderFlag == RenderFlag::InstancedPass) {
 		const auto& instComponent = entity.getComponent<InstanceComponent>();
 		RenderInstanceGroup group{entity.id(), matBatch, instComponent.transforms};
 
@@ -112,9 +112,9 @@ void Batcher::enqueueRenderGroup(const Entity& entity, QueueRegistry& queueRegis
 			queueRegistry.emplace("debug", group);
 		}
 
-		if (matBatch.renderFlag == SKYBOX_PASS) {
+		if (matBatch.renderFlag == RenderFlag::SkyboxPass) {
 			queueRegistry.emplace("skybox", group);
-		} else if (matBatch.renderFlag == TERRAIN_PASS) {
+		} else if (matBatch.renderFlag == RenderFlag::TerrainPass) {
 			queueRegistry.emplace("terrain", group);
 		}
 
