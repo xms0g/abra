@@ -4,10 +4,13 @@ in vec4 FragPos;
 #include "ub/shadow.glsl"
 
 void main() {
-    float lightDistance = length(FragPos.xyz - omniShadowData.posFarPlane.xyz);
+    vec3 ligthPos = omniShadowData.posFarPlane.xyz;
+    float farPlane = omniShadowData.posFarPlane.w;
+
+    float lightDistance = length(FragPos.xyz - ligthPos);
 
     // map to [0;1] range by dividing by far_plane
-    lightDistance = lightDistance / omniShadowData.posFarPlane.w;
+    lightDistance = lightDistance / farPlane;
 
     // write this as modified depth
     gl_FragDepth = lightDistance;
