@@ -75,6 +75,7 @@ It’s designed for clarity, experimentation, and real-time graphics research.
 ![Screenshot5](assets/screenshot5.png)
 ![Screenshot2](assets/screenshot2.png)
 ![Screenshot](assets/screenshot.png)
+![Screenshot7](assets/screenshot7.png)
 ![Screenshot3](assets/screenshot3.png)
 ![Screenshot4](assets/screenshot4.png)
 ![Tessellation](assets/screenshot6.png)
