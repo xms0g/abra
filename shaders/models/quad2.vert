@@ -13,5 +13,5 @@ void main() {
     );
 
     vs_out.TexCoord = coords[gl_VertexID] * 0.5 + 0.5;
-    gl_Position = vec4(coords[gl_VertexID], 0.0f, 1.f);
+    gl_Position = vec4(coords[gl_VertexID], 0.0f, 1.0f);
 }

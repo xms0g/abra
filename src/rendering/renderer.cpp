@@ -865,8 +865,7 @@ void Renderer::createBrdfLUT() {
 	encoder.bindPipeline(pipeline);
 	encoder.bindFrameBuffer(*mPBRBuffers.brdfLUT);
 	encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
-	encoder.setViewport(
-		{.x = 0, .y = 0, .width = mPBRBuffers.brdfLUT->width(), .height = mPBRBuffers.brdfLUT->height()});
+	encoder.setViewport({.x = 0, .y = 0, .width = mPBRBuffers.brdfLUT->width(), .height = mPBRBuffers.brdfLUT->height()});
 
 	encoder.bindVertexArray(quad.vao().id());
 	encoder.draw(6);
