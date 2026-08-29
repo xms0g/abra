@@ -137,25 +137,26 @@ void InstancedOpaquePass::configure(const RenderContext& ctx,
 
 void InstancedOpaquePass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
 	const auto pipelineCullMode = mPipeline.rasterizationState().cullMode;
+	const auto& materialLayout = mPipeline.layout().descriptorSets[0];
 
 	for (const auto& object: mObjects) {
 		const size_t count = object.transforms.size() / 9;
 
 		encoder.bindFrameBuffer(graph.getResource(mIndexes.sceneBuffer));
 		encoder.bindPipeline(mPipeline);
+		encoder.bindDescriptorSet(materialLayout, ctx.renderData->material.descriptorSets[object.matBatch.materialIndex]);
 
-		const auto& materialLayout = mPipeline.layout().descriptorSets[0];
-		encoder.bindDescriptorSet(
-			materialLayout,
-			ctx.renderData->material.descriptorSets[object.matBatch.materialIndex]);
+		{
+			const MaterialPushConstants pushConstants = {
+				.flags = object.matBatch.materialFlags,
+				.heightScale = ctx.renderData->entity.heightScales[object.entityID],
+				.alphaCutoff = ctx.renderData->material.alphaCutoffs[object.matBatch.materialIndex],
+				.color = ctx.renderData->material.colors[object.matBatch.materialIndex]
+			};
 
-		const MaterialPushConstants pushConstants = {
-			.flags = object.matBatch.materialFlags,
-			.heightScale = ctx.renderData->entity.heightScales[object.entityID],
-			.alphaCutoff = ctx.renderData->material.alphaCutoffs[object.matBatch.materialIndex],
-			.color = ctx.renderData->material.colors[object.matBatch.materialIndex]
-		};
-		encoder.pushConstants(&pushConstants);
+			encoder.pushConstants(&pushConstants);
+		}
+
 		encoder.setCullMode((object.matBatch.materialFlags & MaterialFlag::Twosided) != MaterialFlag::None ? CullMode::None : pipelineCullMode);
 
 		for (const auto& meshIdx: object.matBatch.meshIndices) {

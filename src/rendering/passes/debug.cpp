@@ -105,12 +105,15 @@ void DebugPass::execute(const RenderContext& ctx, const FrameGraph& graph, Graph
 
 		encoder.bindPipeline(mPipelines[cmd.debugMode]);
 
-		const TransformPushConstants pushConstants = {
-			.model = cmd.transform.model,
-			.normal = cmd.transform.normal,
-		};
+		{
+			const TransformPushConstants pushConstants = {
+				.model = cmd.transform.model,
+				.normal = cmd.transform.normal,
+			};
 
-		encoder.pushConstants(&pushConstants);
+			encoder.pushConstants(&pushConstants);
+		}
+
 		encoder.bindVertexArray(cmd.mesh.vao);
 		encoder.drawIndexed(cmd.mesh.indexCount);
 	}

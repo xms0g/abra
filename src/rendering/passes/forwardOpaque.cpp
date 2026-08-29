@@ -132,31 +132,31 @@ void ForwardOpaquePass::configure(const RenderContext& ctx,
 
 void ForwardOpaquePass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {
 	const auto pipelineCullMode = mPipeline.rasterizationState().cullMode;
+	const auto& materialLayout = mPipeline.layout().descriptorSets[0];
 
 	for (const auto& cmd: *mCommands) {
 		encoder.bindFrameBuffer(graph.getResource(mIndexes.sceneBuffer));
 		encoder.bindPipeline(mPipeline);
-
-		const auto& materialLayout = mPipeline.layout().descriptorSets[0];
 		encoder.bindDescriptorSet(materialLayout, ctx.renderData->material.descriptorSets[cmd.material.idx]);
 
-		const PushConstants pushConstants = {
-			.material = {
-				.flags = cmd.material.flags,
-				.heightScale = cmd.material.heightScale,
-				.alphaCutoff = cmd.material.alphaCutoff,
-				.color = cmd.material.color
-			},
-			.transform = {
-				.model = cmd.transform.model,
-				.normal = cmd.transform.normal,
-			}
-		};
+		{
+			const PushConstants pushConstants = {
+				.material = {
+					.flags = cmd.material.flags,
+					.heightScale = cmd.material.heightScale,
+					.alphaCutoff = cmd.material.alphaCutoff,
+					.color = cmd.material.color
+				},
+				.transform = {
+					.model = cmd.transform.model,
+					.normal = cmd.transform.normal,
+				}
+			};
 
-		encoder.pushConstants(&pushConstants);
-		encoder.setCullMode((cmd.material.flags & MaterialFlag::Twosided) != MaterialFlag::None
-			                    ? CullMode::None
-			                    : pipelineCullMode);
+			encoder.pushConstants(&pushConstants);
+		}
+
+		encoder.setCullMode((cmd.material.flags & MaterialFlag::Twosided) != MaterialFlag::None ? CullMode::None : pipelineCullMode);
 		encoder.bindVertexArray(cmd.mesh.vao);
 		encoder.drawIndexed(cmd.mesh.indexCount);
 	}

@@ -103,20 +103,23 @@ void TerrainPass::execute(const RenderContext& ctx, const FrameGraph& graph, Gra
 	encoder.bindPipeline(mPipeline);
 	encoder.bindDescriptorSet(materialLayout, ctx.renderData->material.descriptorSets[cmd.material.idx]);
 
-	const PushConstants pushConstants = {
-		.material = {
-			.flags = cmd.material.flags,
-			.heightScale = cmd.material.heightScale,
-			.alphaCutoff = cmd.material.alphaCutoff,
-			.color = cmd.material.color
-		},
-		.transform = {
-			.model = cmd.transform.model,
-			.normal = cmd.transform.normal,
-		}
-	};
+	{
+		const PushConstants pushConstants = {
+			.material = {
+				.flags = cmd.material.flags,
+				.heightScale = cmd.material.heightScale,
+				.alphaCutoff = cmd.material.alphaCutoff,
+				.color = cmd.material.color
+			},
+			.transform = {
+				.model = cmd.transform.model,
+				.normal = cmd.transform.normal,
+			}
+		};
 
-	encoder.pushConstants(&pushConstants);
+		encoder.pushConstants(&pushConstants);
+	}
+
 	encoder.bindVertexArray(cmd.mesh.vao);
 	encoder.draw(cmd.mesh.vertexCount);
 }

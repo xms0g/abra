@@ -42,17 +42,18 @@ void DirectionalShadow::render(const RenderContext& ctx,
 	encoder.bindPipeline(pipeline);
 
 	for (const auto& [entityID, matBatch]: mObjects) {
-		TransformPushConstants transformPushConstants = {
-			.model = ctx.renderData->entity.models[entityID],
-			.normal = ctx.renderData->entity.normals[entityID]
-		};
+		{
+			TransformPushConstants transformPushConstants = {
+				.model = ctx.renderData->entity.models[entityID],
+				.normal = ctx.renderData->entity.normals[entityID]
+			};
 
-		encoder.pushConstants(&transformPushConstants);
+			encoder.pushConstants(&transformPushConstants);
+		}
 
 		for (const auto& meshIdx: matBatch.meshIndices) {
 			encoder.bindVertexArray(ctx.renderData->mesh.vaos[meshIdx]);
 			encoder.drawIndexed(ctx.renderData->mesh.indexCounts[meshIdx]);
 		}
 	}
-	encoder.unbindFrameBuffer();
 }

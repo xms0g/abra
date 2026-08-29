@@ -81,12 +81,15 @@ void SkyboxPass::execute(const RenderContext& ctx, const FrameGraph& graph, Grap
 	encoder.bindPipeline(mPipeline);
 	encoder.bindDescriptorSet(materialLayout, ctx.renderData->material.descriptorSets[cmd.material.idx]);
 
-	const TransformPushConstants pushConstants = {
-		.model = cmd.transform.model,
-		.normal = cmd.transform.normal
-	};
+	{
+		const TransformPushConstants pushConstants = {
+			.model = cmd.transform.model,
+			.normal = cmd.transform.normal
+		};
 
-	encoder.pushConstants(&pushConstants);
+		encoder.pushConstants(&pushConstants);
+	}
+
 	encoder.setCullMode((cmd.material.flags & MaterialFlag::Twosided) != MaterialFlag::None ? CullMode::None : pipelineCullMode);
 	encoder.bindVertexArray(cmd.mesh.vao);
 	encoder.draw(cmd.mesh.vertexCount);
