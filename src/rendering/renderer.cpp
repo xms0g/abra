@@ -805,8 +805,8 @@ void Renderer::createBrdfLUT() {
 	};
 
 	constexpr PipelineDepthStencilState depthStencilState = {
-		.depthTestEnable = true,
-		.depthWriteEnable = true,
+		.depthTestEnable = false,
+		.depthWriteEnable = false,
 		.depthCompareOp = CompareOp::Less,
 	};
 
@@ -864,7 +864,7 @@ void Renderer::createBrdfLUT() {
 	// generate a 2D LUT from the BRDF equations used.
 	encoder.bindPipeline(pipeline);
 	encoder.bindFrameBuffer(*mPBRBuffers.brdfLUT);
-	encoder.clearFrameBuffer(ClearMask::Color | ClearMask::Depth);
+	encoder.clearFrameBuffer(ClearMask::Color);
 	encoder.setViewport({.x = 0, .y = 0, .width = mPBRBuffers.brdfLUT->width(), .height = mPBRBuffers.brdfLUT->height()});
 
 	encoder.bindVertexArray(quad.vao().id());
