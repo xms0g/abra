@@ -15,7 +15,7 @@ in VS_OUT
 layout (location = 0) out vec4 gPosition;
 layout (location = 1) out vec4 gNormal;
 layout (location = 2) out vec4 gAlbedo;
-layout (location = 3) out vec3 gORM;
+layout (location = 3) out vec4 gORM;
 
 void main() {
     vec2 texCoord = parallaxMapping(fs_in.TexCoord, fs_in.TangentViewDir, material.heightScale, (material.flags & HAS_HEIGHT_MAP) != 0);
@@ -39,7 +39,7 @@ void main() {
     } else if ((material.flags & HAS_AO_MAP) != 0) {
         ao = texture(material.texture_ao, texCoord).r;
     }
-    gORM = vec3(ao, orm.g, orm.b);
+    gORM = vec4(ao, orm.g, orm.b, 0.0f);
     // Emissive
     vec3 emissive = vec3(0.0);
     if ((material.flags & HAS_EMISSIVE_MAP) != 0) {
