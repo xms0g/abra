@@ -763,9 +763,7 @@ void Renderer::createPrefilterMap(const GPUTexture& environment) {
 	encoder.bindDescriptorSet(passLayout, descriptorSet);
 
 	encoder.bindFrameBuffer(*mPBRBuffers.prefilter);
-	encoder.setViewport({
-		.x = 0, .y = 0, .width = mPBRBuffers.prefilter->width(), .height = mPBRBuffers.prefilter->height()
-	});
+	encoder.setViewport({.x = 0, .y = 0, .width = mPBRBuffers.prefilter->width(), .height = mPBRBuffers.prefilter->height()});
 
 	constexpr int32_t mipLevels = 5;
 	const int32_t prefilterMapSize = CONFIG_MANAGER.get<int32_t>("PBR.prefilterMap.size");
@@ -820,7 +818,7 @@ void Renderer::createBrdfLUT() {
 		.depthStencilState = depthStencilState,
 		.colorBlendState = colorBlendState,
 		.stages = {
-			{.code = ShaderLoader::load("pbr/brdfLUT.vert"), .stage = ShaderStageType::Vertex},
+			{.code = ShaderLoader::load("models/quad2.vert"), .stage = ShaderStageType::Vertex},
 			{.code = ShaderLoader::load("pbr/brdfLUT.frag"), .stage = ShaderStageType::Fragment}
 		}
 	};
@@ -860,15 +858,16 @@ void Renderer::createBrdfLUT() {
 
 	mPBRBuffers.brdfLUT = std::move(brdfLUT);
 
-	const Model::Quad quad;
+	VertexArray dummyVAO{};
 	// generate a 2D LUT from the BRDF equations used.
 	encoder.bindPipeline(pipeline);
 	encoder.bindFrameBuffer(*mPBRBuffers.brdfLUT);
 	encoder.clearFrameBuffer(ClearMask::Color);
+
 	encoder.setViewport({.x = 0, .y = 0, .width = mPBRBuffers.brdfLUT->width(), .height = mPBRBuffers.brdfLUT->height()});
 
-	encoder.bindVertexArray(quad.vao().id());
-	encoder.draw(6);
+	encoder.bindVertexArray(dummyVAO.id());
+	encoder.draw(3);
 
 	encoder.unbindFrameBuffer();
 }
