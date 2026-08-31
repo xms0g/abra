@@ -22,7 +22,7 @@ out VS_OUT
 } vs_out;
 
 void main() {
-    vs_out.TBN = TBN(model, aTangent, normalMatrix, aNormal);
+    vs_out.TBN = TBN(model * vec4(aTangent, 0.0), normalMatrix * aNormal);
     vs_out.TexCoord = aTexCoord;
     vs_out.WorldPos = vec3(model * vec4(aPos, 1.0));
     vs_out.ViewDir = normalize(cameraPos.xyz - vs_out.WorldPos);

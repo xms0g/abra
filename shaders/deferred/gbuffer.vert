@@ -19,7 +19,7 @@ out VS_OUT
 } vs_out;
 
 void main() {
-    vs_out.TBN = TBN(model, aTangent, normalMatrix, aNormal);
+    vs_out.TBN = TBN(model * vec4(aTangent, 0.0), normalMatrix * aNormal);
     vec4 worldPos = model * vec4(aPos, 1.0);
     vs_out.WorldPos = worldPos.xyz;
     vs_out.TexCoord = aTexCoord;

@@ -21,7 +21,7 @@ out VS_OUT
 
 void main() {
     vs_out.TexCoord = aTexCoord;
-    vs_out.TBN = TBN(aInstanceMatrix, vec3(0.0), aInstanceNormalMatrix, aNormal);
+    vs_out.TBN = TBN(aInstanceMatrix * vec4(0.0), aInstanceNormalMatrix * aNormal);
 
     vec4 worldPos = aInstanceMatrix * vec4(aPos, 1.0);
     vs_out.WorldPos = worldPos.xyz;
