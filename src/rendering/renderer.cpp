@@ -126,15 +126,15 @@ void Renderer::createPBRBuffers() {
 	});
 
 	const auto& matComponent = entityIt->getComponent<MaterialComponent>();
-	auto& textures = matComponent.materials->at(0).textures;
+	auto& matTextures = matComponent.materials->at(0).textures;
 
-	if (const auto& texture = textures.front(); texture.texture->target() == TextureTarget::Texture2D) {
-		const auto& tex = createEnvMap(texture);
-		textures.clear();
-		textures.emplace_back("", TextureType::Albedo, tex);
+	if (const auto& matTexture = matTextures.front(); matTexture.texture->target() == TextureTarget::Texture2D) {
+		const auto& texture = createEnvMap(matTexture);
+		matTextures.clear();
+		matTextures.emplace_back("", TextureType::Albedo, texture);
 	}
 
-	const auto& skyboxTexture = textures.front();
+	const auto& skyboxTexture = matTextures.front();
 	createIrradianceMap(*skyboxTexture.texture);
 	createPrefilterMap(*skyboxTexture.texture);
 	createBrdfLUT();
