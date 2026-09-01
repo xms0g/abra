@@ -2,6 +2,7 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
+#include "../utils/string.hpp"
 
 class GraphicsEncoder;
 class EventBus;
@@ -52,22 +53,6 @@ private:
 		PassNode& operator=(PassNode&&) noexcept = default;
 
 		~PassNode();
-	};
-
-	struct StringHash {
-		using is_transparent = void;
-
-		size_t operator()(const std::string_view value) const noexcept {
-			return std::hash<std::string_view>{}(value);
-		}
-	};
-
-	struct StringEqual {
-		using is_transparent = void;
-
-		bool operator()(const std::string_view lhs, const std::string_view rhs) const noexcept {
-			return lhs == rhs;
-		}
 	};
 
 	std::unordered_map<std::string, uint32_t, StringHash, StringEqual> mResourcesIDs;
