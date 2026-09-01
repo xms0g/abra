@@ -1,8 +1,6 @@
 #pragma once
 #include <memory>
-#include <vector>
 #include <span>
-#include "glm/glm.hpp"
 #include "IPass.hpp"
 #include "../graphicsPipeline.hpp"
 
@@ -23,12 +21,6 @@ public:
 	void execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) override;
 
 private:
-	struct InstanceData {
-		glm::mat4 modelMatrix;
-		glm::mat3 normalMatrix;
-		float padding[3];
-	};
-
 	struct ResourceIndexes {
 		uint32_t sceneBuffer;
 	};

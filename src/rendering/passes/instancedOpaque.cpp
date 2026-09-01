@@ -1,4 +1,5 @@
 #include "instancedOpaque.hpp"
+#include "instance.hpp"
 #include "../frameGraph.hpp"
 #include "../descriptorSet.hpp"
 #include "../graphicsEncoder.hpp"
