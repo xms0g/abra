@@ -166,7 +166,7 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 		std::make_unique<DeferredLightingPass>(),
 		{"gBuffer", "ssaoBlur"},
 		{"sceneBuffer"},
-		!mQueueRegistry.empty("deferred")
+		!mQueueRegistry.get<RenderGroup>("deferred").isEmpty()
 	);
 
 	mGraph.addPass(
@@ -174,63 +174,63 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 		std::make_unique<DeferredGeometryPass>(),
 		{"DeferredCommands"},
 		{"gBuffer"},
-		!mQueueRegistry.empty("deferred")
+		!mQueueRegistry.get<RenderGroup>("deferred").isEmpty()
 	);
 	mGraph.addPass(
 		"ForwardOpaquePass",
 		std::make_unique<ForwardOpaquePass>(),
 		{"sceneBuffer", "OpaqueCommands"},
 		{"sceneBuffer"},
-		!mQueueRegistry.empty("opaque")
+		!mQueueRegistry.get<RenderGroup>("opaque").isEmpty()
 	);
 	mGraph.addPass(
 		"ForwardBlendPass",
 		std::make_unique<ForwardBlendPass>(),
 		{"sceneBuffer", "BlendCommands"},
 		{"sceneBuffer"},
-		!mQueueRegistry.empty("blend")
+		!mQueueRegistry.get<RenderGroup>("blend").isEmpty()
 	);
 	mGraph.addPass(
 		"ForwardUnlitPass",
 		std::make_unique<ForwardUnlitPass>(),
 		{"sceneBuffer", "UnlitCommands"},
 		{"sceneBuffer"},
-		!mQueueRegistry.empty("unlit")
+		!mQueueRegistry.get<RenderGroup>("unlit").isEmpty()
 	);
 	mGraph.addPass(
 		"SSAOPass",
 		std::make_unique<SSAOPass>(),
 		{"gBuffer"},
 		{"ssao", "ssaoBlur"},
-		!mQueueRegistry.empty("deferred")
+		!mQueueRegistry.get<RenderGroup>("deferred").isEmpty()
 	);
 	mGraph.addPass(
 		"InstancedOpaquePass",
 		std::make_unique<InstancedOpaquePass>(),
 		{"sceneBuffer"},
 		{"sceneBuffer"},
-		!mQueueRegistry.empty("opaqueInstanced")
+		!mQueueRegistry.get<RenderGroup>("opaqueInstanced").isEmpty()
 	);
 	mGraph.addPass(
 		"InstancedBlendPass",
 		std::make_unique<InstancedBlendPass>(),
 		{"sceneBuffer"},
 		{"sceneBuffer"},
-		!mQueueRegistry.empty("blendInstanced")
+		!mQueueRegistry.get<RenderGroup>("blendInstanced").isEmpty()
 	);
 	mGraph.addPass(
 		"DebugPass",
 		std::make_unique<DebugPass>(),
 		{"sceneBuffer", "DebugCommands"},
 		{"sceneBuffer"},
-		!mQueueRegistry.empty("debug")
+		!mQueueRegistry.get<RenderGroup>("debug").isEmpty()
 	);
 	mGraph.addPass(
 		"TerrainPass",
 		std::make_unique<TerrainPass>(),
 		{"sceneBuffer"},
 		{"sceneBuffer"},
-		!mQueueRegistry.empty("terrain")
+		!mQueueRegistry.get<RenderGroup>("terrain").isEmpty()
 	);
 	mGraph.addPass(
 		"ResolvePass",
