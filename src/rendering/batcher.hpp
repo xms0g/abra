@@ -31,7 +31,6 @@ private:
 
 	struct BuildState {
 		uint32_t materialIndex{0};
-		uint32_t textureOffset{0};
 		uint32_t meshIndex{0};
 	} buildState{};
 

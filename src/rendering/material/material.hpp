@@ -75,7 +75,5 @@ struct MaterialBatch {
 	uint32_t materialIndex{};
 	MaterialFlag materialFlags{};
 	RenderFlag renderFlag{};
-	uint32_t textureOffset{};
-	size_t textureCount{};
 	std::vector<uint32_t> meshIndices;
 };

@@ -81,16 +81,12 @@ MaterialBatch Batcher::batchMaterial(const uint32_t matID,
 	}
 	renderData.emplaceDescriptorSet(descriptorSet);
 
-	const size_t textureCount = material.textures.size();
 	MaterialBatch matBatch{
 		.materialIndex = material.idx,
 		.materialFlags = material.flags,
 		.renderFlag = matComponent.renderFlag,
-		.textureOffset = buildState.textureOffset,
-		.textureCount = textureCount,
 		.meshIndices = meshIndices
 	};
-	buildState.textureOffset += textureCount;
 
 	return matBatch;
 }
