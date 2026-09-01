@@ -27,8 +27,10 @@ void Batcher::batch(const Entity& entity, RenderData& renderData, QueueRegistry&
 	batchDebugMode(entity, renderData);
 
 	for (auto& [matID, meshes]: *entity.getComponent<MeshComponent>().meshes) {
-		const std::vector<uint32_t> meshIndices = batchMeshes(renderData, meshes);
-		const MaterialBatch matBatch = batchMaterial(matID, entity, renderData, meshIndices);
+		std::vector<uint32_t> meshIndices = batchMeshes(renderData, meshes);
+		MaterialBatch matBatch = batchMaterial(matID, entity, renderData);
+		matBatch.meshIndices = std::move(meshIndices);
+
 		enqueueRenderGroup(entity, queueRegistry, matBatch);
 	}
 }
@@ -65,8 +67,7 @@ std::vector<uint32_t> Batcher::batchMeshes(RenderData& renderData, const std::ve
 
 MaterialBatch Batcher::batchMaterial(const uint32_t matID,
                                      const Entity& entity,
-                                     RenderData& renderData,
-                                     const std::vector<uint32_t>& meshIndices) {
+                                     RenderData& renderData) {
 	const auto& matComponent = entity.getComponent<MaterialComponent>();
 	auto& material = matComponent.materials->at(matID);
 	material.idx = buildState.materialIndex++;
@@ -84,8 +85,7 @@ MaterialBatch Batcher::batchMaterial(const uint32_t matID,
 	MaterialBatch matBatch{
 		.materialIndex = material.idx,
 		.materialFlags = material.flags,
-		.renderFlag = matComponent.renderFlag,
-		.meshIndices = meshIndices
+		.renderFlag = matComponent.renderFlag
 	};
 
 	return matBatch;
