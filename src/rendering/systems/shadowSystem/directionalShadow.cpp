@@ -22,8 +22,8 @@ DirectionalShadow::DirectionalShadow(const RenderContext& ctx) {
 	mLightProjection = glm::ortho(left, right, bottom, top, near, far);
 
 	mObjects = std::span(
-		ctx.queueRegistry->get<RenderGroup>("shadow").data(),
-		ctx.queueRegistry->get<RenderGroup>("shadow").size());
+		ctx.queueRegistry->fetchQueue<RenderGroup>("shadow").data(),
+		ctx.queueRegistry->fetchQueue<RenderGroup>("shadow").size());
 }
 
 DirectionalShadow::~DirectionalShadow() = default;

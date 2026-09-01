@@ -129,8 +129,8 @@ void InstancedOpaquePass::configure(const RenderContext& ctx,
 	encoder.bindDescriptorSet(passLayout, frameSet);
 
 	mObjects = std::span(
-		ctx.queueRegistry->get<RenderInstanceGroup>("opaqueInstanced").data(),
-		ctx.queueRegistry->get<RenderInstanceGroup>("opaqueInstanced").size());
+		ctx.queueRegistry->fetchQueue<RenderInstanceGroup>("opaqueInstanced").data(),
+		ctx.queueRegistry->fetchQueue<RenderInstanceGroup>("opaqueInstanced").size());
 
 	prepareInstanceBuffer(ctx);
 	uploadInstanceData();

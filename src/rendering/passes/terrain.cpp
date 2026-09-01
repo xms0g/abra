@@ -92,7 +92,7 @@ void TerrainPass::configure(const RenderContext& ctx,
 	mPipeline = GraphicsPipeline{createInfo};
 
 	mIndexes.sceneBuffer = graph.getResourceID("sceneBuffer");
-	mCommands = &ctx.queueRegistry->get<DrawCommand>("TerrainCommands");
+	mCommands = &ctx.queueRegistry->fetchQueue<DrawCommand>("TerrainCommands");
 }
 
 void TerrainPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {

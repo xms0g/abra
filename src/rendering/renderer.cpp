@@ -141,23 +141,23 @@ void Renderer::createPBRBuffers() {
 }
 
 void Renderer::createRenderQueues() {
-	mQueueRegistry.set<RenderInstanceGroup>("opaqueInstanced");
-	mQueueRegistry.set<RenderInstanceGroup>("blendInstanced");
-	mQueueRegistry.set<RenderGroup>("opaque");
-	mQueueRegistry.set<RenderGroup>("unlit");
-	mQueueRegistry.set<RenderGroup>("blend");
-	mQueueRegistry.set<RenderGroup>("debug");
-	mQueueRegistry.set<RenderGroup>("shadow");
-	mQueueRegistry.set<RenderGroup>("terrain");
-	mQueueRegistry.set<RenderGroup>("skybox");
-	mQueueRegistry.set<RenderGroup>("deferred");
-	mQueueRegistry.set<DrawCommand>("DeferredCommands");
-	mQueueRegistry.set<DrawCommand>("OpaqueCommands");
-	mQueueRegistry.set<DrawCommand>("UnlitCommands");
-	mQueueRegistry.set<DrawCommand>("BlendCommands");
-	mQueueRegistry.set<DrawCommand>("DebugCommands");
-	mQueueRegistry.set<DrawCommand>("TerrainCommands");
-	mQueueRegistry.set<DrawCommand>("SkyboxCommands");
+	mQueueRegistry.emplace<RenderInstanceGroup>("opaqueInstanced");
+	mQueueRegistry.emplace<RenderInstanceGroup>("blendInstanced");
+	mQueueRegistry.emplace<RenderGroup>("opaque");
+	mQueueRegistry.emplace<RenderGroup>("unlit");
+	mQueueRegistry.emplace<RenderGroup>("blend");
+	mQueueRegistry.emplace<RenderGroup>("debug");
+	mQueueRegistry.emplace<RenderGroup>("shadow");
+	mQueueRegistry.emplace<RenderGroup>("terrain");
+	mQueueRegistry.emplace<RenderGroup>("skybox");
+	mQueueRegistry.emplace<RenderGroup>("deferred");
+	mQueueRegistry.emplace<DrawCommand>("DeferredCommands");
+	mQueueRegistry.emplace<DrawCommand>("OpaqueCommands");
+	mQueueRegistry.emplace<DrawCommand>("UnlitCommands");
+	mQueueRegistry.emplace<DrawCommand>("BlendCommands");
+	mQueueRegistry.emplace<DrawCommand>("DebugCommands");
+	mQueueRegistry.emplace<DrawCommand>("TerrainCommands");
+	mQueueRegistry.emplace<DrawCommand>("SkyboxCommands");
 }
 
 void Renderer::createRenderPasses(EventBus& eventBus) {
@@ -166,7 +166,7 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 		std::make_unique<DeferredLightingPass>(),
 		{"gBuffer", "ssaoBlur"},
 		{"sceneBuffer"},
-		!mQueueRegistry.get<RenderGroup>("deferred").isEmpty()
+		!mQueueRegistry.fetchQueue<RenderGroup>("deferred").isEmpty()
 	);
 
 	mGraph.addPass(
@@ -174,63 +174,63 @@ void Renderer::createRenderPasses(EventBus& eventBus) {
 		std::make_unique<DeferredGeometryPass>(),
 		{"DeferredCommands"},
 		{"gBuffer"},
-		!mQueueRegistry.get<RenderGroup>("deferred").isEmpty()
+		!mQueueRegistry.fetchQueue<RenderGroup>("deferred").isEmpty()
 	);
 	mGraph.addPass(
 		"ForwardOpaquePass",
 		std::make_unique<ForwardOpaquePass>(),
 		{"sceneBuffer", "OpaqueCommands"},
 		{"sceneBuffer"},
-		!mQueueRegistry.get<RenderGroup>("opaque").isEmpty()
+		!mQueueRegistry.fetchQueue<RenderGroup>("opaque").isEmpty()
 	);
 	mGraph.addPass(
 		"ForwardBlendPass",
 		std::make_unique<ForwardBlendPass>(),
 		{"sceneBuffer", "BlendCommands"},
 		{"sceneBuffer"},
-		!mQueueRegistry.get<RenderGroup>("blend").isEmpty()
+		!mQueueRegistry.fetchQueue<RenderGroup>("blend").isEmpty()
 	);
 	mGraph.addPass(
 		"ForwardUnlitPass",
 		std::make_unique<ForwardUnlitPass>(),
 		{"sceneBuffer", "UnlitCommands"},
 		{"sceneBuffer"},
-		!mQueueRegistry.get<RenderGroup>("unlit").isEmpty()
+		!mQueueRegistry.fetchQueue<RenderGroup>("unlit").isEmpty()
 	);
 	mGraph.addPass(
 		"SSAOPass",
 		std::make_unique<SSAOPass>(),
 		{"gBuffer"},
 		{"ssao", "ssaoBlur"},
-		!mQueueRegistry.get<RenderGroup>("deferred").isEmpty()
+		!mQueueRegistry.fetchQueue<RenderGroup>("deferred").isEmpty()
 	);
 	mGraph.addPass(
 		"InstancedOpaquePass",
 		std::make_unique<InstancedOpaquePass>(),
 		{"sceneBuffer"},
 		{"sceneBuffer"},
-		!mQueueRegistry.get<RenderGroup>("opaqueInstanced").isEmpty()
+		!mQueueRegistry.fetchQueue<RenderGroup>("opaqueInstanced").isEmpty()
 	);
 	mGraph.addPass(
 		"InstancedBlendPass",
 		std::make_unique<InstancedBlendPass>(),
 		{"sceneBuffer"},
 		{"sceneBuffer"},
-		!mQueueRegistry.get<RenderGroup>("blendInstanced").isEmpty()
+		!mQueueRegistry.fetchQueue<RenderGroup>("blendInstanced").isEmpty()
 	);
 	mGraph.addPass(
 		"DebugPass",
 		std::make_unique<DebugPass>(),
 		{"sceneBuffer", "DebugCommands"},
 		{"sceneBuffer"},
-		!mQueueRegistry.get<RenderGroup>("debug").isEmpty()
+		!mQueueRegistry.fetchQueue<RenderGroup>("debug").isEmpty()
 	);
 	mGraph.addPass(
 		"TerrainPass",
 		std::make_unique<TerrainPass>(),
 		{"sceneBuffer"},
 		{"sceneBuffer"},
-		!mQueueRegistry.get<RenderGroup>("terrain").isEmpty()
+		!mQueueRegistry.fetchQueue<RenderGroup>("terrain").isEmpty()
 	);
 	mGraph.addPass(
 		"ResolvePass",
@@ -480,9 +480,9 @@ void Renderer::sortEntities() {
 	};
 
 	// Sort opaque objects front to back
-	sortBatches(mQueueRegistry.get<RenderGroup>("deferred"), false);
-	sortBatches(mQueueRegistry.get<RenderGroup>("opaque"), false);
-	sortBatches(mQueueRegistry.get<RenderGroup>("blend"), true);
+	sortBatches(mQueueRegistry.fetchQueue<RenderGroup>("deferred"), false);
+	sortBatches(mQueueRegistry.fetchQueue<RenderGroup>("opaque"), false);
+	sortBatches(mQueueRegistry.fetchQueue<RenderGroup>("blend"), true);
 
 	// for (auto& [entity, transforms, materials]: renderQueues.blendInstancedGroup) {
 	// 	auto transform = *transforms;

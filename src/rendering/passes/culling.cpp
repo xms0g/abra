@@ -20,34 +20,34 @@ void CullingPass::configure(const RenderContext& ctx,
                             GraphicsEncoder& encoder,
                             EventBus& eventBus) {
 	mOpaqueGroups = std::span(
-		ctx.queueRegistry->get<RenderGroup>("opaque").data(),
-		ctx.queueRegistry->get<RenderGroup>("opaque").size());
+		ctx.queueRegistry->fetchQueue<RenderGroup>("opaque").data(),
+		ctx.queueRegistry->fetchQueue<RenderGroup>("opaque").size());
 	mUnlitGroups = std::span(
-		ctx.queueRegistry->get<RenderGroup>("unlit").data(),
-		ctx.queueRegistry->get<RenderGroup>("unlit").size());
+		ctx.queueRegistry->fetchQueue<RenderGroup>("unlit").data(),
+		ctx.queueRegistry->fetchQueue<RenderGroup>("unlit").size());
 	mBlendGroups = std::span(
-		ctx.queueRegistry->get<RenderGroup>("blend").data(),
-		ctx.queueRegistry->get<RenderGroup>("blend").size());
+		ctx.queueRegistry->fetchQueue<RenderGroup>("blend").data(),
+		ctx.queueRegistry->fetchQueue<RenderGroup>("blend").size());
 	mDeferredGroups = std::span(
-		ctx.queueRegistry->get<RenderGroup>("deferred").data(),
-		ctx.queueRegistry->get<RenderGroup>("deferred").size());
+		ctx.queueRegistry->fetchQueue<RenderGroup>("deferred").data(),
+		ctx.queueRegistry->fetchQueue<RenderGroup>("deferred").size());
 	mDebugGroups = std::span(
-		ctx.queueRegistry->get<RenderGroup>("debug").data(),
-		ctx.queueRegistry->get<RenderGroup>("debug").size());
+		ctx.queueRegistry->fetchQueue<RenderGroup>("debug").data(),
+		ctx.queueRegistry->fetchQueue<RenderGroup>("debug").size());
 	mTerrainGroups = std::span(
-		ctx.queueRegistry->get<RenderGroup>("terrain").data(),
-		ctx.queueRegistry->get<RenderGroup>("terrain").size());
+		ctx.queueRegistry->fetchQueue<RenderGroup>("terrain").data(),
+		ctx.queueRegistry->fetchQueue<RenderGroup>("terrain").size());
 	mSkyboxGroups = std::span(
-		ctx.queueRegistry->get<RenderGroup>("skybox").data(),
-		ctx.queueRegistry->get<RenderGroup>("skybox").size());
+		ctx.queueRegistry->fetchQueue<RenderGroup>("skybox").data(),
+		ctx.queueRegistry->fetchQueue<RenderGroup>("skybox").size());
 
-	mOpaqueCommands = &ctx.queueRegistry->get<DrawCommand>("OpaqueCommands");
-	mUnlitCommands = &ctx.queueRegistry->get<DrawCommand>("UnlitCommands");
-	mBlendCommands = &ctx.queueRegistry->get<DrawCommand>("BlendCommands");
-	mDeferredCommands = &ctx.queueRegistry->get<DrawCommand>("DeferredCommands");
-	mDebugCommands = &ctx.queueRegistry->get<DrawCommand>("DebugCommands");
-	mTerrainCommands = &ctx.queueRegistry->get<DrawCommand>("TerrainCommands");
-	mSkyboxCommands = &ctx.queueRegistry->get<DrawCommand>("SkyboxCommands");
+	mOpaqueCommands = &ctx.queueRegistry->fetchQueue<DrawCommand>("OpaqueCommands");
+	mUnlitCommands = &ctx.queueRegistry->fetchQueue<DrawCommand>("UnlitCommands");
+	mBlendCommands = &ctx.queueRegistry->fetchQueue<DrawCommand>("BlendCommands");
+	mDeferredCommands = &ctx.queueRegistry->fetchQueue<DrawCommand>("DeferredCommands");
+	mDebugCommands = &ctx.queueRegistry->fetchQueue<DrawCommand>("DebugCommands");
+	mTerrainCommands = &ctx.queueRegistry->fetchQueue<DrawCommand>("TerrainCommands");
+	mSkyboxCommands = &ctx.queueRegistry->fetchQueue<DrawCommand>("SkyboxCommands");
 }
 
 void CullingPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {

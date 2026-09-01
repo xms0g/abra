@@ -134,7 +134,7 @@ void ForwardBlendPass::configure(const RenderContext& ctx,
 
 	encoder.bindDescriptorSet(passLayout, frameSet);
 
-	mCommands = &ctx.queueRegistry->get<DrawCommand>("BlendCommands");
+	mCommands = &ctx.queueRegistry->fetchQueue<DrawCommand>("BlendCommands");
 }
 
 void ForwardBlendPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {

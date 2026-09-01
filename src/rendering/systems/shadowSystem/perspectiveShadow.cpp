@@ -18,8 +18,8 @@ PerspectiveShadow::PerspectiveShadow(const RenderContext& ctx) {
 	mFar = CONFIG_MANAGER.get<float>("shadow.perspective.farPlane");
 
 	mObjects = std::span(
-		ctx.queueRegistry->get<RenderGroup>("shadow").data(),
-		ctx.queueRegistry->get<RenderGroup>("shadow").size());
+		ctx.queueRegistry->fetchQueue<RenderGroup>("shadow").data(),
+		ctx.queueRegistry->fetchQueue<RenderGroup>("shadow").size());
 }
 
 PerspectiveShadow::~PerspectiveShadow() = default;

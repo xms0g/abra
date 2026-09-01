@@ -98,25 +98,30 @@ void Batcher::enqueueRenderGroup(const Entity& entity, QueueRegistry& queueRegis
 
 		for (const auto& rule: rules) {
 			if ((matBatch.materialFlags & rule.flags) != MaterialFlag::None) {
-				queueRegistry.emplace(rule.instancedQueue, group);
+				auto& queue = queueRegistry.fetchQueue<RenderInstanceGroup>(rule.instancedQueue);
+				queue.push_back(group);
 			}
 		}
 	} else {
 		RenderGroup group{.entityID = entity.id(), .matBatch = matBatch};
 
 		if (entity.hasComponent<DebugComponent>()) {
-			queueRegistry.emplace("debug", group);
+			auto& queue = queueRegistry.fetchQueue<RenderGroup>("debug");
+			queue.push_back(group);
 		}
 
 		if (matBatch.renderFlag == RenderFlag::SkyboxPass) {
-			queueRegistry.emplace("skybox", group);
+			auto& queue = queueRegistry.fetchQueue<RenderGroup>("skybox");
+			queue.push_back(group);
 		} else if (matBatch.renderFlag == RenderFlag::TerrainPass) {
-			queueRegistry.emplace("terrain", group);
+			auto& queue = queueRegistry.fetchQueue<RenderGroup>("terrain");
+			queue.push_back(group);
 		}
 
 		for (const auto& rule: rules) {
 			if ((matBatch.materialFlags & rule.flags) != MaterialFlag::None) {
-				queueRegistry.emplace(rule.queue, group);
+				auto& queue = queueRegistry.fetchQueue<RenderGroup>(rule.queue);
+				queue.push_back(group);
 			}
 		}
 	}

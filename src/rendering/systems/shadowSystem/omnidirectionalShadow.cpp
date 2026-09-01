@@ -21,8 +21,8 @@ OmnidirectionalShadow::OmnidirectionalShadow(const RenderContext& ctx) {
 	mShadowProj = glm::perspective(fovy, aspect, near, far);
 
 	mObjects = std::span(
-		ctx.queueRegistry->get<RenderGroup>("shadow").data(),
-		ctx.queueRegistry->get<RenderGroup>("shadow").size());
+		ctx.queueRegistry->fetchQueue<RenderGroup>("shadow").data(),
+		ctx.queueRegistry->fetchQueue<RenderGroup>("shadow").size());
 
 	mData.posFarPlane.w = far;
 }

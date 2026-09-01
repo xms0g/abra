@@ -29,13 +29,10 @@ public:
 	QueueRegistry() = default;
 
 	template<typename T>
-	RenderQueue<T>& get(std::string_view queueName);
+	RenderQueue<T>& fetchQueue(std::string_view queueName);
 
 	template<typename T>
-	void set(std::string_view queueName);
-
-	template<typename T>
-	void emplace(std::string_view queueName, T& group);
+	void emplace(std::string_view queueName);
 
 private:
 	std::unordered_map<std::string, std::unique_ptr<IRenderQueue>, StringHash, StringEqual > mQueue;

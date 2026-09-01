@@ -93,7 +93,7 @@ void DebugPass::configure(const RenderContext& ctx,
 	};
 
 	mIndexes.sceneBuffer = graph.getResourceID("sceneBuffer");
-	mCommands = &ctx.queueRegistry->get<DrawCommand>("DebugCommands");
+	mCommands = &ctx.queueRegistry->fetchQueue<DrawCommand>("DebugCommands");
 }
 
 void DebugPass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {

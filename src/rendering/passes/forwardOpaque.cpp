@@ -127,7 +127,7 @@ void ForwardOpaquePass::configure(const RenderContext& ctx,
 
 	encoder.bindDescriptorSet(passLayout, frameSet);
 
-	mCommands = &ctx.queueRegistry->get<DrawCommand>("OpaqueCommands");
+	mCommands = &ctx.queueRegistry->fetchQueue<DrawCommand>("OpaqueCommands");
 }
 
 void ForwardOpaquePass::execute(const RenderContext& ctx, const FrameGraph& graph, GraphicsEncoder& encoder) {

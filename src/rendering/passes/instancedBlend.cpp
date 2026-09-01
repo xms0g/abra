@@ -136,8 +136,8 @@ void InstancedBlendPass::configure(const RenderContext& ctx,
 	encoder.bindDescriptorSet(passLayout, frameSet);
 
 	mObjects = std::span(
-		ctx.queueRegistry->get<RenderInstanceGroup>("blendInstanced").data(),
-		ctx.queueRegistry->get<RenderInstanceGroup>("blendInstanced").size());
+		ctx.queueRegistry->fetchQueue<RenderInstanceGroup>("blendInstanced").data(),
+		ctx.queueRegistry->fetchQueue<RenderInstanceGroup>("blendInstanced").size());
 
 	prepareInstanceBuffer(ctx);
 	uploadInstanceData();
