@@ -138,7 +138,7 @@ void InstancedBlendPass::configure(const RenderContext& ctx,
 		ctx.queueRegistry->get<RenderInstanceGroup>("blendInstanced").data(),
 		ctx.queueRegistry->get<RenderInstanceGroup>("blendInstanced").size());
 
-	prepareInstanceBuffer(ctx.renderData->mesh.vaos);
+	prepareInstanceBuffer(ctx);
 	uploadInstanceData();
 }
 
@@ -173,7 +173,7 @@ void InstancedBlendPass::execute(const RenderContext& ctx, const FrameGraph& gra
 	}
 }
 
-void InstancedBlendPass::prepareInstanceBuffer(const std::vector<uint32_t>& vaos) {
+void InstancedBlendPass::prepareInstanceBuffer(const RenderContext& ctx) {
 	size_t totalRequiredSize = 0;
 	for (const auto& group: mObjects) {
 		const size_t instanceCount = group.transforms.size() / 9;
@@ -188,7 +188,7 @@ void InstancedBlendPass::prepareInstanceBuffer(const std::vector<uint32_t>& vaos
 	mVBO->bind();
 	for (const auto& group: mObjects) {
 		for (const auto meshIdx: group.matBatch.meshIndices) {
-			const uint32_t vao = vaos[meshIdx];
+			const uint32_t vao = ctx.renderData->mesh.vaos[meshIdx];
 			Mesh::enableInstanceAttributes(vao, currentOffset);
 		}
 		const size_t instanceCount = group.transforms.size() / 9;

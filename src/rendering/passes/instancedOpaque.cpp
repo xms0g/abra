@@ -131,7 +131,7 @@ void InstancedOpaquePass::configure(const RenderContext& ctx,
 		ctx.queueRegistry->get<RenderInstanceGroup>("opaqueInstanced").data(),
 		ctx.queueRegistry->get<RenderInstanceGroup>("opaqueInstanced").size());
 
-	prepareInstanceBuffer(ctx.renderData->mesh.vaos);
+	prepareInstanceBuffer(ctx);
 	uploadInstanceData();
 }
 
@@ -166,7 +166,7 @@ void InstancedOpaquePass::execute(const RenderContext& ctx, const FrameGraph& gr
 	}
 }
 
-void InstancedOpaquePass::prepareInstanceBuffer(const std::vector<uint32_t>& vaos) {
+void InstancedOpaquePass::prepareInstanceBuffer(const RenderContext& ctx) {
 	size_t totalRequiredSize = 0;
 	for (const auto& group: mObjects) {
 		const size_t instanceCount = group.transforms.size() / 9;
@@ -181,7 +181,7 @@ void InstancedOpaquePass::prepareInstanceBuffer(const std::vector<uint32_t>& vao
 	mVBO->bind();
 	for (const auto& group: mObjects) {
 		for (const auto meshIdx: group.matBatch.meshIndices) {
-			const uint32_t vao = vaos[meshIdx];
+			const uint32_t vao = ctx.renderData->mesh.vaos[meshIdx];
 			Mesh::enableInstanceAttributes(vao, currentOffset);
 		}
 		const size_t instanceCount = group.transforms.size() / 9;

@@ -33,7 +33,7 @@ private:
 		uint32_t sceneBuffer;
 	};
 
-	void prepareInstanceBuffer(const std::vector<uint32_t>& vaos);
+	void prepareInstanceBuffer(const RenderContext& ctx);
 
 	void uploadInstanceData() const;
 
