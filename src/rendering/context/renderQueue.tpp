@@ -1,14 +1,5 @@
 #pragma once
 
-inline bool QueueRegistry::empty(const std::string_view queueName) const {
-	const auto it = mQueue.find(queueName);
-
-	if (it == mQueue.end())
-		return true;
-
-	return it->second->isEmpty();
-}
-
 template<typename T>
 RenderQueue<T>& QueueRegistry::get(const std::string_view queueName) {
 	const auto it = mQueue.find(queueName);
