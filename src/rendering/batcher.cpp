@@ -103,7 +103,7 @@ void Batcher::enqueueRenderGroup(const Entity& entity, QueueRegistry& queueRegis
 			}
 		}
 	} else {
-		RenderGroup group{.entityID = entity.id(), .matBatch = matBatch};
+		const RenderGroup group{.entityID = entity.id(), .matBatch = matBatch};
 
 		if (entity.hasComponent<DebugComponent>()) {
 			auto& queue = queueRegistry.fetchQueue<RenderGroup>("debug");
