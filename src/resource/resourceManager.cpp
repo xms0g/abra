@@ -299,9 +299,9 @@ void ResourceManager::loadMaterialTextures(const aiMaterial* mat, const TextureL
 				}
 			} else if (std::strcmp(alphaMode.C_Str(), "MASK") == 0) {
 				if ((flags & MaterialFlag::Pbr) != MaterialFlag::None) {
-					flags |= MaterialFlag::Alphacutoff;
+					flags |= MaterialFlag::AlphaCutout;
 				} else {
-					flags |= MaterialFlag::Opaque | MaterialFlag::Alphacutoff;
+					flags |= MaterialFlag::Opaque | MaterialFlag::AlphaCutout;
 				}
 				mat->Get(AI_MATKEY_GLTF_ALPHACUTOFF, alphaCutoff);
 			} else if (std::strcmp(alphaMode.C_Str(), "BLEND") == 0) {

@@ -18,7 +18,7 @@ enum class MaterialFlag: uint32_t {
 	HasEmissiveMap = 1 << 7,
 	HasAoMap = 1 << 8,
 	HasOrm = 1 << 9,
-	Alphacutoff = 1 << 10,
+	AlphaCutout = 1 << 10,
 	HasSolidColor = 1 << 11,
 };
 
