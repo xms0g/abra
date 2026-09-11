@@ -94,7 +94,7 @@ MaterialBatch Batcher::batchMaterial(const uint32_t matID,
 void Batcher::enqueueRenderGroup(const Entity& entity, QueueRegistry& queueRegistry, const MaterialBatch& matBatch) {
 	if (matBatch.renderFlag == RenderFlag::InstancedPass) {
 		const auto& instComponent = entity.getComponent<InstanceComponent>();
-		RenderInstanceGroup group{entity.id(), matBatch, instComponent.transforms};
+		const RenderInstanceGroup group{entity.id(), matBatch, instComponent.transforms};
 
 		for (const auto& rule: rules) {
 			if ((matBatch.materialFlags & rule.flags) != MaterialFlag::None) {
