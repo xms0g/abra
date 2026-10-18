@@ -483,23 +483,6 @@ void Renderer::sortEntities() {
 	sortBatches(mQueueRegistry.fetchQueue<RenderGroup>("deferred"), false);
 	sortBatches(mQueueRegistry.fetchQueue<RenderGroup>("opaque"), false);
 	sortBatches(mQueueRegistry.fetchQueue<RenderGroup>("blend"), true);
-
-	// for (auto& [entity, transforms, materials]: renderQueues.blendInstancedGroup) {
-	// 	auto transform = *transforms;
-	//
-	// 	for (int i = 0; i < transform.size(); i += 9) {
-	// 		glm::vec3 pos{transform[i], transform[i + 1], transform[i + 2]};
-	// 		std::sort(
-	// 			positions->begin(),
-	// 			positions->end(),
-	// 			[&camPos](const glm::vec3& a, const glm::vec3& b) {
-	// 				const float da = glm::length2(camPos - a);
-	// 				const float db = glm::length2(camPos - b);
-	// 				return da > db; // back to front
-	// 			}
-	// 		);
-	// 	}
-	// }
 }
 
 const std::shared_ptr<GPUTexture>& Renderer::createEnvMap(const MaterialTexture& hdrTexture) {
