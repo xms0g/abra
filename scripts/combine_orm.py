@@ -2,7 +2,7 @@ from PIL import Image
 import os
 
 def pack_orm_texture(ao_path, roughness_path, metallic_path=None,
-                     output_name="assets/DamagedHelmet/glTF/Default_occlusionRoughnessMetallic.jpg"):
+                     output_name= None):
     """
     Packs textures into glTF 2.0 ORM format (R: AO, G: Roughness, B: Metallic).
     If metallic_path is None, roughness_path is treated as a combined Roughness-Metallic map.
@@ -46,4 +46,6 @@ def pack_orm_texture(ao_path, roughness_path, metallic_path=None,
 # pack_orm_texture('ao.png', 'rough_metal_combined.png', output_name='output/orm.png')
 # Run the function with your uploaded filenames
 pack_orm_texture('assets/DamagedHelmet/glTF/Default_AO.jpg',
-                 'assets/DamagedHelmet/glTF/Default_metalRoughness.jpg')
+                 'assets/DamagedHelmet/glTF/Default_metalRoughness.jpg',
+                 None,
+                 "assets/DamagedHelmet/glTF/Default_occlusionRoughnessMetallic.jpg")
